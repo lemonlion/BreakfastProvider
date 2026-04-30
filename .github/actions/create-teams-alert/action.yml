@@ -1,0 +1,20 @@
+name: Create Teams alert
+description: Creates a Microsoft Teams alert - to notify the status of a GitHub Actions workflow run.
+
+inputs:
+  status:
+    description: 'GitHub Actions Job status (typically use: `job.status`)'
+    required: true
+  webhook-url:
+    description: Teams webhook URL to post to
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Create Teams alert
+      shell: pwsh
+      run: >-
+        ${{ github.action_path }}/create-alert.ps1
+        -jobStatus '${{ inputs.status }}'
+        -webhookUrl '${{ inputs.webhook-url }}'

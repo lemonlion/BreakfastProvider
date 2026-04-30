@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "Dependencies.Fakes.KitchenService": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "https://localhost:49710;http://localhost:49711"
+    }
+  }
+}

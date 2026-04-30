@@ -1,0 +1,5 @@
+template: |
+  $CHANGES
+replacers:
+  - search: '/#(\w+-\d+):/gi'
+    replace: "[$1](https://<your-org>.atlassian.net/browse/$1)"

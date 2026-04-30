@@ -1,0 +1,21 @@
+networks:
+  localdev:
+    driver: bridge
+
+services:
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: docker.prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    healthcheck:
+      test: ["CMD-SHELL", "wget --spider -q http://localhost:9090/-/healthy || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 10s
+    networks:
+      - localdev

@@ -1,0 +1,162 @@
+name: 'CI: Main'
+run-name: "Push To Main: ${{ github.event.head_commit.message }}"
+
+on:
+  workflow_dispatch:
+
+  push:
+    branches: ["main"]
+
+jobs:
+  get-version:
+    name: Get version
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: .github/actions/
+
+      - name: Get version
+        id: get-version
+        uses: ./.github/actions/get-version
+
+    outputs:
+      version: ${{ steps.get-version.outputs.version }}
+      branch: ${{ steps.get-version.outputs.branch }}
+
+
+  build:
+    name: Build
+    needs: [get-version]
+    uses: ./.github/workflows/_build.yml
+    with:
+      version: ${{ needs.get-version.outputs.version }}
+      branch: ${{ needs.get-version.outputs.branch }}
+    secrets: inherit
+
+
+  component-tests-in-memory:
+    name: Component tests in memory
+    uses: ./.github/workflows/_tests.yml
+    with:
+      test-type: component
+      test-run-type: memory
+      test-run-description: component-tests-in-memory
+      csproj-path: ./tests/BreakfastProvider.Tests.Component/BreakfastProvider.Tests.Component.csproj
+    secrets: inherit
+
+
+  component-tests-in-memory-report:
+    name: Component tests in memory
+    needs: [component-tests-in-memory]
+    uses: ./.github/workflows/_report-tests.yml
+    with:
+      test-type: component
+      test-run-type: memory
+      trx-file: component-tests-in-memory-results.trx
+
+
+  component-tests-in-memory-coverage:
+    name: Component tests in memory
+    needs: [component-tests-in-memory]
+    uses: ./.github/workflows/_report-coverage.yml
+    with:
+      test-type: component
+      test-run-type: memory
+      coverage-file: component-tests-in-memory.coverage.cobertura.xml
+
+
+  component-tests-in-docker:
+    name: Component tests in docker
+    uses: ./.github/workflows/_tests.yml
+    with:
+      test-type: component
+      test-run-type: docker
+      test-run-description: component-tests-in-docker
+      csproj-path: ./tests/BreakfastProvider.Tests.Component/BreakfastProvider.Tests.Component.csproj
+    secrets: inherit
+
+
+  component-tests-in-docker-report:
+    name: Component tests in docker
+    needs: [component-tests-in-docker]
+    uses: ./.github/workflows/_report-tests.yml
+    with:
+      test-type: component
+      test-run-type: docker
+      trx-file: component-tests-in-docker-results.trx
+
+
+  component-tests-in-docker-coverage:
+    name: Component tests in docker
+    needs: [component-tests-in-docker]
+    uses: ./.github/workflows/_report-coverage.yml
+    with:
+      test-type: component
+      test-run-type: docker
+      coverage-file: component-tests-in-docker.coverage.cobertura.xml
+
+
+  component-tests-external-sut:
+    name: Component tests (external SUT)
+    uses: ./.github/workflows/_tests.yml
+    with:
+      test-type: component
+      test-run-type: external-sut
+      test-run-description: component-tests-external-sut
+      csproj-path: ./tests/BreakfastProvider.Tests.Component/BreakfastProvider.Tests.Component.csproj
+    secrets: inherit
+
+
+  component-tests-external-sut-report:
+    name: Component tests (external SUT)
+    needs: [component-tests-external-sut]
+    uses: ./.github/workflows/_report-tests.yml
+    with:
+      test-type: component
+      test-run-type: external-sut
+      trx-file: component-tests-external-sut-results.trx
+
+
+  component-tests-external-sut-coverage:
+    name: Component tests (external SUT)
+    needs: [component-tests-external-sut]
+    uses: ./.github/workflows/_report-coverage.yml
+    with:
+      test-type: component
+      test-run-type: external-sut
+      coverage-file: component-tests-external-sut.coverage.cobertura.xml
+
+
+  checks-complete:
+    name: Checks complete
+    needs: [build, component-tests-in-memory, component-tests-in-docker, component-tests-external-sut]
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checks complete
+        run: echo "Checks complete"
+
+  publish:
+    name: Publish
+    needs: [get-version, checks-complete]
+    uses: ./.github/workflows/_publish.yml
+    with:
+      version: ${{ needs.get-version.outputs.version }}
+
+  publish-fakes:
+    name: Publish fakes
+    needs: [checks-complete]
+    uses: ./.github/workflows/_publish-fakes.yml
+    permissions:
+      contents: read
+      packages: write
+    secrets: inherit
+
+  release-github:
+    name: Release (GitHub)
+    needs: [get-version, publish]
+    uses: ./.github/workflows/_release-github.yml
+    with:
+      version: ${{ needs.get-version.outputs.version }}
+    secrets: inherit

@@ -1,0 +1,62 @@
+networks:
+  localdev:
+    driver: bridge
+
+services:
+
+  cosmosdb:
+    container_name: azure-cosmosdb-emulator
+    image: mcr.microsoft.com/cosmosdb/linux/azure-cosmos-emulator
+    hostname: cosmosdb-database.local
+    tty: true
+    ports:
+      - '8081:8081' # Data Explorer
+      - '8900:8900'
+      - '8901:8901'
+      - '8902:8902'
+      - '10250:10250'
+      - '10251:10251'
+      - '10252:10252'
+      - '10253:10253'
+      - '10254:10254'
+      - '10255:10255'
+      - '10256:10256'
+      - '10350:10350'
+    expose:
+      - "8081"
+      - "10250-10256"
+      - "10350"
+    environment:
+      - AZURE_COSMOS_EMULATOR_PARTITION_COUNT=25
+      - AZURE_COSMOS_EMULATOR_ENABLE_DATA_PERSISTENCE=false
+      - AZURE_COSMOS_EMULATOR_IP_ADDRESS_OVERRIDE=127.0.0.1
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sk https://localhost:8081/_explorer/emulator.pem || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 60
+      start_period: 30s
+    networks:
+      localdev:
+        aliases:
+          - cosmosdb-database.local
+
+  sqlserver:
+    container_name: sqlserver-database
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    hostname: sqlserver-database.local
+    ports:
+      - '1433:1433'
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=YourStr0ngP@ssword
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P 'YourStr0ngP@ssword' -C -Q 'SELECT 1' || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 15s
+    networks:
+      localdev:
+        aliases:
+          - sqlserver-database.local

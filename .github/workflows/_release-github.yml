@@ -1,0 +1,38 @@
+name: Create GitHub release
+
+on:
+  workflow_call:
+    inputs:
+      version: { type: string, required: true }
+
+jobs:
+  github-release:
+    name: Create GitHub release
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: .github/
+
+      - name: Get package from cache (API)
+        uses: actions/cache/restore@v4
+        with:
+          key: BreakfastProvider.API.nupkg-${{ github.run_id }}
+          path: ./output/packages/BreakfastProvider.Api.${{ inputs.version }}.nupkg
+          fail-on-cache-miss: true
+
+      - name: Create GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: BreakfastProvider.Api.${{ inputs.version }}
+          token: ${{ github.token }}
+          tag_name: ${{ inputs.version }}
+          generate_release_notes: true
+          files: ./output/packages/*.nupkg
+
+      - name: Show release link
+        run: |
+          git_url='https://github.com/${{ github.repository }}/releases/tag/${{ inputs.version }}'
+          echo "GitHub release created :octocat:: [${{ inputs.version }}](${git_url})" >> $GITHUB_STEP_SUMMARY

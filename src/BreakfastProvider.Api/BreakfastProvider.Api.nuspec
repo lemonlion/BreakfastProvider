@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+  <metadata>
+    <id>BreakfastProvider.Api</id>
+    <version>$version$</version>
+    <description>Breakfast Provider API deployment package</description>
+    <authors>Team Griddle</authors>
+    <repository type="git" url="https://github.com/lemonlion/BreakfastProvider_Temp" branch="$branch$" commit="$commit$" />
+  </metadata>
+  <files>
+    <file src="**\*.*" target="content" />
+  </files>
+</package>

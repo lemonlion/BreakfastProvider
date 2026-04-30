@@ -1,0 +1,13 @@
+{
+  "bindingAssemblies": [
+    {
+      "assembly": "TestTrackingDiagrams.ReqNRoll.xUnit3"
+    },
+    {
+      "assembly": "TestTrackingDiagrams.ReqNRoll.Core"
+    }
+  ],
+  "formatters": {
+    "html": { "outputFilePath": "reqnroll_report.html" }
+  }
+}

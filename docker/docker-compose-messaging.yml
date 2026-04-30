@@ -1,0 +1,110 @@
+volumes:
+  kafka-data:
+
+networks:
+  kafkanet:
+    name: kafka-network
+  localdev:
+    driver: bridge
+
+services:
+  eventgrid:
+    image: pmcilreavy/azureeventgridsimulator:latest
+    container_name: docker.eventgrid
+    hostname: eventgrid.local
+    ports:
+      - "60101:60101"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - ../certificates:/aegs:ro
+      - ./eventgrid-settings.json:/app/appsettings.json:ro
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=/aegs/eventgrid.local.pfx
+      - ASPNETCORE_Kestrel__Certificates__Default__Password=Y0urSup3rCrypt1cPa55w0rd!
+      - AEGS_Serilog__MinimumLevel__Default=Verbose
+      - AEGS_dangerousAcceptAnyServerCertificateValidator=true
+    networks:
+      - localdev
+
+  kafka-ui:
+    container_name: kafka-ui
+    image: provectuslabs/kafka-ui:latest
+    hostname: kafkaui.local
+    ports:
+      - 9001:8080
+    depends_on:
+      - kafka
+    environment:
+      KAFKA_CLUSTERS_0_NAME: local
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka.local:9092
+      KAFKA_CLUSTERS_0_PROPERTIES_SECURITY_PROTOCOL: SASL_SSL
+      KAFKA_CLUSTERS_0_PROPERTIES_SASL_MECHANISM: PLAIN
+      KAFKA_CLUSTERS_0_PROPERTIES_SASL_JAAS_CONFIG: 'org.apache.kafka.common.security.plain.PlainLoginModule required serviceName="kafka" username="kafka-user" password="kafka-user-secret";'
+      KAFKA_CLUSTERS_0_PROPERTIES_SSL_KEYSTORE_LOCATION: kafka.keystore.jks
+      KAFKA_CLUSTERS_0_PROPERTIES_SSL_KEYSTORE_PASSWORD: ${KAFKA_CERTIFICATES_PASSWORD}
+      KAFKA_CLUSTERS_0_SSL_TRUSTSTORELOCATION: kafka.truststore.jks
+      KAFKA_CLUSTERS_0_SSL_TRUSTSTOREPASSWORD: ${KAFKA_CERTIFICATES_PASSWORD}
+    volumes:
+      - ./kafka-config/certificates/kafka.truststore.jks:/kafka.truststore.jks
+      - ./kafka-config/certificates/kafka.keystore.jks:/kafka.keystore.jks
+    networks:
+      kafkanet:
+        aliases:
+          - kafkaui.local
+
+  kafka:
+    image: docker.io/bitnamilegacy/kafka:latest
+    container_name: kafka
+    hostname: kafka.local
+    ports:
+      - "9092:9092"
+      - "9093:9093"
+    volumes:
+      - kafka-data:/bitnami
+      - ./kafka-config/kafka_server_jaas.conf:/opt/bitnami/kafka/config/kafka_server_jaas.conf:ro
+      - ./kafka-config/certificates/kafka.keystore.jks:/opt/bitnami/kafka/config/certs/kafka.keystore.jks:ro
+      - ./kafka-config/certificates/kafka.truststore.jks:/opt/bitnami/kafka/config/certs/kafka.truststore.jks:ro
+      - ./kafka-config/client.properties:/opt/bitnami/kafka/config/client.properties:ro
+    environment:
+      - KAFKA_CFG_NODE_ID=0
+      - KAFKA_CFG_PROCESS_ROLES=controller,broker
+      - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=0@kafka:9093
+      - KAFKA_CFG_LISTENERS=SASL_SSL://:9092,CONTROLLER://:9093
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:SASL_PLAINTEXT,SASL_SSL:SASL_SSL
+      - KAFKA_CFG_ADVERTISED_LISTENERS=SASL_SSL://kafka.local:9092
+      - KAFKA_CLIENT_USERS=kafka-user
+      - KAFKA_CLIENT_PASSWORDS=kafka-user-secret
+      - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
+      - KAFKA_CFG_SASL_MECHANISM_CONTROLLER_PROTOCOL=PLAIN
+      - KAFKA_CONTROLLER_USER=controller_user
+      - KAFKA_CONTROLLER_PASSWORD=controller_password
+      - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=SASL_SSL
+      - KAFKA_CFG_SASL_MECHANISM_INTER_BROKER_PROTOCOL=PLAIN
+      - KAFKA_INTER_BROKER_USER=controller_user
+      - KAFKA_INTER_BROKER_PASSWORD=controller_password
+      - KAFKA_CFG_SSL_KEYSTORE_LOCATION=/opt/bitnami/kafka/config/certs/kafka.keystore.jks
+      - KAFKA_CFG_SSL_KEYSTORE_PASSWORD=${KAFKA_CERTIFICATES_PASSWORD}
+      - KAFKA_CFG_SSL_KEY_PASSWORD=${KAFKA_CERTIFICATES_PASSWORD}
+      - KAFKA_CFG_SSL_TRUSTSTORE_LOCATION=/opt/bitnami/kafka/config/certs/kafka.truststore.jks
+      - KAFKA_CFG_SSL_TRUSTSTORE_PASSWORD=${KAFKA_CERTIFICATES_PASSWORD}
+      - KAFKA_TLS_TYPE=JKS
+      - KAFKA_OPTS=-Djava.security.auth.login.config=/opt/bitnami/kafka/config/kafka_server_jaas.conf
+    networks:
+      kafkanet:
+        aliases:
+          - kafka.local
+    command: >
+      bash -c "
+        # Start Kafka server
+        /opt/bitnami/scripts/kafka/run.sh &
+        KAFKA_PID=$!
+        # Wait for Kafka broker to be available
+        while ! /opt/bitnami/kafka/bin/kafka-topics.sh --bootstrap-server kafka.local:9092 --list --command-config /opt/bitnami/kafka/config/client.properties; do sleep 5; done;
+        # Create Kafka topics (--if-not-exists avoids errors on restart)
+        /opt/bitnami/kafka/bin/kafka-topics.sh --create --if-not-exists --bootstrap-server kafka.local:9092 --replication-factor 1 --partitions 1 --topic breakfast_recipe_logs --command-config /opt/bitnami/kafka/config/client.properties;
+        /opt/bitnami/kafka/bin/kafka-topics.sh --create --if-not-exists --bootstrap-server kafka.local:9092 --replication-factor 1 --partitions 1 --topic breakfast_menu_updates --command-config /opt/bitnami/kafka/config/client.properties;
+        # Wait for Kafka server process to exit
+        wait $KAFKA_PID
+      "

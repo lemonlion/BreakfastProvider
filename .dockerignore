@@ -1,0 +1,15 @@
+.git
+.github
+.gitignore
+.claude
+.vscode
+.vs
+*.md
+**/bin
+**/obj
+docker/
+!docker/Root_CA.crt
+!docker/.dockerkeep
+tests/
+docs/
+_TypeInspect/

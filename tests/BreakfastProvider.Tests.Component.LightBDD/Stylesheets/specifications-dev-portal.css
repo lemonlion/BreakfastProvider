@@ -1,0 +1,7 @@
+/* Breakfast Provider Component Specifications - Dev Portal Stylesheet */
+body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+.feature-title { color: #2d5986; font-size: 1.4em; }
+.scenario-title { color: #4a4a4a; font-size: 1.1em; }
+.step-passed { color: #2d7d2d; }
+.step-failed { color: #c62828; }
+.step-ignored { color: #f57f17; }

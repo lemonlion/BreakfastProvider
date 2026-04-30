@@ -1,0 +1,45 @@
+networks:
+  localdev:
+    driver: bridge
+
+services:
+
+  cow-service:
+    build:
+      context: ..
+      dockerfile: ./fakes/Dependencies.Fakes.CowService/Dockerfile
+    container_name: docker.fakes.cowservice
+    ports:
+      - "5031:8080"
+    networks:
+      - localdev
+
+  goat-service:
+    build:
+      context: ..
+      dockerfile: ./fakes/Dependencies.Fakes.GoatService/Dockerfile
+    container_name: docker.fakes.goatservice
+    ports:
+      - "5032:8080"
+    networks:
+      - localdev
+
+  supplier-service:
+    build:
+      context: ..
+      dockerfile: ./fakes/Dependencies.Fakes.SupplierService/Dockerfile
+    container_name: docker.fakes.supplierservice
+    ports:
+      - "5033:8080"
+    networks:
+      - localdev
+
+  kitchen-service:
+    build:
+      context: ..
+      dockerfile: ./fakes/Dependencies.Fakes.KitchenService/Dockerfile
+    container_name: docker.fakes.kitchenservice
+    ports:
+      - "5034:8080"
+    networks:
+      - localdev

@@ -1,0 +1,26 @@
+networks:
+  localdev:
+    driver: bridge
+
+services:
+
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    container_name: docker.jaeger
+    hostname: jaeger.local
+    ports:
+      - "16686:16686"  # Jaeger UI
+      - "4317:4317"    # OTLP gRPC
+      - "4318:4318"    # OTLP HTTP
+    environment:
+      - COLLECTOR_OTLP_ENABLED=true
+    healthcheck:
+      test: ["CMD-SHELL", "wget --spider -q http://localhost:16687/ || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 10s
+    networks:
+      localdev:
+        aliases:
+          - jaeger.local

@@ -1,0 +1,41 @@
+name: Publish fake service images
+
+on:
+  workflow_call:
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  publish-cow-service-fake:
+    name: Publish CowService Fake Docker Image
+    uses: ./.github/workflows/_publish-docker-image.yml
+    with:
+      name: Fake.CowService
+      dockerfile: ./fakes/Dependencies.Fakes.CowService/Dockerfile
+    secrets: inherit
+
+  publish-goat-service-fake:
+    name: Publish GoatService Fake Docker Image
+    uses: ./.github/workflows/_publish-docker-image.yml
+    with:
+      name: Fake.GoatService
+      dockerfile: ./fakes/Dependencies.Fakes.GoatService/Dockerfile
+    secrets: inherit
+
+  publish-supplier-service-fake:
+    name: Publish SupplierService Fake Docker Image
+    uses: ./.github/workflows/_publish-docker-image.yml
+    with:
+      name: Fake.SupplierService
+      dockerfile: ./fakes/Dependencies.Fakes.SupplierService/Dockerfile
+    secrets: inherit
+
+  publish-kitchen-service-fake:
+    name: Publish KitchenService Fake Docker Image
+    uses: ./.github/workflows/_publish-docker-image.yml
+    with:
+      name: Fake.KitchenService
+      dockerfile: ./fakes/Dependencies.Fakes.KitchenService/Dockerfile
+    secrets: inherit

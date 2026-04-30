@@ -1,0 +1,34 @@
+syntax = "proto3";
+
+option csharp_namespace = "BreakfastProvider.Api.Grpc";
+
+package breakfast;
+
+service BreakfastGrpc {
+  rpc GetRecipeSummary (RecipeSummaryRequest) returns (RecipeSummaryReply);
+  rpc GetOrderStatus (OrderStatusRequest) returns (OrderStatusReply);
+  rpc StreamOrderUpdates (OrderStatusRequest) returns (stream OrderStatusReply);
+}
+
+message RecipeSummaryRequest {
+  string recipe_type = 1;
+}
+
+message RecipeSummaryReply {
+  string recipe_type = 1;
+  int32 total_batches = 2;
+  repeated string common_ingredients = 3;
+  string last_prepared_at = 4;
+}
+
+message OrderStatusRequest {
+  string order_id = 1;
+}
+
+message OrderStatusReply {
+  string order_id = 1;
+  string status = 2;
+  string customer_name = 3;
+  int32 item_count = 4;
+  string created_at = 5;
+}

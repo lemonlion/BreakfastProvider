@@ -1,0 +1,61 @@
+name: Post-deployment API tests
+run-name: Post-deployment API tests (${{ inputs.tenant_environment }})
+
+on:
+  workflow_dispatch:
+    inputs:
+      base_url:
+        description: Base URL of BreakfastProvider Server
+        required: true
+
+      runs_on_tenant:
+        description: Self-hosted runner tenant
+        required: false
+        default: default
+
+      tenant_environment:
+        description: Tenant and environment (e.g. 'dev')
+        required: false
+
+jobs:
+  run-tests:
+    environment: ${{ inputs.tenant_environment }}
+    name: Post-deployment tests
+    runs-on: 
+      group: org/Default
+      labels:
+        - virtualmachine
+        - non-prd
+        - ${{ inputs.runs_on_tenant }}
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Setup .NET v10
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Add references to package repository
+        run: dotnet nuget add source --username Username --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json"
+        continue-on-error: true
+
+      - name: Update AppSettings
+        run: |
+          FILE='tests/BreakfastProvider.Tests.Component/appsettings.componenttests.json'
+          jq --arg url "${{ inputs.base_url }}" '.ExternalServiceUnderTestUrl = $url | .RunAgainstExternalServiceUnderTest = true' "$FILE" > tmp.json && mv tmp.json "$FILE"
+
+      - name: Run component tests
+        run: >
+          dotnet test ./tests/BreakfastProvider.Tests.Component/BreakfastProvider.Tests.Component.csproj
+          --environment RunningEnvironment=${{inputs.tenant_environment}}
+          --logger GitHubActions
+
+      - name: Upload LightBDD report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: post-deployment-test-report
+          path: ./tests/BreakfastProvider.Tests.Component/bin/Debug/net10.0/Reports/FeaturesReport.html
+          retention-days: 7

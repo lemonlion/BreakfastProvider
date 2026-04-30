@@ -1,0 +1,30 @@
+syntax = "proto3";
+
+option csharp_namespace = "BreakfastProvider.Api.Grpc";
+
+package notifications;
+
+service NotificationGrpc {
+  rpc SendOrderConfirmation (OrderConfirmationRequest) returns (NotificationReply);
+  rpc SendReservationReminder (ReservationReminderRequest) returns (NotificationReply);
+}
+
+message OrderConfirmationRequest {
+  string order_id = 1;
+  string customer_name = 2;
+  int32 item_count = 3;
+  string channel = 4;
+}
+
+message ReservationReminderRequest {
+  string reservation_id = 1;
+  string customer_name = 2;
+  string reserved_at = 3;
+  int32 table_number = 4;
+}
+
+message NotificationReply {
+  bool success = 1;
+  string notification_id = 2;
+  string message = 3;
+}

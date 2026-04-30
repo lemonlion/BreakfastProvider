@@ -1,0 +1,18 @@
+{
+  "topics": [
+    {
+      "name": "topic1",
+      "port": 60101,
+      "key": "TheLocal+DevelopmentKey=",
+      "storageQueueConnectionString": "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;QueueEndpoint=http://docker-azurite:10001/devstoreaccount1",
+      "subscribers": {
+        "storageQueue": [
+          {
+            "name": "eventgrid-to-storage",
+            "queueName": "eventgrid-events"
+          }
+        ]
+      }
+    }
+  ]
+}

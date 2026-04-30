@@ -1,0 +1,25 @@
+using BreakfastProvider.Tests.Component.Shared.Constants;
+using BreakfastProvider.Tests.Component.Shared.Models.AuditLogs;
+using BreakfastProvider.Tests.Component.Shared.Util;
+
+namespace BreakfastProvider.Tests.Component.Shared.Common.AuditLogs;
+
+public class GetAuditLogsSteps(RequestContext context)
+{
+    public HttpResponseMessage? ResponseMessage { get; private set; }
+    public List<TestAuditLogResponse>? Response { get; private set; }
+
+    public async Task Retrieve()
+    {
+        var request = new HttpRequestMessage(HttpMethod.Get, Endpoints.AuditLogs);
+        request.Headers.Add(CustomHeaders.ComponentTestRequestId, context.RequestId);
+        ResponseMessage = await context.Client.SendAsync(request);
+    }
+
+    public async Task ParseResponse()
+    {
+        var content = await ResponseMessage!.Content.ReadAsStringAsync();
+        Json.IsValid(content).Should().BeTrue();
+        Response = Json.Deserialize<List<TestAuditLogResponse>>(content)!;
+    }
+}

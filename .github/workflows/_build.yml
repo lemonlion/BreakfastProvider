@@ -1,0 +1,81 @@
+name: Build
+
+on:
+  workflow_call:
+    inputs:
+      version: { type: string, required: true }
+      branch: { type: string, required: true }
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Setup .NET v10
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Setup NuGet
+        uses: nuget/setup-nuget@v2
+        with:
+          nuget-version: 5.x
+
+      - name: Set nuget.config credentials
+        run: |
+          cp nuget.config.github nuget.config
+          sed -i "s|GITHUB_NUGET_APIKEY|${{ secrets.ORGANISATION_PAT }}|g" nuget.config
+
+      - name: Create output folders
+        run: |
+          mkdir -p ./output/publish-api
+          mkdir -p ./output/packages
+
+      - name: Build (dotnet build)
+        run: >
+          dotnet build
+          -c Release
+          -p:WarningLevel=0
+          BreakfastProvider.sln
+
+      - name: Scan for vulnerable packages
+        run: |
+          dotnet list package --vulnerable 2>&1 | tee vulnerable-packages.log
+          if grep -q "has the following vulnerable packages" vulnerable-packages.log; then
+            echo "::error::Vulnerable packages detected"
+            exit 1
+          fi
+
+      - name: Upload scan results artifact
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: vulnerable-packages.log
+          path: ./vulnerable-packages.log
+          retention-days: 1
+
+      - name: Build API (dotnet publish)
+        run: >
+          dotnet publish
+          -c Release
+          -o ./output/publish-api
+          -p:WarningLevel=0
+          ./src/BreakfastProvider.Api/BreakfastProvider.Api.csproj
+
+      - name: Copy nuspec to publish output
+        run: cp ./src/BreakfastProvider.Api/BreakfastProvider.Api.nuspec ./output/publish-api/
+
+      - name: Create package (API)
+        run: >
+          nuget pack ./output/publish-api/BreakfastProvider.Api.nuspec
+          -OutputDirectory ./output/packages
+          -Properties "Configuration=Release;branch=${{ inputs.branch }};commit=${{ github.sha }};version=${{ inputs.version }}";
+
+      - name: Cache package (API)
+        uses: actions/cache/save@v4
+        with:
+          key: BreakfastProvider.API.nupkg-${{ github.run_id }}
+          path: ./output/packages/BreakfastProvider.Api.${{ inputs.version }}.nupkg

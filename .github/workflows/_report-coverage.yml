@@ -1,0 +1,85 @@
+name: Generate coverage report
+
+on:
+  workflow_call:
+    inputs:
+      test-type: { type: string, required: true }  # ["unit", "component"]
+      test-run-type: { type: string, required: false, default: '' }  # ["memory", "docker"]
+      coverage-file: { type: string, required: true }
+
+jobs:
+  generate-report:
+    name: Generate coverage report
+    runs-on: ubuntu-24.04
+
+    steps:
+      - id: pretty-test-type
+        name: Capitalize test type
+        run: |
+          raw="${{ inputs.test-type }}"
+          echo "capitalized=${raw^}" >> $GITHUB_OUTPUT
+
+      - id: pretty-test-run-type
+        name: Capitalize test run type
+        run: |
+          raw="${{ inputs.test-run-type }}"
+          echo "capitalized=${raw^}" >> $GITHUB_OUTPUT
+
+      - name: Install reporting CLI tools
+        run: |
+          dotnet tool install dotnet-reportgenerator-globaltool --global
+          echo "${HOME}/.dotnet/tools" >> $GITHUB_PATH
+
+      - name: Download code coverage XML artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ inputs.coverage-file }}
+
+      - name: Test Code Coverage Report
+        uses: irongut/CodeCoverageSummary@v1.3.0
+        with:
+          filename: ${{ inputs.coverage-file }}
+          badge: true
+          fail_below_min: false
+          format: markdown
+          indicators: false
+          output: both
+
+      - name: Add title to code-coverage-results.md
+        run: |
+          echo '# ${{ steps.pretty-test-type.outputs.capitalized }} ${{ steps.pretty-test-run-type.outputs.capitalized }} Test Code Coverage' | cat - ./code-coverage-results.md > temp
+          mv temp ./code-coverage-results.md
+
+      - name: Write code coverage to Job Summary
+        run: cat code-coverage-results.md >> $GITHUB_STEP_SUMMARY
+
+      - name: Generate code coverage reports
+        run: |
+          reportgenerator -reports:${{ inputs.coverage-file }} -targetdir:./ -reporttype:HtmlSummary
+          reportgenerator -reports:${{ inputs.coverage-file }} -targetdir:./code-coverage-full-report -reporttype:Html
+
+      - id: get-coverage-report-file-name-prefix
+        name: Get Coverage Report file name prefix
+        run: |
+          coverage_file="${{ inputs.coverage-file }}"
+          coverage_file_base="${coverage_file%%.*}"
+          echo "codecoverage_file=Code-Coverage-${coverage_file_base}-report" >> $GITHUB_OUTPUT
+
+      - name: Upload summary coverage report
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.get-coverage-report-file-name-prefix.outputs.codecoverage_file }}-summary.html
+          path: summary.html
+          retention-days: 1
+
+      - name: Upload full coverage report
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.get-coverage-report-file-name-prefix.outputs.codecoverage_file }}-full-report
+          path: code-coverage-full-report
+          retention-days: 1
+
+      - name: Delete code coverage XML artifact
+        uses: geekyeggo/delete-artifact@v4
+        with:
+          name: ${{ inputs.coverage-file }}

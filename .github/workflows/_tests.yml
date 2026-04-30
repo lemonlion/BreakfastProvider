@@ -1,0 +1,307 @@
+name: Tests
+
+on:
+  workflow_call:
+    inputs:
+      test-type: { type: string, required: true }  # ["unit", "component"]
+      test-run-type: { type: string, required: false }  # ["memory", "docker", "external-sut" ]
+      test-run-description: {type: string, required: false, default: "tests"}
+      csproj-path: { type: string, required: true }
+      filter: {type: string, required: false }
+      features-report-path: { type: string, required: false, default: "tests/BreakfastProvider.Tests.Component/bin/Debug/net10.0/Reports/FeaturesReport.html" }
+      runs-on: { type: string, required: false, default: "ubuntu-24.04" }
+      component-specifications-filename: { type: string, required: false, default: "ComponentSpecifications" }
+
+env:
+  BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
+
+jobs:
+  run-tests:
+    name: Run tests
+    runs-on: ${{ inputs.runs-on }}
+    steps:
+      - name: Clear repository
+        run: sudo rm -fr $GITHUB_WORKSPACE && mkdir $GITHUB_WORKSPACE
+
+      - name: Checkout source
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.PUSH_SPECS_IN_CI_TOKEN != '' && secrets.PUSH_SPECS_IN_CI_TOKEN || github.token }}
+          fetch-depth: 2
+
+      - id: get-last-commit-name
+        name: Get last commit name
+        run: |
+          previousGitCommit=$(git log -1 --pretty=%B ${{ github.event.pull_request.head.sha || 'HEAD' }} | head -n 1)
+          echo "previous_commit_message=$previousGitCommit" >> $GITHUB_OUTPUT
+          echo "Previous Git Commit is: $previousGitCommit"
+
+      - name: Setup .NET v10
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Setup NuGet
+        uses: nuget/setup-nuget@v2
+        with:
+          nuget-version: 5.x
+
+      - name: Set nuget.config credentials
+        run: |
+          cp nuget.config.github nuget.config
+          sed -i "s|GITHUB_NUGET_APIKEY|${{ secrets.ORGANISATION_PAT }}|g" nuget.config
+
+      - name: Set component test settings to InMemory
+        if: ${{ inputs.test-run-type == 'memory' }}
+        run: |
+          echo "EnsureComponentSpecificationsFileIsNotEmpty=true" >> $GITHUB_ENV
+          echo "RunWithAnInMemoryCowService=true" >> $GITHUB_ENV
+          echo "RunWithAnInMemoryGoatService=true" >> $GITHUB_ENV
+          echo "RunWithAnInMemorySupplierService=true" >> $GITHUB_ENV
+          echo "RunWithAnInMemoryKitchenService=true" >> $GITHUB_ENV
+          echo "RunWithAnInMemoryDatabase=true" >> $GITHUB_ENV
+          echo "RunWithAnInMemoryEventGrid=true" >> $GITHUB_ENV
+          echo "RunWithAnInMemoryKafkaBroker=true" >> $GITHUB_ENV
+
+      - name: Generate and install Kafka certificate
+        if: ${{ inputs.test-run-type == 'docker' || inputs.test-run-type == 'external-sut' }}
+        run: |
+          cd docker
+          echo "KAFKA_CERTIFICATES_PASSWORD=certificatePassword123" > .env
+          if [ -n "$KAFKA_CERT_PASSWORD" ]; then
+            sed -i "s|certificatePassword123|$KAFKA_CERT_PASSWORD|g" .env
+          fi
+
+          cd kafka-config
+          if [ -n "$KAFKA_CERT_PASSWORD" ]; then
+            sed -i "s|certificatePassword123|$KAFKA_CERT_PASSWORD|g" generate-certs.sh
+            sed -i "s|certificatePassword123|$KAFKA_CERT_PASSWORD|g" client.properties
+          fi
+
+          chmod u+x generate-certs.sh
+          ./generate-certs.sh
+
+          chmod u+x update-hostfile.sh
+          ./update-hostfile.sh
+        env:
+          KAFKA_CERT_PASSWORD: ${{secrets.KAFKA_CERTIFICATES_PASSWORD}}
+
+      - name: Generate EventGrid certificate
+        if: ${{ inputs.test-run-type == 'docker' || inputs.test-run-type == 'external-sut' }}
+        run: |
+          mkdir -p certificates
+          openssl req -x509 -newkey rsa:2048 -keyout certificates/eventgrid.local.key -out certificates/eventgrid.local.crt \
+            -days 365 -nodes -subj "/CN=eventgrid.local"
+          openssl pkcs12 -export -out certificates/eventgrid.local.pfx \
+            -inkey certificates/eventgrid.local.key -in certificates/eventgrid.local.crt \
+            -password pass:Y0urSup3rCrypt1cPa55w0rd!
+
+      - name: Tune Docker Compose for CI
+        if: ${{ inputs.test-run-type == 'docker' || inputs.test-run-type == 'external-sut' }}
+        run: |
+          sed -i 's/AZURE_COSMOS_EMULATOR_PARTITION_COUNT=25/AZURE_COSMOS_EMULATOR_PARTITION_COUNT=3/' docker/docker-compose-database.yml
+          sed -i 's/start_period: 30s/start_period: 120s/' docker/docker-compose-sut.yml
+          sed -i 's/retries: 30/retries: 60/' docker/docker-compose-sut.yml
+
+      - name: Spin up docker
+        if: ${{ inputs.test-run-type == 'docker' }}
+        run: |
+            docker compose -f docker/docker-compose-database.yml -f docker/docker-compose-storage.yml -f docker/docker-compose-fakes.yml -f docker/docker-compose-messaging.yml down
+            docker compose -f docker/docker-compose-database.yml -f docker/docker-compose-storage.yml -f docker/docker-compose-fakes.yml -f docker/docker-compose-messaging.yml up -d --wait --wait-timeout 300
+
+      - name: Set component test settings to InDocker
+        if: ${{ inputs.test-run-type == 'docker' }}
+        run: |
+          echo "RunWithAnInMemoryCowService=false" >> $GITHUB_ENV
+          echo "RunWithAnInMemoryGoatService=false" >> $GITHUB_ENV
+          echo "RunWithAnInMemorySupplierService=false" >> $GITHUB_ENV
+          echo "RunWithAnInMemoryKitchenService=false" >> $GITHUB_ENV
+          echo "RunWithAnInMemoryDatabase=false" >> $GITHUB_ENV
+          echo "RunWithAnInMemoryEventGrid=false" >> $GITHUB_ENV
+          echo "RunWithAnInMemoryKafkaBroker=false" >> $GITHUB_ENV
+
+      - name: Make entrypoint script executable
+        if: ${{ inputs.test-run-type == 'external-sut' }}
+        run: chmod +x docker/docker-entrypoint.sh
+
+      - name: Spin up docker (external SUT)
+        if: ${{ inputs.test-run-type == 'external-sut' }}
+        run: |
+            docker compose -f docker/docker-compose-database.yml -f docker/docker-compose-storage.yml -f docker/docker-compose-fakes.yml -f docker/docker-compose-messaging.yml -f docker/docker-compose-sut.yml down
+            docker compose -f docker/docker-compose-database.yml -f docker/docker-compose-storage.yml -f docker/docker-compose-fakes.yml -f docker/docker-compose-messaging.yml -f docker/docker-compose-sut.yml up -d --wait --wait-timeout 600
+            compose_exit=$?
+            if [ $compose_exit -ne 0 ]; then
+              echo "::warning::Docker Compose exited with code $compose_exit — will rely on health check loop"
+              docker ps -a --format "table {{.Names}}\t{{.Status}}" || true
+            fi
+
+      - name: Wait for SUT to be healthy
+        if: ${{ inputs.test-run-type == 'external-sut' }}
+        run: |
+          echo "Waiting for SUT health endpoint at http://localhost:5080/health ..."
+          timeout_seconds=300
+          start_time=$(date +%s)
+          while true; do
+            elapsed=$(( $(date +%s) - start_time ))
+            if [ $elapsed -ge $timeout_seconds ]; then
+              echo "::error::SUT did not become healthy within ${timeout_seconds}s"
+              echo "=== SUT Container Logs ==="
+              docker logs docker.breakfast-provider-api 2>&1 | tail -80 || true
+              echo "=== Container Status ==="
+              docker ps -a --format "table {{.Names}}\t{{.Status}}" || true
+              exit 1
+            fi
+            status=$(curl -s -o /dev/null -w '%{http_code}' http://localhost:5080/health 2>/dev/null || echo "000")
+            if [ "$status" = "200" ]; then
+              echo "SUT is healthy after ${elapsed}s"
+              break
+            fi
+            echo "Health check returned $status (${elapsed}s elapsed), retrying in 5s..."
+            sleep 5
+          done
+
+      - name: Set component test settings for external SUT
+        if: ${{ inputs.test-run-type == 'external-sut' }}
+        run: |
+          echo "RunAgainstExternalServiceUnderTest=true" >> $GITHUB_ENV
+          echo "ExternalServiceUnderTestUrl=http://localhost:5080" >> $GITHUB_ENV
+
+      - name: Rename checked in Component Specifications document
+        if: ${{ inputs.test-type == 'component' }}
+        run: mv docs/${{ inputs.component-specifications-filename }}.yml docs/${{ inputs.component-specifications-filename }}-old.yml
+
+      - id: get-trx-file-name
+        name: Generate trx file name
+        run: |
+          echo "trx_file=${{ inputs.test-run-description }}-results.trx" >> $GITHUB_OUTPUT
+
+      - name: Wait until the Cosmos DB Emulator is ready
+        if: ${{ inputs.test-run-type == 'docker' }}
+        run: |
+          timeout_seconds=600
+          start_time=$(date +%s)
+          while true; do
+            current_time=$(date +%s)
+            elapsed_time=$((current_time - start_time))
+            remaining_time=$((timeout_seconds - elapsed_time))
+            if [ $elapsed_time -ge $timeout_seconds ]; then
+                echo Timeout reached, aborting
+                exit 1
+            fi
+
+            curl -s -k "https://localhost:8081/_explorer/emulator.pem" && break
+
+            echo curl failed, retrying...
+            sleep 2
+          done
+          echo Cosmos DB emulator started successfully
+
+      - name: Throttle test parallelism for Docker mode
+        if: ${{ inputs.test-run-type == 'docker' || inputs.test-run-type == 'external-sut' }}
+        run: |
+          csproj_dir=$(dirname "${{ inputs.csproj-path }}")
+          jq '.maxParallelThreads = 2' "$csproj_dir/xunit.runner.json" > tmp.json \
+            && mv tmp.json "$csproj_dir/xunit.runner.json"
+          echo "Patched xunit.runner.json for Docker mode:"
+          cat "$csproj_dir/xunit.runner.json"
+
+      - name: Run tests
+        run: >
+          dotnet test ${{ inputs.csproj-path }}
+          -p:WarningLevel=0
+          --collect:"XPlat Code Coverage"
+          --settings coverage.runsettings
+          -l "trx;LogFileName=${{ steps.get-trx-file-name.outputs.trx_file }}"
+          --results-directory ./coverage
+          --logger GitHubActions
+          ${{ inputs.filter && format('--filter {0}', inputs.filter) || '' }}
+
+      - name: Spin down docker
+        if: ${{ always() && (inputs.test-run-type == 'docker' || inputs.test-run-type == 'external-sut') }}
+        run: |
+          docker compose -f docker/docker-compose-database.yml -f docker/docker-compose-storage.yml -f docker/docker-compose-fakes.yml -f docker/docker-compose-messaging.yml ${{ inputs.test-run-type == 'external-sut' && '-f docker/docker-compose-sut.yml' || '' }} down
+
+      - name: Upload TRX artifact
+        if: ${{ !cancelled() && !inputs.filter }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.get-trx-file-name.outputs.trx_file }}
+          path: coverage/${{ steps.get-trx-file-name.outputs.trx_file }}
+          retention-days: 1
+
+      - id: get-coverage-file-name
+        if: ${{ !cancelled() && !inputs.filter }}
+        name: Generate coverage file name
+        run: |
+          echo "coverage_file=${{ inputs.test-run-description }}.coverage.cobertura.xml" >> $GITHUB_OUTPUT
+
+      - name: Move code coverage file to working directory
+        if: ${{ !cancelled() && !inputs.filter }}
+        run: |
+          COVERAGE_FILE_PATH=$(find . -name "coverage.cobertura.xml" | head -n 1)
+          if [ -z "$COVERAGE_FILE_PATH" ]; then
+            echo "::warning::No coverage file found"
+            exit 0
+          fi
+          mv $COVERAGE_FILE_PATH ${{ steps.get-coverage-file-name.outputs.coverage_file }}
+
+      - name: Upload Cobertura XML artifact
+        if: ${{ !cancelled() && !inputs.filter }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.get-coverage-file-name.outputs.coverage_file }}
+          path: ${{ steps.get-coverage-file-name.outputs.coverage_file }}
+          retention-days: 1
+
+      - id: get-lightbdd-test-results-file-name
+        if: ${{ !(cancelled()) && inputs.test-type == 'component' }}
+        name: Generate LightBDD Tests Results file name
+        run: |
+          echo "lightbdd_file=LightBDD-${{ inputs.test-run-description }}-report" >> $GITHUB_OUTPUT
+
+      - name: Upload LightBDD test results report to artifacts
+        uses: actions/upload-artifact@v4
+        if: ${{ !(cancelled()) && inputs.test-type == 'component' }}
+        with:
+          name: ${{ steps.get-lightbdd-test-results-file-name.outputs.lightbdd_file }}
+          path: ${{ inputs.features-report-path }}
+          retention-days: 1
+
+      - name: Check that the checked in Component Specifications document matches the latest one generated in CI
+        id: compare-component-specs
+        if: ${{ inputs.test-type == 'component' && inputs.test-run-type == 'memory'}}
+        run: |
+          if [ ! -f docs/${{ inputs.component-specifications-filename }}.yml ]; then
+            echo "${{ inputs.component-specifications-filename }}.yml is missing"
+            exit 1
+          fi
+          if [ ! -s docs/${{ inputs.component-specifications-filename }}.yml ]; then
+            echo "${{ inputs.component-specifications-filename }}.yml is empty"
+            exit 1
+          fi
+
+          if diff docs/${{ inputs.component-specifications-filename }}-old.yml docs/${{ inputs.component-specifications-filename }}.yml > /dev/null 2>&1
+          then
+            echo "matching=yes" >> $GITHUB_OUTPUT
+          else
+            echo "matching=no" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Update Component Specifications If Necessary
+        if: ${{ inputs.test-type == 'component' && inputs.test-run-type == 'memory' && steps.compare-component-specs.outputs.matching == 'no'}}
+        run: |
+          echo "previous_commit_message is ${{ steps.get-last-commit-name.outputs.previous_commit_message }}"
+          if [[ "${{ steps.get-last-commit-name.outputs.previous_commit_message }}" == "CI update of ${{ inputs.component-specifications-filename }}.yml" ]]; then
+            echo "It appears that a different version of the ${{ inputs.component-specifications-filename }}.yml is being created each time. There might be instance data that is being included in the ${{ inputs.component-specifications-filename }}.yml that is different each time, like a Guid or a DateTime.Now."
+            exit 1
+          fi
+
+          git fetch origin
+          git config --global user.email "ci@example.com"
+          git config --global user.name "Continuous Integration"
+          git add docs/${{ inputs.component-specifications-filename }}.yml
+          git stash
+          git checkout ${{ env.BRANCH_NAME }}
+          git stash pop
+          git commit docs/${{ inputs.component-specifications-filename }}.yml -m "CI update of ${{ inputs.component-specifications-filename }}.yml"
+          git push origin ${{ env.BRANCH_NAME }}

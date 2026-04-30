@@ -1,0 +1,733 @@
+﻿{
+  "asyncapi": "3.0.0",
+  "info": {
+    "title": "Breakfast Provider",
+    "version": "1.0.0",
+    "description": "AsyncAPI for Breakfast Provider"
+  },
+  "defaultContentType": "application/json",
+  "servers": {
+    "default": {
+      "host": "http://localhost",
+      "protocol": "http"
+    }
+  },
+  "channels": {
+    "breakfast_recipe_logs": {
+      "address": "breakfast_recipe_logs",
+      "messages": {
+        "recipeLogMessage": {
+          "$ref": "#/components/messages/recipeLogMessage"
+        }
+      },
+      "description": "Content for the Recipe Log Event."
+    },
+    "daily-special-ordered": {
+      "address": "daily-special-ordered",
+      "messages": {
+        "dailySpecialOrderedMessage": {
+          "$ref": "#/components/messages/dailySpecialOrderedMessage"
+        }
+      },
+      "description": "Published when a daily special is ordered."
+    },
+    "inventory-item-added": {
+      "address": "inventory-item-added",
+      "messages": {
+        "inventoryItemAddedMessage": {
+          "$ref": "#/components/messages/inventoryItemAddedMessage"
+        }
+      },
+      "description": "Published when a new inventory item is added to the system."
+    },
+    "inventory-stock-updated": {
+      "address": "inventory-stock-updated",
+      "messages": {
+        "inventoryStockUpdatedMessage": {
+          "$ref": "#/components/messages/inventoryStockUpdatedMessage"
+        }
+      },
+      "description": "Published when an inventory item's stock level changes."
+    },
+    "menu-availability-changed": {
+      "address": "menu-availability-changed",
+      "messages": {
+        "menuAvailabilityChangedMessage": {
+          "$ref": "#/components/messages/menuAvailabilityChangedMessage"
+        }
+      },
+      "description": "Published when a menu item becomes available or unavailable."
+    },
+    "pancake-batch-completed": {
+      "address": "pancake-batch-completed",
+      "messages": {
+        "pancakeBatchCompletedMessage": {
+          "$ref": "#/components/messages/pancakeBatchCompletedMessage"
+        }
+      },
+      "description": "Published when a pancake batch is completed."
+    },
+    "reservation-cancelled": {
+      "address": "reservation-cancelled",
+      "messages": {
+        "reservationCancelledMessage": {
+          "$ref": "#/components/messages/reservationCancelledMessage"
+        }
+      },
+      "description": "Published when a reservation is cancelled."
+    },
+    "reservation-confirmed": {
+      "address": "reservation-confirmed",
+      "messages": {
+        "reservationConfirmedMessage": {
+          "$ref": "#/components/messages/reservationConfirmedMessage"
+        }
+      },
+      "description": "Published when a reservation is confirmed."
+    },
+    "staff-member-added": {
+      "address": "staff-member-added",
+      "messages": {
+        "staffMemberAddedMessage": {
+          "$ref": "#/components/messages/staffMemberAddedMessage"
+        }
+      },
+      "description": "Published when a new staff member is registered in the system."
+    },
+    "topping-created": {
+      "address": "topping-created",
+      "messages": {
+        "toppingCreatedMessage": {
+          "$ref": "#/components/messages/toppingCreatedMessage"
+        }
+      },
+      "description": "Published when a new topping is added to the toppings catalogue."
+    },
+    "waffle-batch-completed": {
+      "address": "waffle-batch-completed",
+      "messages": {
+        "waffleBatchCompletedMessage": {
+          "$ref": "#/components/messages/waffleBatchCompletedMessage"
+        }
+      },
+      "description": "Published when a waffle batch is completed."
+    }
+  },
+  "operations": {
+    "RecipeLog": {
+      "action": "send",
+      "channel": {
+        "$ref": "#/channels/breakfast_recipe_logs"
+      },
+      "title": "RecipeLog",
+      "summary": "Recipe Log",
+      "description": "Content for the Recipe Log Event.",
+      "messages": [
+        {
+          "$ref": "#/channels/breakfast_recipe_logs/messages/recipeLogMessage"
+        }
+      ]
+    },
+    "PubSubDailySpecialOrdered": {
+      "action": "send",
+      "channel": {
+        "$ref": "#/channels/daily-special-ordered"
+      },
+      "title": "PubSubDailySpecialOrdered",
+      "summary": "Daily Special Ordered",
+      "description": "Published when a daily special is ordered.",
+      "messages": [
+        {
+          "$ref": "#/channels/daily-special-ordered/messages/dailySpecialOrderedMessage"
+        }
+      ]
+    },
+    "PubSubInventoryItemAdded": {
+      "action": "send",
+      "channel": {
+        "$ref": "#/channels/inventory-item-added"
+      },
+      "title": "PubSubInventoryItemAdded",
+      "summary": "Inventory Item Added",
+      "description": "Published when a new inventory item is added to the system.",
+      "messages": [
+        {
+          "$ref": "#/channels/inventory-item-added/messages/inventoryItemAddedMessage"
+        }
+      ]
+    },
+    "PubSubInventoryStockUpdated": {
+      "action": "send",
+      "channel": {
+        "$ref": "#/channels/inventory-stock-updated"
+      },
+      "title": "PubSubInventoryStockUpdated",
+      "summary": "Inventory Stock Updated",
+      "description": "Published when an inventory item's stock level changes.",
+      "messages": [
+        {
+          "$ref": "#/channels/inventory-stock-updated/messages/inventoryStockUpdatedMessage"
+        }
+      ]
+    },
+    "PubSubMenuAvailabilityChanged": {
+      "action": "send",
+      "channel": {
+        "$ref": "#/channels/menu-availability-changed"
+      },
+      "title": "PubSubMenuAvailabilityChanged",
+      "summary": "Menu Availability Changed",
+      "description": "Published when a menu item becomes available or unavailable.",
+      "messages": [
+        {
+          "$ref": "#/channels/menu-availability-changed/messages/menuAvailabilityChangedMessage"
+        }
+      ]
+    },
+    "PubSubPancakeBatchCompleted": {
+      "action": "send",
+      "channel": {
+        "$ref": "#/channels/pancake-batch-completed"
+      },
+      "title": "PubSubPancakeBatchCompleted",
+      "summary": "Pancake Batch Completed",
+      "description": "Published when a pancake batch is completed.",
+      "messages": [
+        {
+          "$ref": "#/channels/pancake-batch-completed/messages/pancakeBatchCompletedMessage"
+        }
+      ]
+    },
+    "PubSubReservationCancelled": {
+      "action": "send",
+      "channel": {
+        "$ref": "#/channels/reservation-cancelled"
+      },
+      "title": "PubSubReservationCancelled",
+      "summary": "Reservation Cancelled",
+      "description": "Published when a reservation is cancelled.",
+      "messages": [
+        {
+          "$ref": "#/channels/reservation-cancelled/messages/reservationCancelledMessage"
+        }
+      ]
+    },
+    "PubSubReservationConfirmed": {
+      "action": "send",
+      "channel": {
+        "$ref": "#/channels/reservation-confirmed"
+      },
+      "title": "PubSubReservationConfirmed",
+      "summary": "Reservation Confirmed",
+      "description": "Published when a reservation is confirmed.",
+      "messages": [
+        {
+          "$ref": "#/channels/reservation-confirmed/messages/reservationConfirmedMessage"
+        }
+      ]
+    },
+    "PubSubStaffMemberAdded": {
+      "action": "send",
+      "channel": {
+        "$ref": "#/channels/staff-member-added"
+      },
+      "title": "PubSubStaffMemberAdded",
+      "summary": "Staff Member Added",
+      "description": "Published when a new staff member is registered in the system.",
+      "messages": [
+        {
+          "$ref": "#/channels/staff-member-added/messages/staffMemberAddedMessage"
+        }
+      ]
+    },
+    "PubSubToppingCreated": {
+      "action": "send",
+      "channel": {
+        "$ref": "#/channels/topping-created"
+      },
+      "title": "PubSubToppingCreated",
+      "summary": "Topping Created",
+      "description": "Published when a new topping is added to the toppings catalogue.",
+      "messages": [
+        {
+          "$ref": "#/channels/topping-created/messages/toppingCreatedMessage"
+        }
+      ]
+    },
+    "PubSubWaffleBatchCompleted": {
+      "action": "send",
+      "channel": {
+        "$ref": "#/channels/waffle-batch-completed"
+      },
+      "title": "PubSubWaffleBatchCompleted",
+      "summary": "Waffle Batch Completed",
+      "description": "Published when a waffle batch is completed.",
+      "messages": [
+        {
+          "$ref": "#/channels/waffle-batch-completed/messages/waffleBatchCompletedMessage"
+        }
+      ]
+    }
+  },
+  "components": {
+    "schemas": {
+      "dailySpecialOrderedEvent": {
+        "type": "object",
+        "description": "Published when a daily special is ordered.",
+        "properties": {
+          "orderId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Order ID for the daily special."
+          },
+          "specialName": {
+            "type": "string",
+            "description": "Name of the daily special."
+          },
+          "customerName": {
+            "type": "string",
+            "description": "Customer name."
+          },
+          "remainingOrders": {
+            "type": "integer",
+            "description": "Remaining order count for this special."
+          },
+          "orderedAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp when the order was placed (ISO 8601 format)."
+          }
+        },
+        "additionalProperties": false
+      },
+      "inventoryItemAddedEvent": {
+        "type": "object",
+        "description": "Published when a new inventory item is added to the system.",
+        "properties": {
+          "itemId": {
+            "type": "integer",
+            "description": "Inventory item ID."
+          },
+          "name": {
+            "type": "string",
+            "description": "Name of the inventory item."
+          },
+          "category": {
+            "type": "string",
+            "description": "Category of the inventory item."
+          },
+          "quantity": {
+            "type": "number",
+            "description": "Initial quantity in stock."
+          },
+          "unit": {
+            "type": "string",
+            "description": "Unit of measurement (e.g. kg, litres, units)."
+          },
+          "addedAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp when the item was added (ISO 8601 format)."
+          }
+        },
+        "additionalProperties": false
+      },
+      "inventoryStockUpdatedEvent": {
+        "type": "object",
+        "description": "Published when an inventory item's stock level changes.",
+        "properties": {
+          "itemId": {
+            "type": "integer",
+            "description": "Inventory item ID."
+          },
+          "name": {
+            "type": "string",
+            "description": "Name of the inventory item."
+          },
+          "previousQuantity": {
+            "type": "number",
+            "description": "Previous quantity in stock."
+          },
+          "newQuantity": {
+            "type": "number",
+            "description": "New quantity in stock."
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp of the update (ISO 8601 format)."
+          }
+        },
+        "additionalProperties": false
+      },
+      "menuAvailabilityChangedEvent": {
+        "type": "object",
+        "description": "Published when a menu item becomes available or unavailable.",
+        "properties": {
+          "itemName": {
+            "type": "string",
+            "description": "Name of the menu item."
+          },
+          "isAvailable": {
+            "type": "boolean",
+            "description": "Whether the item is now available."
+          },
+          "reason": {
+            "type": "string",
+            "description": "Reason for the availability change."
+          },
+          "changedAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp of the change (ISO 8601 format)."
+          }
+        },
+        "additionalProperties": false
+      },
+      "messageHeaders": {
+        "type": "object",
+        "description": "Message headers, in both legacy and CloudEvents formats.",
+        "properties": {
+          "ce_specversion": {
+            "type": "string",
+            "description": "Version of the CloudEvents specification."
+          },
+          "ce_type": {
+            "type": "string",
+            "description": "Type of event."
+          },
+          "ce_source": {
+            "type": "string",
+            "description": "Issuer URL."
+          },
+          "ce_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "ID of the event."
+          },
+          "ce_time": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp of the event (ISO 8601 format)."
+          },
+          "ce_traceparent": {
+            "type": "string",
+            "description": "Correlation ID."
+          },
+          "ce_tenant": {
+            "type": "string",
+            "description": "Tenant ID."
+          },
+          "content-type": {
+            "type": "string",
+            "description": "Content type."
+          }
+        },
+        "additionalProperties": false
+      },
+      "pancakeBatchCompletedEvent": {
+        "type": "object",
+        "description": "Published when a pancake batch is completed.",
+        "properties": {
+          "batchId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Batch ID."
+          },
+          "ingredients": {
+            "type": "array",
+            "description": "List of ingredients used.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "toppings": {
+            "type": "array",
+            "description": "List of toppings applied.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "completedAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp when the batch was completed (ISO 8601 format)."
+          }
+        },
+        "additionalProperties": false
+      },
+      "recipeLogEvent": {
+        "type": "object",
+        "description": "Content for the Recipe Log Event.",
+        "properties": {
+          "orderId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Order ID."
+          },
+          "recipeType": {
+            "type": "string",
+            "description": "Recipe type (e.g. Pancakes, Waffles)."
+          },
+          "ingredients": {
+            "type": "array",
+            "description": "List of ingredients used.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "toppings": {
+            "type": "array",
+            "description": "List of toppings applied.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "loggedAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp when the recipe was logged (ISO 8601 format)."
+          }
+        },
+        "additionalProperties": false
+      },
+      "reservationCancelledEvent": {
+        "type": "object",
+        "description": "Published when a reservation is cancelled.",
+        "properties": {
+          "reservationId": {
+            "type": "integer",
+            "description": "Reservation ID."
+          },
+          "customerName": {
+            "type": "string",
+            "description": "Customer name for the reservation."
+          },
+          "reason": {
+            "type": "string",
+            "description": "Reason for cancellation."
+          },
+          "cancelledAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp when the reservation was cancelled (ISO 8601 format)."
+          }
+        },
+        "additionalProperties": false
+      },
+      "reservationConfirmedEvent": {
+        "type": "object",
+        "description": "Published when a reservation is confirmed.",
+        "properties": {
+          "reservationId": {
+            "type": "integer",
+            "description": "Reservation ID."
+          },
+          "customerName": {
+            "type": "string",
+            "description": "Customer name for the reservation."
+          },
+          "partySize": {
+            "type": "integer",
+            "description": "Number of guests."
+          },
+          "reservedAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Reserved date and time (ISO 8601 format)."
+          },
+          "confirmedAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp when the reservation was confirmed (ISO 8601 format)."
+          }
+        },
+        "additionalProperties": false
+      },
+      "staffMemberAddedEvent": {
+        "type": "object",
+        "description": "Published when a new staff member is registered in the system.",
+        "properties": {
+          "staffId": {
+            "type": "integer",
+            "description": "Staff member ID."
+          },
+          "name": {
+            "type": "string",
+            "description": "Full name of the staff member."
+          },
+          "role": {
+            "type": "string",
+            "description": "Role assigned to the staff member."
+          },
+          "addedAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp when the staff member was added (ISO 8601 format)."
+          }
+        },
+        "additionalProperties": false
+      },
+      "toppingCreatedEvent": {
+        "type": "object",
+        "description": "Published when a new topping is added to the toppings catalogue.",
+        "properties": {
+          "toppingId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Topping ID."
+          },
+          "name": {
+            "type": "string",
+            "description": "Name of the topping."
+          },
+          "category": {
+            "type": "string",
+            "description": "Category of the topping (e.g. fruit, sauce, nut)."
+          },
+          "isSeasonal": {
+            "type": "boolean",
+            "description": "Whether the topping is seasonal."
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp when the topping was created (ISO 8601 format)."
+          }
+        },
+        "additionalProperties": false
+      },
+      "waffleBatchCompletedEvent": {
+        "type": "object",
+        "description": "Published when a waffle batch is completed.",
+        "properties": {
+          "batchId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Batch ID."
+          },
+          "ingredients": {
+            "type": "array",
+            "description": "List of ingredients used.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "toppings": {
+            "type": "array",
+            "description": "List of toppings applied.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "completedAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp when the batch was completed (ISO 8601 format)."
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "messages": {
+      "recipeLogMessage": {
+        "headers": {
+          "$ref": "#/components/schemas/messageHeaders"
+        },
+        "payload": {
+          "$ref": "#/components/schemas/recipeLogEvent"
+        },
+        "name": "recipeLogMessage",
+        "title": "Recipe Log Message",
+        "summary": "Content for the Recipe Log Event."
+      },
+      "dailySpecialOrderedMessage": {
+        "payload": {
+          "$ref": "#/components/schemas/dailySpecialOrderedEvent"
+        },
+        "name": "dailySpecialOrderedMessage",
+        "title": "Daily Special Ordered Message",
+        "summary": "Published when a daily special is ordered."
+      },
+      "inventoryItemAddedMessage": {
+        "payload": {
+          "$ref": "#/components/schemas/inventoryItemAddedEvent"
+        },
+        "name": "inventoryItemAddedMessage",
+        "title": "Inventory Item Added Message",
+        "summary": "Published when a new inventory item is added to the system."
+      },
+      "inventoryStockUpdatedMessage": {
+        "payload": {
+          "$ref": "#/components/schemas/inventoryStockUpdatedEvent"
+        },
+        "name": "inventoryStockUpdatedMessage",
+        "title": "Inventory Stock Updated Message",
+        "summary": "Published when an inventory item's stock level changes."
+      },
+      "menuAvailabilityChangedMessage": {
+        "payload": {
+          "$ref": "#/components/schemas/menuAvailabilityChangedEvent"
+        },
+        "name": "menuAvailabilityChangedMessage",
+        "title": "Menu Availability Changed Message",
+        "summary": "Published when a menu item becomes available or unavailable."
+      },
+      "pancakeBatchCompletedMessage": {
+        "payload": {
+          "$ref": "#/components/schemas/pancakeBatchCompletedEvent"
+        },
+        "name": "pancakeBatchCompletedMessage",
+        "title": "Pancake Batch Completed Message",
+        "summary": "Published when a pancake batch is completed."
+      },
+      "reservationCancelledMessage": {
+        "payload": {
+          "$ref": "#/components/schemas/reservationCancelledEvent"
+        },
+        "name": "reservationCancelledMessage",
+        "title": "Reservation Cancelled Message",
+        "summary": "Published when a reservation is cancelled."
+      },
+      "reservationConfirmedMessage": {
+        "payload": {
+          "$ref": "#/components/schemas/reservationConfirmedEvent"
+        },
+        "name": "reservationConfirmedMessage",
+        "title": "Reservation Confirmed Message",
+        "summary": "Published when a reservation is confirmed."
+      },
+      "staffMemberAddedMessage": {
+        "payload": {
+          "$ref": "#/components/schemas/staffMemberAddedEvent"
+        },
+        "name": "staffMemberAddedMessage",
+        "title": "Staff Member Added Message",
+        "summary": "Published when a new staff member is registered in the system."
+      },
+      "toppingCreatedMessage": {
+        "payload": {
+          "$ref": "#/components/schemas/toppingCreatedEvent"
+        },
+        "name": "toppingCreatedMessage",
+        "title": "Topping Created Message",
+        "summary": "Published when a new topping is added to the toppings catalogue."
+      },
+      "waffleBatchCompletedMessage": {
+        "payload": {
+          "$ref": "#/components/schemas/waffleBatchCompletedEvent"
+        },
+        "name": "waffleBatchCompletedMessage",
+        "title": "Waffle Batch Completed Message",
+        "summary": "Published when a waffle batch is completed."
+      }
+    }
+  },
+  "x-pub-settings": {
+    "pub-ready": true,
+    "tags": [
+      "Breakfast"
+    ],
+    "team": "Griddle"
+  }
+}

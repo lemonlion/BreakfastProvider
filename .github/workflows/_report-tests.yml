@@ -1,0 +1,45 @@
+name: Generate test report
+
+on:
+  workflow_call:
+    inputs:
+      test-type: { type: string, required: true }  # ["unit", "component"]
+      test-run-type: { type: string, required: false }  # ["memory", "docker"]
+      trx-file: { type: string, required: true }
+
+jobs:
+  generate-reports:
+    name: Generate test report
+    runs-on: ubuntu-24.04
+
+    steps:
+      - id: pretty-test-type
+        name: Capitalize test type
+        run: |
+          raw="${{ inputs.test-type }}"
+          echo "capitalized=${raw^}" >> $GITHUB_OUTPUT
+
+      - name: Install reporting CLI tools
+        run: |
+          dotnet tool install LiquidTestReports.Cli --version 2.0.0-beta.6 --global
+          echo "${HOME}/.dotnet/tools" >> $GITHUB_PATH
+
+      - name: Download TRX artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ inputs.trx-file }}
+
+      - name: Generate test report
+        run: >
+          liquid
+          --inputs "File=./${{ inputs.trx-file }};Format=Trx"
+          --title "${{ steps.pretty-test-type.outputs.capitalized }} test run"
+          --output-file ./test-results.md
+
+      - name: Write test results to job summary
+        run: cat test-results.md >> $GITHUB_STEP_SUMMARY
+
+      - name: Delete TRX artifact
+        uses: geekyeggo/delete-artifact@v4
+        with:
+          name: ${{ inputs.trx-file }}

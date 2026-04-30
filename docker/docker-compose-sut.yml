@@ -1,0 +1,64 @@
+networks:
+  localdev:
+    driver: bridge
+  kafkanet:
+    name: kafka-network
+
+services:
+
+  breakfast-provider-api:
+    build:
+      context: ..
+      dockerfile: ./src/BreakfastProvider.Api/Dockerfile
+    container_name: docker.breakfast-provider-api
+    ports:
+      - "5080:8080"
+    depends_on:
+      cosmosdb:
+        condition: service_healthy
+      sqlserver:
+        condition: service_healthy
+      cow-service:
+        condition: service_started
+      goat-service:
+        condition: service_started
+      supplier-service:
+        condition: service_started
+      kitchen-service:
+        condition: service_started
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - CowServiceConfig__BaseAddress=http://cow-service:8080
+      - GoatServiceConfig__BaseAddress=http://goat-service:8080
+      - SupplierServiceConfig__BaseAddress=http://supplier-service:8080
+      - KitchenServiceConfig__BaseAddress=http://kitchen-service:8080
+      - CosmosConfig__ConnectionString=AccountEndpoint=https://cosmosdb-database.local:8081/;AccountKey=C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw==
+      - CosmosConfig__UseGatewayMode=true
+      - EventGridConfig__Endpoint=https://eventgrid.local:60101/api/events
+      - EventGridConfig__TopicKey=TheLocal+DevelopmentKey=
+      - KafkaConfig__BootstrapServers=kafka.local:9092
+      - KafkaConfig__ProducerConfigurations__RecipeLogEvent__TopicName=breakfast_recipe_logs
+      - KafkaConfig__ProducerConfigurations__RecipeLogEvent__ApiKey=kafka-user
+      - KafkaConfig__ProducerConfigurations__RecipeLogEvent__ApiSecret=kafka-user-secret
+      - KafkaConfig__ConsumerConfigurations__RecipeLogEvent__TopicName=breakfast_recipe_logs
+      - KafkaConfig__ConsumerConfigurations__RecipeLogEvent__ApiKey=kafka-user
+      - KafkaConfig__ConsumerConfigurations__RecipeLogEvent__ApiSecret=kafka-user-secret
+      - FeatureSwitchesConfig__IsGoatMilkEnabled=true
+      - ReportingConfig__ConnectionString=Server=sqlserver-database.local,1433;Database=BreakfastReporting;User Id=sa;Password=YourStr0ngP@ssword;TrustServerCertificate=True
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://jaeger.local:4317
+    volumes:
+      - ./kafka-config/certificates/ca.crt:/certs/kafka-ca.crt:ro
+      - ./docker-entrypoint.sh:/app/docker-entrypoint.sh:ro
+    user: root
+    entrypoint: ["/bin/sh", "/app/docker-entrypoint.sh"]
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:8080/health || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 30s
+    networks:
+      localdev:
+      kafkanet:
+        aliases:
+          - breakfast-provider-api.local

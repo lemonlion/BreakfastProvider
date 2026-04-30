@@ -1,0 +1,41 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`Badge snapshots should match snapshot for error variant 1`] = `
+<span>
+  Status Text
+</span>
+`;
+
+exports[`Badge snapshots should match snapshot for info variant 1`] = `
+<span>
+  Status Text
+</span>
+`;
+
+exports[`Badge snapshots should match snapshot for neutral variant 1`] = `
+<span>
+  Status Text
+</span>
+`;
+
+exports[`Badge snapshots should match snapshot for success variant 1`] = `
+<span>
+  Status Text
+</span>
+`;
+
+exports[`Badge snapshots should match snapshot for warning variant 1`] = `
+<span>
+  Status Text
+</span>
+`;
+
+exports[`Badge snapshots should match snapshot with dot indicator 1`] = `
+<span>
+  <span
+    aria-hidden="true"
+    style="width: 6px; height: 6px; border-radius: 50%; background-color: currentcolor;"
+  />
+  Online
+</span>
+`;

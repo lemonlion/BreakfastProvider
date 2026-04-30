@@ -1,0 +1,7 @@
+ca.crt
+ca.key
+ca.srl
+kafka.crt
+kafka.csr
+kafka.keystore.jks
+kafka.truststore.jks

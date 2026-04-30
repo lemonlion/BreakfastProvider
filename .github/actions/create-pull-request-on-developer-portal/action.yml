@@ -1,0 +1,47 @@
+name: Create Pull Request
+description: Creates a pull request on the developer portal repository
+
+inputs:
+  source_folder:
+    description: 'The folder containing the files to be used for creating the pull request'
+    required: true
+  branch_name:
+    description: 'The branch name for creating the pull request'
+    required: true
+  github_api_token:
+    description: 'The GitHub API token for the developer portal repository'
+    required: true
+  destination_repo:
+    description: 'The destination repository for the pull request'
+    required: true
+  destination_folder:
+    description: 'The destination folder for the pull request'
+    required: true
+  github_user_email:
+    description: 'The email address of the user creating the pull request'
+    required: true
+  github_user_name:
+    description: 'The name of the user creating the pull request'
+    required: true
+  pull_request_reviewers:
+    description: 'The reviewers for the pull request'
+    required: true
+
+
+runs:
+  using: composite
+  steps:
+    - name: Create pull request on developer portal
+      uses: jacopocarlini/action-pull-request-another-repo@f0c80501be1cd880ac5b1fd90da4c1f417e5a737  # latest as of 2024-09-18
+      env:
+        API_TOKEN_GITHUB: ${{ inputs.github_api_token }}
+      with:
+        source_folder: ${{ inputs.source_folder }}
+        destination_repo: ${{ inputs.destination_repo }}
+        destination_folder: ${{ inputs.destination_folder }}
+        destination_base_branch: 'main'
+        destination_head_branch: ${{ inputs.branch_name }}
+        user_email: ${{ inputs.github_user_email }}
+        user_name: ${{ inputs.github_user_name }}
+        pull_request_reviewers: ${{ inputs.pull_request_reviewers }}
+        allow_force_push: 'true'

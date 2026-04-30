@@ -1,0 +1,31 @@
+name: Publish NuGet package
+
+on:
+  workflow_call:
+    inputs:
+      version: { type: string, required: true }
+
+jobs:
+  publish:
+    name: Publish NuGet package
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: .github/
+
+      - name: Get package from cache (API)
+        uses: actions/cache/restore@v4
+        with:
+          key: BreakfastProvider.API.nupkg-${{ github.run_id }}
+          path: ./output/packages/BreakfastProvider.Api.${{ inputs.version }}.nupkg
+          fail-on-cache-miss: true
+
+      - name: Push NuGet packages
+        run: >
+          dotnet nuget push ./output/packages/*.nupkg
+          --source https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json
+          --api-key ${{ github.token }}
+          --skip-duplicate
+          --no-symbols

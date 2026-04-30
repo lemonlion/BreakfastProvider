@@ -21,6 +21,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using CosmosDB.InMemoryEmulator;
 using Spanner.InMemoryEmulator;
+using TestTrackingDiagrams.Constants;
 using TestTrackingDiagrams.Extensions;
 using TestTrackingDiagrams.Extensions.CosmosDB;
 using TestTrackingDiagrams.Extensions.EfCore.Relational;
@@ -399,8 +400,8 @@ public static class ServiceCollectionExtensions
         // arrows in PlantUML diagrams when the SUT consumes events.
         //
         // CallerName = broker so the arrow goes Kafka → BP (delivery
-        // direction). CallerDependencyCategory = "MessageQueue" renders the
-        // broker as a queue shape. DependencyCategory = "" keeps BP as entity.
+        // direction). CallerDependencyCategory renders the broker as a queue shape.
+        // DependencyCategory = "" keeps BP as entity.
         services.AddHttpContextAccessor();
         services.AddKeyedSingleton("Kafka", (sp, _) => new MessageTracker(
             new MessageTrackerOptions
@@ -410,7 +411,7 @@ public static class ServiceCollectionExtensions
                 Verbosity = MessageTrackerVerbosity.Detailed,
                 UseHttpContextCorrelation = true,
                 CurrentTestInfoFetcher = currentTestInfoFetcher,
-                CallerDependencyCategory = "MessageQueue",
+                CallerDependencyCategory = DependencyCategories.MessageQueue,
                 DependencyCategory = ""
             },
             sp.GetRequiredService<IHttpContextAccessor>()));
@@ -426,7 +427,7 @@ public static class ServiceCollectionExtensions
                 Verbosity = MessageTrackerVerbosity.Detailed,
                 UseHttpContextCorrelation = true,
                 CurrentTestInfoFetcher = currentTestInfoFetcher,
-                CallerDependencyCategory = "MessageQueue",
+                CallerDependencyCategory = DependencyCategories.MessageQueue,
                 DependencyCategory = ""
             },
             sp.GetRequiredService<IHttpContextAccessor>()));
@@ -445,7 +446,7 @@ public static class ServiceCollectionExtensions
                 Verbosity = MessageTrackerVerbosity.Detailed,
                 UseHttpContextCorrelation = true,
                 CurrentTestInfoFetcher = currentTestInfoFetcher,
-                CallerDependencyCategory = "MessageQueue",
+                CallerDependencyCategory = DependencyCategories.MessageQueue,
                 DependencyCategory = ""
             },
             sp.GetRequiredService<IHttpContextAccessor>()));

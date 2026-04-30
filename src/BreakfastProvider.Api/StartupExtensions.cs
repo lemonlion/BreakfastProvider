@@ -193,7 +193,6 @@ public static class Documentation
     public static class ServiceNames
     {
         public const string BreakfastProvider = "Breakfast Provider";
-        public const string PrimaryCallerOfTheBreakfastProvider = "Caller";
         public const string CosmosDb = "CosmosDB";
         public const string EventGrid = "Event Grid";
         public const string KafkaBroker = "Kafka Broker";

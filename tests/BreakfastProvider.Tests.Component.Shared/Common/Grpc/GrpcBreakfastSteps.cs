@@ -22,7 +22,6 @@ public class GrpcBreakfastSteps
             new GrpcTrackingOptions
             {
                 ServiceName = Documentation.ServiceNames.BreakfastProvider,
-                CallerName = Documentation.ServiceNames.PrimaryCallerOfTheBreakfastProvider,
                 Verbosity = GrpcTrackingVerbosity.Detailed,
                 CurrentTestInfoFetcher = currentTestInfoFetcher
             });

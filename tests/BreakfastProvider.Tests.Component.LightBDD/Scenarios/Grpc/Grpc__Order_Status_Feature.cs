@@ -12,6 +12,7 @@ public partial class Grpc__Order_Status_Feature
 
     [HappyPath]
     [Scenario]
+    [IgnoreIf(nameof(Settings.RunAgainstExternalServiceUnderTest), NeedsInProcessGrpc)]
     public async Task Order_Status_Via_Grpc_Should_Return_Order_Details()
     {
         await Runner.RunScenarioAsync(
@@ -26,6 +27,7 @@ public partial class Grpc__Order_Status_Feature
     #region Not Found
 
     [Scenario]
+    [IgnoreIf(nameof(Settings.RunAgainstExternalServiceUnderTest), NeedsInProcessGrpc)]
     public async Task Order_Status_For_Non_Existent_Order_Should_Return_Not_Found()
     {
         await Runner.RunScenarioAsync(

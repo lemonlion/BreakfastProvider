@@ -94,7 +94,6 @@ jobs:
       - name: Tune Docker Compose for CI
         if: ${{ inputs.test-run-type == 'docker' || inputs.test-run-type == 'external-sut' }}
         run: |
-          sed -i 's/AZURE_COSMOS_EMULATOR_PARTITION_COUNT=25/AZURE_COSMOS_EMULATOR_PARTITION_COUNT=3/' docker/docker-compose-database.yml
           sed -i 's/start_period: 30s/start_period: 120s/' docker/docker-compose-sut.yml
           sed -i 's/retries: 30/retries: 60/' docker/docker-compose-sut.yml
 
@@ -169,20 +168,19 @@ jobs:
       - name: Wait until the Cosmos DB Emulator is ready
         if: ${{ inputs.test-run-type == 'docker' }}
         run: |
-          timeout_seconds=600
+          timeout_seconds=120
           start_time=$(date +%s)
           while true; do
             current_time=$(date +%s)
             elapsed_time=$((current_time - start_time))
-            remaining_time=$((timeout_seconds - elapsed_time))
             if [ $elapsed_time -ge $timeout_seconds ]; then
                 echo Timeout reached, aborting
                 exit 1
             fi
 
-            curl -s -k "https://localhost:8081/_explorer/emulator.pem" && break
+            curl -sf http://localhost:8080/ready && break
 
-            echo curl failed, retrying...
+            echo "Cosmos DB emulator not ready yet (${elapsed_time}s), retrying..."
             sleep 2
           done
           echo Cosmos DB emulator started successfully

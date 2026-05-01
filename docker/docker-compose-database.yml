@@ -6,36 +6,26 @@ services:
 
   cosmosdb:
     container_name: azure-cosmosdb-emulator
-    image: mcr.microsoft.com/cosmosdb/linux/azure-cosmos-emulator
+    image: mcr.microsoft.com/cosmosdb/linux/azure-cosmos-emulator:vnext-preview
     hostname: cosmosdb-database.local
     tty: true
     ports:
-      - '8081:8081' # Data Explorer
-      - '8900:8900'
-      - '8901:8901'
-      - '8902:8902'
-      - '10250:10250'
-      - '10251:10251'
-      - '10252:10252'
-      - '10253:10253'
-      - '10254:10254'
-      - '10255:10255'
-      - '10256:10256'
-      - '10350:10350'
+      - '8081:8081'
+      - '8080:8080'
+      - '1234:1234'
     expose:
       - "8081"
-      - "10250-10256"
-      - "10350"
+      - "8080"
+      - "1234"
     environment:
-      - AZURE_COSMOS_EMULATOR_PARTITION_COUNT=25
-      - AZURE_COSMOS_EMULATOR_ENABLE_DATA_PERSISTENCE=false
-      - AZURE_COSMOS_EMULATOR_IP_ADDRESS_OVERRIDE=127.0.0.1
+      - PROTOCOL=https
+      - ENABLE_EXPLORER=true
     healthcheck:
-      test: ["CMD-SHELL", "curl -sk https://localhost:8081/_explorer/emulator.pem || exit 1"]
-      interval: 10s
+      test: ["CMD-SHELL", "curl -sf http://localhost:8080/ready || exit 1"]
+      interval: 5s
       timeout: 5s
       retries: 60
-      start_period: 30s
+      start_period: 10s
     networks:
       localdev:
         aliases:

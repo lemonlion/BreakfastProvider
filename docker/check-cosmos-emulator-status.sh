@@ -20,7 +20,7 @@ while true; do
 
     sleep 2
 
-    command="curl -k \"https://localhost:8081/_explorer/emulator.pem\""
+    command="curl -sf \"http://localhost:8080/ready\""
 
     # Print the command
     echo "$command"

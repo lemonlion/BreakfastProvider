@@ -13,6 +13,7 @@ public static class IgnoreReasons
     public const string NeedsNonDefaultConfiguration = "This test requires configuration overrides which are not possible in post-deployment environments where only the default config is available";
     public const string NeedsDirectDatabaseAccess = "This test needs direct database access which is not available in post-deployment environments";
     public const string NeedsEventAndKafkaInfrastructure = "This test's primary assertions depend on event store and/or Kafka which are unavailable in post-deployment environments";
+    public const string NeedsInProcessGrpc = "This test requires in-process gRPC access via AppFactory which is not available in post-deployment environments";
 
     // ── Docker-mode skip reasons (scenario-level) ────────────────────────────
     public const string NeedsIsolatedDatabase = "This test assumes an empty database which is not guaranteed when using a shared Docker database";

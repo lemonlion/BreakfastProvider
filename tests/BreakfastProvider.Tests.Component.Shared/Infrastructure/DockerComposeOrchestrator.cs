@@ -222,9 +222,8 @@ public sealed class DockerComposeOrchestrator : IDisposable
 
     /// <summary>
     /// Verifies the Cosmos DB emulator is ready by testing the actual data plane.
-    /// First checks the HTTPS certificate endpoint (fast), then uses the Cosmos SDK
-    /// to create the database and container — this ensures the emulator is fully
-    /// warmed up and can serve data-plane write requests, not just read metadata.
+    /// First checks the vNext health probe endpoint (fast), then the HTTPS gateway
+    /// endpoint to ensure the emulator is fully warmed up and can serve requests.
     /// </summary>
     private static bool IsCosmosDbReady()
     {
@@ -235,15 +234,12 @@ public sealed class DockerComposeOrchestrator : IDisposable
                 ServerCertificateCustomValidationCallback = (_, _, _, _) => true
             };
             using var httpClient = new HttpClient(handler) { Timeout = TimeSpan.FromSeconds(5) };
-            var certResponse = httpClient.GetAsync("https://localhost:8081/_explorer/emulator.pem").GetAwaiter().GetResult();
-            if (!certResponse.IsSuccessStatusCode)
+
+            // vNext emulator exposes a readiness probe on port 8080 (HTTP)
+            var readyResponse = httpClient.GetAsync("http://localhost:8080/ready").GetAwaiter().GetResult();
+            if (!readyResponse.IsSuccessStatusCode)
                 return false;
 
-            // Certificate endpoint is up — the data plane is likely ready.
-            // Avoid creating a full CosmosClient here; the SDK's process-wide
-            // client counter and lingering TCP connections add emulator load.
-            // The static WebApplicationFactory startup will create the database
-            // and container via Program.cs's CreateDatabaseIfNotExistsAsync.
             return true;
         }
         catch

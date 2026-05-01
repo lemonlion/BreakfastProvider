@@ -12,6 +12,7 @@ public partial class Grpc__Recipe_Summary_Feature
 
     [HappyPath]
     [Scenario]
+    [IgnoreIf(nameof(Settings.RunAgainstExternalServiceUnderTest), NeedsInProcessGrpc)]
     public async Task Pancake_Recipe_Summary_Should_Return_Correct_Data()
     {
         await Runner.RunScenarioAsync(
@@ -21,6 +22,7 @@ public partial class Grpc__Recipe_Summary_Feature
 
     [HappyPath]
     [Scenario]
+    [IgnoreIf(nameof(Settings.RunAgainstExternalServiceUnderTest), NeedsInProcessGrpc)]
     public async Task Waffle_Recipe_Summary_Should_Return_Correct_Data()
     {
         await Runner.RunScenarioAsync(
@@ -33,6 +35,7 @@ public partial class Grpc__Recipe_Summary_Feature
     #region Edge Cases
 
     [Scenario]
+    [IgnoreIf(nameof(Settings.RunAgainstExternalServiceUnderTest), NeedsInProcessGrpc)]
     public async Task Unknown_Recipe_Type_Should_Return_Zero_Batches()
     {
         await Runner.RunScenarioAsync(

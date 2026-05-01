@@ -10,6 +10,7 @@ public partial class Orders__Outbox_Retry_Exhaustion_Feature
 {
     [Scenario]
     [IgnoreIf(nameof(Settings.RunAgainstExternalServiceUnderTest), NeedsEventAndKafkaInfrastructure)]
+    [IgnoreIf(nameof(Settings.UsesSharedDockerDatabase), NeedsIsolatedDatabase)]
     public async Task An_Outbox_Message_Should_Transition_To_Failed_After_Exhausting_Retries()
     {
         await Runner.RunScenarioAsync(

@@ -150,6 +150,15 @@ jobs:
             sleep 5
           done
 
+      - name: Verify Cosmos connectivity from SUT container
+        if: ${{ inputs.test-run-type == 'external-sut' }}
+        run: |
+          echo "=== Verifying Cosmos DB connectivity from SUT container ==="
+          docker exec docker.breakfast-provider-api curl -sk https://cosmosdb-database.local:8081/ || echo "WARN: curl to Cosmos from SUT failed"
+          echo ""
+          echo "=== Cosmos emulator health from host ==="
+          curl -sf http://localhost:8080/ready && echo "Cosmos emulator ready" || echo "WARN: Cosmos emulator not ready"
+
       - name: Set component test settings for external SUT
         if: ${{ inputs.test-run-type == 'external-sut' }}
         run: |
@@ -204,6 +213,20 @@ jobs:
           --results-directory ./coverage
           --logger GitHubActions
           ${{ inputs.filter && format('--filter {0}', inputs.filter) || '' }}
+
+      - name: Dump container logs on failure
+        if: ${{ failure() && (inputs.test-run-type == 'docker' || inputs.test-run-type == 'external-sut') }}
+        run: |
+          echo "=== Container Status ==="
+          docker ps -a --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}" || true
+          if [ "${{ inputs.test-run-type }}" = "external-sut" ]; then
+            echo ""
+            echo "=== SUT Container Logs (last 100 lines) ==="
+            docker logs docker.breakfast-provider-api 2>&1 | tail -100 || true
+          fi
+          echo ""
+          echo "=== Cosmos DB Emulator Logs (last 30 lines) ==="
+          docker logs azure-cosmosdb-emulator 2>&1 | tail -30 || true
 
       - name: Spin down docker
         if: ${{ always() && (inputs.test-run-type == 'docker' || inputs.test-run-type == 'external-sut') }}

@@ -24,4 +24,10 @@ public record ComponentTestSettings
     public string? ExternalServiceUnderTestUrl { get; set; }
     public bool EnableDockerInSetupAndTearDown { get; set; }
     public bool SkipDockerTearDown { get; set; }
+
+    /// <summary>
+    /// True when tests target a shared Docker database (not in-memory, not external SUT).
+    /// Tests that require an isolated database should be skipped in this mode.
+    /// </summary>
+    public bool UsesSharedDockerDatabase => !RunWithAnInMemoryDatabase && !RunAgainstExternalServiceUnderTest;
 }

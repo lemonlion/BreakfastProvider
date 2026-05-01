@@ -37,7 +37,7 @@ public class GraphQlReportingSteps(RequestContext context)
         ResponseMessage = await context.Client.SendAsync(request);
     }
 
-    public async Task QueryRecipeReports(int maxAttempts = 10, int delayMs = 1000)
+    public async Task QueryRecipeReports(int maxAttempts = 30, int delayMs = 2000)
     {
         for (var attempt = 1; attempt <= maxAttempts; attempt++)
         {

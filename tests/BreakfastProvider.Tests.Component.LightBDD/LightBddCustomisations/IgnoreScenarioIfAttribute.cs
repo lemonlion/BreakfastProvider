@@ -5,6 +5,7 @@ using LightBDD.XUnit3;
 
 namespace BreakfastProvider.Tests.Component.LightBDD.LightBddCustomisations;
 
+[AttributeUsage(AttributeTargets.Method | AttributeTargets.Class, AllowMultiple = true)]
 public class IgnoreScenarioIfAttribute<T>(string settingName, params string[] reasons) : Attribute, IScenarioDecoratorAttribute where T : class
 {
     public Task ExecuteAsync(IScenario scenario, Func<Task> scenarioInvocation)

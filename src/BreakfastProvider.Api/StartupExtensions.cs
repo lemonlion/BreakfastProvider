@@ -43,6 +43,10 @@ public static class StartupExtensions
             .Bind(configuration.GetSection("PubSubConfig"))
             .Validate(configObject =>
             {
+                // When ProjectId is empty, Pub/Sub is disabled — skip validation.
+                if (string.IsNullOrWhiteSpace(configObject.ProjectId))
+                    return true;
+
                 var validator = new PubSubConfigValidator();
                 var validationResult = validator.Validate(configObject);
                 return validationResult.IsValid;
@@ -50,7 +54,21 @@ public static class StartupExtensions
             .ValidateOnStart();
 
         if (string.IsNullOrWhiteSpace(pubSubConfig.ProjectId))
+        {
+            // Register typed PubSub publishers (no-op) so that DI resolves
+            // even when there's no real Pub/Sub project configured.
+            services.AddSingleton(_ => new PubSubEventPublisher<InventoryItemAddedEvent>());
+            services.AddSingleton(_ => new PubSubEventPublisher<InventoryStockUpdatedEvent>());
+            services.AddSingleton(_ => new PubSubEventPublisher<MenuAvailabilityChangedEvent>());
+            services.AddSingleton(_ => new PubSubEventPublisher<ToppingCreatedEvent>());
+            services.AddSingleton(_ => new PubSubEventPublisher<StaffMemberAddedEvent>());
+            services.AddSingleton(_ => new PubSubEventPublisher<ReservationConfirmedEvent>());
+            services.AddSingleton(_ => new PubSubEventPublisher<ReservationCancelledEvent>());
+            services.AddSingleton(_ => new PubSubEventPublisher<DailySpecialOrderedEvent>());
+            services.AddSingleton(_ => new PubSubEventPublisher<PancakeBatchCompletedEvent>());
+            services.AddSingleton(_ => new PubSubEventPublisher<WaffleBatchCompletedEvent>());
             return services;
+        }
 
         // Register a PublisherClient per event type
         foreach (var (eventTypeName, topicConfig) in pubSubConfig.PublisherConfigurations)
@@ -157,6 +175,10 @@ public static class StartupExtensions
             .Bind(configuration.GetSection(nameof(SpannerConfig)))
             .Validate(configObject =>
             {
+                // When ProjectId is empty, Spanner is disabled — skip validation.
+                if (string.IsNullOrWhiteSpace(configObject.ProjectId))
+                    return true;
+
                 var validator = new SpannerConfigValidator();
                 return validator.Validate(configObject).IsValid;
             })
@@ -173,9 +195,13 @@ public static class StartupExtensions
         var notificationConfig = configuration.GetSection(nameof(NotificationServiceConfig)).Get<NotificationServiceConfig>()
             ?? new NotificationServiceConfig();
 
+        var address = string.IsNullOrWhiteSpace(notificationConfig.BaseAddress)
+            ? "http://localhost" // Placeholder — gRPC calls will fail at runtime if actually invoked.
+            : notificationConfig.BaseAddress;
+
         services.AddSingleton(sp =>
         {
-            var channel = GrpcChannel.ForAddress(notificationConfig.BaseAddress);
+            var channel = GrpcChannel.ForAddress(address);
             return new Grpc.NotificationGrpc.NotificationGrpcClient(channel);
         });
 

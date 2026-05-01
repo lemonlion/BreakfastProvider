@@ -27,6 +27,12 @@ public class PubSubBatchCompletionConsumerService(
     {
         var config = pubSubOptions.Value;
 
+        if (string.IsNullOrWhiteSpace(config.ProjectId))
+        {
+            logger.LogInformation("Pub/Sub ProjectId is not configured. Batch completion consumer will not start.");
+            return;
+        }
+
         if (!config.SubscriberConfigurations.TryGetValue(EventTypeName, out var subConfig))
         {
             logger.LogWarning("No Pub/Sub subscriber configuration found for {EventType}. Batch completion consumer will not start.",

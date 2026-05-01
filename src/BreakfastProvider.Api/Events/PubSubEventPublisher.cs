@@ -32,10 +32,13 @@ public class PubSubEventPublisher<T> where T : IPubSubEvent
         _httpContextAccessor = httpContextAccessor;
     }
 
-    protected PubSubEventPublisher() { }
+    protected internal PubSubEventPublisher() { }
 
     public virtual async Task PublishEvent(T @event, CancellationToken cancellationToken = default)
     {
+        if (_publisher is null)
+            return;
+
         var eventName = @event.GetEventName();
         var messageId = Guid.NewGuid().ToString();
         var tenant = _httpContextAccessor.HttpContext?.Request.Headers["Tenant"].FirstOrDefault();

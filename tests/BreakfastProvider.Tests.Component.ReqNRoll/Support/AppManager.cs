@@ -1,5 +1,6 @@
 using System.Collections.Concurrent;
 using BreakfastProvider.Api;
+using BreakfastProvider.Api.Reporting;
 using BreakfastProvider.Tests.Component.Shared.Fakes.EventHub;
 using BreakfastProvider.Tests.Component.Shared.Fakes.HttpFakes;
 using BreakfastProvider.Tests.Component.Shared.Fakes.Kafka;
@@ -184,7 +185,24 @@ public sealed class AppManager : IDisposable
         }
 
         if (Settings.RunWithAnInMemoryReportingDatabase)
+        {
             services.UseInMemoryReportingDatabase();
+
+            // UseInMemoryReportingDatabase replaces the real Kafka consumer with
+            // an in-memory variant that listens to ConsumedKafkaMessageStore events.
+            // In Docker mode (real Kafka broker), the real producer doesn't fire
+            // those events, so re-register the real consumer to read from Kafka
+            // and write to the (now SQLite) reporting DB.
+            if (!Settings.RunWithAnInMemoryKafkaBroker)
+            {
+                var inMemoryKafkaConsumer = services
+                    .FirstOrDefault(d => d.ImplementationType == typeof(InMemoryReportingKafkaConsumerService));
+                if (inMemoryKafkaConsumer is not null)
+                    services.Remove(inMemoryKafkaConsumer);
+
+                services.AddHostedService<ReportingKafkaConsumerService>();
+            }
+        }
 
         if (Settings.RunWithAnInMemoryBreakfastDatabase)
             services.UseInMemoryBreakfastDatabase();

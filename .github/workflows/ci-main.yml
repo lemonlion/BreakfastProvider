@@ -37,13 +37,14 @@ jobs:
 
 
   component-tests-in-memory:
-    name: Component tests in memory
+    name: Component tests in memory (LightBDD)
     uses: ./.github/workflows/_tests.yml
     with:
       test-type: component
       test-run-type: memory
       test-run-description: component-tests-in-memory
-      csproj-path: ./tests/BreakfastProvider.Tests.Component/BreakfastProvider.Tests.Component.csproj
+      csproj-path: ./tests/BreakfastProvider.Tests.Component.LightBDD/BreakfastProvider.Tests.Component.LightBDD.csproj
+      features-report-path: tests/BreakfastProvider.Tests.Component.LightBDD/bin/Debug/net10.0/Reports/TestRunReport.html
     secrets: inherit
 
 
@@ -68,13 +69,14 @@ jobs:
 
 
   component-tests-in-docker:
-    name: Component tests in docker
+    name: Component tests in docker (LightBDD)
     uses: ./.github/workflows/_tests.yml
     with:
       test-type: component
       test-run-type: docker
       test-run-description: component-tests-in-docker
-      csproj-path: ./tests/BreakfastProvider.Tests.Component/BreakfastProvider.Tests.Component.csproj
+      csproj-path: ./tests/BreakfastProvider.Tests.Component.LightBDD/BreakfastProvider.Tests.Component.LightBDD.csproj
+      features-report-path: tests/BreakfastProvider.Tests.Component.LightBDD/bin/Debug/net10.0/Reports/TestRunReport.html
     secrets: inherit
 
 
@@ -99,13 +101,14 @@ jobs:
 
 
   component-tests-external-sut:
-    name: Component tests (external SUT)
+    name: Component tests (external SUT, LightBDD)
     uses: ./.github/workflows/_tests.yml
     with:
       test-type: component
       test-run-type: external-sut
       test-run-description: component-tests-external-sut
-      csproj-path: ./tests/BreakfastProvider.Tests.Component/BreakfastProvider.Tests.Component.csproj
+      csproj-path: ./tests/BreakfastProvider.Tests.Component.LightBDD/BreakfastProvider.Tests.Component.LightBDD.csproj
+      features-report-path: tests/BreakfastProvider.Tests.Component.LightBDD/bin/Debug/net10.0/Reports/TestRunReport.html
     secrets: inherit
 
 
@@ -129,9 +132,21 @@ jobs:
       coverage-file: component-tests-external-sut.coverage.cobertura.xml
 
 
+  component-tests-reqnroll-in-memory:
+    name: Component tests in memory (ReqNRoll)
+    uses: ./.github/workflows/_tests.yml
+    with:
+      test-type: component
+      test-run-type: memory
+      test-run-description: component-tests-reqnroll-in-memory
+      csproj-path: ./tests/BreakfastProvider.Tests.Component.ReqNRoll/BreakfastProvider.Tests.Component.ReqNRoll.csproj
+      features-report-path: tests/BreakfastProvider.Tests.Component.ReqNRoll/bin/Debug/net10.0/Reports/TestRunReport.html
+    secrets: inherit
+
+
   checks-complete:
     name: Checks complete
-    needs: [build, component-tests-in-memory, component-tests-in-docker, component-tests-external-sut]
+    needs: [build, component-tests-in-memory, component-tests-in-docker, component-tests-external-sut, component-tests-reqnroll-in-memory]
     runs-on: ubuntu-24.04
     steps:
       - name: Checks complete
@@ -160,3 +175,66 @@ jobs:
     with:
       version: ${{ needs.get-version.outputs.version }}
     secrets: inherit
+
+
+  deploy-pages:
+    name: Deploy test reports to GitHub Pages
+    needs: [component-tests-in-memory, component-tests-reqnroll-in-memory]
+    runs-on: ubuntu-24.04
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Download LightBDD report artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: LightBDD-component-tests-in-memory-report
+          path: site/lightbdd
+
+      - name: Download ReqNRoll report artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: LightBDD-component-tests-reqnroll-in-memory-report
+          path: site/reqnroll
+
+      - name: Generate index page
+        run: |
+          cat > site/index.html << 'EOF'
+          <!DOCTYPE html>
+          <html lang="en">
+          <head>
+            <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1">
+            <title>Breakfast Provider — Test Reports</title>
+            <style>
+              body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 4rem auto; padding: 0 1rem; }
+              h1 { margin-bottom: 0.5rem; }
+              p { color: #555; }
+              ul { list-style: none; padding: 0; }
+              li { margin: 1rem 0; }
+              a { font-size: 1.1rem; color: #0366d6; text-decoration: none; }
+              a:hover { text-decoration: underline; }
+            </style>
+          </head>
+          <body>
+            <h1>Breakfast Provider</h1>
+            <p>Component Test Reports (updated on every push to main)</p>
+            <ul>
+              <li><a href="lightbdd/TestRunReport.html">LightBDD Test Run Report</a></li>
+              <li><a href="reqnroll/TestRunReport.html">ReqNRoll Test Run Report</a></li>
+            </ul>
+          </body>
+          </html>
+          EOF
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

@@ -22,7 +22,7 @@ RUN dotnet publish src/BreakfastProvider.Api/BreakfastProvider.Api.csproj -c $BU
 
 FROM base AS final
 USER root
-RUN apt-get update && apt-get install -y --no-install-recommends curl && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y --no-install-recommends curl libssl3 && rm -rf /var/lib/apt/lists/*
 USER $APP_UID
 WORKDIR /app
 COPY --from=publish /app/publish .

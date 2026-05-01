@@ -123,12 +123,7 @@ jobs:
         if: ${{ inputs.test-run-type == 'external-sut' }}
         run: |
             docker compose -f docker/docker-compose-database.yml -f docker/docker-compose-storage.yml -f docker/docker-compose-fakes.yml -f docker/docker-compose-messaging.yml -f docker/docker-compose-sut.yml down
-            docker compose -f docker/docker-compose-database.yml -f docker/docker-compose-storage.yml -f docker/docker-compose-fakes.yml -f docker/docker-compose-messaging.yml -f docker/docker-compose-sut.yml up -d --wait --wait-timeout 600
-            compose_exit=$?
-            if [ $compose_exit -ne 0 ]; then
-              echo "::warning::Docker Compose exited with code $compose_exit — will rely on health check loop"
-              docker ps -a --format "table {{.Names}}\t{{.Status}}" || true
-            fi
+            docker compose -f docker/docker-compose-database.yml -f docker/docker-compose-storage.yml -f docker/docker-compose-fakes.yml -f docker/docker-compose-messaging.yml -f docker/docker-compose-sut.yml up -d
 
       - name: Wait for SUT to be healthy
         if: ${{ inputs.test-run-type == 'external-sut' }}

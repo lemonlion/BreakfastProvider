@@ -11,6 +11,7 @@ services:
       context: ..
       dockerfile: ./src/BreakfastProvider.Api/Dockerfile
     container_name: docker.breakfast-provider-api
+    restart: on-failure:3
     ports:
       - "5080:8080"
     depends_on:
@@ -28,6 +29,7 @@ services:
         condition: service_started
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
+      - DOTNET_EnableDiagnostics=0
       - CowServiceConfig__BaseAddress=http://cow-service:8080
       - GoatServiceConfig__BaseAddress=http://goat-service:8080
       - SupplierServiceConfig__BaseAddress=http://supplier-service:8080

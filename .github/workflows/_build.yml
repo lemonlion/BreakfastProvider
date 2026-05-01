@@ -19,11 +19,6 @@ jobs:
         with:
           dotnet-version: 10.0.x
 
-      - name: Setup NuGet
-        uses: nuget/setup-nuget@v2
-        with:
-          nuget-version: 5.x
-
       - name: Set nuget.config credentials
         run: |
           cp nuget.config.github nuget.config
@@ -65,14 +60,15 @@ jobs:
           -p:WarningLevel=0
           ./src/BreakfastProvider.Api/BreakfastProvider.Api.csproj
 
-      - name: Copy nuspec to publish output
-        run: cp ./src/BreakfastProvider.Api/BreakfastProvider.Api.nuspec ./output/publish-api/
-
       - name: Create package (API)
         run: >
-          nuget pack ./output/publish-api/BreakfastProvider.Api.nuspec
-          -OutputDirectory ./output/packages
-          -Properties "Configuration=Release;branch=${{ inputs.branch }};commit=${{ github.sha }};version=${{ inputs.version }}";
+          dotnet pack ./src/BreakfastProvider.Api/BreakfastProvider.Api.csproj
+          --no-build
+          -c Release
+          -o ./output/packages
+          /p:NuspecFile=BreakfastProvider.Api.nuspec
+          /p:NuspecBasePath=../../output/publish-api
+          /p:NuspecProperties="Configuration=Release%3Bbranch=${{ inputs.branch }}%3Bcommit=${{ github.sha }}%3Bversion=${{ inputs.version }}"
 
       - name: Cache package (API)
         uses: actions/cache/save@v4

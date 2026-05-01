@@ -228,6 +228,12 @@ public class Program
         builder.Services.AddScoped<IReservationService, ReservationService>();
         builder.Services.AddScoped<IFeedbackService, FeedbackService>();
         builder.Services.AddScoped<ICustomerPreferenceService, CustomerPreferenceService>();
+        builder.Services.AddScoped<IDailySpecialsService, DailySpecialsService>();
+        builder.Services.AddScoped<IPancakeService, PancakeService>();
+        builder.Services.AddScoped<IWaffleService, WaffleService>();
+        builder.Services.AddScoped<IMenuService, MenuService>();
+        builder.Services.AddScoped<IMilkSourcingService, MilkSourcingService>();
+        builder.Services.AddScoped<IToppingService, ToppingService>();
 
         // Validation
         builder.Services.AddValidatorsFromAssemblyContaining<Program>();

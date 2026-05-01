@@ -1,6 +1,6 @@
 using BreakfastProvider.Api.Configuration;
-using BreakfastProvider.Api.HttpClients;
 using BreakfastProvider.Api.Models.Responses;
+using BreakfastProvider.Api.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 
@@ -9,7 +9,7 @@ namespace BreakfastProvider.Api.Controllers;
 [ApiController]
 [Route("goat-milk")]
 [Produces("application/json")]
-public class GoatMilkController(IHttpClientFactory httpClientFactory, IOptions<FeatureSwitchesConfig> featureSwitches, ILogger<GoatMilkController> logger) : ControllerBase
+public class GoatMilkController(IMilkSourcingService milkSourcingService, IOptions<FeatureSwitchesConfig> featureSwitches, ILogger<GoatMilkController> logger) : ControllerBase
 {
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
@@ -20,27 +20,16 @@ public class GoatMilkController(IHttpClientFactory httpClientFactory, IOptions<F
         if (!featureSwitches.Value.IsGoatMilkEnabled)
             return NotFound(new ProblemDetails { Title = "Feature Disabled", Detail = "Goat milk is not currently available.", Status = 404 });
 
-        var client = httpClientFactory.CreateClient(HttpClientNames.GoatService);
-
         try
         {
-            using var response = await client.GetAsync("goat-milk", cancellationToken);
-            if (!response.IsSuccessStatusCode)
-                return StatusCode(StatusCodes.Status502BadGateway,
-                    new ProblemDetails { Title = "Goat Service Unavailable", Detail = "The Goat Service returned an error.", Status = 502 });
-
-            var goatMilkResponse = await response.Content.ReadFromJsonAsync<GoatMilkResponse>(cancellationToken);
-            if (goatMilkResponse is null)
-                return StatusCode(StatusCodes.Status502BadGateway,
-                    new ProblemDetails { Title = "Goat Service Unavailable", Detail = "The Goat Service returned an invalid response.", Status = 502 });
-
+            var goatMilkResponse = await milkSourcingService.SourceFromGoatAsync(cancellationToken);
             return goatMilkResponse;
         }
         catch (HttpRequestException ex)
         {
             logger.LogWarning(ex, "Goat Service is unreachable");
             return StatusCode(StatusCodes.Status502BadGateway,
-                new ProblemDetails { Title = "Goat Service Unavailable", Detail = "The Goat Service is unreachable.", Status = 502 });
+                new ProblemDetails { Title = "Goat Service Unavailable", Detail = ex.Message, Status = 502 });
         }
     }
 }

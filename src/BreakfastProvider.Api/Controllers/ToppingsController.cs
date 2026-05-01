@@ -1,10 +1,7 @@
-using BreakfastProvider.Api.Configuration;
-using BreakfastProvider.Api.Events;
-using BreakfastProvider.Api.Models.Events;
 using BreakfastProvider.Api.Models.Requests;
 using BreakfastProvider.Api.Models.Responses;
+using BreakfastProvider.Api.Services;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
 
 namespace BreakfastProvider.Api.Controllers;
 
@@ -12,29 +9,13 @@ namespace BreakfastProvider.Api.Controllers;
 [Route("[controller]")]
 [Produces("application/json")]
 [Consumes("application/json")]
-public class ToppingsController(
-    IOptions<FeatureSwitchesConfig> featureSwitches,
-    PubSubEventPublisher<ToppingCreatedEvent> toppingCreatedPublisher) : ControllerBase
+public class ToppingsController(IToppingService toppingService) : ControllerBase
 {
-    private static readonly List<ToppingResponse> Toppings =
-    [
-        new() { ToppingId = Guid.Parse("11111111-0000-0000-0000-000000000001"), Name = "Raspberries", Category = "Fruit" },
-        new() { ToppingId = Guid.Parse("11111111-0000-0000-0000-000000000002"), Name = "Blueberries", Category = "Fruit" },
-        new() { ToppingId = Guid.Parse("11111111-0000-0000-0000-000000000003"), Name = "Maple Syrup", Category = "Syrup" },
-        new() { ToppingId = Guid.Parse("11111111-0000-0000-0000-000000000004"), Name = "Whipped Cream", Category = "Cream" },
-        new() { ToppingId = Guid.Parse("11111111-0000-0000-0000-000000000005"), Name = "Chocolate Chips", Category = "Chocolate" }
-    ];
-
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public ActionResult<List<ToppingResponse>> GetToppings()
     {
-        var result = Toppings.AsEnumerable();
-
-        if (!featureSwitches.Value.IsRaspberryToppingEnabled)
-            result = result.Where(t => t.Name != "Raspberries");
-
-        return result.ToList();
+        return toppingService.GetAvailableToppings();
     }
 
     [HttpPost]
@@ -42,22 +23,7 @@ public class ToppingsController(
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<ToppingResponse>> AddTopping([FromBody] ToppingRequest request, CancellationToken cancellationToken)
     {
-        var topping = new ToppingResponse
-        {
-            ToppingId = Guid.NewGuid(),
-            Name = request.Name!,
-            Category = request.Category!
-        };
-
-        await toppingCreatedPublisher.PublishEvent(new ToppingCreatedEvent
-        {
-            ToppingId = topping.ToppingId,
-            Name = topping.Name,
-            Category = topping.Category,
-            IsSeasonal = false,
-            CreatedAt = DateTime.UtcNow
-        }, cancellationToken);
-
+        var topping = await toppingService.CreateToppingAsync(request, cancellationToken);
         return StatusCode(StatusCodes.Status201Created, topping);
     }
 
@@ -67,15 +33,9 @@ public class ToppingsController(
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public ActionResult<ToppingResponse> UpdateTopping(Guid toppingId, [FromBody] UpdateToppingRequest request)
     {
-        var topping = Toppings.FirstOrDefault(t => t.ToppingId == toppingId);
-        if (topping == null) return NotFound();
-
-        return new ToppingResponse
-        {
-            ToppingId = toppingId,
-            Name = request.Name!,
-            Category = request.Category!
-        };
+        var result = toppingService.UpdateTopping(toppingId, request);
+        if (result is null) return NotFound();
+        return result;
     }
 
     [HttpDelete("{toppingId:guid}")]
@@ -83,8 +43,7 @@ public class ToppingsController(
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public IActionResult DeleteTopping(Guid toppingId)
     {
-        var topping = Toppings.FirstOrDefault(t => t.ToppingId == toppingId);
-        if (topping == null) return NotFound();
+        if (!toppingService.DeleteTopping(toppingId)) return NotFound();
         return NoContent();
     }
 }

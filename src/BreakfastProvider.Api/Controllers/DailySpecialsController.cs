@@ -1,12 +1,7 @@
-using System.Collections.Concurrent;
-using BreakfastProvider.Api.Configuration;
-using BreakfastProvider.Api.Events;
-using BreakfastProvider.Api.Models.Events;
 using BreakfastProvider.Api.Models.Requests;
 using BreakfastProvider.Api.Models.Responses;
-using BreakfastProvider.Api.Storage;
+using BreakfastProvider.Api.Services;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
 
 namespace BreakfastProvider.Api.Controllers;
 
@@ -14,34 +9,13 @@ namespace BreakfastProvider.Api.Controllers;
 [Route("daily-specials")]
 [Produces("application/json")]
 [Consumes("application/json")]
-public class DailySpecialsController(
-    IOptions<DailySpecialsConfig> config,
-    IIdempotencyStore idempotencyStore,
-    PubSubEventPublisher<DailySpecialOrderedEvent> dailySpecialOrderedPublisher) : ControllerBase
+public class DailySpecialsController(IDailySpecialsService dailySpecialsService) : ControllerBase
 {
-    private static readonly List<(Guid Id, string Name, string Description)> Specials =
-    [
-        (Guid.Parse("aaaa0000-0000-0000-0000-000000000001"), "Cinnamon Swirl Pancakes", "Fluffy pancakes with cinnamon sugar swirl and cream cheese drizzle"),
-        (Guid.Parse("aaaa0000-0000-0000-0000-000000000002"), "Matcha Waffles", "Crispy green tea waffles with white chocolate chips"),
-        (Guid.Parse("aaaa0000-0000-0000-0000-000000000003"), "Lemon Ricotta Pancakes", "Light and airy pancakes with fresh ricotta and lemon zest")
-    ];
-
-    private static readonly ConcurrentDictionary<Guid, int> OrderCounts = new();
-
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public ActionResult<List<DailySpecialResponse>> GetDailySpecials()
     {
-        var maxOrders = config.Value.MaxOrdersPerSpecial;
-        var result = Specials.Select(s => new DailySpecialResponse
-        {
-            SpecialId = s.Id,
-            Name = s.Name,
-            Description = s.Description,
-            RemainingQuantity = Math.Max(0, maxOrders - OrderCounts.GetValueOrDefault(s.Id, 0))
-        }).ToList();
-
-        return result;
+        return dailySpecialsService.GetAvailableSpecials();
     }
 
     [HttpPost("orders")]
@@ -55,17 +29,12 @@ public class DailySpecialsController(
     {
         var idempotencyKey = Request.Headers["Idempotency-Key"].FirstOrDefault();
 
-        if (idempotencyKey is not null)
-        {
-            var (found, statusCode, cachedResponse) =
-                await idempotencyStore.TryGetAsync<DailySpecialOrderResponse>(idempotencyKey, cancellationToken);
+        var cached = await dailySpecialsService.CheckIdempotencyAsync(idempotencyKey, cancellationToken);
+        if (cached is not null)
+            return StatusCode(StatusCodes.Status201Created, cached);
 
-            if (found)
-                return StatusCode(statusCode, cachedResponse);
-        }
-
-        var special = Specials.FirstOrDefault(s => s.Id == request.SpecialId);
-        if (special == default)
+        var special = dailySpecialsService.ValidateSpecialExists(request.SpecialId);
+        if (special is null)
             return NotFound(new ProblemDetails
             {
                 Title = "Daily special not found",
@@ -73,75 +42,26 @@ public class DailySpecialsController(
                 Detail = $"No daily special found with ID '{request.SpecialId}'."
             });
 
-        var maxOrders = config.Value.MaxOrdersPerSpecial;
-
-        // Atomically check-and-increment using a CAS (compare-and-swap) loop
-        // to prevent overselling under concurrent requests.
-        while (true)
-        {
-            var currentCount = OrderCounts.GetOrAdd(request.SpecialId!.Value, 0);
-
-            if (currentCount + request.Quantity > maxOrders)
+        var response = dailySpecialsService.ReserveQuantity(request.SpecialId!.Value, request.Quantity, special.Value.Name);
+        if (response is null)
+            return Conflict(new ProblemDetails
             {
-                return Conflict(new ProblemDetails
-                {
-                    Title = "Daily special sold out",
-                    Status = StatusCodes.Status409Conflict,
-                    Detail = $"'{special.Name}' has reached the maximum of {maxOrders} orders for today."
-                });
-            }
+                Title = "Daily special sold out",
+                Status = StatusCodes.Status409Conflict,
+                Detail = $"'{special.Value.Name}' has reached the maximum orders for today."
+            });
 
-            var newCount = currentCount + request.Quantity;
+        await dailySpecialsService.StoreIdempotencyResultAsync(idempotencyKey, response, cancellationToken);
+        await dailySpecialsService.PublishOrderEventAsync(response, special.Value.Name, cancellationToken);
 
-            // Atomically swap only if the value hasn't changed since we read it.
-            // If another thread modified the count, retry the loop.
-            if (OrderCounts.TryUpdate(request.SpecialId!.Value, newCount, currentCount))
-            {
-                var remaining = Math.Max(0, maxOrders - newCount);
-
-                var response = new DailySpecialOrderResponse
-                {
-                    OrderConfirmationId = Guid.NewGuid(),
-                    SpecialId = request.SpecialId!.Value,
-                    QuantityOrdered = request.Quantity,
-                    RemainingQuantity = remaining
-                };
-
-                if (idempotencyKey is not null)
-                {
-                    await idempotencyStore.SetAsync(
-                        idempotencyKey,
-                        StatusCodes.Status201Created,
-                        response,
-                        config.Value.IdempotencyTtlSeconds,
-                        cancellationToken);
-                }
-
-                await dailySpecialOrderedPublisher.PublishEvent(new DailySpecialOrderedEvent
-                {
-                    OrderId = response.OrderConfirmationId,
-                    SpecialName = special.Name,
-                    CustomerName = "Guest",
-                    RemainingOrders = remaining,
-                    OrderedAt = DateTime.UtcNow
-                }, cancellationToken);
-
-                return StatusCode(StatusCodes.Status201Created, response);
-            }
-
-            // CAS failed — another thread modified the count. Retry.
-        }
+        return StatusCode(StatusCodes.Status201Created, response);
     }
 
     [HttpDelete("orders")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     public IActionResult ResetOrderCounts([FromQuery] Guid? specialId = null)
     {
-        if (specialId.HasValue)
-            OrderCounts.TryRemove(specialId.Value, out _);
-        else
-            OrderCounts.Clear();
-
+        dailySpecialsService.ResetOrderCounts(specialId);
         return NoContent();
     }
 }

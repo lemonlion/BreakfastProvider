@@ -236,7 +236,7 @@ jobs:
 
       - name: Upload TRX artifact
         if: ${{ !cancelled() && !inputs.filter }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: ${{ steps.get-trx-file-name.outputs.trx_file }}
           path: coverage/${{ steps.get-trx-file-name.outputs.trx_file }}
@@ -260,7 +260,7 @@ jobs:
 
       - name: Upload Cobertura XML artifact
         if: ${{ !cancelled() && !inputs.filter }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: ${{ steps.get-coverage-file-name.outputs.coverage_file }}
           path: ${{ steps.get-coverage-file-name.outputs.coverage_file }}
@@ -273,7 +273,7 @@ jobs:
           echo "lightbdd_file=LightBDD-${{ inputs.test-run-description }}-report" >> $GITHUB_OUTPUT
 
       - name: Upload LightBDD test results report to artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         if: ${{ !(cancelled()) && inputs.test-type == 'component' }}
         with:
           name: ${{ steps.get-lightbdd-test-results-file-name.outputs.lightbdd_file }}

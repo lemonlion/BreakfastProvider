@@ -46,7 +46,7 @@ jobs:
 
       - name: Upload scan results artifact
         if: ${{ !cancelled() }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: vulnerable-packages.log
           path: ./vulnerable-packages.log

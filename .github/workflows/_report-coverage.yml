@@ -66,14 +66,14 @@ jobs:
           echo "codecoverage_file=Code-Coverage-${coverage_file_base}-report" >> $GITHUB_OUTPUT
 
       - name: Upload summary coverage report
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: ${{ steps.get-coverage-report-file-name-prefix.outputs.codecoverage_file }}-summary.html
           path: summary.html
           retention-days: 1
 
       - name: Upload full coverage report
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: ${{ steps.get-coverage-report-file-name-prefix.outputs.codecoverage_file }}-full-report
           path: code-coverage-full-report

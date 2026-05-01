@@ -54,7 +54,7 @@ jobs:
 
       - name: Upload LightBDD report
         if: ${{ !cancelled() }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: post-deployment-test-report
           path: ./tests/BreakfastProvider.Tests.Component/bin/Debug/net10.0/Reports/FeaturesReport.html

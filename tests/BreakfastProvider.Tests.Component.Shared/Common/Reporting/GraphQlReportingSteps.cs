@@ -37,19 +37,34 @@ public class GraphQlReportingSteps(RequestContext context)
         ResponseMessage = await context.Client.SendAsync(request);
     }
 
-    public async Task QueryRecipeReports()
+    public async Task QueryRecipeReports(int maxAttempts = 10, int delayMs = 1000)
     {
-        var query = new
+        for (var attempt = 1; attempt <= maxAttempts; attempt++)
         {
-            query = "{ recipeReports { orderId recipeType ingredients toppings loggedAt } }"
-        };
+            var query = new
+            {
+                query = "{ recipeReports { orderId recipeType ingredients toppings loggedAt } }"
+            };
 
-        var request = new HttpRequestMessage(HttpMethod.Post, Endpoints.GraphQL)
-        {
-            Content = JsonContent.Create(query)
-        };
-        request.Headers.Add(CustomHeaders.ComponentTestRequestId, context.RequestId);
-        ResponseMessage = await context.Client.SendAsync(request);
+            var request = new HttpRequestMessage(HttpMethod.Post, Endpoints.GraphQL)
+            {
+                Content = JsonContent.Create(query)
+            };
+            request.Headers.Add(CustomHeaders.ComponentTestRequestId, context.RequestId);
+            ResponseMessage = await context.Client.SendAsync(request);
+
+            if (attempt >= maxAttempts || !ResponseMessage.IsSuccessStatusCode)
+                break;
+
+            var content = await ResponseMessage.Content.ReadAsStringAsync();
+            var doc = JsonDocument.Parse(content);
+            if (doc.RootElement.TryGetProperty("data", out var data) &&
+                data.TryGetProperty("recipeReports", out var reports) &&
+                reports.GetArrayLength() > 0)
+                break;
+
+            await Task.Delay(delayMs);
+        }
     }
 
     public async Task QueryIngredientUsage()

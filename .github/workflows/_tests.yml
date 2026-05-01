@@ -114,6 +114,7 @@ jobs:
           echo "RunWithAnInMemoryDatabase=false" >> $GITHUB_ENV
           echo "RunWithAnInMemoryEventGrid=false" >> $GITHUB_ENV
           echo "RunWithAnInMemoryKafkaBroker=false" >> $GITHUB_ENV
+          echo "CosmosConfig__RequestTimeoutSeconds=60" >> $GITHUB_ENV
 
       - name: Make entrypoint script executable
         if: ${{ inputs.test-run-type == 'external-sut' }}

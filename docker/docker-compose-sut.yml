@@ -11,7 +11,7 @@ services:
       context: ..
       dockerfile: ./src/BreakfastProvider.Api/Dockerfile
     container_name: docker.breakfast-provider-api
-    restart: on-failure:3
+    restart: on-failure:5
     ports:
       - "5080:8080"
     depends_on:

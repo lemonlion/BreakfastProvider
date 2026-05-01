@@ -285,6 +285,10 @@ public class Program
             {
                 Console.Error.WriteLine("[Startup] Reporting database initialization timed out — continuing without pre-created schema.");
             }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"[Startup] Reporting database initialization failed — continuing without pre-created schema. Error: {ex.Message}");
+            }
         }
 
         // Ensure Breakfast database schema is created.
@@ -300,6 +304,10 @@ public class Program
             catch (OperationCanceledException)
             {
                 Console.Error.WriteLine("[Startup] Breakfast database initialization timed out — continuing without pre-created schema.");
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"[Startup] Breakfast database initialization failed — continuing without pre-created schema. Error: {ex.Message}");
             }
         }
 

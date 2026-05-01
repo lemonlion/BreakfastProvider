@@ -49,6 +49,9 @@ services:
       - FeatureSwitchesConfig__IsGoatMilkEnabled=true
       - ReportingConfig__ConnectionString=Server=sqlserver-database.local,1433;Database=BreakfastReporting;User Id=sa;Password=YourStr0ngP@ssword;TrustServerCertificate=True
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://jaeger.local:4317
+      - PubSubConfig__ProjectId=
+      - SpannerConfig__ProjectId=
+      - NotificationServiceConfig__BaseAddress=
     volumes:
       - ./kafka-config/certificates/ca.crt:/certs/kafka-ca.crt:ro
       - ./docker-entrypoint.sh:/app/docker-entrypoint.sh:ro

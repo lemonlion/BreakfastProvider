@@ -37,7 +37,7 @@ public class GraphQlReportingSteps(RequestContext context)
         ResponseMessage = await context.Client.SendAsync(request);
     }
 
-    public async Task QueryRecipeReports(int maxAttempts = 30, int delayMs = 2000)
+    public async Task QueryRecipeReports(int maxAttempts = 30, int delayMs = 2000, Guid? waitForOrderId = null)
     {
         for (var attempt = 1; attempt <= maxAttempts; attempt++)
         {
@@ -61,7 +61,24 @@ public class GraphQlReportingSteps(RequestContext context)
             if (doc.RootElement.TryGetProperty("data", out var data) &&
                 data.TryGetProperty("recipeReports", out var reports) &&
                 reports.GetArrayLength() > 0)
-                break;
+            {
+                // When waiting for a specific order, keep polling until it appears
+                if (waitForOrderId == null)
+                    break;
+
+                var targetId = waitForOrderId.Value.ToString();
+                var found = false;
+                foreach (var report in reports.EnumerateArray())
+                {
+                    if (report.TryGetProperty("orderId", out var oid) &&
+                        oid.GetString()?.Equals(targetId, StringComparison.OrdinalIgnoreCase) == true)
+                    {
+                        found = true;
+                        break;
+                    }
+                }
+                if (found) break;
+            }
 
             await Task.Delay(delayMs);
         }

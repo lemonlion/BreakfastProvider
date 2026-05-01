@@ -165,7 +165,7 @@ public partial class Reporting__Recipe_Reports_Feature : BaseFixture
     #region When
 
     private async Task The_recipe_reports_are_queried_via_graphql()
-        => await _graphQlSteps.QueryRecipeReports();
+        => await _graphQlSteps.QueryRecipeReports(waitForOrderId: _pancakeSteps.Response?.BatchId);
 
     private async Task The_ingredient_usage_is_queried_via_graphql()
         => await _graphQlSteps.QueryIngredientUsage();

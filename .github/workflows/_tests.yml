@@ -10,7 +10,7 @@ on:
       filter: {type: string, required: false }
       features-report-path: { type: string, required: false, default: "tests/BreakfastProvider.Tests.Component/bin/Debug/net10.0/Reports/FeaturesReport.html" }
       runs-on: { type: string, required: false, default: "ubuntu-24.04" }
-      component-specifications-filename: { type: string, required: false, default: "ComponentSpecifications" }
+      component-specifications-filename: { type: string, required: false, default: "Specifications" }
 
 env:
   BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
@@ -261,6 +261,18 @@ jobs:
           name: ${{ steps.get-lightbdd-test-results-file-name.outputs.lightbdd_file }}
           path: ${{ inputs.features-report-path }}
           retention-days: 1
+
+      - name: Copy generated Component Specifications to docs
+        if: ${{ inputs.test-type == 'component' }}
+        run: |
+          REPORT_DIR=$(dirname "${{ inputs.features-report-path }}")
+          SPECS_FILE="$REPORT_DIR/${{ inputs.component-specifications-filename }}.yml"
+          if [ -f "$SPECS_FILE" ]; then
+            cp "$SPECS_FILE" docs/${{ inputs.component-specifications-filename }}.yml
+            echo "Copied $SPECS_FILE to docs/${{ inputs.component-specifications-filename }}.yml"
+          else
+            echo "Warning: $SPECS_FILE not found"
+          fi
 
       - name: Check that the checked in Component Specifications document matches the latest one generated in CI
         id: compare-component-specs

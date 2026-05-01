@@ -17,7 +17,7 @@ namespace BreakfastProvider.Tests.Component.LightBDD.Infrastructure;
 
 public class ConfiguredLightBddScopeAttribute : LightBddScope
 {
-    private const string SpecificationsFileName = "ComponentSpecifications";
+    private const string SpecificationsFileName = "Specifications";
 
     private WebApplicationFactoryForSpecificUrl<Dependencies.Fakes.CowService.Program>? _cowServiceFake;
     private WebApplicationFactoryForSpecificUrl<Dependencies.Fakes.GoatService.Program>? _goatServiceFake;

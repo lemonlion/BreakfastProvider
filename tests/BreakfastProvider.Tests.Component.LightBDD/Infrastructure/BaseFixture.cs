@@ -287,9 +287,9 @@ public abstract class BaseFixture : FeatureFixture, IDisposable, IIgnorable<Comp
             // so that tests can read events the API published through the real
             // EventGrid simulator end-to-end.
             services.AddSingleton(_ => TestServiceCollectionExtensions.SharedQueueDrainer!);
-            services.AddSingleton<Fakes.EventGrid.IPublishedEventStore>(
-                sp => new Fakes.EventGrid.EventGridStorageQueueEventStore(
-                    sp.GetRequiredService<Fakes.EventGrid.EventGridQueueDrainer>(),
+            services.AddSingleton<Shared.Fakes.EventGrid.IPublishedEventStore>(
+                _ => new Shared.Fakes.EventGrid.EventGridStorageQueueEventStore(
+                    TestServiceCollectionExtensions.SharedQueueDrainer!,
                     "OrderCreatedEvent"));
         }
 

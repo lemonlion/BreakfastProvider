@@ -43,3 +43,16 @@ services:
       - "5034:8080"
     networks:
       - localdev
+
+  notification-service:
+    build:
+      context: ..
+      dockerfile: ./fakes/Dependencies.Fakes.NotificationService/Dockerfile
+    container_name: docker.fakes.notificationservice
+    ports:
+      - "5035:8080"
+    environment:
+      - ASPNETCORE_URLS=http://+:8080
+      - Kestrel__EndpointDefaults__Protocols=Http1AndHttp2
+    networks:
+      - localdev

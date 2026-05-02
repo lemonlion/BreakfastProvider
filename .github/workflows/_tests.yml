@@ -113,6 +113,11 @@ jobs:
           echo "RunWithAnInMemoryDatabase=false" >> $GITHUB_ENV
           echo "RunWithAnInMemoryEventGrid=false" >> $GITHUB_ENV
           echo "RunWithAnInMemoryKafkaBroker=false" >> $GITHUB_ENV
+          echo "RunWithAnInMemoryReportingDatabase=false" >> $GITHUB_ENV
+          echo "RunWithAnInMemoryBreakfastDatabase=false" >> $GITHUB_ENV
+          echo "RunWithAnInMemorySpannerDatabase=false" >> $GITHUB_ENV
+          echo "RunWithAnInMemoryNotificationService=false" >> $GITHUB_ENV
+          echo "SPANNER_EMULATOR_HOST=localhost:9010" >> $GITHUB_ENV
           echo "CosmosConfig__RequestTimeoutSeconds=60" >> $GITHUB_ENV
 
       - name: Make entrypoint script executable

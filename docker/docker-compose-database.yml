@@ -50,3 +50,97 @@ services:
       localdev:
         aliases:
           - sqlserver-database.local
+
+  spanner-emulator:
+    container_name: spanner-emulator
+    image: gcr.io/cloud-spanner-emulator/emulator:latest
+    hostname: spanner-emulator.local
+    ports:
+      - '9010:9010'
+      - '9020:9020'
+    networks:
+      localdev:
+        aliases:
+          - spanner-emulator.local
+
+  spanner-init:
+    container_name: spanner-init
+    image: curlimages/curl:latest
+    depends_on:
+      spanner-emulator:
+        condition: service_started
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        set -e
+        EMULATOR=http://spanner-emulator.local:9020
+
+        echo "Waiting for Spanner emulator..."
+        for i in $$(seq 1 60); do
+          if curl -sf "$$EMULATOR/v1/projects/test/instances" >/dev/null 2>&1; then
+            echo "Spanner emulator is ready."
+            break
+          fi
+          echo "  attempt $$i — not ready yet..."
+          sleep 2
+        done
+
+        echo "Creating Spanner instance..."
+        curl -sf -X POST "$$EMULATOR/v1/projects/breakfast-provider-project/instances" \
+          -H "Content-Type: application/json" \
+          -d '{"instanceId":"breakfast-instance","instance":{"config":"emulator-config","displayName":"Breakfast Instance","nodeCount":1}}'
+
+        echo "Creating Spanner database..."
+        curl -sf -X POST "$$EMULATOR/v1/projects/breakfast-provider-project/instances/breakfast-instance/databases" \
+          -H "Content-Type: application/json" \
+          -d '{"createStatement":"CREATE DATABASE `breakfast-db`","extraStatements":["CREATE TABLE Feedback (FeedbackId STRING(MAX) NOT NULL, CustomerName STRING(MAX), OrderId STRING(MAX), Rating INT64, Comment STRING(MAX), CreatedAt TIMESTAMP) PRIMARY KEY (FeedbackId)","CREATE TABLE CustomerPreferences (CustomerId STRING(MAX) NOT NULL, CustomerName STRING(MAX), PreferredMilkType STRING(MAX), LikesExtraToppings BOOL, FavouriteItem STRING(MAX), UpdatedAt TIMESTAMP) PRIMARY KEY (CustomerId)"]}'
+
+        echo "Spanner initialisation complete."
+    networks:
+      - localdev
+
+  pubsub-emulator:
+    container_name: pubsub-emulator
+    image: gcr.io/google.com/cloudsdktool/google-cloud-cli:emulators
+    hostname: pubsub-emulator.local
+    command: ["gcloud", "beta", "emulators", "pubsub", "start", "--host-port=0.0.0.0:8085"]
+    ports:
+      - '8085:8085'
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:8085/v1/projects/test/topics || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 10s
+    networks:
+      localdev:
+        aliases:
+          - pubsub-emulator.local
+
+  pubsub-init:
+    container_name: pubsub-init
+    image: curlimages/curl:latest
+    depends_on:
+      pubsub-emulator:
+        condition: service_healthy
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        set -e
+        EMULATOR=http://pubsub-emulator.local:8085
+
+        echo "Creating PubSub topics..."
+        for topic in pancake-batch-completed waffle-batch-completed inventory-item-added inventory-stock-updated menu-availability-changed topping-created staff-member-added reservation-confirmed reservation-cancelled daily-special-ordered; do
+          curl -sf -X PUT "$$EMULATOR/v1/projects/breakfast-provider-project/topics/$$topic" || true
+          echo " -> Created topic: $$topic"
+        done
+
+        echo "Creating PubSub subscriptions..."
+        curl -sf -X PUT "$$EMULATOR/v1/projects/breakfast-provider-project/subscriptions/pancake-batch-completed-sub" \
+          -H "Content-Type: application/json" \
+          -d '{"topic":"projects/breakfast-provider-project/topics/pancake-batch-completed"}' || true
+        echo " -> Created subscription: pancake-batch-completed-sub"
+
+        echo "PubSub initialisation complete."
+    networks:
+      - localdev

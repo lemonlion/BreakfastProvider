@@ -11,6 +11,7 @@ public partial class Reporting__Equipment_Alerts_Feature
 {
     [HappyPath]
     [Scenario]
+    [IgnoreIf(nameof(Settings.RunAgainstExternalServiceUnderTest), IgnoreReasons.NeedsInProcessEventConsumers)]
     public async Task Equipment_Alerts_Should_Contain_Data_Ingested_Via_Event_Hub_Consumer()
     {
         await Runner.RunScenarioAsync(

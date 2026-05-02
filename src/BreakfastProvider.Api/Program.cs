@@ -182,9 +182,24 @@ public class Program
         {
             builder.Services.AddSingleton(sp =>
             {
+                var clientOptions = new EventGridPublisherClientOptions();
+
+                // In Development mode, the EventGrid simulator uses a self-signed
+                // certificate. Bypass SSL validation to avoid UntrustedRoot errors.
+                if (builder.Environment.IsDevelopment())
+                {
+                    clientOptions.Transport = new Azure.Core.Pipeline.HttpClientTransport(
+                        new HttpClientHandler
+                        {
+                            ServerCertificateCustomValidationCallback =
+                                HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
+                        });
+                }
+
                 return new EventGridPublisherClient(
                     new Uri(eventGridConfig.Endpoint),
-                    new AzureKeyCredential(eventGridConfig.TopicKey));
+                    new AzureKeyCredential(eventGridConfig.TopicKey),
+                    clientOptions);
             });
         }
 

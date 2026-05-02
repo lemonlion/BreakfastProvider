@@ -237,6 +237,20 @@ public sealed class AppManager : IDisposable
         services.UseInMemoryPubSub(ConsumedPubSubMessageStore);
         services.ReplacePubSubHealthCheckWithNoOp();
 
+        // UseInMemoryReportingDatabase already replaces PubSubBatchCompletionConsumerService
+        // with InMemoryPubSubBatchCompletionConsumerService. When the reporting DB is NOT
+        // in-memory, we still need this replacement because the real consumer requires
+        // real GCP Pub/Sub infrastructure which isn't available in tests.
+        if (!Settings.RunWithAnInMemoryReportingDatabase)
+        {
+            var realPubSubConsumer = services
+                .FirstOrDefault(d => d.ImplementationType == typeof(PubSubBatchCompletionConsumerService));
+            if (realPubSubConsumer is not null)
+                services.Remove(realPubSubConsumer);
+
+            services.AddHostedService<InMemoryPubSubBatchCompletionConsumerService>();
+        }
+
         // Azure Event Hub — always in-memory for component tests
         services.AddSingleton(_ => ConsumedEventHubMessageStore);
         services.UseInMemoryEventHub(ConsumedEventHubMessageStore);

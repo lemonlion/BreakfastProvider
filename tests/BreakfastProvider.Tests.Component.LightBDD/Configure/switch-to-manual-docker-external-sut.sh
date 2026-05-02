@@ -18,6 +18,9 @@ sed -i \
   -e 's/"RunWithAnInMemoryEventGrid": true/"RunWithAnInMemoryEventGrid": false/' \
   -e 's/"RunWithAnInMemoryKafkaBroker": true/"RunWithAnInMemoryKafkaBroker": false/' \
   -e 's/"RunWithAnInMemoryReportingDatabase": true/"RunWithAnInMemoryReportingDatabase": false/' \
+  -e 's/"RunWithAnInMemoryBreakfastDatabase": true/"RunWithAnInMemoryBreakfastDatabase": false/' \
+  -e 's/"RunWithAnInMemorySpannerDatabase": true/"RunWithAnInMemorySpannerDatabase": false/' \
+  -e 's/"RunWithAnInMemoryNotificationService": true/"RunWithAnInMemoryNotificationService": false/' \
   -e 's/"RunAgainstExternalServiceUnderTest": false/"RunAgainstExternalServiceUnderTest": true/' \
   -e 's/"EnableDockerInSetupAndTearDown": true/"EnableDockerInSetupAndTearDown": false/' \
   -e 's/"SkipDockerTearDown": true/"SkipDockerTearDown": false/' \

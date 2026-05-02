@@ -185,7 +185,9 @@ public static class StartupExtensions
             .ValidateOnStart();
 
         services.AddSingleton<ISpannerConnectionFactory>(
-            new SpannerConnectionFactory(spannerConfig.ConnectionString));
+            string.IsNullOrWhiteSpace(spannerConfig.ProjectId)
+                ? new NoOpSpannerConnectionFactory()
+                : new SpannerConnectionFactory(spannerConfig.ConnectionString));
 
         return services;
     }

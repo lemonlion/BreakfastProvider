@@ -19,6 +19,10 @@ services:
         condition: service_healthy
       sqlserver:
         condition: service_healthy
+      spanner-init:
+        condition: service_completed_successfully
+      pubsub-init:
+        condition: service_completed_successfully
       cow-service:
         condition: service_started
       goat-service:
@@ -26,6 +30,8 @@ services:
       supplier-service:
         condition: service_started
       kitchen-service:
+        condition: service_started
+      notification-service:
         condition: service_started
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
@@ -49,9 +55,15 @@ services:
       - FeatureSwitchesConfig__IsGoatMilkEnabled=true
       - ReportingConfig__ConnectionString=Server=sqlserver-database.local,1433;Database=BreakfastReporting;User Id=sa;Password=YourStr0ngP@ssword;TrustServerCertificate=True
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://jaeger.local:4317
-      - PubSubConfig__ProjectId=
-      - SpannerConfig__ProjectId=
-      - NotificationServiceConfig__BaseAddress=
+      - PubSubConfig__ProjectId=breakfast-provider-project
+      - PUBSUB_EMULATOR_HOST=pubsub-emulator.local:8085
+      - PubSubConfig__SubscriberConfigurations__PancakeBatchCompletedEvent__SubscriptionId=pancake-batch-completed-sub
+      - SPANNER_EMULATOR_HOST=spanner-emulator.local:9010
+      - SpannerConfig__ProjectId=breakfast-provider-project
+      - SpannerConfig__InstanceId=breakfast-instance
+      - SpannerConfig__DatabaseId=breakfast-db
+      - NotificationServiceConfig__BaseAddress=http://notification-service:8080
+      - DatabaseConfig__ConnectionString=Server=sqlserver-database.local,1433;Database=BreakfastProvider;User Id=sa;Password=YourStr0ngP@ssword;TrustServerCertificate=True
     volumes:
       - ./kafka-config/certificates/ca.crt:/certs/kafka-ca.crt:ro
       - ./docker-entrypoint.sh:/app/docker-entrypoint.sh:ro

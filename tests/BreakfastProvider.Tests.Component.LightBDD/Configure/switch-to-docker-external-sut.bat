@@ -16,6 +16,9 @@ powershell -NoProfile -Command ^
   "$f = $f -replace '\"RunWithAnInMemoryEventGrid\": true',       '\"RunWithAnInMemoryEventGrid\": false';" ^
   "$f = $f -replace '\"RunWithAnInMemoryKafkaBroker\": true',     '\"RunWithAnInMemoryKafkaBroker\": false';" ^
   "$f = $f -replace '\"RunWithAnInMemoryReportingDatabase\": true', '\"RunWithAnInMemoryReportingDatabase\": false';" ^
+  "$f = $f -replace '\"RunWithAnInMemoryBreakfastDatabase\": true', '\"RunWithAnInMemoryBreakfastDatabase\": false';" ^
+  "$f = $f -replace '\"RunWithAnInMemorySpannerDatabase\": true', '\"RunWithAnInMemorySpannerDatabase\": false';" ^
+  "$f = $f -replace '\"RunWithAnInMemoryNotificationService\": true', '\"RunWithAnInMemoryNotificationService\": false';" ^
   "$f = $f -replace '\"RunAgainstExternalServiceUnderTest\": false', '\"RunAgainstExternalServiceUnderTest\": true';" ^
   "$f = $f -replace '\"EnableDockerInSetupAndTearDown\": false',   '\"EnableDockerInSetupAndTearDown\": true';" ^
   "$f = $f -replace '\"SkipDockerTearDown\": false',               '\"SkipDockerTearDown\": true';" ^

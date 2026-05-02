@@ -7,6 +7,7 @@ docker rmi "docker-cow-service"
 docker rmi "docker-goat-service"
 docker rmi "docker-supplier-service"
 docker rmi "docker-kitchen-service"
+docker rmi "docker-notification-service"
 
 docker compose -f docker-compose-database.yml -f docker-compose-storage.yml -f docker-compose-fakes.yml -f docker-compose-messaging.yml -f docker-compose-prometheus.yml -f docker-compose-grafana.yml -f docker-compose-jaeger.yml up --build
 

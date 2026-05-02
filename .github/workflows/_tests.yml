@@ -57,6 +57,7 @@ jobs:
           echo "RunWithAnInMemoryDatabase=true" >> $GITHUB_ENV
           echo "RunWithAnInMemoryEventGrid=true" >> $GITHUB_ENV
           echo "RunWithAnInMemoryKafkaBroker=true" >> $GITHUB_ENV
+          echo "RunWithAnInMemoryEventHub=true" >> $GITHUB_ENV
 
       - name: Generate and install Kafka certificate
         if: ${{ inputs.test-run-type == 'docker' || inputs.test-run-type == 'external-sut' }}
@@ -117,6 +118,7 @@ jobs:
           echo "RunWithAnInMemoryBreakfastDatabase=false" >> $GITHUB_ENV
           echo "RunWithAnInMemorySpannerDatabase=false" >> $GITHUB_ENV
           echo "RunWithAnInMemoryNotificationService=false" >> $GITHUB_ENV
+          echo "RunWithAnInMemoryEventHub=false" >> $GITHUB_ENV
           echo "SPANNER_EMULATOR_HOST=localhost:9010" >> $GITHUB_ENV
           echo "CosmosConfig__RequestTimeoutSeconds=60" >> $GITHUB_ENV
 

@@ -15,6 +15,7 @@ public record ComponentTestSettings
     public bool RunWithAnInMemoryBreakfastDatabase { get; set; }
     public bool RunWithAnInMemorySpannerDatabase { get; set; }
     public bool RunWithAnInMemoryNotificationService { get; set; }
+    public bool RunWithAnInMemoryEventHub { get; set; }
     public string? CowServiceBaseUrl { get; set; }
     public string? GoatServiceBaseUrl { get; set; }
     public string? SupplierServiceBaseUrl { get; set; }

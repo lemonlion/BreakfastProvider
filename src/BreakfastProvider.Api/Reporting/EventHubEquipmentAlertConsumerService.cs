@@ -33,7 +33,21 @@ public class EventHubEquipmentAlertConsumerService(
         }
 
         var blobContainerClient = new BlobContainerClient(cfg.BlobStorageConnectionString, cfg.BlobContainerName);
-        await blobContainerClient.CreateIfNotExistsAsync(cancellationToken: stoppingToken);
+
+        // Retry blob container creation — Azurite may not be ready at startup.
+        for (var attempt = 1; ; attempt++)
+        {
+            try
+            {
+                await blobContainerClient.CreateIfNotExistsAsync(cancellationToken: stoppingToken);
+                break;
+            }
+            catch (Exception ex) when (attempt < 10 && !stoppingToken.IsCancellationRequested)
+            {
+                logger.LogWarning(ex, "Blob container creation attempt {Attempt} failed — retrying in 3s", attempt);
+                await Task.Delay(3000, stoppingToken);
+            }
+        }
 
         var processor = new EventProcessorClient(
             blobContainerClient,

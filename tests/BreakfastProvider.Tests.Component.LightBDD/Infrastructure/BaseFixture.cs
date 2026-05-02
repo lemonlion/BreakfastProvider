@@ -340,9 +340,10 @@ public abstract class BaseFixture : FeatureFixture, IDisposable, IIgnorable<Comp
             services.AddHostedService<InMemoryPubSubBatchCompletionConsumerService>();
         }
 
-        // Azure Event Hub — always in-memory for component tests
+        // Azure Event Hub — conditional based on settings
         services.AddSingleton(_ => ConsumedEventHubMessageStore);
-        services.UseInMemoryEventHub(ConsumedEventHubMessageStore);
+        if (Settings.RunWithAnInMemoryEventHub)
+            services.UseInMemoryEventHub(ConsumedEventHubMessageStore);
 
         // gRPC Notification Service — tracked client pointing at fake service
         if (Settings.RunWithAnInMemoryNotificationService)

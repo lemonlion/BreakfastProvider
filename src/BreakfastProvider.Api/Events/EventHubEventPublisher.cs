@@ -38,6 +38,9 @@ public class EventHubEventPublisher<T> where T : IEventHubEvent
 
     public virtual async Task PublishEvent(T @event, CancellationToken cancellationToken = default)
     {
+        if (_producerClient is null)
+            return;
+
         var eventName = @event.GetEventName();
 
         using var activity = DiagnosticsConfig.ActivitySource.StartActivity("EventHubPublish", ActivityKind.Producer);

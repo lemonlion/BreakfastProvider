@@ -212,6 +212,8 @@ public abstract class BaseFixture : FeatureFixture, IDisposable, IIgnorable<Comp
                 {
                     builder.ConfigureAppConfiguration((_, config) =>
                     {
+                        config.SetBasePath(Directory.GetCurrentDirectory())
+                            .AddJsonFile("appsettings.componenttests.json", optional: true, reloadOnChange: false);
                         config.AddInMemoryCollection(settingOverrides);
                     });
                     builder.ConfigureTestServices(ConfigureTestServices);

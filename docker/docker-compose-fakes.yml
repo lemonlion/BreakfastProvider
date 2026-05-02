@@ -45,6 +45,7 @@ services:
       - localdev
 
   notification-service:
+    image: docker-notification-service
     build:
       context: ..
       dockerfile: ./fakes/Dependencies.Fakes.NotificationService/Dockerfile

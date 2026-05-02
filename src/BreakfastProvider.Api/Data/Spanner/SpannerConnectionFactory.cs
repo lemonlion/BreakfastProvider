@@ -9,7 +9,15 @@ public interface ISpannerConnectionFactory
 
 public class SpannerConnectionFactory(string connectionString) : ISpannerConnectionFactory
 {
-    public SpannerConnection CreateConnection() => new(connectionString);
+    public SpannerConnection CreateConnection()
+    {
+        var builder = new SpannerConnectionStringBuilder(connectionString);
+
+        if (!string.IsNullOrEmpty(Environment.GetEnvironmentVariable("SPANNER_EMULATOR_HOST")))
+            builder.EmulatorDetection = Google.Api.Gax.EmulatorDetection.EmulatorOnly;
+
+        return new SpannerConnection(builder);
+    }
 }
 
 /// <summary>

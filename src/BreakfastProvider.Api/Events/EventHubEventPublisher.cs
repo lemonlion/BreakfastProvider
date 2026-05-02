@@ -39,7 +39,9 @@ public class EventHubEventPublisher<T> where T : IEventHubEvent
     public virtual async Task PublishEvent(T @event, CancellationToken cancellationToken = default)
     {
         if (_producerClient is null)
-            return;
+            throw new InvalidOperationException(
+                $"EventHubEventPublisher<{typeof(T).Name}> was created without a producer client. " +
+                "Ensure EventHubConfig.ConnectionString is configured.");
 
         var eventName = @event.GetEventName();
 

@@ -101,8 +101,9 @@ jobs:
       - name: Spin up docker
         if: ${{ inputs.test-run-type == 'docker' }}
         run: |
-            docker compose -f docker/docker-compose-database.yml -f docker/docker-compose-storage.yml -f docker/docker-compose-fakes.yml -f docker/docker-compose-messaging.yml down
+            docker compose -f docker/docker-compose-database.yml -f docker/docker-compose-storage.yml -f docker/docker-compose-fakes.yml -f docker/docker-compose-messaging.yml -f docker/docker-compose-eventhub.yml down
             docker compose -f docker/docker-compose-database.yml -f docker/docker-compose-storage.yml -f docker/docker-compose-fakes.yml -f docker/docker-compose-messaging.yml up -d --wait --wait-timeout 300
+            docker compose -f docker/docker-compose-storage.yml -f docker/docker-compose-eventhub.yml up -d
 
       - name: Set component test settings to InDocker
         if: ${{ inputs.test-run-type == 'docker' }}
@@ -129,8 +130,8 @@ jobs:
       - name: Spin up docker (external SUT)
         if: ${{ inputs.test-run-type == 'external-sut' }}
         run: |
-            docker compose -f docker/docker-compose-database.yml -f docker/docker-compose-storage.yml -f docker/docker-compose-fakes.yml -f docker/docker-compose-messaging.yml -f docker/docker-compose-sut.yml down
-            docker compose -f docker/docker-compose-database.yml -f docker/docker-compose-storage.yml -f docker/docker-compose-fakes.yml -f docker/docker-compose-messaging.yml -f docker/docker-compose-sut.yml up -d
+            docker compose -f docker/docker-compose-database.yml -f docker/docker-compose-storage.yml -f docker/docker-compose-fakes.yml -f docker/docker-compose-messaging.yml -f docker/docker-compose-eventhub.yml -f docker/docker-compose-sut.yml down
+            docker compose -f docker/docker-compose-database.yml -f docker/docker-compose-storage.yml -f docker/docker-compose-fakes.yml -f docker/docker-compose-messaging.yml -f docker/docker-compose-eventhub.yml -f docker/docker-compose-sut.yml up -d
 
       - name: Wait for SUT to be healthy
         if: ${{ inputs.test-run-type == 'external-sut' }}
@@ -238,7 +239,7 @@ jobs:
       - name: Spin down docker
         if: ${{ always() && (inputs.test-run-type == 'docker' || inputs.test-run-type == 'external-sut') }}
         run: |
-          docker compose -f docker/docker-compose-database.yml -f docker/docker-compose-storage.yml -f docker/docker-compose-fakes.yml -f docker/docker-compose-messaging.yml ${{ inputs.test-run-type == 'external-sut' && '-f docker/docker-compose-sut.yml' || '' }} down
+          docker compose -f docker/docker-compose-database.yml -f docker/docker-compose-storage.yml -f docker/docker-compose-fakes.yml -f docker/docker-compose-messaging.yml -f docker/docker-compose-eventhub.yml ${{ inputs.test-run-type == 'external-sut' && '-f docker/docker-compose-sut.yml' || '' }} down
 
       - name: Upload TRX artifact
         if: ${{ !cancelled() && !inputs.filter }}

@@ -1,0 +1,24 @@
+networks:
+  localdev:
+    driver: bridge
+
+services:
+  eventhub-emulator:
+    container_name: eventhubs-emulator
+    image: mcr.microsoft.com/azure-messaging/eventhubs-emulator:latest
+    hostname: eventhub-emulator.local
+    restart: on-failure:5
+    volumes:
+      - ./eventhub-emulator-config.json:/Eventhubs_Emulator/ConfigFiles/Config.json
+    ports:
+      - "5672:5672"
+      - "5300:5300"
+    environment:
+      BLOB_SERVER: storage.local
+      METADATA_SERVER: storage.local
+      ACCEPT_EULA: "Y"
+    depends_on:
+      storage:
+        condition: service_healthy
+    networks:
+      - localdev

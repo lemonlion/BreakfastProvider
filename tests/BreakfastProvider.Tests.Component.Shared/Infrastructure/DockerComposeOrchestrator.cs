@@ -25,6 +25,7 @@ public sealed class DockerComposeOrchestrator : IDisposable
         "docker-compose-storage.yml",
         "docker-compose-fakes.yml",
         "docker-compose-messaging.yml",
+        "docker-compose-eventhub.yml",
         "docker-compose-prometheus.yml",
         "docker-compose-grafana.yml",
         "docker-compose-jaeger.yml"

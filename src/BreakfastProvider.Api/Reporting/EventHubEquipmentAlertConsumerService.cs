@@ -32,6 +32,27 @@ public class EventHubEquipmentAlertConsumerService(
             return;
         }
 
+        while (!stoppingToken.IsCancellationRequested)
+        {
+            try
+            {
+                await RunProcessorAsync(cfg, stoppingToken);
+            }
+            catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
+            {
+                // Graceful shutdown
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Event Hub processor failed — restarting in 10s");
+                try { await Task.Delay(10_000, stoppingToken); }
+                catch (OperationCanceledException) { return; }
+            }
+        }
+    }
+
+    private async Task RunProcessorAsync(EventHubConfig cfg, CancellationToken stoppingToken)
+    {
         var blobContainerClient = new BlobContainerClient(cfg.BlobStorageConnectionString, cfg.BlobContainerName);
 
         // Retry blob container creation — Azurite may not be ready at startup.

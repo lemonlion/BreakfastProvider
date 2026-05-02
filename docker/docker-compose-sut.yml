@@ -24,7 +24,7 @@ services:
       pubsub-init:
         condition: service_completed_successfully
       eventhub-emulator:
-        condition: service_healthy
+        condition: service_started
       cow-service:
         condition: service_started
       goat-service:

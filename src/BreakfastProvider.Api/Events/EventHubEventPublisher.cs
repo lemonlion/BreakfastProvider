@@ -1,5 +1,7 @@
 using System.Diagnostics;
 using System.Text.Json;
+using Azure.Messaging.EventHubs;
+using Azure.Messaging.EventHubs.Producer;
 using Microsoft.Extensions.Options;
 using BreakfastProvider.Api.Configuration;
 using BreakfastProvider.Api.Telemetry;
@@ -14,17 +16,20 @@ public class EventHubEventPublisher<T> where T : IEventHubEvent
     };
 
     private readonly EventHubConfig? _config;
+    private readonly EventHubProducerClient? _producerClient;
     private readonly ILogger<EventHubEventPublisher<T>>? _logger;
 
     public EventHubEventPublisher(
         IOptions<EventHubConfig> config,
+        EventHubProducerClient producerClient,
         ILogger<EventHubEventPublisher<T>> logger)
     {
         _config = config.Value;
+        _producerClient = producerClient;
         _logger = logger;
     }
 
-    protected EventHubEventPublisher() { }
+    protected internal EventHubEventPublisher() { }
 
     public virtual async Task PublishEvent(T @event, CancellationToken cancellationToken = default)
     {
@@ -44,11 +49,16 @@ public class EventHubEventPublisher<T> where T : IEventHubEvent
             _logger!.LogInformation("Publishing {EventType} to Event Hub {EventHubName}",
                 typeof(T).Name, _config.EventHubName);
 
-            // In production this would use EventHubProducerClient.SendAsync()
-            // with EventData containing the JSON payload and CloudEvents properties.
-            // For this platform service, the real client is injected via DI and
-            // replaced with an in-memory fake during component tests.
-            await Task.CompletedTask;
+            var eventData = new EventData(json)
+            {
+                ContentType = "application/json"
+            };
+            eventData.Properties["ce_type"] = typeof(T).Name;
+            eventData.Properties["ce_source"] = "BreakfastProvider.Api";
+            eventData.Properties["ce_id"] = Guid.NewGuid().ToString();
+            eventData.Properties["ce_time"] = DateTime.UtcNow.ToString("O");
+
+            await _producerClient!.SendAsync([eventData], cancellationToken);
 
             _logger.LogInformation("Successfully published {EventType} to Event Hub {EventHubName}",
                 typeof(T).Name, _config.EventHubName);

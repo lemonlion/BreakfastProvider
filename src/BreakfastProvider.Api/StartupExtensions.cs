@@ -1,3 +1,4 @@
+using Azure.Messaging.EventHubs.Producer;
 using BreakfastProvider.Api.Configuration;
 using BreakfastProvider.Api.Data;
 using BreakfastProvider.Api.Data.Spanner;
@@ -95,8 +96,19 @@ public static class StartupExtensions
 
     public static IServiceCollection AddEventHub(this IServiceCollection services, IConfiguration configuration)
     {
+        var eventHubConfig = configuration.GetSection(nameof(EventHubConfig)).Get<EventHubConfig>() ?? new EventHubConfig();
         services.AddOptions<EventHubConfig>()
             .Bind(configuration.GetSection(nameof(EventHubConfig)));
+
+        if (string.IsNullOrWhiteSpace(eventHubConfig.ConnectionString))
+        {
+            // Register no-op publisher so DI resolves even without a real Event Hub.
+            services.AddSingleton(_ => new EventHubEventPublisher<EquipmentAlertEvent>());
+            return services;
+        }
+
+        services.AddSingleton(_ =>
+            new EventHubProducerClient(eventHubConfig.ConnectionString, eventHubConfig.EventHubName));
 
         services.AddSingleton<EventHubEventPublisher<EquipmentAlertEvent>>();
 

@@ -23,6 +23,8 @@ services:
         condition: service_completed_successfully
       pubsub-init:
         condition: service_completed_successfully
+      eventhub-emulator:
+        condition: service_started
       cow-service:
         condition: service_started
       goat-service:
@@ -63,6 +65,11 @@ services:
       - SpannerConfig__InstanceId=breakfast-instance
       - SpannerConfig__DatabaseId=breakfast-db
       - NotificationServiceConfig__BaseAddress=http://notification-service:8080
+      - EventHubConfig__ConnectionString=Endpoint=sb://eventhub-emulator.local;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=SAS_KEY_VALUE;UseDevelopmentEmulator=true;
+      - EventHubConfig__EventHubName=breakfast-equipment-alerts
+      - EventHubConfig__ConsumerGroup=$$Default
+      - EventHubConfig__BlobStorageConnectionString=DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://storage.local:10000/devstoreaccount1;
+      - EventHubConfig__BlobContainerName=eventhub-checkpoints
       - DatabaseConfig__ConnectionString=Server=sqlserver-database.local,1433;Database=BreakfastProvider;User Id=sa;Password=YourStr0ngP@ssword;TrustServerCertificate=True
     volumes:
       - ./kafka-config/certificates/ca.crt:/certs/kafka-ca.crt:ro

@@ -8,6 +8,21 @@ networks:
     driver: bridge
 
 services:
+  eventhub-emulator:
+    container_name: eventhubs-emulator
+    image: mcr.microsoft.com/azure-messaging/eventhubs-emulator:latest
+    hostname: eventhub-emulator.local
+    volumes:
+      - ./eventhub-emulator-config.json:/Eventhubs_Emulator/ConfigFiles/Config.json
+    ports:
+      - "5672:5672"
+    environment:
+      BLOB_SERVER: storage.local
+      METADATA_SERVER: storage.local
+      ACCEPT_EULA: "Y"
+    networks:
+      - localdev
+
   eventgrid:
     image: pmcilreavy/azureeventgridsimulator:latest
     container_name: docker.eventgrid

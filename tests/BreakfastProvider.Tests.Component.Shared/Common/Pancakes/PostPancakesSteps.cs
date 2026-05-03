@@ -24,7 +24,8 @@ public class PostPancakesSteps(RequestContext context)
     public async Task ParseResponse()
     {
         var responseString = await ResponseMessage!.Content.ReadAsStringAsync();
-        Track.That(() => Json.IsValid(responseString).Should().BeTrue());
+        var responseContentIsValidJson = Json.IsValid(responseString);
+        Track.That(() => responseContentIsValidJson.Should().BeTrue());
         Response = Json.Deserialize<TestPancakeResponse>(responseString)!;
     }
 }

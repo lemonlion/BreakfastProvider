@@ -61,7 +61,6 @@ public abstract class BaseFixture : FeatureFixture, IDisposable, IIgnorable<Comp
     public static readonly ConsumedPubSubMessageStore ConsumedPubSubMessageStore = new();
     public static readonly ConsumedEventHubMessageStore ConsumedEventHubMessageStore = new();
     private static FakeSpannerServer? _fakeSpannerServer;
-    internal static HttpMessageHandler? NotificationServiceHandler;
 
     static BaseFixture()
     {
@@ -397,7 +396,7 @@ public abstract class BaseFixture : FeatureFixture, IDisposable, IIgnorable<Comp
 
         // gRPC Notification Service — tracked client pointing at fake service
         if (Settings.RunWithAnInMemoryNotificationService)
-            services.UseTrackedGrpcNotificationClient(CurrentTestInfo.Fetcher, NotificationServiceHandler!);
+            services.UseTrackedGrpcNotificationClient(CurrentTestInfo.Fetcher, Settings.NotificationServiceBaseUrl!);
 
         // Tracking wrappers must be registered AFTER the in-memory/real publishers
         services.UseTrackedOutboxWriter(CurrentTestInfo.Fetcher);

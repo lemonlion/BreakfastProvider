@@ -708,20 +708,19 @@ public static class ServiceCollectionExtensions
 
     /// <summary>
     /// Replaces the production <see cref="BreakfastProvider.Api.Grpc.NotificationGrpc.NotificationGrpcClient"/>
-    /// with a tracked version that routes calls to a fake notification gRPC service
-    /// running in-process via the TestServer handler and records all calls for PlantUML
-    /// sequence diagrams. Uses <see cref="GrpcResponseVersionHandler"/> to fix the
-    /// HTTP response version (TestServer returns HTTP/1.1, gRPC requires HTTP/2).
+    /// with a tracked version that routes calls to a Kestrel-hosted fake notification
+    /// gRPC service over real HTTP/2 (h2c) and records all calls for PlantUML sequence
+    /// diagrams via a gRPC interceptor.
     /// </summary>
     public static IServiceCollection UseTrackedGrpcNotificationClient(this IServiceCollection services,
         Func<(string Name, string Id)> currentTestInfoFetcher,
-        HttpMessageHandler testServerHandler)
+        string baseUrl)
     {
         services.RemoveAll<Api.Grpc.NotificationGrpc.NotificationGrpcClient>();
 
         services.AddTrackedGrpcClient<Api.Grpc.NotificationGrpc.NotificationGrpcClient>(
-            new GrpcResponseVersionHandler(testServerHandler),
-            new Uri("http://localhost"),
+            new SocketsHttpHandler(),
+            new Uri(baseUrl),
             opts =>
             {
                 opts.ServiceName = Documentation.ServiceNames.NotificationService;

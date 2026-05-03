@@ -14,7 +14,7 @@ public sealed class TestRunHooks
     private static WebApplicationFactoryForSpecificUrl<Dependencies.Fakes.GoatService.Program>? _goatServiceFake;
     private static WebApplicationFactoryForSpecificUrl<Dependencies.Fakes.SupplierService.Program>? _supplierServiceFake;
     private static WebApplicationFactoryForSpecificUrl<Dependencies.Fakes.KitchenService.Program>? _kitchenServiceFake;
-    private static Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactory<Dependencies.Fakes.NotificationService.Program>? _notificationServiceFake;
+    private static WebApplicationFactoryForSpecificUrl<Dependencies.Fakes.NotificationService.Program>? _notificationServiceFake;
     private static readonly Dictionary<string, BackgroundService> KafkaConsumers = new();
     private static readonly DockerComposeOrchestrator DockerOrchestrator = new();
 
@@ -73,10 +73,7 @@ public sealed class TestRunHooks
             _kitchenServiceFake = InMemoryFakeHelper.Create<Dependencies.Fakes.KitchenService.Program>(settings.KitchenServiceBaseUrl!);
 
         if (settings.RunWithAnInMemoryNotificationService)
-        {
-            _notificationServiceFake = new Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactory<Dependencies.Fakes.NotificationService.Program>();
-            Support.AppManager.NotificationServiceHandler = _notificationServiceFake.Server.CreateHandler();
-        }
+            _notificationServiceFake = InMemoryFakeHelper.Create<Dependencies.Fakes.NotificationService.Program>(settings.NotificationServiceBaseUrl!);
     }
 
     private static void DisposeHttpFakes()

@@ -23,7 +23,7 @@ public class ConfiguredLightBddScopeAttribute : LightBddScope
     private WebApplicationFactoryForSpecificUrl<Dependencies.Fakes.GoatService.Program>? _goatServiceFake;
     private WebApplicationFactoryForSpecificUrl<Dependencies.Fakes.SupplierService.Program>? _supplierServiceFake;
     private WebApplicationFactoryForSpecificUrl<Dependencies.Fakes.KitchenService.Program>? _kitchenServiceFake;
-    private Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactory<Dependencies.Fakes.NotificationService.Program>? _notificationServiceFake;
+    private WebApplicationFactoryForSpecificUrl<Dependencies.Fakes.NotificationService.Program>? _notificationServiceFake;
 
     private readonly Dictionary<string, BackgroundService> _kafkaConsumers = new();
     private readonly DockerComposeOrchestrator _dockerOrchestrator = new();
@@ -96,10 +96,7 @@ public class ConfiguredLightBddScopeAttribute : LightBddScope
             _kitchenServiceFake = InMemoryFakeHelper.Create<Dependencies.Fakes.KitchenService.Program>(Settings.KitchenServiceBaseUrl!);
 
         if (Settings.RunWithAnInMemoryNotificationService)
-        {
-            _notificationServiceFake = new Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactory<Dependencies.Fakes.NotificationService.Program>();
-            BaseFixture.NotificationServiceHandler = _notificationServiceFake.Server.CreateHandler();
-        }
+            _notificationServiceFake = InMemoryFakeHelper.Create<Dependencies.Fakes.NotificationService.Program>(Settings.NotificationServiceBaseUrl!);
     }
 
     private void DisposeHttpFakes()

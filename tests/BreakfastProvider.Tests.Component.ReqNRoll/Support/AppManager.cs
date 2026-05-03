@@ -38,7 +38,6 @@ public sealed class AppManager : IDisposable
     public static readonly ConsumedPubSubMessageStore ConsumedPubSubMessageStore = new();
     public static readonly ConsumedEventHubMessageStore ConsumedEventHubMessageStore = new();
     private static FakeSpannerServer? _fakeSpannerServer;
-    internal static HttpMessageHandler? NotificationServiceHandler;
 
     public string RequestId { get; } = Guid.NewGuid().ToString();
 
@@ -304,7 +303,7 @@ public sealed class AppManager : IDisposable
 
         // gRPC Notification Service — tracked client pointing at fake service
         if (Settings.RunWithAnInMemoryNotificationService)
-            services.UseTrackedGrpcNotificationClient(CurrentTestInfo.Fetcher, NotificationServiceHandler!);
+            services.UseTrackedGrpcNotificationClient(CurrentTestInfo.Fetcher, Settings.NotificationServiceBaseUrl!);
 
         services.UseTrackedOutboxWriter(CurrentTestInfo.Fetcher);
         services.UseTrackedKafkaProducer(CurrentTestInfo.Fetcher);

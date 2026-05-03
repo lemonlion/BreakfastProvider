@@ -212,7 +212,7 @@ jobs:
 
   checks-complete:
     name: Checks complete
-    needs: [build, component-tests-in-memory, component-tests-in-docker, component-tests-external-sut]
+    needs: [build, component-tests-in-memory, component-tests-in-docker, component-tests-external-sut, xunit-component-tests-in-memory, xunit-component-tests-in-docker, xunit-component-tests-external-sut]
     runs-on: ubuntu-24.04
     steps:
       - name: Checks complete

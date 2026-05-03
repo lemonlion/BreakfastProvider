@@ -147,7 +147,7 @@ jobs:
 
   deploy-pages:
     name: Deploy test reports to GitHub Pages
-    needs: [component-tests-in-memory, component-tests-reqnroll-in-memory]
+    needs: [component-tests-in-memory, component-tests-reqnroll-in-memory, xunit-component-tests-in-memory]
     runs-on: ubuntu-24.04
     permissions:
       pages: write
@@ -167,6 +167,12 @@ jobs:
         with:
           name: LightBDD-component-tests-reqnroll-in-memory-report
           path: site/reqnroll
+
+      - name: Download xUnit report artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: LightBDD-xunit-component-tests-in-memory-report
+          path: site/xunit
 
       - name: Generate index page
         run: |

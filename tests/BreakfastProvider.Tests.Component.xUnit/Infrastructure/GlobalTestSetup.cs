@@ -13,7 +13,6 @@ namespace BreakfastProvider.Tests.Component.xUnit.Infrastructure;
 public class GlobalTestSetup : IAsyncLifetime
 {
     private readonly DateTime _startRunTime = DateTime.UtcNow;
-    private readonly DiagrammedTestRun _diagrammedTestRun = new();
 
     private WebApplicationFactoryForSpecificUrl<Dependencies.Fakes.CowService.Program>? _cowServiceFake;
     private WebApplicationFactoryForSpecificUrl<Dependencies.Fakes.GoatService.Program>? _goatServiceFake;
@@ -46,7 +45,7 @@ public class GlobalTestSetup : IAsyncLifetime
         BaseFixture.DisposeFactory();
 
         XUnitReportGenerator.CreateStandardReportsWithDiagrams(
-            _diagrammedTestRun.TestContexts,
+            DiagrammedTestRun.TestContexts,
             _startRunTime,
             DateTime.UtcNow,
             new ReportConfigurationOptions

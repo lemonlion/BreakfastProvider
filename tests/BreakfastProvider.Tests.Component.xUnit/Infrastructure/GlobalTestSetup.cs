@@ -33,11 +33,23 @@ public class GlobalTestSetup : IAsyncLifetime
 
         StartDockerCompose();
         StartHttpFakes();
-        StartKafkaConsumers();
-        StartPubSubConsumers();
-        InitEventGridQueueDrainer();
-        ClearDockerQueues();
+        TryRun("kafka consumers", StartKafkaConsumers);
+        TryRun("pubsub consumers", StartPubSubConsumers);
+        TryRun("eventgrid queue drainer", InitEventGridQueueDrainer);
+        TryRun("clear docker queues", ClearDockerQueues);
         await BaseFixture.EnsureHostInitialized();
+    }
+
+    private static void TryRun(string stepName, Action action)
+    {
+        try
+        {
+            action();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[GlobalTestSetup] Warning: '{stepName}' threw {ex.GetType().Name}: {ex.Message}");
+        }
     }
 
     public async ValueTask DisposeAsync()

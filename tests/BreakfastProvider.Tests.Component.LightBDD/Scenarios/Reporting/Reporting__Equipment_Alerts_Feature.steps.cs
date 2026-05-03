@@ -83,7 +83,7 @@ public partial class Reporting__Equipment_Alerts_Feature : BaseFixture
     #region When
 
     private async Task The_equipment_alerts_are_queried_via_graphql()
-        => await _graphQlSteps.QueryEquipmentAlerts();
+        => await _graphQlSteps.QueryEquipmentAlerts(waitForBatchId: _pancakeSteps.Response?.BatchId);
 
     #endregion
 

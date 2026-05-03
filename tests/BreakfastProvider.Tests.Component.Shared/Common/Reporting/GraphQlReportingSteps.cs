@@ -198,19 +198,50 @@ public class GraphQlReportingSteps(RequestContext context)
         IngredientShipments = JsonSerializer.Deserialize<List<TestIngredientShipmentResponse>>(data.GetRawText(), JsonOptions)!;
     }
 
-    public async Task QueryEquipmentAlerts()
+    public async Task QueryEquipmentAlerts(int maxAttempts = 30, int delayMs = 2000, Guid? waitForBatchId = null)
     {
-        var query = new
+        for (var attempt = 1; attempt <= maxAttempts; attempt++)
         {
-            query = "{ equipmentAlerts { id alertId batchId equipmentName alertType alertedAt } }"
-        };
+            var query = new
+            {
+                query = "{ equipmentAlerts { id alertId batchId equipmentName alertType alertedAt } }"
+            };
 
-        var request = new HttpRequestMessage(HttpMethod.Post, Endpoints.GraphQL)
-        {
-            Content = JsonContent.Create(query)
-        };
-        request.Headers.Add(CustomHeaders.ComponentTestRequestId, context.RequestId);
-        ResponseMessage = await context.Client.SendAsync(request);
+            var request = new HttpRequestMessage(HttpMethod.Post, Endpoints.GraphQL)
+            {
+                Content = JsonContent.Create(query)
+            };
+            request.Headers.Add(CustomHeaders.ComponentTestRequestId, context.RequestId);
+            ResponseMessage = await context.Client.SendAsync(request);
+
+            if (attempt >= maxAttempts || !ResponseMessage.IsSuccessStatusCode)
+                break;
+
+            var content = await ResponseMessage.Content.ReadAsStringAsync();
+            var doc = JsonDocument.Parse(content);
+            if (doc.RootElement.TryGetProperty("data", out var data) &&
+                data.TryGetProperty("equipmentAlerts", out var alerts) &&
+                alerts.GetArrayLength() > 0)
+            {
+                if (waitForBatchId == null)
+                    break;
+
+                var targetId = waitForBatchId.Value.ToString();
+                var found = false;
+                foreach (var alert in alerts.EnumerateArray())
+                {
+                    if (alert.TryGetProperty("batchId", out var bid) &&
+                        bid.GetString()?.Equals(targetId, StringComparison.OrdinalIgnoreCase) == true)
+                    {
+                        found = true;
+                        break;
+                    }
+                }
+                if (found) break;
+            }
+
+            await Task.Delay(delayMs);
+        }
     }
 
     public async Task ParseEquipmentAlertsResponse()

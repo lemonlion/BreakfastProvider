@@ -7,6 +7,7 @@ using Azure.Messaging.EventGrid;
 using BreakfastProvider.Api;
 using BreakfastProvider.Api.Events;
 using BreakfastProvider.Api.Events.Outbox;
+using BreakfastProvider.Api.Models.Events;
 using BreakfastProvider.Tests.Component.Shared.Fakes.Cosmos;
 using BreakfastProvider.Tests.Component.Shared.Fakes.EventGrid;
 using BreakfastProvider.Tests.Component.Shared.Fakes.EventHub;
@@ -386,6 +387,30 @@ public static class ServiceCollectionExtensions
 
         // Register the in-memory consumer
         services.AddSingleton<IHostedService, InMemoryEventHubEquipmentAlertConsumerService>();
+
+        return services;
+    }
+
+    /// <summary>
+    /// Re-registers the real EventHub publisher using options from DI.
+    /// Needed because <c>AddEventHub()</c> in Program.cs reads config eagerly
+    /// before <c>ConfigureAppConfiguration</c> test overrides are applied,
+    /// causing it to register a no-op publisher when the production config
+    /// has an empty connection string.
+    /// </summary>
+    public static IServiceCollection UseRealEventHub(this IServiceCollection services)
+    {
+        services.RemoveAll<EventHubEventPublisher<EquipmentAlertEvent>>();
+        services.RemoveAll<Azure.Messaging.EventHubs.Producer.EventHubProducerClient>();
+
+        services.AddSingleton(sp =>
+        {
+            var config = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<Api.Configuration.EventHubConfig>>().Value;
+            return new Azure.Messaging.EventHubs.Producer.EventHubProducerClient(
+                config.ConnectionString, config.EventHubName);
+        });
+
+        services.AddSingleton<EventHubEventPublisher<EquipmentAlertEvent>>();
 
         return services;
     }

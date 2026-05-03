@@ -8,11 +8,7 @@
             {
                 "Name": "breakfast-equipment-alerts",
                 "PartitionCount": "2",
-                "ConsumerGroups": [
-                {
-                    "Name": "$Default"
-                }
-                ]
+                "ConsumerGroups": []
             }
             ]
         }

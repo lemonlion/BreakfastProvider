@@ -20,6 +20,7 @@ public class KafkaConfig
     public TimeSpan FlushTimeout { get; set; } = TimeSpan.FromSeconds(10);
     public Acks Acknowledgements { get; init; } = Acks.Leader;
     public int MessageTimeoutInMilliseconds { get; init; }
+    public string? SslCaLocation { get; set; }
 }
 
 public record TopicConfiguration

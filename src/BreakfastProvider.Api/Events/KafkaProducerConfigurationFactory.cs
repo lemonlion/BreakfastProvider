@@ -40,7 +40,8 @@ public class KafkaProducerConfigurationFactory : IKafkaProducerConfigurationFact
             SaslPassword = topicConfiguration.ApiSecret,
             SecurityProtocol = SecurityProtocol.SaslSsl,
             Acks = _kafkaSettings.Acknowledgements,
-            SslEndpointIdentificationAlgorithm = SslEndpointIdentificationAlgorithm.None
+            SslEndpointIdentificationAlgorithm = SslEndpointIdentificationAlgorithm.None,
+            SslCaLocation = _kafkaSettings.SslCaLocation
         };
     
     private TopicConfiguration GetTopicConfiguration<TValue>()

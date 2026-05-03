@@ -13,7 +13,7 @@ public class EquipmentAlertsSteps(
 {
     [When("the equipment alerts are queried via graphql")]
     public async Task WhenTheEquipmentAlertsAreQueriedViaGraphql()
-        => await graphQlSteps.QueryEquipmentAlerts();
+        => await graphQlSteps.QueryEquipmentAlerts(waitForBatchId: pancakeSteps.Response?.BatchId);
 
     [Then("the graphql response should contain the equipment alert record")]
     public async Task ThenTheGraphqlResponseShouldContainTheEquipmentAlertRecord()

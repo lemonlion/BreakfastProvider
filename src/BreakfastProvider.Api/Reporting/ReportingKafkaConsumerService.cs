@@ -46,6 +46,7 @@ public class ReportingKafkaConsumerService(
             consumerConfig.SaslUsername = topicConfig.ApiKey;
             consumerConfig.SaslPassword = topicConfig.ApiSecret;
             consumerConfig.SslEndpointIdentificationAlgorithm = SslEndpointIdentificationAlgorithm.None;
+            consumerConfig.SslCaLocation = kafkaConfig.SslCaLocation;
         }
 
         using var consumer = new ConsumerBuilder<string, string>(consumerConfig)

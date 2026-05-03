@@ -1,5 +1,6 @@
 using System.Collections.Concurrent;
 using BreakfastProvider.Api;
+using BreakfastProvider.Api.Configuration;
 using BreakfastProvider.Api.Reporting;
 using BreakfastProvider.Tests.Component.Shared.Fakes.EventHub;
 using BreakfastProvider.Tests.Component.Shared.Fakes.HttpFakes;
@@ -98,7 +99,7 @@ public sealed class AppManager : IDisposable
             {
                 builder.ConfigureAppConfiguration((_, config) =>
                 {
-                    config.SetBasePath(Directory.GetCurrentDirectory())
+                    config.SetBasePath(AppContext.BaseDirectory)
                         .AddJsonFile("appsettings.componenttests.json", optional: true, reloadOnChange: false);
                     if (configOverrides != null)
                         config.AddInMemoryCollection(configOverrides);
@@ -154,7 +155,7 @@ public sealed class AppManager : IDisposable
         {
             builder.ConfigureAppConfiguration((_, config) =>
             {
-                config.SetBasePath(Directory.GetCurrentDirectory())
+                config.SetBasePath(AppContext.BaseDirectory)
                     .AddJsonFile("appsettings.componenttests.json", optional: true, reloadOnChange: false);
             });
             builder.ConfigureTestServices(ConfigureTestServices);
@@ -232,6 +233,29 @@ public sealed class AppManager : IDisposable
         if (Settings.RunWithAnInMemoryKafkaBroker)
             services.ReplaceKafkaHealthCheckWithNoOp();
 
+        // Docker mode: resolve relative SslCaLocation to absolute by walking up from CWD
+        // (test CWD is bin/Debug/net10.0/, but the cert is at the repo root).
+        if (!Settings.RunWithAnInMemoryKafkaBroker)
+        {
+            services.PostConfigure<KafkaConfig>(config =>
+            {
+                if (string.IsNullOrEmpty(config.SslCaLocation) || Path.IsPathRooted(config.SslCaLocation))
+                    return;
+
+                var dir = new DirectoryInfo(Directory.GetCurrentDirectory());
+                while (dir != null)
+                {
+                    var candidate = Path.Combine(dir.FullName, config.SslCaLocation);
+                    if (File.Exists(candidate))
+                    {
+                        config.SslCaLocation = candidate;
+                        return;
+                    }
+                    dir = dir.Parent;
+                }
+            });
+        }
+
         // Google Cloud Pub/Sub — always in-memory for component tests
         services.AddSingleton(_ => ConsumedPubSubMessageStore);
         services.UseInMemoryPubSub(ConsumedPubSubMessageStore);
@@ -255,6 +279,8 @@ public sealed class AppManager : IDisposable
         services.AddSingleton(_ => ConsumedEventHubMessageStore);
         if (Settings.RunWithAnInMemoryEventHub)
             services.UseInMemoryEventHub(ConsumedEventHubMessageStore);
+        else
+            services.UseRealEventHub();
 
         // gRPC Notification Service — tracked client pointing at fake service
         if (Settings.RunWithAnInMemoryNotificationService)

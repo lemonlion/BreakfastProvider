@@ -114,6 +114,102 @@ jobs:
       coverage-file: component-tests-external-sut.coverage.cobertura.xml
 
 
+  xunit-component-tests-in-memory:
+    name: xUnit component tests in memory
+    uses: ./.github/workflows/_tests.yml
+    with:
+      test-type: component
+      test-run-type: memory
+      test-run-description: xunit-component-tests-in-memory
+      csproj-path: ./tests/BreakfastProvider.Tests.Component.xUnit/BreakfastProvider.Tests.Component.xUnit.csproj
+      features-report-path: tests/BreakfastProvider.Tests.Component.xUnit/bin/Debug/net10.0/Reports/TestRunReport.html
+    secrets: inherit
+
+
+  xunit-component-tests-in-memory-report:
+    name: xUnit component tests in memory
+    needs: [xunit-component-tests-in-memory]
+    uses: ./.github/workflows/_report-tests.yml
+    with:
+      test-type: component
+      test-run-type: memory
+      trx-file: xunit-component-tests-in-memory-results.trx
+
+
+  xunit-component-tests-in-memory-coverage:
+    name: xUnit component tests in memory
+    needs: [xunit-component-tests-in-memory]
+    uses: ./.github/workflows/_report-coverage.yml
+    with:
+      test-type: component
+      test-run-type: memory
+      coverage-file: xunit-component-tests-in-memory.coverage.cobertura.xml
+
+
+  xunit-component-tests-in-docker:
+    name: xUnit component tests in docker
+    uses: ./.github/workflows/_tests.yml
+    with:
+      test-type: component
+      test-run-type: docker
+      test-run-description: xunit-component-tests-in-docker
+      csproj-path: ./tests/BreakfastProvider.Tests.Component.xUnit/BreakfastProvider.Tests.Component.xUnit.csproj
+      features-report-path: tests/BreakfastProvider.Tests.Component.xUnit/bin/Debug/net10.0/Reports/TestRunReport.html
+    secrets: inherit
+
+
+  xunit-component-tests-in-docker-report:
+    name: xUnit component tests in docker
+    needs: [xunit-component-tests-in-docker]
+    uses: ./.github/workflows/_report-tests.yml
+    with:
+      test-type: component
+      test-run-type: docker
+      trx-file: xunit-component-tests-in-docker-results.trx
+
+
+  xunit-component-tests-in-docker-coverage:
+    name: xUnit component tests in docker
+    needs: [xunit-component-tests-in-docker]
+    uses: ./.github/workflows/_report-coverage.yml
+    with:
+      test-type: component
+      test-run-type: docker
+      coverage-file: xunit-component-tests-in-docker.coverage.cobertura.xml
+
+
+  xunit-component-tests-external-sut:
+    name: xUnit component tests (external SUT)
+    uses: ./.github/workflows/_tests.yml
+    with:
+      test-type: component
+      test-run-type: external-sut
+      test-run-description: xunit-component-tests-external-sut
+      csproj-path: ./tests/BreakfastProvider.Tests.Component.xUnit/BreakfastProvider.Tests.Component.xUnit.csproj
+      features-report-path: tests/BreakfastProvider.Tests.Component.xUnit/bin/Debug/net10.0/Reports/TestRunReport.html
+    secrets: inherit
+
+
+  xunit-component-tests-external-sut-report:
+    name: xUnit component tests (external SUT)
+    needs: [xunit-component-tests-external-sut]
+    uses: ./.github/workflows/_report-tests.yml
+    with:
+      test-type: component
+      test-run-type: external-sut
+      trx-file: xunit-component-tests-external-sut-results.trx
+
+
+  xunit-component-tests-external-sut-coverage:
+    name: xUnit component tests (external SUT)
+    needs: [xunit-component-tests-external-sut]
+    uses: ./.github/workflows/_report-coverage.yml
+    with:
+      test-type: component
+      test-run-type: external-sut
+      coverage-file: xunit-component-tests-external-sut.coverage.cobertura.xml
+
+
   checks-complete:
     name: Checks complete
     needs: [build, component-tests-in-memory, component-tests-in-docker, component-tests-external-sut]

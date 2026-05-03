@@ -11,7 +11,10 @@ public static class InMemoryFakeHelper
     {
         HttpFakesHelper.AssertPortIsNotInUse(baseUrl);
         var fixture = new WebApplicationFactoryForSpecificUrl<TProgram>(hostUrl: baseUrl, config);
-        fixture.CreateDefaultClient();
+        // Access Services to trigger host creation (starts Kestrel).
+        // Do NOT call CreateDefaultClient() — the factory returns a dummy host
+        // without a running TestServer, so CreateClient/CreateDefaultClient would throw.
+        _ = fixture.Services;
         return fixture;
     }
 }

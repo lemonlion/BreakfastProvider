@@ -18,6 +18,7 @@ powershell -NoProfile -Command ^
   "$f = $f -replace '\"RunWithAnInMemorySpannerDatabase\": false', '\"RunWithAnInMemorySpannerDatabase\": true';" ^
   "$f = $f -replace '\"RunWithAnInMemoryNotificationService\": false', '\"RunWithAnInMemoryNotificationService\": true';" ^
   "$f = $f -replace '\"RunWithAnInMemoryEventHub\": false', '\"RunWithAnInMemoryEventHub\": true';" ^
+  "$f = $f -replace '\"RunWithAnInMemoryPubSub\": false', '\"RunWithAnInMemoryPubSub\": true';" ^
   "$f = $f -replace '\"RunAgainstExternalServiceUnderTest\": true', '\"RunAgainstExternalServiceUnderTest\": false';" ^
   "$f = $f -replace '\"EnableDockerInSetupAndTearDown\": true',    '\"EnableDockerInSetupAndTearDown\": false';" ^
   "$f = $f -replace '\"SkipDockerTearDown\": true',                '\"SkipDockerTearDown\": false';" ^

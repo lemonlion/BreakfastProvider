@@ -1,4 +1,5 @@
 using BreakfastProvider.Tests.Component.Shared.Fakes.Kafka;
+using BreakfastProvider.Tests.Component.Shared.Fakes.PubSub;
 using BreakfastProvider.Tests.Component.Shared.Infrastructure;
 using Microsoft.Extensions.Hosting;
 using Reqnroll;
@@ -16,6 +17,7 @@ public sealed class TestRunHooks
     private static WebApplicationFactoryForSpecificUrl<Dependencies.Fakes.KitchenService.Program>? _kitchenServiceFake;
     private static WebApplicationFactoryForSpecificUrl<Dependencies.Fakes.NotificationService.Program>? _notificationServiceFake;
     private static readonly Dictionary<string, BackgroundService> KafkaConsumers = new();
+    private static readonly Dictionary<string, BackgroundService> PubSubConsumers = new();
     private static readonly DockerComposeOrchestrator DockerOrchestrator = new();
 
     [BeforeTestRun]
@@ -33,6 +35,7 @@ public sealed class TestRunHooks
         {
             StartHttpFakes(settings);
             StartKafkaConsumers(settings);
+            StartPubSubConsumers(settings);
             InitEventGridQueueDrainer(settings);
             ClearDockerQueues(settings);
         }
@@ -51,6 +54,7 @@ public sealed class TestRunHooks
 
         Support.AppManager.DisposeFactory();
         DisposeKafkaConsumers();
+        DisposePubSubConsumers();
         DisposeHttpFakes();
         DockerOrchestrator.Dispose();
     }
@@ -112,6 +116,39 @@ public sealed class TestRunHooks
         }
 
         KafkaConsumers.Clear();
+    }
+
+    private static void StartPubSubConsumers(ComponentTestSettings settings)
+    {
+        if (settings.RunWithAnInMemoryPubSub)
+            return;
+
+        Environment.SetEnvironmentVariable("PUBSUB_EMULATOR_HOST", "localhost:8085");
+
+        foreach (var (eventTypeName, topicConfig) in settings.PubSubConfig.PublisherConfigurations)
+        {
+            PubSubConsumers.Add(eventTypeName,
+                new RawJsonPubSubConsumer(
+                    settings.PubSubConfig.ProjectId, topicConfig.TopicId, eventTypeName,
+                    Support.AppManager.ConsumedPubSubMessageStore));
+        }
+
+        foreach (var consumer in PubSubConsumers.Values)
+            consumer.StartAsync(CancellationToken.None);
+    }
+
+    private static void DisposePubSubConsumers()
+    {
+        foreach (var (name, consumer) in PubSubConsumers)
+        {
+            try { consumer.StopAsync(CancellationToken.None).GetAwaiter().GetResult(); }
+            catch (Exception ex) { Console.WriteLine($"[PubSubConsumer] Warning: StopAsync for '{name}' threw {ex.GetType().Name}: {ex.Message}"); }
+
+            try { consumer.Dispose(); }
+            catch (Exception ex) { Console.WriteLine($"[PubSubConsumer] Warning: Dispose for '{name}' threw {ex.GetType().Name}: {ex.Message}"); }
+        }
+
+        PubSubConsumers.Clear();
     }
 
     private static void InitEventGridQueueDrainer(ComponentTestSettings settings)

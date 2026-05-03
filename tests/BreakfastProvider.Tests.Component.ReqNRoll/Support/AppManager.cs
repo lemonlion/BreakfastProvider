@@ -275,16 +275,21 @@ public sealed class AppManager : IDisposable
             });
         }
 
-        // Google Cloud Pub/Sub — always in-memory for component tests
+        // Google Cloud Pub/Sub — conditional based on settings
         services.AddSingleton(_ => ConsumedPubSubMessageStore);
-        services.UseInMemoryPubSub(ConsumedPubSubMessageStore);
-        services.ReplacePubSubHealthCheckWithNoOp();
+        if (Settings.RunWithAnInMemoryPubSub)
+        {
+            services.UseInMemoryPubSub(ConsumedPubSubMessageStore);
+            services.ReplacePubSubHealthCheckWithNoOp();
+        }
 
-        // UseInMemoryReportingDatabase already replaces PubSubBatchCompletionConsumerService
-        // with InMemoryPubSubBatchCompletionConsumerService. When the reporting DB is NOT
-        // in-memory, we still need this replacement because the real consumer requires
-        // real GCP Pub/Sub infrastructure which isn't available in tests.
-        if (!Settings.RunWithAnInMemoryReportingDatabase)
+        // When Pub/Sub is in-memory, UseInMemoryReportingDatabase already replaces
+        // PubSubBatchCompletionConsumerService with InMemoryPubSubBatchCompletionConsumerService.
+        // When the reporting DB is NOT in-memory, we still need this replacement because
+        // the InMemory PubSub publisher doesn't go through the real subscriber pipeline.
+        // When Pub/Sub is NOT in-memory (Docker mode), the real consumer connects to the
+        // emulator and no replacement is needed.
+        if (Settings.RunWithAnInMemoryPubSub && !Settings.RunWithAnInMemoryReportingDatabase)
         {
             var realPubSubConsumer = services
                 .FirstOrDefault(d => d.ImplementationType == typeof(PubSubBatchCompletionConsumerService));

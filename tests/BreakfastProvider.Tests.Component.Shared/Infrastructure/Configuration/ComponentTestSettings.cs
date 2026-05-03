@@ -16,6 +16,7 @@ public record ComponentTestSettings
     public bool RunWithAnInMemorySpannerDatabase { get; set; }
     public bool RunWithAnInMemoryNotificationService { get; set; }
     public bool RunWithAnInMemoryEventHub { get; set; }
+    public bool RunWithAnInMemoryPubSub { get; set; }
     public string? CowServiceBaseUrl { get; set; }
     public string? GoatServiceBaseUrl { get; set; }
     public string? SupplierServiceBaseUrl { get; set; }
@@ -24,6 +25,7 @@ public record ComponentTestSettings
     public string? PlantUmlServerBaseUrl { get; set; }
     public string? ExternalBlobStorageConnectionString { get; set; }
     public KafkaConfig KafkaConfig { get; set; } = new();
+    public PubSubConfig PubSubConfig { get; set; } = new();
     public bool RunAgainstExternalServiceUnderTest { get; set; }
     public string? ExternalServiceUnderTestUrl { get; set; }
     public bool EnableDockerInSetupAndTearDown { get; set; }

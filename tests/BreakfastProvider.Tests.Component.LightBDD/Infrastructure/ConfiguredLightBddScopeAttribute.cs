@@ -1,4 +1,5 @@
 using BreakfastProvider.Tests.Component.Shared.Fakes.Kafka;
+using BreakfastProvider.Tests.Component.Shared.Fakes.PubSub;
 using LightBDD.Core.Configuration;
 using LightBDD.Framework.Configuration;
 using LightBDD.Framework.Notification;
@@ -26,6 +27,7 @@ public class ConfiguredLightBddScopeAttribute : LightBddScope
     private WebApplicationFactoryForSpecificUrl<Dependencies.Fakes.NotificationService.Program>? _notificationServiceFake;
 
     private readonly Dictionary<string, BackgroundService> _kafkaConsumers = new();
+    private readonly Dictionary<string, BackgroundService> _pubSubConsumers = new();
     private readonly DockerComposeOrchestrator _dockerOrchestrator = new();
 
     protected override void OnConfigure(LightBddConfiguration configuration)
@@ -58,6 +60,7 @@ public class ConfiguredLightBddScopeAttribute : LightBddScope
             .RegisterGlobalSetUp("docker compose", StartDockerCompose, StopDockerCompose)
             .RegisterGlobalSetUp("http fakes", StartHttpFakes, DisposeHttpFakes)
             .RegisterGlobalSetUp("kafka consumer", StartKafkaConsumers, DisposeKafkaConsumers)
+            .RegisterGlobalSetUp("pubsub consumer", StartPubSubConsumers, DisposePubSubConsumers)
             .RegisterGlobalSetUp("eventgrid queue drainer", InitEventGridQueueDrainer)
             .RegisterGlobalSetUp("clear docker queues", ClearDockerQueues)
             .RegisterGlobalSetUp("host init", BaseFixture.EnsureHostInitialized);
@@ -152,6 +155,56 @@ public class ConfiguredLightBddScopeAttribute : LightBddScope
         }
 
         _kafkaConsumers.Clear();
+    }
+
+    private void StartPubSubConsumers()
+    {
+        if (Settings.RunWithAnInMemoryPubSub)
+            return;
+
+        try { DisposePubSubConsumers(); } catch { /* ignore */ }
+
+        Environment.SetEnvironmentVariable("PUBSUB_EMULATOR_HOST", "localhost:8085");
+
+        foreach (var (eventTypeName, topicConfig) in Settings.PubSubConfig.PublisherConfigurations)
+        {
+            _pubSubConsumers.Add(eventTypeName,
+                new RawJsonPubSubConsumer(
+                    Settings.PubSubConfig.ProjectId, topicConfig.TopicId, eventTypeName,
+                    BaseFixture.ConsumedPubSubMessageStore));
+        }
+
+        foreach (var consumer in _pubSubConsumers.Values)
+            consumer.StartAsync(CancellationToken.None);
+    }
+
+    private void DisposePubSubConsumers()
+    {
+        if (_pubSubConsumers.Count == 0)
+            return;
+
+        foreach (var (name, consumer) in _pubSubConsumers)
+        {
+            try
+            {
+                consumer.StopAsync(CancellationToken.None).GetAwaiter().GetResult();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[PubSubConsumer] Warning: StopAsync for '{name}' threw {ex.GetType().Name}: {ex.Message}");
+            }
+
+            try
+            {
+                consumer.Dispose();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[PubSubConsumer] Warning: Dispose for '{name}' threw {ex.GetType().Name}: {ex.Message}");
+            }
+        }
+
+        _pubSubConsumers.Clear();
     }
 
     private void InitEventGridQueueDrainer()

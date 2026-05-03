@@ -22,6 +22,7 @@ sed -i \
   -e 's/"RunWithAnInMemorySpannerDatabase": true/"RunWithAnInMemorySpannerDatabase": false/' \
   -e 's/"RunWithAnInMemoryNotificationService": true/"RunWithAnInMemoryNotificationService": false/' \
   -e 's/"RunWithAnInMemoryEventHub": true/"RunWithAnInMemoryEventHub": false/' \
+  -e 's/"RunWithAnInMemoryPubSub": true/"RunWithAnInMemoryPubSub": false/' \
   -e 's/"RunAgainstExternalServiceUnderTest": false/"RunAgainstExternalServiceUnderTest": true/' \
   -e 's/"EnableDockerInSetupAndTearDown": true/"EnableDockerInSetupAndTearDown": false/' \
   -e 's/"SkipDockerTearDown": true/"SkipDockerTearDown": false/' \

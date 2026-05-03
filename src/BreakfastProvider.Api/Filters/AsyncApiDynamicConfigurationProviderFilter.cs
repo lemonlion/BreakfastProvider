@@ -217,6 +217,9 @@ internal class AsyncApiDynamicConfigurationProviderFilter(
     /// </summary>
     private void RewriteKafkaTopicName(AsyncApiDocument document)
     {
+        if (_kafkaSettings.ProducerConfigurations is not { Count: > 0 })
+            return;
+
         var kafkaChannelKeys = _kafkaSettings.ProducerConfigurations.Keys.ToHashSet();
 
         foreach (var channel in document.Channels.ToArray())
@@ -264,6 +267,9 @@ internal class AsyncApiDynamicConfigurationProviderFilter(
     /// </summary>
     private void RewritePubSubTopicName(AsyncApiDocument document)
     {
+        if (_pubSubSettings.PublisherConfigurations is not { Count: > 0 })
+            return;
+
         var pubSubChannelKeys = _pubSubSettings.PublisherConfigurations.Keys.ToHashSet();
 
         foreach (var channel in document.Channels.ToArray())

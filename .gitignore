@@ -430,3 +430,4 @@ docker/Root_CA.crt
 docker/*.crt
 docker/*.pem
 docker/*.cer
+ttd_decompiled.txt

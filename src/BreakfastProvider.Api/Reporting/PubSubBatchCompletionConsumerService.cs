@@ -1,7 +1,9 @@
 using System.Text.Json;
 using BreakfastProvider.Api.Configuration;
 using Google.Api.Gax;
+using Google.Api.Gax.Grpc;
 using Google.Cloud.PubSub.V1;
+using Grpc.Core;
 using Microsoft.Extensions.Options;
 
 namespace BreakfastProvider.Api.Reporting;
@@ -99,6 +101,11 @@ public class PubSubBatchCompletionConsumerService(
         logger.LogInformation("Batch completion Pub/Sub consumer started (pull) on subscription {Subscription}",
             subscriptionName.SubscriptionId);
 
+        // Use a short gRPC deadline on each Pull so the emulator's long-poll doesn't
+        // block indefinitely when no messages exist yet. The emulator may not wake a
+        // waiting Pull when new messages arrive after the call was issued.
+        var pullCallSettings = CallSettings.FromExpiration(Expiration.FromTimeout(TimeSpan.FromSeconds(5)));
+
         while (!stoppingToken.IsCancellationRequested)
         {
             try
@@ -106,13 +113,10 @@ public class PubSubBatchCompletionConsumerService(
                 var response = await apiClient.PullAsync(
                     subscriptionName,
                     maxMessages: 10,
-                    stoppingToken);
+                    pullCallSettings);
 
                 if (response.ReceivedMessages.Count == 0)
-                {
-                    await Task.Delay(TimeSpan.FromSeconds(2), stoppingToken);
                     continue;
-                }
 
                 var ackIds = new List<string>();
                 foreach (var received in response.ReceivedMessages)
@@ -132,6 +136,10 @@ public class PubSubBatchCompletionConsumerService(
                 {
                     await apiClient.AcknowledgeAsync(subscriptionName, ackIds, stoppingToken);
                 }
+            }
+            catch (RpcException ex) when (ex.StatusCode == StatusCode.DeadlineExceeded)
+            {
+                // Normal timeout — no messages available yet, loop around immediately
             }
             catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
             {

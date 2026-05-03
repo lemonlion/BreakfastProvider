@@ -267,6 +267,28 @@ public abstract class BaseFixture : FeatureFixture, IDisposable, IIgnorable<Comp
             services.AddSingleton(_staticServiceProvider.GetRequiredService<Microsoft.Azure.Cosmos.CosmosClient>());
             services.RemoveAll<Microsoft.Azure.Cosmos.Container>();
             services.AddSingleton(_staticServiceProvider.GetRequiredService<Microsoft.Azure.Cosmos.Container>());
+
+            // Docker mode: per-scenario factories must not spawn their own Kafka/EventHub
+            // consumers — they join the same consumer group as the static factory's consumers
+            // and compete for partition ownership on single-partition topics, causing
+            // rebalance storms and message processing gaps. Only the static factory's
+            // background consumers should be active; they write to the shared SQL Server
+            // reporting DB that all factories' GraphQL endpoints read from.
+            if (!Settings.RunWithAnInMemoryKafkaBroker)
+            {
+                var kafkaConsumer = services
+                    .FirstOrDefault(d => d.ImplementationType == typeof(ReportingKafkaConsumerService));
+                if (kafkaConsumer is not null)
+                    services.Remove(kafkaConsumer);
+            }
+
+            if (!Settings.RunWithAnInMemoryEventHub)
+            {
+                var ehConsumer = services
+                    .FirstOrDefault(d => d.ImplementationType == typeof(EventHubEquipmentAlertConsumerService));
+                if (ehConsumer is not null)
+                    services.Remove(ehConsumer);
+            }
         }
 
         if (Settings.RunWithAnInMemoryReportingDatabase)

@@ -18,7 +18,7 @@ Feature: Order Pagination
         When orders are listed with page 2 and page size 1
         Then the paginated response should have correct page metadata
 
-    @IgnoreUnlessInMemoryDb
+    @IgnoreIfNeedsDirectDbAccess @IgnoreUnlessInMemoryDb
     Scenario: Listing orders when none exist should return an empty page
         When orders are listed with default pagination
         Then the paginated response should be empty

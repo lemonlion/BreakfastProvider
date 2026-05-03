@@ -243,10 +243,12 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.Orders
         [global::Xunit.FactAttribute(DisplayName="Listing orders when none exist should return an empty page")]
         [global::Xunit.TraitAttribute("FeatureTitle", "Order Pagination")]
         [global::Xunit.TraitAttribute("Description", "Listing orders when none exist should return an empty page")]
+        [global::Xunit.TraitAttribute("Category", "IgnoreIfNeedsDirectDbAccess")]
         [global::Xunit.TraitAttribute("Category", "IgnoreUnlessInMemoryDb")]
         public async global::System.Threading.Tasks.Task ListingOrdersWhenNoneExistShouldReturnAnEmptyPage()
         {
             string[] tagsOfScenario = new string[] {
+                    "IgnoreIfNeedsDirectDbAccess",
                     "IgnoreUnlessInMemoryDb"};
             global::System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new global::System.Collections.Specialized.OrderedDictionary();
             string pickleIndex = "3";

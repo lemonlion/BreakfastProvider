@@ -40,6 +40,7 @@ public partial class Orders__Pagination_Feature
     }
 
     [Scenario]
+    [IgnoreIf(nameof(Settings.RunAgainstExternalServiceUnderTest), NeedsDirectDatabaseAccess)]
     [IgnoreUnless(nameof(Settings.RunWithAnInMemoryDatabase), NeedsIsolatedDatabase)]
     public async Task Listing_Orders_When_None_Exist_Should_Return_An_Empty_Page()
     {

@@ -127,9 +127,45 @@ jobs:
     secrets: inherit
 
 
+  xunit-component-tests-in-memory:
+    name: Component tests in memory (xUnit)
+    uses: ./.github/workflows/_tests.yml
+    with:
+      test-type: component
+      test-run-type: memory
+      test-run-description: xunit-component-tests-in-memory
+      csproj-path: ./tests/BreakfastProvider.Tests.Component.xUnit/BreakfastProvider.Tests.Component.xUnit.csproj
+      features-report-path: tests/BreakfastProvider.Tests.Component.xUnit/bin/Debug/net10.0/Reports/TestRunReport.html
+    secrets: inherit
+
+
+  xunit-component-tests-in-docker:
+    name: Component tests in docker (xUnit)
+    uses: ./.github/workflows/_tests.yml
+    with:
+      test-type: component
+      test-run-type: docker
+      test-run-description: xunit-component-tests-in-docker
+      csproj-path: ./tests/BreakfastProvider.Tests.Component.xUnit/BreakfastProvider.Tests.Component.xUnit.csproj
+      features-report-path: tests/BreakfastProvider.Tests.Component.xUnit/bin/Debug/net10.0/Reports/TestRunReport.html
+    secrets: inherit
+
+
+  xunit-component-tests-external-sut:
+    name: Component tests (external SUT, xUnit)
+    uses: ./.github/workflows/_tests.yml
+    with:
+      test-type: component
+      test-run-type: external-sut
+      test-run-description: xunit-component-tests-external-sut
+      csproj-path: ./tests/BreakfastProvider.Tests.Component.xUnit/BreakfastProvider.Tests.Component.xUnit.csproj
+      features-report-path: tests/BreakfastProvider.Tests.Component.xUnit/bin/Debug/net10.0/Reports/TestRunReport.html
+    secrets: inherit
+
+
   checks-complete:
     name: Checks complete
-    needs: [build, component-tests-in-memory, component-tests-in-docker, component-tests-external-sut, component-tests-reqnroll-in-memory]
+    needs: [build, component-tests-in-memory, component-tests-in-docker, component-tests-external-sut, component-tests-reqnroll-in-memory, xunit-component-tests-in-memory, xunit-component-tests-in-docker, xunit-component-tests-external-sut]
     runs-on: ubuntu-24.04
     steps:
       - name: Checks complete
@@ -199,6 +235,7 @@ jobs:
             <ul>
               <li><a href="lightbdd/TestRunReport.html">LightBDD Test Run Report</a></li>
               <li><a href="reqnroll/TestRunReport.html">ReqNRoll Test Run Report</a></li>
+              <li><a href="xunit/TestRunReport.html">xUnit Test Run Report</a></li>
             </ul>
           </body>
           </html>

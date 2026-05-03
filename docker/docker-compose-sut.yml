@@ -37,7 +37,7 @@ services:
         condition: service_started
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_Kestrel__EndpointDefaults__Protocols=Http1AndHttp2
+      - Kestrel__EndpointDefaults__Protocols=Http1AndHttp2
       - DOTNET_EnableDiagnostics=0
       - CowServiceConfig__BaseAddress=http://cow-service:8080
       - GoatServiceConfig__BaseAddress=http://goat-service:8080

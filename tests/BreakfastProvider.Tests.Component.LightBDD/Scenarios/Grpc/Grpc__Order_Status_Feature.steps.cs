@@ -33,7 +33,8 @@ public partial class Grpc__Order_Status_Feature : BaseFixture
         _pancakeSteps = Get<PostPancakesSteps>();
         _orderSteps = Get<PostOrderSteps>();
         _grpcSteps = Get<GrpcBreakfastSteps>();
-        _grpcSteps.Initialize(AppFactory, CurrentTestInfo.Fetcher);
+        if (!Settings.RunAgainstExternalServiceUnderTest)
+            _grpcSteps.Initialize(AppFactory, CurrentTestInfo.Fetcher);
     }
 
     private Guid _createdOrderId;

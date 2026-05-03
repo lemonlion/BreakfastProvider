@@ -76,7 +76,11 @@ public static class StartupExtensions
         {
             var topicName = TopicName.FromProjectTopic(pubSubConfig.ProjectId, topicConfig.TopicId);
             services.AddSingleton(sp =>
-                PublisherClient.CreateAsync(topicName).GetAwaiter().GetResult());
+                new PublisherClientBuilder
+                {
+                    TopicName = topicName,
+                    EmulatorDetection = Google.Api.Gax.EmulatorDetection.EmulatorOrProduction
+                }.Build());
         }
 
         // Register typed PubSub publishers for each event type

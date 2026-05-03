@@ -54,6 +54,7 @@ services:
       - KafkaConfig__ConsumerConfigurations__RecipeLogEvent__TopicName=breakfast_recipe_logs
       - KafkaConfig__ConsumerConfigurations__RecipeLogEvent__ApiKey=kafka-user
       - KafkaConfig__ConsumerConfigurations__RecipeLogEvent__ApiSecret=kafka-user-secret
+      - KafkaConfig__SslCaLocation=/certs/kafka-ca.crt
       - FeatureSwitchesConfig__IsGoatMilkEnabled=true
       - ReportingConfig__ConnectionString=Server=sqlserver-database.local,1433;Database=BreakfastReporting;User Id=sa;Password=YourStr0ngP@ssword;TrustServerCertificate=True
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://jaeger.local:4317

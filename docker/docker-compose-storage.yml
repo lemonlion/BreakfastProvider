@@ -7,7 +7,7 @@ services:
     container_name: docker-azurite
     image: mcr.microsoft.com/azure-storage/azurite
     hostname: storage.local
-    command: azurite --blobHost 0.0.0.0 --queueHost 0.0.0.0 --tableHost 0.0.0.0 --skipApiVersionCheck
+    command: azurite --blobHost 0.0.0.0 --queueHost 0.0.0.0 --tableHost 0.0.0.0 --skipApiVersionCheck --disableProductStyleUrl
     ports:
       - '10000:10000'
       - '10001:10001'

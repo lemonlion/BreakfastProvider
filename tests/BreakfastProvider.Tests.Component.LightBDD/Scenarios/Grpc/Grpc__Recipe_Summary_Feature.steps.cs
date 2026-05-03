@@ -13,7 +13,8 @@ public partial class Grpc__Recipe_Summary_Feature : BaseFixture
     public Grpc__Recipe_Summary_Feature()
     {
         _grpcSteps = Get<GrpcBreakfastSteps>();
-        _grpcSteps.Initialize(AppFactory, CurrentTestInfo.Fetcher);
+        if (!Settings.RunAgainstExternalServiceUnderTest)
+            _grpcSteps.Initialize(AppFactory, CurrentTestInfo.Fetcher);
     }
 
     #region When

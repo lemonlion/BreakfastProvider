@@ -83,7 +83,7 @@ public partial class Reporting__Batch_Completions_Feature : BaseFixture
     #region When
 
     private async Task The_batch_completions_are_queried_via_graphql()
-        => await _graphQlSteps.QueryBatchCompletions();
+        => await _graphQlSteps.QueryBatchCompletions(waitForBatchId: _pancakeSteps.Response?.BatchId);
 
     #endregion
 

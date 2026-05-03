@@ -11,7 +11,6 @@ public partial class Orders__Breakfast_Order_Feature
 {
     [HappyPath]
     [Scenario]
-    [IgnoreIf(nameof(Settings.RunAgainstExternalServiceUnderTest), NeedsEventAndKafkaInfrastructure)]
     public async Task A_Valid_Order_Should_Be_Created_And_An_Event_Published()
     {
         await Runner.RunScenarioAsync(
@@ -24,7 +23,6 @@ public partial class Orders__Breakfast_Order_Feature
     }
 
     [Scenario]
-    [IgnoreIf(nameof(Settings.RunAgainstExternalServiceUnderTest), NeedsEventAndKafkaInfrastructure)]
     public async Task Creating_An_Order_Should_Produce_An_Audit_Log_Entry_And_Events()
     {
         await Runner.RunScenarioAsync(
@@ -37,7 +35,6 @@ public partial class Orders__Breakfast_Order_Feature
     }
 
     [Scenario]
-    [IgnoreIf(nameof(Settings.RunAgainstExternalServiceUnderTest), NeedsEventAndKafkaInfrastructure)]
     public async Task Creating_An_Order_Should_Write_An_Outbox_Message_That_Gets_Processed()
     {
         await Runner.RunScenarioAsync(

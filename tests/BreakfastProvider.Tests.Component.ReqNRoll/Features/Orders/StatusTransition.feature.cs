@@ -136,20 +136,13 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.Orders
         [global::Xunit.TheoryAttribute(DisplayName="A valid status transition should update the order")]
         [global::Xunit.TraitAttribute("FeatureTitle", "Order Status Transition")]
         [global::Xunit.TraitAttribute("Description", "A valid status transition should update the order")]
-        [global::Xunit.TraitAttribute("Category", "IgnoreIfNeedsEventInfrastructure")]
         [global::Xunit.InlineDataAttribute("Created", "Preparing", "0", new string[0])]
         [global::Xunit.InlineDataAttribute("Created", "Cancelled", "1", new string[0])]
         [global::Xunit.InlineDataAttribute("Preparing", "Ready", "2", new string[0])]
         [global::Xunit.InlineDataAttribute("Ready", "Completed", "3", new string[0])]
         public async global::System.Threading.Tasks.Task AValidStatusTransitionShouldUpdateTheOrder(string fromStatus, string toStatus, string @__pickleIndex, string[] exampleTags)
         {
-            string[] @__tags = new string[] {
-                    "IgnoreIfNeedsEventInfrastructure"};
-            if ((exampleTags != null))
-            {
-                @__tags = System.Linq.Enumerable.ToArray(System.Linq.Enumerable.Concat(@__tags, exampleTags));
-            }
-            string[] tagsOfScenario = @__tags;
+            string[] tagsOfScenario = exampleTags;
             global::System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new global::System.Collections.Specialized.OrderedDictionary();
             argumentsOfScenario.Add("FromStatus", fromStatus);
             argumentsOfScenario.Add("ToStatus", toStatus);
@@ -157,7 +150,7 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.Orders
             global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("A valid status transition should update the order", null, tagsOfScenario, argumentsOfScenario, featureTags, pickleIndex);
             string[] tagsOfRule = ((string[])(null));
             global::Reqnroll.RuleInfo ruleInfo = null;
-#line 5
+#line 4
     this.ScenarioInitialize(scenarioInfo, ruleInfo);
 #line hidden
             if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
@@ -167,13 +160,13 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.Orders
             else
             {
                 await this.ScenarioStartAsync();
-#line 6
+#line 5
         await testRunner.GivenAsync(string.Format("an order exists with status \"{0}\"", fromStatus), ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
 #line hidden
-#line 7
+#line 6
         await testRunner.WhenAsync(string.Format("the order status is updated to \"{0}\"", toStatus), ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
 #line hidden
-#line 8
+#line 7
         await testRunner.ThenAsync(string.Format("the order status should be updated successfully to \"{0}\"", toStatus), ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
 #line hidden
             }
@@ -183,7 +176,6 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.Orders
         [global::Xunit.TheoryAttribute(DisplayName="An invalid status transition should return a conflict response")]
         [global::Xunit.TraitAttribute("FeatureTitle", "Order Status Transition")]
         [global::Xunit.TraitAttribute("Description", "An invalid status transition should return a conflict response")]
-        [global::Xunit.TraitAttribute("Category", "IgnoreIfNeedsEventInfrastructure")]
         [global::Xunit.InlineDataAttribute("Created", "Ready", "4", new string[0])]
         [global::Xunit.InlineDataAttribute("Created", "Completed", "5", new string[0])]
         [global::Xunit.InlineDataAttribute("Preparing", "Cancelled", "6", new string[0])]
@@ -193,13 +185,7 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.Orders
         [global::Xunit.InlineDataAttribute("Cancelled", "Ready", "10", new string[0])]
         public async global::System.Threading.Tasks.Task AnInvalidStatusTransitionShouldReturnAConflictResponse(string fromStatus, string toStatus, string @__pickleIndex, string[] exampleTags)
         {
-            string[] @__tags = new string[] {
-                    "IgnoreIfNeedsEventInfrastructure"};
-            if ((exampleTags != null))
-            {
-                @__tags = System.Linq.Enumerable.ToArray(System.Linq.Enumerable.Concat(@__tags, exampleTags));
-            }
-            string[] tagsOfScenario = @__tags;
+            string[] tagsOfScenario = exampleTags;
             global::System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new global::System.Collections.Specialized.OrderedDictionary();
             argumentsOfScenario.Add("FromStatus", fromStatus);
             argumentsOfScenario.Add("ToStatus", toStatus);
@@ -207,7 +193,7 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.Orders
             global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("An invalid status transition should return a conflict response", null, tagsOfScenario, argumentsOfScenario, featureTags, pickleIndex);
             string[] tagsOfRule = ((string[])(null));
             global::Reqnroll.RuleInfo ruleInfo = null;
-#line 18
+#line 16
     this.ScenarioInitialize(scenarioInfo, ruleInfo);
 #line hidden
             if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
@@ -217,13 +203,13 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.Orders
             else
             {
                 await this.ScenarioStartAsync();
-#line 19
+#line 17
         await testRunner.GivenAsync(string.Format("an order exists with status \"{0}\"", fromStatus), ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
 #line hidden
-#line 20
+#line 18
         await testRunner.WhenAsync(string.Format("the order status is updated to \"{0}\"", toStatus), ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
 #line hidden
-#line 21
+#line 19
         await testRunner.ThenAsync("the response should indicate an invalid state transition", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
 #line hidden
             }

@@ -13,7 +13,9 @@ public partial class Grpc__Recipe_Summary_Feature : BaseFixture
     public Grpc__Recipe_Summary_Feature()
     {
         _grpcSteps = Get<GrpcBreakfastSteps>();
-        if (!Settings.RunAgainstExternalServiceUnderTest)
+        if (Settings.RunAgainstExternalServiceUnderTest)
+            _grpcSteps.InitializeExternal(Settings.ExternalServiceUnderTestUrl!);
+        else
             _grpcSteps.Initialize(AppFactory, CurrentTestInfo.Fetcher);
     }
 

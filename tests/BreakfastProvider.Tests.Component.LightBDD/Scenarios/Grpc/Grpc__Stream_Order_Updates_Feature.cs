@@ -12,7 +12,6 @@ public partial class Grpc__Stream_Order_Updates_Feature
 
     [HappyPath]
     [Scenario]
-    [IgnoreIf(nameof(Settings.RunAgainstExternalServiceUnderTest), NeedsInProcessGrpc)]
     public async Task Streaming_Order_Updates_Should_Return_The_Current_Status()
     {
         await Runner.RunScenarioAsync(
@@ -27,7 +26,6 @@ public partial class Grpc__Stream_Order_Updates_Feature
     #region Not Found
 
     [Scenario]
-    [IgnoreIf(nameof(Settings.RunAgainstExternalServiceUnderTest), NeedsInProcessGrpc)]
     public async Task Streaming_Updates_For_Non_Existent_Order_Should_Return_Not_Found()
     {
         await Runner.RunScenarioAsync(

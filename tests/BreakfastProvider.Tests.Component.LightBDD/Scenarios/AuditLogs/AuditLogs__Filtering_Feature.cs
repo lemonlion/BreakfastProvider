@@ -9,7 +9,6 @@ namespace BreakfastProvider.Tests.Component.LightBDD.Scenarios.AuditLogs;
 public partial class AuditLogs__Filtering_Feature
 {
     [Scenario]
-    [IgnoreIf(nameof(Settings.RunAgainstExternalServiceUnderTest), NeedsEventAndKafkaInfrastructure)]
     public async Task Audit_Logs_Should_Be_Filterable_By_Entity_Type()
     {
         await Runner.RunScenarioAsync(
@@ -19,7 +18,6 @@ public partial class AuditLogs__Filtering_Feature
     }
 
     [Scenario]
-    [IgnoreIf(nameof(Settings.RunAgainstExternalServiceUnderTest), NeedsEventAndKafkaInfrastructure)]
     public async Task Audit_Logs_Should_Be_Filterable_By_Entity_Id()
     {
         await Runner.RunScenarioAsync(
@@ -37,7 +35,6 @@ public partial class AuditLogs__Filtering_Feature
     }
 
     [Scenario]
-    [IgnoreIf(nameof(Settings.RunAgainstExternalServiceUnderTest), NeedsEventAndKafkaInfrastructure)]
     public async Task Audit_Logs_Should_Be_Returned_In_Descending_Timestamp_Order()
     {
         await Runner.RunScenarioAsync(

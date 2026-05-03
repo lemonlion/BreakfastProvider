@@ -1,7 +1,6 @@
 Feature: Order Status Transition
     /orders - Order status transitions following the order lifecycle
 
-    @IgnoreIfNeedsEventInfrastructure
     Scenario Outline: A valid status transition should update the order
         Given an order exists with status "<FromStatus>"
         When the order status is updated to "<ToStatus>"
@@ -14,7 +13,6 @@ Feature: Order Status Transition
             | Preparing  | Ready      |
             | Ready      | Completed  |
 
-    @IgnoreIfNeedsEventInfrastructure
     Scenario Outline: An invalid status transition should return a conflict response
         Given an order exists with status "<FromStatus>"
         When the order status is updated to "<ToStatus>"

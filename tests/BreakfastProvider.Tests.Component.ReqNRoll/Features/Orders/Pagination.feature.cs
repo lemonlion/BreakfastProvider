@@ -136,12 +136,10 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.Orders
         [global::Xunit.FactAttribute(DisplayName="Listing orders should return a paginated response")]
         [global::Xunit.TraitAttribute("FeatureTitle", "Order Pagination")]
         [global::Xunit.TraitAttribute("Description", "Listing orders should return a paginated response")]
-        [global::Xunit.TraitAttribute("Category", "IgnoreIfNeedsDirectDbAccess")]
         [global::Xunit.TraitAttribute("Category", "happy-path")]
         public async global::System.Threading.Tasks.Task ListingOrdersShouldReturnAPaginatedResponse()
         {
             string[] tagsOfScenario = new string[] {
-                    "IgnoreIfNeedsDirectDbAccess",
                     "happy-path"};
             global::System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new global::System.Collections.Specialized.OrderedDictionary();
             string pickleIndex = "0";
@@ -177,17 +175,15 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.Orders
         [global::Xunit.FactAttribute(DisplayName="Listing orders with a small page size should limit results")]
         [global::Xunit.TraitAttribute("FeatureTitle", "Order Pagination")]
         [global::Xunit.TraitAttribute("Description", "Listing orders with a small page size should limit results")]
-        [global::Xunit.TraitAttribute("Category", "IgnoreIfNeedsDirectDbAccess")]
         public async global::System.Threading.Tasks.Task ListingOrdersWithASmallPageSizeShouldLimitResults()
         {
-            string[] tagsOfScenario = new string[] {
-                    "IgnoreIfNeedsDirectDbAccess"};
+            string[] tagsOfScenario = ((string[])(null));
             global::System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new global::System.Collections.Specialized.OrderedDictionary();
             string pickleIndex = "1";
             global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("Listing orders with a small page size should limit results", null, tagsOfScenario, argumentsOfScenario, featureTags, pickleIndex);
             string[] tagsOfRule = ((string[])(null));
             global::Reqnroll.RuleInfo ruleInfo = null;
-#line 12
+#line 11
     this.ScenarioInitialize(scenarioInfo, ruleInfo);
 #line hidden
             if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
@@ -197,13 +193,13 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.Orders
             else
             {
                 await this.ScenarioStartAsync();
-#line 13
+#line 12
         await testRunner.GivenAsync("multiple orders have been created", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
 #line hidden
-#line 14
+#line 13
         await testRunner.WhenAsync("orders are listed with page 1 and page size 1", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
 #line hidden
-#line 15
+#line 14
         await testRunner.ThenAsync("the paginated response should have correct page metadata", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
 #line hidden
             }
@@ -213,17 +209,15 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.Orders
         [global::Xunit.FactAttribute(DisplayName="Requesting the second page should return different orders")]
         [global::Xunit.TraitAttribute("FeatureTitle", "Order Pagination")]
         [global::Xunit.TraitAttribute("Description", "Requesting the second page should return different orders")]
-        [global::Xunit.TraitAttribute("Category", "IgnoreIfNeedsDirectDbAccess")]
         public async global::System.Threading.Tasks.Task RequestingTheSecondPageShouldReturnDifferentOrders()
         {
-            string[] tagsOfScenario = new string[] {
-                    "IgnoreIfNeedsDirectDbAccess"};
+            string[] tagsOfScenario = ((string[])(null));
             global::System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new global::System.Collections.Specialized.OrderedDictionary();
             string pickleIndex = "2";
             global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("Requesting the second page should return different orders", null, tagsOfScenario, argumentsOfScenario, featureTags, pickleIndex);
             string[] tagsOfRule = ((string[])(null));
             global::Reqnroll.RuleInfo ruleInfo = null;
-#line 18
+#line 16
     this.ScenarioInitialize(scenarioInfo, ruleInfo);
 #line hidden
             if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
@@ -233,13 +227,13 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.Orders
             else
             {
                 await this.ScenarioStartAsync();
-#line 19
+#line 17
         await testRunner.GivenAsync("multiple orders have been created", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
 #line hidden
-#line 20
+#line 18
         await testRunner.WhenAsync("orders are listed with page 2 and page size 1", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
 #line hidden
-#line 21
+#line 19
         await testRunner.ThenAsync("the paginated response should have correct page metadata", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
 #line hidden
             }
@@ -259,7 +253,7 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.Orders
             global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("Listing orders when none exist should return an empty page", null, tagsOfScenario, argumentsOfScenario, featureTags, pickleIndex);
             string[] tagsOfRule = ((string[])(null));
             global::Reqnroll.RuleInfo ruleInfo = null;
-#line 24
+#line 22
     this.ScenarioInitialize(scenarioInfo, ruleInfo);
 #line hidden
             if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
@@ -269,10 +263,10 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.Orders
             else
             {
                 await this.ScenarioStartAsync();
-#line 25
+#line 23
         await testRunner.WhenAsync("orders are listed with default pagination", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
 #line hidden
-#line 26
+#line 24
         await testRunner.ThenAsync("the paginated response should be empty", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
 #line hidden
             }

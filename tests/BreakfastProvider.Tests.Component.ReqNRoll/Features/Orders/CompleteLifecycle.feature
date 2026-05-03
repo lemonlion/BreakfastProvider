@@ -1,7 +1,7 @@
 Feature: Complete Order Lifecycle
     /orders - Complete order lifecycle from creation through to completion
 
-    @happy-path @IgnoreIfNeedsEventInfrastructure
+    @happy-path
     Scenario: An order should progress through all status transitions to completion
         Given a pancake batch has been created
         And a breakfast order has been placed for the batch

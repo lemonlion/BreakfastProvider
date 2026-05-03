@@ -137,12 +137,10 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.Orders
         [global::Xunit.TraitAttribute("FeatureTitle", "Complete Order Lifecycle")]
         [global::Xunit.TraitAttribute("Description", "An order should progress through all status transitions to completion")]
         [global::Xunit.TraitAttribute("Category", "happy-path")]
-        [global::Xunit.TraitAttribute("Category", "IgnoreIfNeedsEventInfrastructure")]
         public async global::System.Threading.Tasks.Task AnOrderShouldProgressThroughAllStatusTransitionsToCompletion()
         {
             string[] tagsOfScenario = new string[] {
-                    "happy-path",
-                    "IgnoreIfNeedsEventInfrastructure"};
+                    "happy-path"};
             global::System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new global::System.Collections.Specialized.OrderedDictionary();
             string pickleIndex = "0";
             global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("An order should progress through all status transitions to completion", null, tagsOfScenario, argumentsOfScenario, featureTags, pickleIndex);

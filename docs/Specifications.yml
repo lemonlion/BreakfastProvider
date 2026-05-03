@@ -1,27 +1,6 @@
 TtdVersion: 2.28.35+289050951f284b4e69509bb722c4873a7536a7a2
 Title: Breakfast Provider Specifications
 Features:
-  - Feature: Async Api Specification Feature
-    Description: /asyncapi/v1.json - Serving the AsyncAPI specification describing event-driven messaging
-    Scenarios:
-      - Scenario: The AsyncApi Endpoint Should Return A Valid Specification
-        IsHappyPath: true
-        Labels:
-          - Happy Path
-        Steps:
-          - WHEN The asyncapi endpoint is called
-          - THEN The response should be valid
-            - The response status should be ok
-            - The response should be valid json
-          - AND The asyncapi spec is written to disk
-            - The asyncapi spec should contain "asyncapi"
-            - The asyncapi spec should contain "info"
-            - The asyncapi spec should contain "defaultContentType"
-            - The asyncapi spec should contain "channels"
-            - The asyncapi spec should contain "operations"
-            - The asyncapi spec should contain "components"
-            - The asyncapi spec is written to disk as json
-
   - Feature: Audit Logs Filtering Feature
     Description: /audit-logs - Filtering audit logs by entity type and entity ID
     Scenarios:
@@ -723,47 +702,6 @@ Features:
             - The menu response http status should be ok
             - The menu list should be valid json
             - All menu items should be marked as unavailable
-
-  - Feature: Open Api Scalar UI Feature
-    Description: /scalar/v1 - Serving the interactive API documentation UI powered by Scalar
-    Scenarios:
-      - Scenario: The Scalar UI Endpoint Should Return A Valid Page
-        IsHappyPath: true
-        Labels:
-          - Happy Path
-        Steps:
-          - WHEN The scalar ui endpoint is called
-          - THEN The response should be a valid scalar page
-            - The response status should be ok
-            - The response should be valid html
-            - The response should refer to scalar
-
-  - Feature: Open Api Specification Feature
-    Description: /openapi/v1.json - Serving the OpenAPI specification describing all REST endpoints
-    Scenarios:
-      - Scenario: The OpenApi Endpoint Should Return A Valid Specification
-        IsHappyPath: true
-        Labels:
-          - Happy Path
-        Steps:
-          - WHEN The open api endpoint is called
-          - THEN The response should be valid
-            - The response status should be ok
-            - The response should be valid json
-          - AND The response should contain all the endpoints
-            - The response should contain the endpoint "/pancakes"
-            - The response should contain the endpoint "/waffles"
-            - The response should contain the endpoint "/orders"
-            - The response should contain the endpoint "/orders/(orderId)"
-            - The response should contain the endpoint "/toppings"
-            - The response should contain the endpoint "/menu"
-            - The response should contain the endpoint "/milk"
-            - The response should contain the endpoint "/eggs"
-            - The response should contain the endpoint "/flour"
-            - The response should contain the endpoint "/goat-milk"
-            - The response should contain the endpoint "/audit-logs"
-          - AND The openapi spec is written to disk
-            - The openapi spec is written to disk as json
 
   - Feature: Orders Breakfast Order Feature
     Description: /orders - Creating and managing breakfast orders with event publishing
@@ -1492,6 +1430,68 @@ Features:
             - The get response http status should be ok
             - The get response should be valid json
             - The retrieved reservation should match the created booking
+
+  - Feature: Specifications Async Api Feature
+    Description: /asyncapi/v1.json - Serving the AsyncAPI specification describing event-driven messaging
+    Scenarios:
+      - Scenario: The AsyncApi Endpoint Should Return A Valid Specification
+        IsHappyPath: true
+        Labels:
+          - Happy Path
+        Steps:
+          - WHEN The asyncapi endpoint is called
+          - THEN The response should be valid
+            - The response status should be ok
+            - The response should be valid json
+          - AND The asyncapi spec is written to disk
+            - The asyncapi spec should contain "asyncapi"
+            - The asyncapi spec should contain "info"
+            - The asyncapi spec should contain "defaultContentType"
+            - The asyncapi spec should contain "channels"
+            - The asyncapi spec should contain "operations"
+            - The asyncapi spec should contain "components"
+            - The asyncapi spec is written to disk as json
+
+  - Feature: Specifications Open Api Feature
+    Description: /openapi/v1.json - Serving the OpenAPI specification describing all REST endpoints
+    Scenarios:
+      - Scenario: The OpenApi Endpoint Should Return A Valid Specification
+        IsHappyPath: true
+        Labels:
+          - Happy Path
+        Steps:
+          - WHEN The open api endpoint is called
+          - THEN The response should be valid
+            - The response status should be ok
+            - The response should be valid json
+          - AND The response should contain all the endpoints
+            - The response should contain the endpoint "/pancakes"
+            - The response should contain the endpoint "/waffles"
+            - The response should contain the endpoint "/orders"
+            - The response should contain the endpoint "/orders/(orderId)"
+            - The response should contain the endpoint "/toppings"
+            - The response should contain the endpoint "/menu"
+            - The response should contain the endpoint "/milk"
+            - The response should contain the endpoint "/eggs"
+            - The response should contain the endpoint "/flour"
+            - The response should contain the endpoint "/goat-milk"
+            - The response should contain the endpoint "/audit-logs"
+          - AND The openapi spec is written to disk
+            - The openapi spec is written to disk as json
+
+  - Feature: Specifications Open Api Scalar UI Feature
+    Description: /scalar/v1 - Serving the interactive API documentation UI powered by Scalar
+    Scenarios:
+      - Scenario: The Scalar UI Endpoint Should Return A Valid Page
+        IsHappyPath: true
+        Labels:
+          - Happy Path
+        Steps:
+          - WHEN The scalar ui endpoint is called
+          - THEN The response should be a valid scalar page
+            - The response status should be ok
+            - The response should be valid html
+            - The response should refer to scalar
 
   - Feature: Staff Management Feature
     Description: /staff - Managing kitchen staff members with full CRUD operations

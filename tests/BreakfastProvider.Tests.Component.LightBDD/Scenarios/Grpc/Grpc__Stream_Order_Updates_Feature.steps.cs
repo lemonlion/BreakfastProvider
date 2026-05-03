@@ -33,7 +33,9 @@ public partial class Grpc__Stream_Order_Updates_Feature : BaseFixture
         _pancakeSteps = Get<PostPancakesSteps>();
         _orderSteps = Get<PostOrderSteps>();
         _grpcSteps = Get<GrpcBreakfastSteps>();
-        if (!Settings.RunAgainstExternalServiceUnderTest)
+        if (Settings.RunAgainstExternalServiceUnderTest)
+            _grpcSteps.InitializeExternal(Settings.ExternalServiceUnderTestUrl!);
+        else
             _grpcSteps.Initialize(AppFactory, CurrentTestInfo.Fetcher);
     }
 

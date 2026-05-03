@@ -11,7 +11,6 @@ public partial class Orders__Complete_Lifecycle_Feature
 {
     [HappyPath]
     [Scenario]
-    [IgnoreIf(nameof(Settings.RunAgainstExternalServiceUnderTest), NeedsEventAndKafkaInfrastructure)]
     public async Task An_Order_Should_Progress_Through_All_Status_Transitions_To_Completion()
     {
         await Runner.RunScenarioAsync(

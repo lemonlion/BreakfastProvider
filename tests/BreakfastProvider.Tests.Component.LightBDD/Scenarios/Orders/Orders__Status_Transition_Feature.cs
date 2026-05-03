@@ -9,7 +9,6 @@ namespace BreakfastProvider.Tests.Component.LightBDD.Scenarios.Orders;
 public partial class Orders__Status_Transition_Feature
 {
     [Scenario]
-    [IgnoreIf(nameof(Settings.RunAgainstExternalServiceUnderTest), NeedsEventAndKafkaInfrastructure)]
     [InlineData("Created", "Preparing")]
     [InlineData("Created", "Cancelled")]
     [InlineData("Preparing", "Ready")]
@@ -23,7 +22,6 @@ public partial class Orders__Status_Transition_Feature
     }
 
     [Scenario]
-    [IgnoreIf(nameof(Settings.RunAgainstExternalServiceUnderTest), NeedsEventAndKafkaInfrastructure)]
     [InlineData("Created", "Ready")]
     [InlineData("Created", "Completed")]
     [InlineData("Preparing", "Cancelled")]

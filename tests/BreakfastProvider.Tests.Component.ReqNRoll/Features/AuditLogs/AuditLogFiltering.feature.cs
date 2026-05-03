@@ -136,17 +136,15 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.AuditLogs
         [global::Xunit.FactAttribute(DisplayName="Audit logs should be filterable by entity type")]
         [global::Xunit.TraitAttribute("FeatureTitle", "Audit Log Filtering")]
         [global::Xunit.TraitAttribute("Description", "Audit logs should be filterable by entity type")]
-        [global::Xunit.TraitAttribute("Category", "IgnoreIfNeedsEventInfrastructure")]
         public async global::System.Threading.Tasks.Task AuditLogsShouldBeFilterableByEntityType()
         {
-            string[] tagsOfScenario = new string[] {
-                    "IgnoreIfNeedsEventInfrastructure"};
+            string[] tagsOfScenario = ((string[])(null));
             global::System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new global::System.Collections.Specialized.OrderedDictionary();
             string pickleIndex = "0";
             global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("Audit logs should be filterable by entity type", null, tagsOfScenario, argumentsOfScenario, featureTags, pickleIndex);
             string[] tagsOfRule = ((string[])(null));
             global::Reqnroll.RuleInfo ruleInfo = null;
-#line 5
+#line 4
     this.ScenarioInitialize(scenarioInfo, ruleInfo);
 #line hidden
             if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
@@ -156,16 +154,16 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.AuditLogs
             else
             {
                 await this.ScenarioStartAsync();
-#line 6
+#line 5
         await testRunner.GivenAsync("a pancake batch has been created", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
 #line hidden
-#line 7
+#line 6
         await testRunner.AndAsync("an order has been created for the batch", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
 #line hidden
-#line 8
+#line 7
         await testRunner.WhenAsync("audit logs are requested filtered by entity type", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
 #line hidden
-#line 9
+#line 8
         await testRunner.ThenAsync("the audit log response should only contain order entries", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
 #line hidden
             }
@@ -175,17 +173,15 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.AuditLogs
         [global::Xunit.FactAttribute(DisplayName="Audit logs should be filterable by entity id")]
         [global::Xunit.TraitAttribute("FeatureTitle", "Audit Log Filtering")]
         [global::Xunit.TraitAttribute("Description", "Audit logs should be filterable by entity id")]
-        [global::Xunit.TraitAttribute("Category", "IgnoreIfNeedsEventInfrastructure")]
         public async global::System.Threading.Tasks.Task AuditLogsShouldBeFilterableByEntityId()
         {
-            string[] tagsOfScenario = new string[] {
-                    "IgnoreIfNeedsEventInfrastructure"};
+            string[] tagsOfScenario = ((string[])(null));
             global::System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new global::System.Collections.Specialized.OrderedDictionary();
             string pickleIndex = "1";
             global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("Audit logs should be filterable by entity id", null, tagsOfScenario, argumentsOfScenario, featureTags, pickleIndex);
             string[] tagsOfRule = ((string[])(null));
             global::Reqnroll.RuleInfo ruleInfo = null;
-#line 12
+#line 10
     this.ScenarioInitialize(scenarioInfo, ruleInfo);
 #line hidden
             if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
@@ -195,16 +191,16 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.AuditLogs
             else
             {
                 await this.ScenarioStartAsync();
-#line 13
+#line 11
         await testRunner.GivenAsync("a pancake batch has been created", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
 #line hidden
-#line 14
+#line 12
         await testRunner.AndAsync("an order has been created for the batch", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
 #line hidden
-#line 15
+#line 13
         await testRunner.WhenAsync("audit logs are requested filtered by entity id", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
 #line hidden
-#line 16
+#line 14
         await testRunner.ThenAsync("the audit log response should contain the specific order entry", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
 #line hidden
             }
@@ -225,7 +221,7 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.AuditLogs
                     "ion", null, tagsOfScenario, argumentsOfScenario, featureTags, pickleIndex);
             string[] tagsOfRule = ((string[])(null));
             global::Reqnroll.RuleInfo ruleInfo = null;
-#line 18
+#line 16
     this.ScenarioInitialize(scenarioInfo, ruleInfo);
 #line hidden
             if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
@@ -235,10 +231,10 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.AuditLogs
             else
             {
                 await this.ScenarioStartAsync();
-#line 19
+#line 17
         await testRunner.WhenAsync("audit logs are requested filtered by a non-existent entity type", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
 #line hidden
-#line 20
+#line 18
         await testRunner.ThenAsync("the audit log response should be an empty collection", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
 #line hidden
             }
@@ -248,17 +244,15 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.AuditLogs
         [global::Xunit.FactAttribute(DisplayName="Audit logs should be returned in descending timestamp order")]
         [global::Xunit.TraitAttribute("FeatureTitle", "Audit Log Filtering")]
         [global::Xunit.TraitAttribute("Description", "Audit logs should be returned in descending timestamp order")]
-        [global::Xunit.TraitAttribute("Category", "IgnoreIfNeedsEventInfrastructure")]
         public async global::System.Threading.Tasks.Task AuditLogsShouldBeReturnedInDescendingTimestampOrder()
         {
-            string[] tagsOfScenario = new string[] {
-                    "IgnoreIfNeedsEventInfrastructure"};
+            string[] tagsOfScenario = ((string[])(null));
             global::System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new global::System.Collections.Specialized.OrderedDictionary();
             string pickleIndex = "3";
             global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("Audit logs should be returned in descending timestamp order", null, tagsOfScenario, argumentsOfScenario, featureTags, pickleIndex);
             string[] tagsOfRule = ((string[])(null));
             global::Reqnroll.RuleInfo ruleInfo = null;
-#line 23
+#line 20
     this.ScenarioInitialize(scenarioInfo, ruleInfo);
 #line hidden
             if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
@@ -268,16 +262,16 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.AuditLogs
             else
             {
                 await this.ScenarioStartAsync();
-#line 24
+#line 21
         await testRunner.GivenAsync("a pancake batch has been created", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
 #line hidden
-#line 25
+#line 22
         await testRunner.AndAsync("an order has been created for the batch", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
 #line hidden
-#line 26
+#line 23
         await testRunner.WhenAsync("audit logs are requested filtered by entity type", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
 #line hidden
-#line 27
+#line 24
         await testRunner.ThenAsync("the audit logs should be ordered by timestamp descending", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
 #line hidden
             }

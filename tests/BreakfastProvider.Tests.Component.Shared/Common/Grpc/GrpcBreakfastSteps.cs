@@ -2,6 +2,7 @@ using BreakfastProvider.Api;
 using BreakfastProvider.Api.Grpc;
 using BreakfastProvider.Tests.Component.Shared.Constants;
 using Grpc.Core;
+using Grpc.Net.Client;
 using Microsoft.AspNetCore.Mvc.Testing;
 using TestTrackingDiagrams.Extensions.Grpc;
 
@@ -25,6 +26,12 @@ public class GrpcBreakfastSteps
                 Verbosity = GrpcTrackingVerbosity.Detailed,
                 CurrentTestInfoFetcher = currentTestInfoFetcher
             });
+    }
+
+    public void InitializeExternal(string baseUrl)
+    {
+        var channel = GrpcChannel.ForAddress(baseUrl);
+        _client = new BreakfastGrpc.BreakfastGrpcClient(channel);
     }
 
     public async Task GetRecipeSummary(string recipeType)

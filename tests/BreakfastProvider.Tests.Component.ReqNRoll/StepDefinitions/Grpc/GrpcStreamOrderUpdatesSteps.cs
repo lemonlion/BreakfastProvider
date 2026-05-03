@@ -15,9 +15,15 @@ public class GrpcStreamOrderUpdatesSteps(
 {
     private readonly GrpcBreakfastSteps _grpcSteps = new();
 
+    private bool _initialized;
+
     private void EnsureGrpcClient()
     {
-        if (!AppManager.Settings.RunAgainstExternalServiceUnderTest)
+        if (_initialized) return;
+        _initialized = true;
+        if (AppManager.Settings.RunAgainstExternalServiceUnderTest)
+            _grpcSteps.InitializeExternal(AppManager.Settings.ExternalServiceUnderTestUrl!);
+        else
             _grpcSteps.Initialize(appManager.AppFactory, CurrentTestInfo.Fetcher);
     }
 

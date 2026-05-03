@@ -7,7 +7,6 @@ using TestTrackingDiagrams.LightBDD;
 namespace BreakfastProvider.Tests.Component.LightBDD.Scenarios.Orders;
 
 [FeatureDescription($"/{Endpoints.Orders} - Paginated listing of breakfast orders")]
-[IgnoreIf(nameof(Settings.RunAgainstExternalServiceUnderTest), IgnoreReasons.NeedsDirectDatabaseAccess)]
 public partial class Orders__Pagination_Feature
 {
     [HappyPath]

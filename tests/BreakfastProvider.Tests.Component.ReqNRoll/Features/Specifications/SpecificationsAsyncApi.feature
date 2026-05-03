@@ -1,4 +1,4 @@
-Feature: AsyncAPI Specification
+Feature: Specifications Async Api
     /asyncapi/asyncapi.json - Serving the AsyncAPI specification describing event-driven messaging
 
     @happy-path

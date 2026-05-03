@@ -4,10 +4,10 @@ using LightBDD.Framework.Scenarios;
 using LightBDD.XUnit3;
 using TestTrackingDiagrams.LightBDD;
 
-namespace BreakfastProvider.Tests.Component.LightBDD.Scenarios.OpenApi;
+namespace BreakfastProvider.Tests.Component.LightBDD.Scenarios.Specifications;
 
 [FeatureDescription($"/{Endpoints.Swagger.ScalarUI} - Serving the interactive API documentation UI powered by Scalar")]
-public partial class OpenApi__Scalar_UI_Feature
+public partial class Specifications__Open_Api_Scalar_UI_Feature
 {
     [HappyPath]
     [Scenario]

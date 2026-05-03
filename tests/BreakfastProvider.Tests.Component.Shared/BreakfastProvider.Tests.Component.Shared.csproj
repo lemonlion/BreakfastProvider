@@ -26,14 +26,14 @@
     <PackageReference Include="morelinq" Version="4.4.0" />
     <PackageReference Include="NSubstitute" Version="5.3.0" />
     <PackageReference Include="AutoFixture" Version="4.18.1" />
-    <PackageReference Include="TestTrackingDiagrams" Version="2.28.34" />
-    <PackageReference Include="TestTrackingDiagrams.Extensions.CosmosDB" Version="2.28.34" />
+    <PackageReference Include="TestTrackingDiagrams" Version="2.28.35" />
+    <PackageReference Include="TestTrackingDiagrams.Extensions.CosmosDB" Version="2.28.35" />
     <PackageReference Include="CosmosDB.InMemoryEmulator" Version="4.0.6" />
-    <PackageReference Include="TestTrackingDiagrams.Extensions.EfCore.Relational" Version="2.28.34" />
-    <PackageReference Include="TestTrackingDiagrams.Extensions.Kafka" Version="2.28.34" />
-    <PackageReference Include="TestTrackingDiagrams.Extensions.PubSub" Version="2.28.34" />
-    <PackageReference Include="TestTrackingDiagrams.Extensions.Grpc" Version="2.28.34" />
-    <PackageReference Include="TestTrackingDiagrams.Extensions.Spanner" Version="2.28.34" />
+    <PackageReference Include="TestTrackingDiagrams.Extensions.EfCore.Relational" Version="2.28.35" />
+    <PackageReference Include="TestTrackingDiagrams.Extensions.Kafka" Version="2.28.35" />
+    <PackageReference Include="TestTrackingDiagrams.Extensions.PubSub" Version="2.28.35" />
+    <PackageReference Include="TestTrackingDiagrams.Extensions.Grpc" Version="2.28.35" />
+    <PackageReference Include="TestTrackingDiagrams.Extensions.Spanner" Version="2.28.35" />
     <PackageReference Include="Spanner.InMemoryEmulator" Version="1.0.20" />
     <PackageReference Include="Grpc.Net.Client" Version="2.80.0" />
   </ItemGroup>

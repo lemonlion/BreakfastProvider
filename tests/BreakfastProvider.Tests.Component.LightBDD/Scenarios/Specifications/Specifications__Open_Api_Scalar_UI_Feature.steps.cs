@@ -4,10 +4,10 @@ using LightBDD.Framework;
 using BreakfastProvider.Tests.Component.LightBDD.Util;
 
 
-namespace BreakfastProvider.Tests.Component.LightBDD.Scenarios.OpenApi;
+namespace BreakfastProvider.Tests.Component.LightBDD.Scenarios.Specifications;
 
 #pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
-public partial class OpenApi__Scalar_UI_Feature : BaseFixture
+public partial class Specifications__Open_Api_Scalar_UI_Feature : BaseFixture
 {
     private HttpResponseMessage? _scalarResponse;
     private string? _scalarHtml;

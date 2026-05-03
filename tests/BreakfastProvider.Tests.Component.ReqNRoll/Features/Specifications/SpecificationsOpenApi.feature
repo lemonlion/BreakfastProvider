@@ -1,4 +1,4 @@
-Feature: OpenAPI Specification
+Feature: Specifications Open Api
     /swagger/v1/swagger.json - Serving the OpenAPI specification describing all REST endpoints
 
     @happy-path

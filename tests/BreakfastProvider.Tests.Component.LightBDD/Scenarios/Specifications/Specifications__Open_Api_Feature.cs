@@ -4,10 +4,10 @@ using LightBDD.Framework.Scenarios;
 using LightBDD.XUnit3;
 using TestTrackingDiagrams.LightBDD;
 
-namespace BreakfastProvider.Tests.Component.LightBDD.Scenarios.OpenApi;
+namespace BreakfastProvider.Tests.Component.LightBDD.Scenarios.Specifications;
 
 [FeatureDescription($"/{Endpoints.Swagger.SwaggerJson} - Serving the OpenAPI specification describing all REST endpoints")]
-public partial class OpenApi__Specification_Feature
+public partial class Specifications__Open_Api_Feature
 {
     [HappyPath]
     [Scenario]

@@ -1,4 +1,4 @@
-TtdVersion: 2.28.34+b3950742078dcbe775067204df16704d6a3f6e55
+TtdVersion: 2.28.35+289050951f284b4e69509bb722c4873a7536a7a2
 Title: Breakfast Provider Specifications
 Features:
   - Feature: Async Api Specification Feature

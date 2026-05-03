@@ -1,4 +1,4 @@
-Feature: Scalar UI
+Feature: Specifications Open Api Scalar UI
     /scalar/v1 - Serving the interactive API documentation UI powered by Scalar
 
     @happy-path

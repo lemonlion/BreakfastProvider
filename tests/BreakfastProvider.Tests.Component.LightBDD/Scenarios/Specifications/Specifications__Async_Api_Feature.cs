@@ -4,10 +4,10 @@ using LightBDD.Framework.Scenarios;
 using LightBDD.XUnit3;
 using TestTrackingDiagrams.LightBDD;
 
-namespace BreakfastProvider.Tests.Component.LightBDD.Scenarios.AsyncApi;
+namespace BreakfastProvider.Tests.Component.LightBDD.Scenarios.Specifications;
 
 [FeatureDescription($"{Endpoints.AsyncApi.AsyncApiSpec} - Serving the AsyncAPI specification describing event-driven messaging")]
-public partial class AsyncApi__Specification_Feature
+public partial class Specifications__Async_Api_Feature
 {
     [HappyPath]
     [Scenario]

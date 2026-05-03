@@ -7,10 +7,10 @@ using LightBDD.Framework;
 using BreakfastProvider.Tests.Component.LightBDD.Util;
 
 
-namespace BreakfastProvider.Tests.Component.LightBDD.Scenarios.AsyncApi;
+namespace BreakfastProvider.Tests.Component.LightBDD.Scenarios.Specifications;
 
 #pragma warning disable CS1998
-public partial class AsyncApi__Specification_Feature : BaseFixture
+public partial class Specifications__Async_Api_Feature : BaseFixture
 {
     private HttpResponseMessage? _asyncApiResponse;
     private string? _asyncApiJsonString;

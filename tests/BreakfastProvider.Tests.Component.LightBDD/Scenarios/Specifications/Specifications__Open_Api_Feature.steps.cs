@@ -7,10 +7,10 @@ using LightBDD.Framework;
 using BreakfastProvider.Tests.Component.LightBDD.Util;
 
 
-namespace BreakfastProvider.Tests.Component.LightBDD.Scenarios.OpenApi;
+namespace BreakfastProvider.Tests.Component.LightBDD.Scenarios.Specifications;
 
 #pragma warning disable CS1998
-public partial class OpenApi__Specification_Feature : BaseFixture
+public partial class Specifications__Open_Api_Feature : BaseFixture
 {
     private HttpResponseMessage? _swaggerResponse;
     private string? _swaggerJsonString;

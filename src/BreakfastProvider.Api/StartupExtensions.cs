@@ -13,6 +13,7 @@ using ByteBard.AsyncAPI;
 using Google.Cloud.PubSub.V1;
 using Grpc.Net.Client;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 
 namespace BreakfastProvider.Api;
 
@@ -71,11 +72,12 @@ public static class StartupExtensions
             return services;
         }
 
-        // Register a PublisherClient per event type
+        // Register a keyed PublisherClient per event type so each typed publisher
+        // gets the client bound to the correct topic (not just the last registered one).
         foreach (var (eventTypeName, topicConfig) in pubSubConfig.PublisherConfigurations)
         {
             var topicName = TopicName.FromProjectTopic(pubSubConfig.ProjectId, topicConfig.TopicId);
-            services.AddSingleton(sp =>
+            services.AddKeyedSingleton(eventTypeName, (sp, key) =>
                 new PublisherClientBuilder
                 {
                     TopicName = topicName,
@@ -83,19 +85,32 @@ public static class StartupExtensions
                 }.Build());
         }
 
-        // Register typed PubSub publishers for each event type
-        services.AddSingleton<PubSubEventPublisher<InventoryItemAddedEvent>>();
-        services.AddSingleton<PubSubEventPublisher<InventoryStockUpdatedEvent>>();
-        services.AddSingleton<PubSubEventPublisher<MenuAvailabilityChangedEvent>>();
-        services.AddSingleton<PubSubEventPublisher<ToppingCreatedEvent>>();
-        services.AddSingleton<PubSubEventPublisher<StaffMemberAddedEvent>>();
-        services.AddSingleton<PubSubEventPublisher<ReservationConfirmedEvent>>();
-        services.AddSingleton<PubSubEventPublisher<ReservationCancelledEvent>>();
-        services.AddSingleton<PubSubEventPublisher<DailySpecialOrderedEvent>>();
-        services.AddSingleton<PubSubEventPublisher<PancakeBatchCompletedEvent>>();
-        services.AddSingleton<PubSubEventPublisher<WaffleBatchCompletedEvent>>();
+        // Register typed PubSub publishers, each resolving the keyed PublisherClient for its event type
+        RegisterKeyedPublisher<InventoryItemAddedEvent>(services);
+        RegisterKeyedPublisher<InventoryStockUpdatedEvent>(services);
+        RegisterKeyedPublisher<MenuAvailabilityChangedEvent>(services);
+        RegisterKeyedPublisher<ToppingCreatedEvent>(services);
+        RegisterKeyedPublisher<StaffMemberAddedEvent>(services);
+        RegisterKeyedPublisher<ReservationConfirmedEvent>(services);
+        RegisterKeyedPublisher<ReservationCancelledEvent>(services);
+        RegisterKeyedPublisher<DailySpecialOrderedEvent>(services);
+        RegisterKeyedPublisher<PancakeBatchCompletedEvent>(services);
+        RegisterKeyedPublisher<WaffleBatchCompletedEvent>(services);
 
         return services;
+    }
+
+    private static void RegisterKeyedPublisher<T>(IServiceCollection services) where T : IPubSubEvent
+    {
+        services.AddSingleton(sp =>
+        {
+            var publisher = sp.GetRequiredKeyedService<PublisherClient>(typeof(T).Name);
+            return new PubSubEventPublisher<T>(
+                sp.GetRequiredService<IOptions<PubSubConfig>>(),
+                publisher,
+                sp.GetRequiredService<ILogger<PubSubEventPublisher<T>>>(),
+                sp.GetRequiredService<IHttpContextAccessor>());
+        });
     }
 
     public static IServiceCollection AddEventHub(this IServiceCollection services, IConfiguration configuration)

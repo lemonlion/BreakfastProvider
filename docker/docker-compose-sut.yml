@@ -14,6 +14,7 @@ services:
     restart: on-failure:5
     ports:
       - "5080:8080"
+      - "5081:8081"
     depends_on:
       cosmosdb:
         condition: service_healthy
@@ -38,7 +39,9 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - Kestrel__Endpoints__Http__Url=http://+:8080
-      - Kestrel__Endpoints__Http__Protocols=Http1AndHttp2
+      - Kestrel__Endpoints__Http__Protocols=Http1
+      - Kestrel__Endpoints__Grpc__Url=http://+:8081
+      - Kestrel__Endpoints__Grpc__Protocols=Http2
       - DOTNET_EnableDiagnostics=0
       - CowServiceConfig__BaseAddress=http://cow-service:8080
       - GoatServiceConfig__BaseAddress=http://goat-service:8080

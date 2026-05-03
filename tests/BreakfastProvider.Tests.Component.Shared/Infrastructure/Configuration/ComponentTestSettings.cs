@@ -28,6 +28,7 @@ public record ComponentTestSettings
     public PubSubConfig PubSubConfig { get; set; } = new();
     public bool RunAgainstExternalServiceUnderTest { get; set; }
     public string? ExternalServiceUnderTestUrl { get; set; }
+    public string? ExternalGrpcUrl { get; set; }
     public bool EnableDockerInSetupAndTearDown { get; set; }
     public bool SkipDockerTearDown { get; set; }
 

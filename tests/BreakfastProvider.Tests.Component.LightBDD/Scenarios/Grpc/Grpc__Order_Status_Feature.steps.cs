@@ -34,7 +34,7 @@ public partial class Grpc__Order_Status_Feature : BaseFixture
         _orderSteps = Get<PostOrderSteps>();
         _grpcSteps = Get<GrpcBreakfastSteps>();
         if (Settings.RunAgainstExternalServiceUnderTest)
-            _grpcSteps.InitializeExternal(Settings.ExternalServiceUnderTestUrl!);
+            _grpcSteps.InitializeExternal(Settings.ExternalGrpcUrl ?? Settings.ExternalServiceUnderTestUrl!);
         else
             _grpcSteps.Initialize(AppFactory, CurrentTestInfo.Fetcher);
     }

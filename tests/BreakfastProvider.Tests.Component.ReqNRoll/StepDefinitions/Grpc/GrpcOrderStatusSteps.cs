@@ -22,7 +22,7 @@ public class GrpcOrderStatusSteps(
         if (_initialized) return;
         _initialized = true;
         if (AppManager.Settings.RunAgainstExternalServiceUnderTest)
-            _grpcSteps.InitializeExternal(AppManager.Settings.ExternalServiceUnderTestUrl!);
+            _grpcSteps.InitializeExternal(AppManager.Settings.ExternalGrpcUrl ?? AppManager.Settings.ExternalServiceUnderTestUrl!);
         else
             _grpcSteps.Initialize(appManager.AppFactory, CurrentTestInfo.Fetcher);
     }

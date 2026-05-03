@@ -204,6 +204,7 @@ jobs:
         run: |
           echo "RunAgainstExternalServiceUnderTest=true" >> $GITHUB_ENV
           echo "ExternalServiceUnderTestUrl=http://localhost:5080" >> $GITHUB_ENV
+          echo "ExternalGrpcUrl=http://localhost:5081" >> $GITHUB_ENV
 
       - name: Rename checked in Component Specifications document
         if: ${{ inputs.test-type == 'component' }}

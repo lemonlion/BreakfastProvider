@@ -62,13 +62,13 @@ public class OrderValidationSteps(AppManager appManager)
     public async Task ThenTheOrderResponseShouldContainError(string errorMessage, string responseStatus)
     {
         var actualResults = await ValidationHelper.ParseValidationResponses(_orderValidationResponses);
-        actualResults.Should().Contain(r => r.ErrorMessage.Contains(errorMessage));
+        Track.That(() => actualResults.Should().Contain(r => r.ErrorMessage.Contains(errorMessage)));
     }
 
     [Then(@"the status update response should contain error ""(.*)"" with status ""(.*)""")]
     public async Task ThenTheStatusUpdateResponseShouldContainError(string errorMessage, string responseStatus)
     {
         var actualResults = await ValidationHelper.ParseValidationResponses(_statusValidationResponses);
-        actualResults.Should().Contain(r => r.ErrorMessage.Contains(errorMessage));
+        Track.That(() => actualResults.Should().Contain(r => r.ErrorMessage.Contains(errorMessage)));
     }
 }

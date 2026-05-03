@@ -34,7 +34,7 @@ public partial class Orders__Status_Update_Not_Found_Feature : BaseFixture
     #region Then
 
     private async Task The_response_should_indicate_not_found()
-        => _patchSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.NotFound);
+        => Track.That(() => _patchSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.NotFound));
 
     #endregion
 }

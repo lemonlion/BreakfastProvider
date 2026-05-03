@@ -80,28 +80,28 @@ public partial class Infrastructure__Degraded_Health_Check_Feature : BaseFixture
     }
 
     private async Task The_health_check_response_status_should_be_ok()
-        => _healthResponse!.StatusCode.Should().Be(HttpStatusCode.OK);
+        => Track.That(() => _healthResponse!.StatusCode.Should().Be(HttpStatusCode.OK));
 
     private async Task The_health_check_response_should_be_valid_json()
     {
         var content = await _healthResponse!.Content.ReadAsStringAsync();
         _healthCheckResult = Json.Deserialize<TestHealthCheckResponse>(content)!;
-        _healthCheckResult.Should().NotBeNull();
+        Track.That(() => _healthCheckResult.Should().NotBeNull());
     }
 
     private async Task The_overall_status_should_be_degraded()
-        => _healthCheckResult!.Status.Should().Be(HealthCheckStatuses.Degraded);
+        => Track.That(() => _healthCheckResult!.Status.Should().Be(HealthCheckStatuses.Degraded));
 
     private async Task The_cow_service_dependency_should_report_degraded()
     {
-        _healthCheckResult!.Results.Should().ContainKey(HealthCheckNames.CowService);
-        _healthCheckResult.Results[HealthCheckNames.CowService].Status.Should().Be(HealthCheckStatuses.Degraded);
+        Track.That(() => _healthCheckResult!.Results.Should().ContainKey(HealthCheckNames.CowService));
+        Track.That(() => _healthCheckResult.Results[HealthCheckNames.CowService].Status.Should().Be(HealthCheckStatuses.Degraded));
     }
 
     private async Task The_supplier_service_dependency_should_report_degraded()
     {
-        _healthCheckResult!.Results.Should().ContainKey(HealthCheckNames.SupplierService);
-        _healthCheckResult.Results[HealthCheckNames.SupplierService].Status.Should().Be(HealthCheckStatuses.Degraded);
+        Track.That(() => _healthCheckResult!.Results.Should().ContainKey(HealthCheckNames.SupplierService));
+        Track.That(() => _healthCheckResult.Results[HealthCheckNames.SupplierService].Status.Should().Be(HealthCheckStatuses.Degraded));
     }
 
     #endregion

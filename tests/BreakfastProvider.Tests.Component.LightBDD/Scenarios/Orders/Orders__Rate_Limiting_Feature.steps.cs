@@ -71,7 +71,7 @@ public partial class Orders__Rate_Limiting_Feature : BaseFixture
 
     private async Task The_pancake_batch_should_be_successful()
     {
-        _pancakeSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
+        Track.That(() => _pancakeSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created));
         await _pancakeSteps.ParseResponse();
     }
 
@@ -113,10 +113,10 @@ public partial class Orders__Rate_Limiting_Feature : BaseFixture
     #region Then
 
     private async Task The_first_request_should_succeed()
-        => _firstResponse!.StatusCode.Should().Be(HttpStatusCode.Created);
+        => Track.That(() => _firstResponse!.StatusCode.Should().Be(HttpStatusCode.Created));
 
     private async Task The_second_request_should_be_rate_limited()
-        => _secondResponse!.StatusCode.Should().Be(HttpStatusCode.TooManyRequests);
+        => Track.That(() => _secondResponse!.StatusCode.Should().Be(HttpStatusCode.TooManyRequests));
 
     #endregion
 }

@@ -78,7 +78,7 @@ public partial class Orders__Status_Transition_Feature : BaseFixture
         foreach (var intermediateStatus in path)
         {
             await _patchSteps.Send(_orderId, intermediateStatus);
-            _patchSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
+            Track.That(() => _patchSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
         }
     }
 
@@ -111,16 +111,16 @@ public partial class Orders__Status_Transition_Feature : BaseFixture
     }
 
     private async Task The_patch_response_http_status_should_be_ok()
-        => _patchSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
+        => Track.That(() => _patchSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
 
     private async Task The_updated_order_status_should_be(string expectedStatus)
     {
         await _patchSteps.ParseResponse();
-        _patchSteps.Response!.Status.Should().Be(expectedStatus);
+        Track.That(() => _patchSteps.Response!.Status.Should().Be(expectedStatus));
     }
 
     private async Task The_response_should_indicate_an_invalid_state_transition()
-        => _patchSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Conflict);
+        => Track.That(() => _patchSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Conflict));
 
     #endregion
 }

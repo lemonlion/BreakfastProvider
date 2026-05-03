@@ -21,11 +21,11 @@ public class HeartbeatSteps(AppManager appManager)
     [Then("the heartbeat response should indicate the service is running")]
     public async Task ThenTheHeartbeatResponseShouldIndicateTheServiceIsRunning()
     {
-        _heartbeatResponse!.StatusCode.Should().Be(HttpStatusCode.OK);
+        Track.That(() => _heartbeatResponse!.StatusCode.Should().Be(HttpStatusCode.OK));
         var content = await _heartbeatResponse!.Content.ReadAsStringAsync();
         var result = Json.Deserialize<HeartbeatResult>(content);
-        result.Should().NotBeNull();
-        result!.Status.Should().Be(Documentation.HeartbeatStatus);
+        Track.That(() => result.Should().NotBeNull());
+        Track.That(() => result!.Status.Should().Be(Documentation.HeartbeatStatus));
     }
 
     private record HeartbeatResult(string Status);

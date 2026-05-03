@@ -18,12 +18,12 @@ public class EquipmentAlertsSteps(
     [Then("the graphql response should contain the equipment alert record")]
     public async Task ThenTheGraphqlResponseShouldContainTheEquipmentAlertRecord()
     {
-        graphQlSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
+        Track.That(() => graphQlSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
         await graphQlSteps.ParseEquipmentAlertsResponse();
         var batchId = pancakeSteps.Response!.BatchId;
-        graphQlSteps.EquipmentAlerts.Should().Contain(a =>
+        Track.That(() => graphQlSteps.EquipmentAlerts.Should().Contain(a =>
             a.BatchId == batchId &&
             a.EquipmentName == "Griddle" &&
-            a.AlertType == "UsageCycleCompleted");
+            a.AlertType == "UsageCycleCompleted"));
     }
 }

@@ -27,19 +27,19 @@ public class GrpcRecipeSummarySteps(AppManager appManager)
     [Then(@"the recipe summary should contain (\d+) total batches")]
     public void ThenTheRecipeSummaryShouldContainTotalBatches(int expectedBatches)
     {
-        _grpcSteps.RecipeSummaryReply!.TotalBatches.Should().Be(expectedBatches);
+        Track.That(() => _grpcSteps.RecipeSummaryReply!.TotalBatches.Should().Be(expectedBatches));
     }
 
     [Then(@"the recipe summary should contain ingredients ""(.*)""")]
     public void ThenTheRecipeSummaryShouldContainIngredients(string ingredientsCsv)
     {
         var expected = ingredientsCsv.Split(',', StringSplitOptions.TrimEntries);
-        _grpcSteps.RecipeSummaryReply!.CommonIngredients.Should().BeEquivalentTo(expected);
+        Track.That(() => _grpcSteps.RecipeSummaryReply!.CommonIngredients.Should().BeEquivalentTo(expected));
     }
 
     [Then("the recipe summary should contain no ingredients")]
     public void ThenTheRecipeSummaryShouldContainNoIngredients()
     {
-        _grpcSteps.RecipeSummaryReply!.CommonIngredients.Should().BeEmpty();
+        Track.That(() => _grpcSteps.RecipeSummaryReply!.CommonIngredients.Should().BeEmpty());
     }
 }

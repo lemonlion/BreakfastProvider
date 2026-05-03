@@ -36,7 +36,7 @@ public partial class Waffles__Content_Negotiation_Feature : BaseFixture
     #region Then
 
     private async Task The_response_should_indicate_unsupported_media_type()
-        => _response!.StatusCode.Should().Be(HttpStatusCode.UnsupportedMediaType);
+        => Track.That(() => _response!.StatusCode.Should().Be(HttpStatusCode.UnsupportedMediaType));
 
     #endregion
 }

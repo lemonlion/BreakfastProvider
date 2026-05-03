@@ -35,15 +35,15 @@ public class WaffleCreationSteps(
     public async Task GivenAValidWaffleRecipeWithAllIngredients()
     {
         await milkSteps.Retrieve();
-        milkSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
+        Track.That(() => milkSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
         waffleSteps.Request.Milk = milkSteps.MilkResponse.Milk;
 
         await eggsSteps.Retrieve();
-        eggsSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
+        Track.That(() => eggsSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
         waffleSteps.Request.Eggs = eggsSteps.EggsResponse.Eggs;
 
         await flourSteps.Retrieve();
-        flourSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
+        Track.That(() => flourSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
         waffleSteps.Request.Flour = flourSteps.FlourResponse.Flour;
 
         waffleSteps.Request.Butter = IngredientDefaults.UnsaltedButter;
@@ -90,26 +90,26 @@ public class WaffleCreationSteps(
     [Then("the waffles response should contain a valid batch with all ingredients")]
     public async Task ThenTheWafflesResponseShouldContainAValidBatchWithAllIngredients()
     {
-        waffleSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
+        Track.That(() => waffleSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created));
         await waffleSteps.ParseResponse();
-        waffleSteps.Response!.Ingredients.Should().Contain(milkSteps.MilkResponse.Milk);
-        waffleSteps.Response!.Ingredients.Should().Contain(eggsSteps.EggsResponse.Eggs);
-        waffleSteps.Response!.Ingredients.Should().Contain(flourSteps.FlourResponse.Flour);
-        waffleSteps.Response!.Ingredients.Should().Contain(IngredientDefaults.UnsaltedButter);
+        Track.That(() => waffleSteps.Response!.Ingredients.Should().Contain(milkSteps.MilkResponse.Milk));
+        Track.That(() => waffleSteps.Response!.Ingredients.Should().Contain(eggsSteps.EggsResponse.Eggs));
+        Track.That(() => waffleSteps.Response!.Ingredients.Should().Contain(flourSteps.FlourResponse.Flour));
+        Track.That(() => waffleSteps.Response!.Ingredients.Should().Contain(IngredientDefaults.UnsaltedButter));
     }
 
     [Then("the waffles response should indicate too many toppings")]
     public async Task ThenTheWafflesResponseShouldIndicateTooManyToppings()
     {
-        waffleSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-        var content = await waffleSteps.ResponseMessage!.Content.ReadAsStringAsync();
-        content.Should().Contain(WaffleValidationMessages.MaxToppingsExceeded);
+        Track.That(() => waffleSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.BadRequest));
+        var waffleErrorResponseBody = await waffleSteps.ResponseMessage!.Content.ReadAsStringAsync();
+        Track.That(() => waffleErrorResponseBody.Should().Contain(WaffleValidationMessages.MaxToppingsExceeded));
     }
 
     [Then(@"the waffle response should contain error ""(.*)"" with status ""(.*)""")]
     public async Task ThenTheWaffleResponseShouldContainErrorWithStatus(string errorMessage, string responseStatus)
     {
         var actualResults = await ValidationHelper.ParseValidationResponses(_validationResponses);
-        actualResults.Should().Contain(r => r.ErrorMessage.Contains(errorMessage));
+        Track.That(() => actualResults.Should().Contain(r => r.ErrorMessage.Contains(errorMessage)));
     }
 }

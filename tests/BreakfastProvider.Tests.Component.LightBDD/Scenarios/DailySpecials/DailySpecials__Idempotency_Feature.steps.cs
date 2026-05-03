@@ -54,12 +54,12 @@ public partial class DailySpecials__Idempotency_Feature : BaseFixture
         _postSteps.AddHeader(CustomHeaders.IdempotencyKey, _idempotencyKey);
 
         await _postSteps.Send();
-        _postSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
+        Track.That(() => _postSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created));
         await _postSteps.ParseResponse();
         _firstConfirmationId = _postSteps.Response!.OrderConfirmationId;
 
         await _postSteps.Send();
-        _postSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
+        Track.That(() => _postSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created));
         await _postSteps.ParseResponse();
         _secondConfirmationId = _postSteps.Response!.OrderConfirmationId;
     }
@@ -68,13 +68,13 @@ public partial class DailySpecials__Idempotency_Feature : BaseFixture
     {
         _postSteps.AddHeader(CustomHeaders.IdempotencyKey, Guid.NewGuid().ToString());
         await _postSteps.Send();
-        _postSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
+        Track.That(() => _postSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created));
         await _postSteps.ParseResponse();
         _firstConfirmationId = _postSteps.Response!.OrderConfirmationId;
 
         _postSteps.AddHeader(CustomHeaders.IdempotencyKey, Guid.NewGuid().ToString());
         await _postSteps.Send();
-        _postSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
+        Track.That(() => _postSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created));
         await _postSteps.ParseResponse();
         _secondConfirmationId = _postSteps.Response!.OrderConfirmationId;
     }
@@ -84,10 +84,10 @@ public partial class DailySpecials__Idempotency_Feature : BaseFixture
     #region Then
 
     private async Task Both_responses_should_return_the_same_confirmation_id()
-        => _firstConfirmationId.Should().Be(_secondConfirmationId);
+        => Track.That(() => _firstConfirmationId.Should().Be(_secondConfirmationId));
 
     private async Task The_responses_should_have_different_confirmation_ids()
-        => _firstConfirmationId.Should().NotBe(_secondConfirmationId);
+        => Track.That(() => _firstConfirmationId.Should().NotBe(_secondConfirmationId));
 
     #endregion
 }

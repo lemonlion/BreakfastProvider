@@ -1,0 +1,14 @@
+  Determining projects to restore...
+  All projects are up-to-date for restore.
+  Dependencies.Fakes.KitchenService -> C:\git\BreakfastProvider\fakes\Dependencies.Fakes.KitchenService\bin\Debug\net10.0\Dependencies.Fakes.KitchenService.dll
+  Dependencies.Fakes.SupplierService -> C:\git\BreakfastProvider\fakes\Dependencies.Fakes.SupplierService\bin\Debug\net10.0\Dependencies.Fakes.SupplierService.dll
+  Dependencies.Fakes.GoatService -> C:\git\BreakfastProvider\fakes\Dependencies.Fakes.GoatService\bin\Debug\net10.0\Dependencies.Fakes.GoatService.dll
+  Dependencies.Fakes.CowService -> C:\git\BreakfastProvider\fakes\Dependencies.Fakes.CowService\bin\Debug\net10.0\Dependencies.Fakes.CowService.dll
+  Dependencies.Fakes.NotificationService -> C:\git\BreakfastProvider\fakes\Dependencies.Fakes.NotificationService\bin\Debug\net10.0\Dependencies.Fakes.NotificationService.dll
+  BreakfastProvider.Api -> C:\git\BreakfastProvider\src\BreakfastProvider.Api\bin\Debug\net10.0\BreakfastProvider.Api.dll
+  BreakfastProvider.Tests.Component.Shared -> C:\git\BreakfastProvider\tests\BreakfastProvider.Tests.Component.Shared\bin\Debug\net10.0\BreakfastProvider.Tests.Component.Shared.dll
+  BreakfastProvider.Tests.Component.LightBDD -> C:\git\BreakfastProvider\tests\BreakfastProvider.Tests.Component.LightBDD\bin\Debug\net10.0\BreakfastProvider.Tests.Component.LightBDD.dll
+Test run for C:\git\BreakfastProvider\tests\BreakfastProvider.Tests.Component.LightBDD\bin\Debug\net10.0\BreakfastProvider.Tests.Component.LightBDD.dll (.NETCoreApp,Version=v10.0)
+A total of 1 test files matched the specified pattern.
+
+Passed!  - Failed:     0, Passed:   130, Skipped:     0, Total:   130, Duration: 37 s - BreakfastProvider.Tests.Component.LightBDD.dll (net10.0)

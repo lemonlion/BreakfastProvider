@@ -41,9 +41,9 @@ public class AuditLogSteps(
             ]
         };
         await orderSteps.Send();
-        orderSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
+        Track.That(() => orderSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created));
         await orderSteps.ParseResponse();
-        orderSteps.Response!.OrderId.Should().NotBeEmpty();
+        Track.That(() => orderSteps.Response!.OrderId.Should().NotBeEmpty());
         _orderId = orderSteps.Response!.OrderId;
     }
 
@@ -81,41 +81,41 @@ public class AuditLogSteps(
     [Then("the audit log response should contain the order creation entry")]
     public async Task ThenTheAuditLogResponseShouldContainTheOrderCreationEntry()
     {
-        auditSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
+        Track.That(() => auditSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
         await auditSteps.ParseResponse();
-        auditSteps.Response!.Should().Contain(a =>
+        Track.That(() => auditSteps.Response!.Should().Contain(a =>
             a.Action == AuditLogDefaults.CreatedAction
             && a.EntityType == AuditLogDefaults.OrderEntityType
-            && a.Details.Contains(_customerName));
+            && a.Details.Contains(_customerName)));
     }
 
     [Then("the audit log response should only contain order entries")]
     public void ThenTheAuditLogResponseShouldOnlyContainOrderEntries()
     {
-        _auditLogResponse!.StatusCode.Should().Be(HttpStatusCode.OK);
-        _auditLogs!.Should().OnlyContain(l => l.EntityType == AuditLogDefaults.OrderEntityType);
+        Track.That(() => _auditLogResponse!.StatusCode.Should().Be(HttpStatusCode.OK));
+        Track.That(() => _auditLogs!.Should().OnlyContain(l => l.EntityType == AuditLogDefaults.OrderEntityType));
     }
 
     [Then("the audit log response should contain the specific order entry")]
     public void ThenTheAuditLogResponseShouldContainTheSpecificOrderEntry()
     {
-        _auditLogResponse!.StatusCode.Should().Be(HttpStatusCode.OK);
-        _auditLogs!.Should().Contain(l => l.EntityId == _orderId);
+        Track.That(() => _auditLogResponse!.StatusCode.Should().Be(HttpStatusCode.OK));
+        Track.That(() => _auditLogs!.Should().Contain(l => l.EntityId == _orderId));
     }
 
     [Then("the audit log response should be an empty collection")]
     public async Task ThenTheAuditLogResponseShouldBeAnEmptyCollection()
     {
-        _auditLogResponse!.StatusCode.Should().Be(HttpStatusCode.OK);
+        Track.That(() => _auditLogResponse!.StatusCode.Should().Be(HttpStatusCode.OK));
         var content = await _auditLogResponse.Content.ReadAsStringAsync();
-        var logs = Json.Deserialize<List<TestAuditLogResponse>>(content)!;
-        logs.Should().BeEmpty();
+        var auditLogsFromDifferentTimeRange = Json.Deserialize<List<TestAuditLogResponse>>(content)!;
+        Track.That(() => auditLogsFromDifferentTimeRange.Should().BeEmpty());
     }
 
     [Then("the audit logs should be ordered by timestamp descending")]
     public void ThenTheAuditLogsShouldBeOrderedByTimestampDescending()
     {
-        _auditLogs.Should().NotBeNullOrEmpty();
-        _auditLogs!.Should().BeInDescendingOrder(l => l.Timestamp);
+        Track.That(() => _auditLogs.Should().NotBeNullOrEmpty());
+        Track.That(() => _auditLogs!.Should().BeInDescendingOrder(l => l.Timestamp));
     }
 }

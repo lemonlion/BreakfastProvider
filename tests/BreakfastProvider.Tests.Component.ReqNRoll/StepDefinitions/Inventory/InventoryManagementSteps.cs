@@ -32,7 +32,7 @@ public class InventoryManagementSteps(
     {
         GivenAValidInventoryItemRequest();
         await postSteps.Send();
-        postSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
+        Track.That(() => postSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created));
         await postSteps.ParseResponse();
         _createdItemId = postSteps.Response!.Id;
     }
@@ -69,42 +69,42 @@ public class InventoryManagementSteps(
     [Then("the inventory response should contain the created item")]
     public async Task ThenTheInventoryResponseShouldContainTheCreatedItem()
     {
-        postSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
+        Track.That(() => postSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created));
         await postSteps.ParseResponse();
-        postSteps.Response!.Name.Should().Be(postSteps.Request.Name);
-        postSteps.Response!.Category.Should().Be("Dry Goods");
+        Track.That(() => postSteps.Response!.Name.Should().Be(postSteps.Request.Name));
+        Track.That(() => postSteps.Response!.Category.Should().Be("Dry Goods"));
     }
 
     [Then("the inventory get response should contain the item")]
     public async Task ThenTheInventoryGetResponseShouldContainTheItem()
     {
-        getSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
+        Track.That(() => getSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
         await getSteps.ParseResponse();
-        getSteps.Response!.Id.Should().Be(_createdItemId);
-        getSteps.Response!.Name.Should().Be(postSteps.Response!.Name);
+        Track.That(() => getSteps.Response!.Id.Should().Be(_createdItemId));
+        Track.That(() => getSteps.Response!.Name.Should().Be(postSteps.Response!.Name));
     }
 
     [Then("the inventory list response should contain the item")]
     public async Task ThenTheInventoryListResponseShouldContainTheItem()
     {
-        getSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
+        Track.That(() => getSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
         await getSteps.ParseListResponse();
-        getSteps.ListResponse!.Should().Contain(i => i.Id == _createdItemId);
+        Track.That(() => getSteps.ListResponse!.Should().Contain(i => i.Id == _createdItemId));
     }
 
     [Then("the inventory update response should contain the updated values")]
     public async Task ThenTheInventoryUpdateResponseShouldContainTheUpdatedValues()
     {
-        putSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
+        Track.That(() => putSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
         await putSteps.ParseResponse();
-        putSteps.Response!.Category.Should().Be("Updated Category");
+        Track.That(() => putSteps.Response!.Category.Should().Be("Updated Category"));
     }
 
     [Then("the inventory delete response should indicate no content")]
     public void ThenTheInventoryDeleteResponseShouldIndicateNoContent()
-        => deleteSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.NoContent);
+        => Track.That(() => deleteSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.NoContent));
 
     [Then("the inventory get response should indicate not found")]
     public void ThenTheInventoryGetResponseShouldIndicateNotFound()
-        => getSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.NotFound);
+        => Track.That(() => getSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.NotFound));
 }

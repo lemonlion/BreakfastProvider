@@ -44,7 +44,7 @@ public partial class Feedback__Management_Feature : BaseFixture
 
     private async Task The_setup_response_should_be_created()
     {
-        _postSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
+        Track.That(() => _postSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created));
         await _postSteps.ParseResponse();
         _createdFeedbackId = _postSteps.Response!.FeedbackId;
     }
@@ -101,16 +101,16 @@ public partial class Feedback__Management_Feature : BaseFixture
     }
 
     private async Task The_post_response_http_status_should_be_created()
-        => _postSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
+        => Track.That(() => _postSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created));
 
     private async Task The_post_response_should_be_valid_json()
         => await _postSteps.ParseResponse();
 
     private async Task The_created_feedback_should_have_the_correct_customer_name()
-        => _postSteps.Response!.CustomerName.Should().Be(_postSteps.Request.CustomerName);
+        => Track.That(() => _postSteps.Response!.CustomerName.Should().Be(_postSteps.Request.CustomerName));
 
     private async Task The_created_feedback_should_have_the_correct_rating()
-        => _postSteps.Response!.Rating.Should().Be(4);
+        => Track.That(() => _postSteps.Response!.Rating.Should().Be(4));
 
     private async Task<CompositeStep> The_feedback_get_response_should_contain_the_feedback()
     {
@@ -121,16 +121,16 @@ public partial class Feedback__Management_Feature : BaseFixture
     }
 
     private async Task The_get_response_http_status_should_be_ok()
-        => _getSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
+        => Track.That(() => _getSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
 
     private async Task The_get_response_should_be_valid_json()
         => await _getSteps.ParseResponse();
 
     private async Task The_retrieved_feedback_should_match_the_created_feedback()
     {
-        _getSteps.Response!.FeedbackId.Should().Be(_createdFeedbackId);
-        _getSteps.Response!.CustomerName.Should().Be(_postSteps.Response!.CustomerName);
-        _getSteps.Response!.Rating.Should().Be(4);
+        Track.That(() => _getSteps.Response!.FeedbackId.Should().Be(_createdFeedbackId));
+        Track.That(() => _getSteps.Response!.CustomerName.Should().Be(_postSteps.Response!.CustomerName));
+        Track.That(() => _getSteps.Response!.Rating.Should().Be(4));
     }
 
     private async Task<CompositeStep> The_feedback_list_response_should_contain_the_feedback()
@@ -142,19 +142,19 @@ public partial class Feedback__Management_Feature : BaseFixture
     }
 
     private async Task The_list_response_http_status_should_be_ok()
-        => _getSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
+        => Track.That(() => _getSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
 
     private async Task The_list_response_should_be_valid_json()
         => await _getSteps.ParseListResponse();
 
     private async Task The_list_should_contain_the_created_feedback()
-        => _getSteps.ListResponse!.Should().Contain(f => f.FeedbackId == _createdFeedbackId);
+        => Track.That(() => _getSteps.ListResponse!.Should().Contain(f => f.FeedbackId == _createdFeedbackId));
 
     private async Task The_feedback_get_response_should_indicate_not_found()
-        => _getSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.NotFound);
+        => Track.That(() => _getSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.NotFound));
 
     private async Task The_feedback_response_should_indicate_bad_request()
-        => _postSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        => Track.That(() => _postSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.BadRequest));
 
     #endregion
 }

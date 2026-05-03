@@ -54,7 +54,7 @@ public class StatusTransitionSteps(
         foreach (var intermediateStatus in path)
         {
             await patchSteps.Send(_orderId, intermediateStatus);
-            patchSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
+            Track.That(() => patchSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
         }
     }
 
@@ -67,15 +67,15 @@ public class StatusTransitionSteps(
     [Then(@"the order status should be updated successfully to ""(.*)""")]
     public async Task ThenTheOrderStatusShouldBeUpdatedSuccessfullyTo(string expectedStatus)
     {
-        patchSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
+        Track.That(() => patchSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
         await patchSteps.ParseResponse();
-        patchSteps.Response!.Status.Should().Be(expectedStatus);
+        Track.That(() => patchSteps.Response!.Status.Should().Be(expectedStatus));
     }
 
     [Then("the response should indicate an invalid state transition")]
     public void ThenTheResponseShouldIndicateAnInvalidStateTransition()
     {
-        patchSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Conflict);
+        Track.That(() => patchSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Conflict));
     }
 
     private static List<string> GetTransitionPath(string targetStatus) => targetStatus switch

@@ -42,7 +42,7 @@ public class PaginationSteps(
             Flour = flourSteps.FlourResponse.Flour
         };
         await pancakeSteps.Send();
-        pancakeSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
+        Track.That(() => pancakeSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created));
         await pancakeSteps.ParseResponse();
 
         for (var i = 0; i < 2; i++)
@@ -62,7 +62,7 @@ public class PaginationSteps(
                 ]
             };
             await orderSteps.Send();
-            orderSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
+            Track.That(() => orderSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created));
         }
 
         _createdOrderCount = 2;
@@ -83,23 +83,23 @@ public class PaginationSteps(
     [Then("the paginated response should contain the orders")]
     public async Task ThenThePaginatedResponseShouldContainTheOrders()
     {
-        listSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
+        Track.That(() => listSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
         await listSteps.ParseResponse();
-        listSteps.Response!.Items.Should().HaveCountGreaterThanOrEqualTo(_createdOrderCount);
+        Track.That(() => listSteps.Response!.Items.Should().HaveCountGreaterThanOrEqualTo(_createdOrderCount));
     }
 
     [Then("the paginated response should have correct page metadata")]
     public async Task ThenThePaginatedResponseShouldHaveCorrectPageMetadata()
     {
         await listSteps.ParseResponse();
-        listSteps.Response!.Page.Should().BeGreaterThanOrEqualTo(1);
-        listSteps.Response!.TotalCount.Should().BeGreaterThanOrEqualTo(_createdOrderCount);
+        Track.That(() => listSteps.Response!.Page.Should().BeGreaterThanOrEqualTo(1));
+        Track.That(() => listSteps.Response!.TotalCount.Should().BeGreaterThanOrEqualTo(_createdOrderCount));
     }
 
     [Then("the paginated response should be empty")]
     public async Task ThenThePaginatedResponseShouldBeEmpty()
     {
-        listSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
+        Track.That(() => listSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
         await listSteps.ParseResponse();
     }
 }

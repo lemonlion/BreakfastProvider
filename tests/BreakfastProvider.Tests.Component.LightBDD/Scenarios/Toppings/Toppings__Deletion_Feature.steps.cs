@@ -42,10 +42,10 @@ public partial class Toppings__Deletion_Feature : BaseFixture
     #region Then
 
     private async Task The_delete_response_should_indicate_success()
-        => _deleteSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.NoContent);
+        => Track.That(() => _deleteSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.NoContent));
 
     private async Task The_delete_response_should_indicate_not_found()
-        => _deleteSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.NotFound);
+        => Track.That(() => _deleteSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.NotFound));
 
     #endregion
 }

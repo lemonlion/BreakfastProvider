@@ -60,7 +60,7 @@ public partial class Reporting__EventGrid_Webhook_Feature : BaseFixture
     }
 
     private async Task The_webhook_response_should_be_successful()
-        => _webhookResponse!.StatusCode.Should().Be(HttpStatusCode.OK);
+        => Track.That(() => _webhookResponse!.StatusCode.Should().Be(HttpStatusCode.OK));
 
     #endregion
 
@@ -82,17 +82,17 @@ public partial class Reporting__EventGrid_Webhook_Feature : BaseFixture
     }
 
     private async Task The_ingredient_shipments_response_should_be_successful()
-        => _graphQlSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
+        => Track.That(() => _graphQlSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
 
     private async Task The_ingredient_shipments_response_should_be_valid_json()
         => await _graphQlSteps.ParseIngredientShipmentsResponse();
 
     private async Task The_ingredient_shipments_should_contain_the_delivery()
     {
-        _graphQlSteps.IngredientShipments.Should().Contain(s =>
+        Track.That(() => _graphQlSteps.IngredientShipments.Should().Contain(s =>
             s.DeliveryId == _deliveryId &&
             s.IngredientName == "Milk" &&
-            s.Quantity == 50.0m);
+            s.Quantity == 50.0m));
     }
 
     #endregion

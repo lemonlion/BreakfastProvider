@@ -34,7 +34,7 @@ public class StaffManagementSteps(
     {
         GivenAValidStaffMemberRequest();
         await postSteps.Send();
-        postSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
+        Track.That(() => postSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created));
         await postSteps.ParseResponse();
         _createdMemberId = postSteps.Response!.Id;
     }
@@ -67,27 +67,27 @@ public class StaffManagementSteps(
     [Then("the staff response should contain the created member")]
     public async Task ThenTheStaffResponseShouldContainTheCreatedMember()
     {
-        postSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
+        Track.That(() => postSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created));
         await postSteps.ParseResponse();
-        postSteps.Response!.Name.Should().Be(postSteps.Request.Name);
-        postSteps.Response!.Role.Should().Be("Chef");
+        Track.That(() => postSteps.Response!.Name.Should().Be(postSteps.Request.Name));
+        Track.That(() => postSteps.Response!.Role.Should().Be("Chef"));
     }
 
     [Then("the staff get response should contain the member")]
     public async Task ThenTheStaffGetResponseShouldContainTheMember()
     {
-        getSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
+        Track.That(() => getSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
         await getSteps.ParseResponse();
-        getSteps.Response!.Id.Should().Be(_createdMemberId);
-        getSteps.Response!.Name.Should().Be(postSteps.Response!.Name);
-        getSteps.Response!.Role.Should().Be("Chef");
+        Track.That(() => getSteps.Response!.Id.Should().Be(_createdMemberId));
+        Track.That(() => getSteps.Response!.Name.Should().Be(postSteps.Response!.Name));
+        Track.That(() => getSteps.Response!.Role.Should().Be("Chef"));
     }
 
     [Then("the staff delete response should indicate no content")]
     public void ThenTheStaffDeleteResponseShouldIndicateNoContent()
-        => _deleteResponse!.StatusCode.Should().Be(HttpStatusCode.NoContent);
+        => Track.That(() => _deleteResponse!.StatusCode.Should().Be(HttpStatusCode.NoContent));
 
     [Then("the staff response should indicate bad request")]
     public void ThenTheStaffResponseShouldIndicateBadRequest()
-        => postSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        => Track.That(() => postSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.BadRequest));
 }

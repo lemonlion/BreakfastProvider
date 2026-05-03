@@ -52,19 +52,19 @@ public partial class Orders__Kitchen_Service_Failure_Feature : BaseFixture
         => await _milkSteps.Retrieve();
 
     private async Task The_milk_response_should_be_successful()
-        => _milkSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
+        => Track.That(() => _milkSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
 
     private async Task Eggs_are_retrieved()
         => await _eggsSteps.Retrieve();
 
     private async Task The_eggs_response_should_be_successful()
-        => _eggsSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
+        => Track.That(() => _eggsSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
 
     private async Task Flour_is_retrieved()
         => await _flourSteps.Retrieve();
 
     private async Task The_flour_response_should_be_successful()
-        => _flourSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
+        => Track.That(() => _flourSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
 
     private async Task A_pancake_request_is_submitted()
     {
@@ -79,9 +79,9 @@ public partial class Orders__Kitchen_Service_Failure_Feature : BaseFixture
 
     private async Task The_pancake_response_should_be_successful()
     {
-        _pancakeSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
+        Track.That(() => _pancakeSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created));
         await _pancakeSteps.ParseResponse();
-        _pancakeSteps.Response.Should().NotBeNull();
+        Track.That(() => _pancakeSteps.Response.Should().NotBeNull());
     }
 
     private async Task A_valid_order_request_for_the_created_batch()
@@ -119,18 +119,18 @@ public partial class Orders__Kitchen_Service_Failure_Feature : BaseFixture
     }
 
     private async Task The_order_response_http_status_should_be_created()
-        => _orderSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
+        => Track.That(() => _orderSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created));
 
     private async Task The_order_response_should_be_valid_json()
         => await _orderSteps.ParseResponse();
 
     private async Task The_order_should_contain_the_customer_name()
-        => _orderSteps.Response!.CustomerName.Should().Be(_customerName);
+        => Track.That(() => _orderSteps.Response!.CustomerName.Should().Be(_customerName));
 
     private async Task The_order_should_be_retrievable_by_its_id()
     {
         await _getOrderSteps.Retrieve(_orderSteps.Response!.OrderId);
-        _getOrderSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
+        Track.That(() => _getOrderSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
     }
 
     #endregion

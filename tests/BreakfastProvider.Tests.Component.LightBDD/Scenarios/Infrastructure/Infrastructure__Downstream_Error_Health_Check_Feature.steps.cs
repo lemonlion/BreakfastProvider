@@ -70,25 +70,27 @@ public partial class Infrastructure__Downstream_Error_Health_Check_Feature : Bas
     }
 
     private async Task The_health_check_response_status_should_be_ok()
-        => _healthResponse!.StatusCode.Should().Be(HttpStatusCode.OK);
+        => Track.That(() => _healthResponse!.StatusCode.Should().Be(HttpStatusCode.OK));
 
     private async Task The_health_check_response_should_be_valid_json()
     {
         var content = await _healthResponse!.Content.ReadAsStringAsync();
         _healthCheckResult = Json.Deserialize<TestHealthCheckResponse>(content)!;
-        _healthCheckResult.Should().NotBeNull();
+        Track.That(() => _healthCheckResult.Should().NotBeNull());
     }
 
     private async Task The_overall_status_should_be_degraded()
-        => _healthCheckResult!.Status.Should().Be(HealthCheckStatuses.Degraded);
+        => Track.That(() => _healthCheckResult!.Status.Should().Be(HealthCheckStatuses.Degraded));
 
     private async Task The_kitchen_service_dependency_should_report_degraded_with_a_status_code_description()
     {
-        _healthCheckResult!.Results.Should().ContainKey(HealthCheckNames.KitchenService);
+        Track.That(() => _healthCheckResult!.Results.Should().ContainKey(HealthCheckNames.KitchenService));
 
-        var kitchenEntry = _healthCheckResult.Results[HealthCheckNames.KitchenService];
-        kitchenEntry.Status.Should().Be(HealthCheckStatuses.Degraded);
-        kitchenEntry.Description.Should().Contain("503");
+        var kitchenServiceHealthCheckEntry = _healthCheckResult.Results[HealthCheckNames.KitchenService];
+        var kitchenServiceHealthStatus = kitchenServiceHealthCheckEntry.Status;
+        Track.That(() => kitchenServiceHealthStatus.Should().Be(HealthCheckStatuses.Degraded));
+        var kitchenServiceHealthDescription = kitchenServiceHealthCheckEntry.Description;
+        Track.That(() => kitchenServiceHealthDescription.Should().Contain("503"));
     }
 
     #endregion

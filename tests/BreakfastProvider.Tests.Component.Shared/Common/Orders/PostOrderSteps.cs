@@ -30,7 +30,7 @@ public class PostOrderSteps(RequestContext context)
     public async Task ParseResponse()
     {
         var responseString = await ResponseMessage!.Content.ReadAsStringAsync();
-        Json.IsValid(responseString).Should().BeTrue();
+        Track.That(() => Json.IsValid(responseString).Should().BeTrue());
         Response = Json.Deserialize<TestOrderResponse>(responseString)!;
     }
 }

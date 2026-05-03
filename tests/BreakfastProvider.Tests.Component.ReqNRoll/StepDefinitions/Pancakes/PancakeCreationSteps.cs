@@ -33,15 +33,15 @@ public class PancakeCreationSteps(
     public async Task GivenAValidPancakeRecipeWithAllIngredients()
     {
         await milkSteps.Retrieve();
-        milkSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
+        Track.That(() => milkSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
         pancakeSteps.Request.Milk = milkSteps.MilkResponse.Milk;
 
         await eggsSteps.Retrieve();
-        eggsSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
+        Track.That(() => eggsSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
         pancakeSteps.Request.Eggs = eggsSteps.EggsResponse.Eggs;
 
         await flourSteps.Retrieve();
-        flourSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
+        Track.That(() => flourSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
         pancakeSteps.Request.Flour = flourSteps.FlourResponse.Flour;
     }
 
@@ -91,25 +91,25 @@ public class PancakeCreationSteps(
     [Then("the pancakes response should contain a valid batch with all ingredients")]
     public async Task ThenThePancakesResponseShouldContainAValidBatchWithAllIngredients()
     {
-        pancakeSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
+        Track.That(() => pancakeSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created));
         await pancakeSteps.ParseResponse();
-        pancakeSteps.Response!.Ingredients.Should().Contain(milkSteps.MilkResponse.Milk);
-        pancakeSteps.Response!.Ingredients.Should().Contain(eggsSteps.EggsResponse.Eggs);
-        pancakeSteps.Response!.Ingredients.Should().Contain(flourSteps.FlourResponse.Flour);
+        Track.That(() => pancakeSteps.Response!.Ingredients.Should().Contain(milkSteps.MilkResponse.Milk));
+        Track.That(() => pancakeSteps.Response!.Ingredients.Should().Contain(eggsSteps.EggsResponse.Eggs));
+        Track.That(() => pancakeSteps.Response!.Ingredients.Should().Contain(flourSteps.FlourResponse.Flour));
     }
 
     [Then(@"the response should contain error ""(.*)"" with status ""(.*)""")]
     public async Task ThenTheResponseShouldContainErrorWithStatus(string errorMessage, string responseStatus)
     {
         var actualResults = await ValidationHelper.ParseValidationResponses(_validationResponses);
-        actualResults.Should().Contain(r => r.ErrorMessage.Contains(errorMessage));
+        Track.That(() => actualResults.Should().Contain(r => r.ErrorMessage.Contains(errorMessage)));
     }
 
     [Then("the pancakes response should indicate too many toppings")]
     public async Task ThenThePancakesResponseShouldIndicateTooManyToppings()
     {
-        pancakeSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-        var content = await pancakeSteps.ResponseMessage!.Content.ReadAsStringAsync();
-        content.Should().Contain(PancakeValidationMessages.MaxToppingsExceeded);
+        Track.That(() => pancakeSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.BadRequest));
+        var pancakeErrorResponseBody = await pancakeSteps.ResponseMessage!.Content.ReadAsStringAsync();
+        Track.That(() => pancakeErrorResponseBody.Should().Contain(PancakeValidationMessages.MaxToppingsExceeded));
     }
 }

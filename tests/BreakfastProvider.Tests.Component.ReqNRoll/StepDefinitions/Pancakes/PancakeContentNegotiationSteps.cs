@@ -32,6 +32,6 @@ public class PancakeContentNegotiationSteps(AppManager appManager)
     [Then("the response should indicate unsupported media type")]
     public void ThenTheResponseShouldIndicateUnsupportedMediaType()
     {
-        _response!.StatusCode.Should().Be(HttpStatusCode.UnsupportedMediaType);
+        Track.That(() => _response!.StatusCode.Should().Be(HttpStatusCode.UnsupportedMediaType));
     }
 }

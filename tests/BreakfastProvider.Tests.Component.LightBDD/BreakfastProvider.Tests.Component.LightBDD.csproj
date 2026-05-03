@@ -45,7 +45,7 @@
     <PackageReference Include="NSubstitute" Version="5.3.0" />
     <PackageReference Include="AutoFixture" Version="4.18.1" />
     <PackageReference Include="Spanner.InMemoryEmulator" Version="1.0.20" />
-    <PackageReference Include="TestTrackingDiagrams.LightBDD.xUnit3" Version="2.28.27" />
+    <PackageReference Include="TestTrackingDiagrams.LightBDD.xUnit3" Version="2.28.34" />
     <PackageReference Include="xunit.v3" Version="3.2.2" />
     <PackageReference Include="coverlet.collector" Version="6.0.4">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

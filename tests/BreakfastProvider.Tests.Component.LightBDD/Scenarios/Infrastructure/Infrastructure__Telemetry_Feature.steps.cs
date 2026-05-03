@@ -69,7 +69,7 @@ public partial class Infrastructure__Telemetry_Feature : BaseFixture
 
     private async Task The_pancake_batch_should_be_successful()
     {
-        _pancakeSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
+        Track.That(() => _pancakeSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created));
         await _pancakeSteps.ParseResponse();
     }
 
@@ -98,7 +98,7 @@ public partial class Infrastructure__Telemetry_Feature : BaseFixture
     private async Task The_order_is_submitted()
     {
         await _orderSteps.Send();
-        _orderSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
+        Track.That(() => _orderSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created));
     }
 
     #endregion
@@ -114,15 +114,15 @@ public partial class Infrastructure__Telemetry_Feature : BaseFixture
     }
 
     private async Task The_log_should_contain_an_order_created_message()
-        => _logProvider.Entries.Should().Contain(e => e.Message.Contains("created for customer"));
+        => Track.That(() => _logProvider.Entries.Should().Contain(e => e.Message.Contains("created for customer")));
 
     private async Task The_log_message_should_include_the_customer_name()
-        => _logProvider.Entries.Should().Contain(e =>
-            e.Message.Contains(_orderSteps.Request.CustomerName!));
+        => Track.That(() => _logProvider.Entries.Should().Contain(e =>
+            e.Message.Contains(_orderSteps.Request.CustomerName!)));
 
     private async Task The_log_message_should_include_the_item_count()
-        => _logProvider.Entries.Should().Contain(e =>
-            e.Message.Contains("1 items"));
+        => Track.That(() => _logProvider.Entries.Should().Contain(e =>
+            e.Message.Contains("1 items")));
 
     #endregion
 }

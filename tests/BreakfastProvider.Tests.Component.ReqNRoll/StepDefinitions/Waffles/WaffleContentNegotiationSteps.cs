@@ -32,6 +32,6 @@ public class WaffleContentNegotiationSteps(AppManager appManager)
     [Then("the waffle response should indicate unsupported media type")]
     public void ThenTheWaffleResponseShouldIndicateUnsupportedMediaType()
     {
-        _response!.StatusCode.Should().Be(HttpStatusCode.UnsupportedMediaType);
+        Track.That(() => _response!.StatusCode.Should().Be(HttpStatusCode.UnsupportedMediaType));
     }
 }

@@ -30,7 +30,7 @@ public class PostDailySpecialOrderSteps(RequestContext context)
     public async Task ParseResponse()
     {
         var content = await ResponseMessage!.Content.ReadAsStringAsync();
-        Json.IsValid(content).Should().BeTrue();
+        Track.That(() => Json.IsValid(content).Should().BeTrue());
         Response = Json.Deserialize<TestDailySpecialOrderResponse>(content)!;
     }
 }

@@ -63,19 +63,19 @@ public class CrossFieldValidationSteps(
     [Then("the response should indicate a validation error")]
     public void ThenTheResponseShouldIndicateAValidationError()
     {
-        orderSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        Track.That(() => orderSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.BadRequest));
     }
 
     [Then("the error message should reference the item limit")]
     public async Task ThenTheErrorMessageShouldReferenceTheItemLimit()
     {
-        var content = await orderSteps.ResponseMessage!.Content.ReadAsStringAsync();
-        content.Should().Contain("Items");
+        var orderValidationErrorResponseBody = await orderSteps.ResponseMessage!.Content.ReadAsStringAsync();
+        Track.That(() => orderValidationErrorResponseBody.Should().Contain("Items"));
     }
 
     [Then("the response should indicate success")]
     public void ThenTheResponseShouldIndicateSuccess()
     {
-        orderSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
+        Track.That(() => orderSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created));
     }
 }

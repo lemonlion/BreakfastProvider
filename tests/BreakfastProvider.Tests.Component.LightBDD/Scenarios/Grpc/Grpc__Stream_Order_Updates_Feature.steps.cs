@@ -65,7 +65,7 @@ public partial class Grpc__Stream_Order_Updates_Feature : BaseFixture
 
     private async Task The_pancake_batch_response_should_be_successful()
     {
-        _pancakeSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
+        Track.That(() => _pancakeSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created));
         await _pancakeSteps.ParseResponse();
     }
 
@@ -97,7 +97,7 @@ public partial class Grpc__Stream_Order_Updates_Feature : BaseFixture
 
     private async Task The_order_creation_response_should_be_successful()
     {
-        _orderSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
+        Track.That(() => _orderSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created));
         await _orderSteps.ParseResponse();
         _createdOrderId = _orderSteps.Response!.OrderId;
     }
@@ -126,21 +126,21 @@ public partial class Grpc__Stream_Order_Updates_Feature : BaseFixture
     }
 
     private async Task The_stream_should_contain_one_reply()
-        => _grpcSteps.StreamedReplies.Should().HaveCount(1);
+        => Track.That(() => _grpcSteps.StreamedReplies.Should().HaveCount(1));
 
     private async Task The_streamed_order_id_should_match()
-        => _grpcSteps.StreamedReplies[0].OrderId.Should().Be(_createdOrderId.ToString());
+        => Track.That(() => _grpcSteps.StreamedReplies[0].OrderId.Should().Be(_createdOrderId.ToString()));
 
     private async Task The_streamed_customer_name_should_match()
-        => _grpcSteps.StreamedReplies[0].CustomerName.Should().Be(_customerName);
+        => Track.That(() => _grpcSteps.StreamedReplies[0].CustomerName.Should().Be(_customerName));
 
     private async Task The_streamed_status_should_be_created()
-        => _grpcSteps.StreamedReplies[0].Status.Should().Be(OrderStatuses.Created);
+        => Track.That(() => _grpcSteps.StreamedReplies[0].Status.Should().Be(OrderStatuses.Created));
 
     private async Task The_grpc_stream_should_return_a_not_found_error()
     {
-        _grpcSteps.RpcException.Should().NotBeNull();
-        _grpcSteps.RpcException!.StatusCode.Should().Be(StatusCode.NotFound);
+        Track.That(() => _grpcSteps.RpcException.Should().NotBeNull());
+        Track.That(() => _grpcSteps.RpcException!.StatusCode.Should().Be(StatusCode.NotFound));
     }
 
     #endregion

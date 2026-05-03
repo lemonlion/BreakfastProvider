@@ -26,8 +26,8 @@ public class TelemetrySteps(
     [Then("a structured log entry should have been captured for order creation")]
     public void ThenAStructuredLogEntryShouldHaveBeenCapturedForOrderCreation()
     {
-        _logProvider.Entries.Should().Contain(e => e.Message.Contains("created for customer"));
-        _logProvider.Entries.Should().Contain(e => e.Message.Contains(orderSteps.Request.CustomerName!));
-        _logProvider.Entries.Should().Contain(e => e.Message.Contains("1 items"));
+        Track.That(() => _logProvider.Entries.Should().Contain(e => e.Message.Contains("created for customer")));
+        Track.That(() => _logProvider.Entries.Should().Contain(e => e.Message.Contains(orderSteps.Request.CustomerName!)));
+        Track.That(() => _logProvider.Entries.Should().Contain(e => e.Message.Contains("1 items")));
     }
 }

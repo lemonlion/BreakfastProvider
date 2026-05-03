@@ -72,7 +72,7 @@ public partial class Waffles__Creation_Feature : BaseFixture
         => await _milkSteps.Retrieve();
 
     private async Task The_milk_response_should_be_successful()
-        => _milkSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
+        => Track.That(() => _milkSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
 
     private async Task Retrieved_milk_is_set_on_the_body()
         => _waffleSteps.Request.Milk = _milkSteps.MilkResponse.Milk;
@@ -89,7 +89,7 @@ public partial class Waffles__Creation_Feature : BaseFixture
         => await _eggsSteps.Retrieve();
 
     private async Task The_eggs_response_should_be_successful()
-        => _eggsSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
+        => Track.That(() => _eggsSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
 
     private async Task Retrieved_eggs_are_set_on_the_body()
         => _waffleSteps.Request.Eggs = _eggsSteps.EggsResponse.Eggs;
@@ -106,7 +106,7 @@ public partial class Waffles__Creation_Feature : BaseFixture
         => await _flourSteps.Retrieve();
 
     private async Task The_flour_response_should_be_successful()
-        => _flourSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
+        => Track.That(() => _flourSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
 
     private async Task Retrieved_flour_is_set_on_the_body()
         => _waffleSteps.Request.Flour = _flourSteps.FlourResponse.Flour;
@@ -167,22 +167,22 @@ public partial class Waffles__Creation_Feature : BaseFixture
     }
 
     private async Task The_response_http_status_should_be_created()
-        => _waffleSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
+        => Track.That(() => _waffleSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created));
 
     private async Task The_response_should_be_valid_json()
         => await _waffleSteps.ParseResponse();
 
     private async Task The_response_ingredients_should_include_milk()
-        => _waffleSteps.Response!.Ingredients.Should().Contain(_milkSteps.MilkResponse.Milk);
+        => Track.That(() => _waffleSteps.Response!.Ingredients.Should().Contain(_milkSteps.MilkResponse.Milk));
 
     private async Task The_response_ingredients_should_include_eggs()
-        => _waffleSteps.Response!.Ingredients.Should().Contain(_eggsSteps.EggsResponse.Eggs);
+        => Track.That(() => _waffleSteps.Response!.Ingredients.Should().Contain(_eggsSteps.EggsResponse.Eggs));
 
     private async Task The_response_ingredients_should_include_flour()
-        => _waffleSteps.Response!.Ingredients.Should().Contain(_flourSteps.FlourResponse.Flour);
+        => Track.That(() => _waffleSteps.Response!.Ingredients.Should().Contain(_flourSteps.FlourResponse.Flour));
 
     private async Task The_response_ingredients_should_include_butter()
-        => _waffleSteps.Response!.Ingredients.Should().Contain(IngredientDefaults.UnsaltedButter);
+        => Track.That(() => _waffleSteps.Response!.Ingredients.Should().Contain(IngredientDefaults.UnsaltedButter));
 
     private async Task The_responses_should_each_contain_the_validation_error_for_the_invalid_field(
         VerifiableDataTable<VerifiableErrorResult> expectedOutputs)
@@ -199,12 +199,12 @@ public partial class Waffles__Creation_Feature : BaseFixture
     }
 
     private async Task The_response_http_status_should_be_bad_request()
-        => _waffleSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        => Track.That(() => _waffleSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.BadRequest));
 
     private async Task The_response_should_contain_max_toppings_error()
     {
-        var content = await _waffleSteps.ResponseMessage!.Content.ReadAsStringAsync();
-        content.Should().Contain(WaffleValidationMessages.MaxToppingsExceeded);
+        var waffleErrorResponseBody = await _waffleSteps.ResponseMessage!.Content.ReadAsStringAsync();
+        Track.That(() => waffleErrorResponseBody.Should().Contain(WaffleValidationMessages.MaxToppingsExceeded));
     }
 
     [SkipStepIf(nameof(Settings.RunAgainstExternalServiceUnderTest), DownstreamFakeRequestStoreIsUnavailableInPostDeploymentEnvironments)]

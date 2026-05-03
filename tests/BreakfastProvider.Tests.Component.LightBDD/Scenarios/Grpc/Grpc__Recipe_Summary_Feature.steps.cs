@@ -57,16 +57,16 @@ public partial class Grpc__Recipe_Summary_Feature : BaseFixture
     }
 
     private async Task The_recipe_type_should_be(string expected)
-        => _grpcSteps.RecipeSummaryReply!.RecipeType.Should().Be(expected);
+        => Track.That(() => _grpcSteps.RecipeSummaryReply!.RecipeType.Should().Be(expected));
 
     private async Task The_total_batches_should_be(int expected)
-        => _grpcSteps.RecipeSummaryReply!.TotalBatches.Should().Be(expected);
+        => Track.That(() => _grpcSteps.RecipeSummaryReply!.TotalBatches.Should().Be(expected));
 
     private async Task The_common_ingredients_should_contain(params string[] expected)
-        => _grpcSteps.RecipeSummaryReply!.CommonIngredients.Should().BeEquivalentTo(expected);
+        => Track.That(() => _grpcSteps.RecipeSummaryReply!.CommonIngredients.Should().BeEquivalentTo(expected));
 
     private async Task The_common_ingredients_should_be_empty()
-        => _grpcSteps.RecipeSummaryReply!.CommonIngredients.Should().BeEmpty();
+        => Track.That(() => _grpcSteps.RecipeSummaryReply!.CommonIngredients.Should().BeEmpty());
 
     #endregion
 }

@@ -60,19 +60,19 @@ public partial class Orders__Complete_Lifecycle_Feature : BaseFixture
         => await _milkSteps.Retrieve();
 
     private async Task The_milk_response_should_be_successful()
-        => _milkSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
+        => Track.That(() => _milkSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
 
     private async Task Eggs_are_retrieved_from_the_eggs_endpoint()
         => await _eggsSteps.Retrieve();
 
     private async Task The_eggs_response_should_be_successful()
-        => _eggsSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
+        => Track.That(() => _eggsSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
 
     private async Task Flour_is_retrieved_from_the_flour_endpoint()
         => await _flourSteps.Retrieve();
 
     private async Task The_flour_response_should_be_successful()
-        => _flourSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
+        => Track.That(() => _flourSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
 
     private async Task A_pancake_request_is_submitted_with_all_ingredients()
     {
@@ -87,10 +87,10 @@ public partial class Orders__Complete_Lifecycle_Feature : BaseFixture
 
     private async Task The_pancake_batch_response_should_be_successful()
     {
-        _pancakeSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
+        Track.That(() => _pancakeSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created));
         await _pancakeSteps.ParseResponse();
-        _pancakeSteps.Response.Should().NotBeNull();
-        _pancakeSteps.Response!.BatchId.Should().NotBeEmpty();
+        Track.That(() => _pancakeSteps.Response.Should().NotBeNull());
+        Track.That(() => _pancakeSteps.Response!.BatchId.Should().NotBeEmpty());
     }
 
     private async Task<CompositeStep> A_breakfast_order_has_been_placed_for_the_batch()
@@ -122,15 +122,15 @@ public partial class Orders__Complete_Lifecycle_Feature : BaseFixture
 
     private async Task The_order_creation_response_should_be_successful()
     {
-        _orderSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
+        Track.That(() => _orderSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created));
         await _orderSteps.ParseResponse();
-        _orderSteps.Response.Should().NotBeNull();
+        Track.That(() => _orderSteps.Response.Should().NotBeNull());
     }
 
     private async Task The_order_id_is_captured_from_the_order_response()
     {
         _orderId = _orderSteps.Response!.OrderId;
-        _orderId.Should().NotBeEmpty();
+        Track.That(() => _orderId.Should().NotBeEmpty());
     }
 
     #endregion
@@ -152,19 +152,19 @@ public partial class Orders__Complete_Lifecycle_Feature : BaseFixture
         => await _patchSteps.Send(_orderId, OrderStatuses.Preparing);
 
     private async Task The_preparing_transition_should_succeed()
-        => _patchSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
+        => Track.That(() => _patchSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
 
     private async Task The_order_status_is_updated_to_ready()
         => await _patchSteps.Send(_orderId, OrderStatuses.Ready);
 
     private async Task The_ready_transition_should_succeed()
-        => _patchSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
+        => Track.That(() => _patchSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
 
     private async Task The_order_status_is_updated_to_completed()
         => await _patchSteps.Send(_orderId, OrderStatuses.Completed);
 
     private async Task The_completed_transition_should_succeed()
-        => _patchSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
+        => Track.That(() => _patchSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
 
     #endregion
 
@@ -186,28 +186,28 @@ public partial class Orders__Complete_Lifecycle_Feature : BaseFixture
         => await _retrievalSteps.Retrieve(_orderId);
 
     private async Task The_retrieval_response_should_be_ok()
-        => _retrievalSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
+        => Track.That(() => _retrievalSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
 
     private async Task The_retrieved_order_should_be_valid_json()
         => await _retrievalSteps.ParseResponse();
 
     private async Task The_retrieved_order_status_should_be_completed()
-        => _retrievalSteps.Response!.Status.Should().Be(OrderStatuses.Completed);
+        => Track.That(() => _retrievalSteps.Response!.Status.Should().Be(OrderStatuses.Completed));
 
     private async Task The_retrieved_customer_name_should_match()
-        => _retrievalSteps.Response!.CustomerName.Should().Be(_customerName);
+        => Track.That(() => _retrievalSteps.Response!.CustomerName.Should().Be(_customerName));
 
     private async Task The_retrieved_items_should_match()
-        => _retrievalSteps.Response!.Items.Should().HaveCount(1);
+        => Track.That(() => _retrievalSteps.Response!.Items.Should().HaveCount(1));
 
     private async Task The_retrieved_table_number_should_match()
-        => _retrievalSteps.Response!.TableNumber.Should().Be(4);
+        => Track.That(() => _retrievalSteps.Response!.TableNumber.Should().Be(4));
 
     private async Task The_order_timestamps_should_be_recent()
-        => _retrievalSteps.Response!.CreatedAt.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromMinutes(2));
+        => Track.That(() => _retrievalSteps.Response!.CreatedAt.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromMinutes(2)));
 
     private async Task The_order_id_should_be_a_valid_guid_format()
-        => _retrievalSteps.Response!.OrderId.ToString().Should().MatchRegex(@"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$");
+        => Track.That(() => _retrievalSteps.Response!.OrderId.ToString().Should().MatchRegex(@"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"));
 
     private async Task<CompositeStep> An_audit_log_entry_should_exist_for_the_order()
     {
@@ -224,13 +224,13 @@ public partial class Orders__Complete_Lifecycle_Feature : BaseFixture
         var request = new HttpRequestMessage(HttpMethod.Get, $"{Endpoints.AuditLogs}?entityId={_orderId}");
         request.Headers.Add(CustomHeaders.ComponentTestRequestId, RequestId);
         _auditLogResponse = await Client.SendAsync(request);
-        _auditLogResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+        Track.That(() => _auditLogResponse.StatusCode.Should().Be(HttpStatusCode.OK));
         var content = await _auditLogResponse.Content.ReadAsStringAsync();
         _auditLogs = Json.Deserialize<List<Models.AuditLogs.TestAuditLogResponse>>(content)!;
     }
 
     private async Task The_audit_logs_should_contain_the_order_creation_entry()
-        => _auditLogs!.Should().Contain(l => l.EntityId == _orderId && l.Action == AuditLogDefaults.CreatedAction);
+        => Track.That(() => _auditLogs!.Should().Contain(l => l.EntityId == _orderId && l.Action == AuditLogDefaults.CreatedAction));
 
     [SkipStepIf(nameof(Settings.RunAgainstExternalServiceUnderTest), DownstreamFakeRequestStoreIsUnavailableInPostDeploymentEnvironments)]
     private async Task The_cow_service_should_have_received_a_milk_request()

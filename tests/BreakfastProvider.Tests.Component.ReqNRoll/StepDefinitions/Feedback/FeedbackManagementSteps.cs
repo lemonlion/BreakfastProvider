@@ -31,7 +31,7 @@ public class FeedbackManagementSteps(
     {
         GivenAValidFeedbackRequest();
         await postSteps.Send();
-        postSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
+        Track.That(() => postSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created));
         await postSteps.ParseResponse();
         _createdFeedbackId = postSteps.Response!.FeedbackId;
     }
@@ -75,35 +75,35 @@ public class FeedbackManagementSteps(
     [Then("the feedback response should contain the created feedback")]
     public async Task ThenTheFeedbackResponseShouldContainTheCreatedFeedback()
     {
-        postSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
+        Track.That(() => postSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created));
         await postSteps.ParseResponse();
-        postSteps.Response!.CustomerName.Should().Be(postSteps.Request.CustomerName);
-        postSteps.Response!.Rating.Should().Be(4);
+        Track.That(() => postSteps.Response!.CustomerName.Should().Be(postSteps.Request.CustomerName));
+        Track.That(() => postSteps.Response!.Rating.Should().Be(4));
     }
 
     [Then("the feedback get response should contain the feedback")]
     public async Task ThenTheFeedbackGetResponseShouldContainTheFeedback()
     {
-        getSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
+        Track.That(() => getSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
         await getSteps.ParseResponse();
-        getSteps.Response!.FeedbackId.Should().Be(_createdFeedbackId);
-        getSteps.Response!.CustomerName.Should().Be(postSteps.Response!.CustomerName);
-        getSteps.Response!.Rating.Should().Be(4);
+        Track.That(() => getSteps.Response!.FeedbackId.Should().Be(_createdFeedbackId));
+        Track.That(() => getSteps.Response!.CustomerName.Should().Be(postSteps.Response!.CustomerName));
+        Track.That(() => getSteps.Response!.Rating.Should().Be(4));
     }
 
     [Then("the feedback list response should contain the feedback")]
     public async Task ThenTheFeedbackListResponseShouldContainTheFeedback()
     {
-        getSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
+        Track.That(() => getSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
         await getSteps.ParseListResponse();
-        getSteps.ListResponse!.Should().Contain(f => f.FeedbackId == _createdFeedbackId);
+        Track.That(() => getSteps.ListResponse!.Should().Contain(f => f.FeedbackId == _createdFeedbackId));
     }
 
     [Then("the feedback get response should indicate not found")]
     public void ThenTheFeedbackGetResponseShouldIndicateNotFound()
-        => getSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.NotFound);
+        => Track.That(() => getSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.NotFound));
 
     [Then("the feedback response should indicate bad request")]
     public void ThenTheFeedbackResponseShouldIndicateBadRequest()
-        => postSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        => Track.That(() => postSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.BadRequest));
 }

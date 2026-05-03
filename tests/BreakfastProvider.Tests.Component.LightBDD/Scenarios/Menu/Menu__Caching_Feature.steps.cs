@@ -37,7 +37,7 @@ public partial class Menu__Caching_Feature : BaseFixture
         => await _menuSteps.Retrieve();
 
     private async Task The_first_menu_response_should_be_successful()
-        => _menuSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
+        => Track.That(() => _menuSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
 
     private async Task The_supplier_service_is_then_made_unavailable()
         => _secondMenuSteps.AddHeader(FakeScenarioHeaders.SupplierService, FakeScenarios.ServiceUnavailable);
@@ -62,13 +62,13 @@ public partial class Menu__Caching_Feature : BaseFixture
     }
 
     private async Task The_cached_menu_response_http_status_should_be_ok()
-        => _secondMenuSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
+        => Track.That(() => _secondMenuSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
 
     private async Task The_cached_menu_list_should_be_valid_json()
         => await _secondMenuSteps.ParseResponse();
 
     private async Task The_cached_menu_should_contain_available_items()
-        => _secondMenuSteps.Response!.Should().Contain(m => m.IsAvailable);
+        => Track.That(() => _secondMenuSteps.Response!.Should().Contain(m => m.IsAvailable));
 
     #endregion
 }

@@ -1,0 +1,439 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>BreakfastProvider.Api</name>
+    </assembly>
+    <members>
+        <member name="P:BreakfastProvider.Api.Configuration.KafkaConfig.ProducerConfigurations">
+            <summary>
+            Contains configurations for producer topics.
+            </summary>
+        </member>
+        <member name="P:BreakfastProvider.Api.Configuration.KafkaConfig.ConsumerConfigurations">
+            <summary>
+            Contains configurations for consumer topics.
+            </summary>
+        </member>
+        <member name="P:BreakfastProvider.Api.Configuration.PubSubConfig.PublisherConfigurations">
+            <summary>
+            Contains configurations for publisher topics.
+            </summary>
+        </member>
+        <member name="P:BreakfastProvider.Api.Configuration.PubSubConfig.SubscriberConfigurations">
+            <summary>
+            Contains configurations for subscriber subscriptions.
+            </summary>
+        </member>
+        <member name="T:BreakfastProvider.Api.Data.Spanner.NoOpSpannerConnectionFactory">
+            <summary>
+            Registered when Spanner is not configured (empty ProjectId).
+            Any call to CreateConnection will throw, preventing the Spanner SDK
+            from creating a connection with an invalid data source that crashes
+            the GC finalizer.
+            </summary>
+        </member>
+        <member name="T:BreakfastProvider.Api.Events.EventHubEventAsyncApiMetadata">
+            <summary>
+            AsyncAPI metadata for an Event Hub event, derived by convention from the event type.
+            </summary>
+        </member>
+        <member name="T:BreakfastProvider.Api.Events.KafkaEventAsyncApiMetadata">
+            <summary>
+            AsyncAPI metadata for a Kafka event, derived by convention from the event type.
+            </summary>
+        </member>
+        <member name="M:BreakfastProvider.Api.Events.IKafkaEvent.GetAsyncApiMetadata(System.Type)">
+            <summary>
+            Returns the AsyncAPI metadata for a given event type. All values are derived by convention
+            from the type name and its [Description] attribute.
+            </summary>
+        </member>
+        <member name="M:BreakfastProvider.Api.Events.IKafkaEvent.GetPropertySchema(System.Reflection.PropertyInfo)">
+            <summary>
+            Builds an AsyncAPI JSON schema property descriptor from a CLR property, using [JsonPropertyName]
+            for the key and [Description] for the description.
+            </summary>
+        </member>
+        <member name="M:BreakfastProvider.Api.Events.IKafkaEvent.Humanize(System.String)">
+            <summary>Inserts spaces before each uppercase letter (except the first), e.g. "RecipeLog" → "Recipe Log".</summary>
+        </member>
+        <member name="M:BreakfastProvider.Api.Events.IKafkaEvent.CamelCase(System.String)">
+            <summary>Lowercases the first character, e.g. "RecipeLogEvent" → "recipeLogEvent".</summary>
+        </member>
+        <member name="T:BreakfastProvider.Api.Events.PubSubEventAsyncApiMetadata">
+            <summary>
+            AsyncAPI metadata for a Pub/Sub event, derived by convention from the event type.
+            </summary>
+        </member>
+        <member name="M:BreakfastProvider.Api.Events.IPubSubEvent.GetAsyncApiMetadata(System.Type)">
+            <summary>
+            Returns the AsyncAPI metadata for a given event type. All values are derived by convention
+            from the type name and its [Description] attribute.
+            </summary>
+        </member>
+        <member name="M:BreakfastProvider.Api.Events.IPubSubEvent.GetPropertySchema(System.Reflection.PropertyInfo)">
+            <summary>
+            Builds an AsyncAPI JSON schema property descriptor from a CLR property, using [JsonPropertyName]
+            for the key and [Description] for the description.
+            </summary>
+        </member>
+        <member name="T:BreakfastProvider.Api.Events.MessageHeaders">
+            <summary>
+            Message headers, in both legacy and CloudEvents formats.
+            </summary>
+        </member>
+        <member name="M:BreakfastProvider.Api.Events.Outbox.IOutboxWriter.WriteAsync``2(``0,``1,System.String,System.String,System.Threading.CancellationToken)">
+            <summary>
+            Atomically writes a business document and its associated outbox message
+            in a single Cosmos DB transactional batch. Both items must share the same
+            <paramref name="partitionKey"/>.
+            </summary>
+        </member>
+        <member name="M:BreakfastProvider.Api.Filters.AsyncApiDynamicConfigurationProviderFilter.PopulateChannels(ByteBard.AsyncAPI.Models.AsyncApiDocument)">
+            <summary>
+            Discovers all IKafkaEvent implementations and populates channels, messages, schemas, and operations.
+            Required because the beta version of Bielu.AspNetCore.AsyncApi uses ApiDescription-based
+            scanning which does not discover non-controller classes decorated with AsyncAPI attributes.
+            </summary>
+        </member>
+        <member name="M:BreakfastProvider.Api.Filters.AsyncApiDynamicConfigurationProviderFilter.BuildSchemaFromType(System.Type,System.String)">
+            <summary>
+            Builds a JSON schema from a CLR type by reflecting over its public instance properties.
+            Uses [JsonPropertyName] for the property key and [Description] for the description.
+            </summary>
+        </member>
+        <member name="M:BreakfastProvider.Api.Filters.AsyncApiDynamicConfigurationProviderFilter.RewriteKafkaTopicName(ByteBard.AsyncAPI.Models.AsyncApiDocument)">
+            <summary>
+            Rewrites Kafka channel names from compile-time defaults to runtime topic names.
+            Also updates operation channel/message references to match the new channel keys.
+            </summary>
+        </member>
+        <member name="M:BreakfastProvider.Api.Filters.AsyncApiDynamicConfigurationProviderFilter.RewritePubSubTopicName(ByteBard.AsyncAPI.Models.AsyncApiDocument)">
+            <summary>
+            Rewrites Pub/Sub channel names from compile-time event type names to runtime topic IDs.
+            </summary>
+        </member>
+        <member name="T:BreakfastProvider.Api.Grpc.BreakfastReflection">
+            <summary>Holder for reflection information generated from Protos/breakfast.proto</summary>
+        </member>
+        <member name="P:BreakfastProvider.Api.Grpc.BreakfastReflection.Descriptor">
+            <summary>File descriptor for Protos/breakfast.proto</summary>
+        </member>
+        <member name="F:BreakfastProvider.Api.Grpc.RecipeSummaryRequest.RecipeTypeFieldNumber">
+            <summary>Field number for the "recipe_type" field.</summary>
+        </member>
+        <member name="F:BreakfastProvider.Api.Grpc.RecipeSummaryReply.RecipeTypeFieldNumber">
+            <summary>Field number for the "recipe_type" field.</summary>
+        </member>
+        <member name="F:BreakfastProvider.Api.Grpc.RecipeSummaryReply.TotalBatchesFieldNumber">
+            <summary>Field number for the "total_batches" field.</summary>
+        </member>
+        <member name="F:BreakfastProvider.Api.Grpc.RecipeSummaryReply.CommonIngredientsFieldNumber">
+            <summary>Field number for the "common_ingredients" field.</summary>
+        </member>
+        <member name="F:BreakfastProvider.Api.Grpc.RecipeSummaryReply.LastPreparedAtFieldNumber">
+            <summary>Field number for the "last_prepared_at" field.</summary>
+        </member>
+        <member name="F:BreakfastProvider.Api.Grpc.OrderStatusRequest.OrderIdFieldNumber">
+            <summary>Field number for the "order_id" field.</summary>
+        </member>
+        <member name="F:BreakfastProvider.Api.Grpc.OrderStatusReply.OrderIdFieldNumber">
+            <summary>Field number for the "order_id" field.</summary>
+        </member>
+        <member name="F:BreakfastProvider.Api.Grpc.OrderStatusReply.StatusFieldNumber">
+            <summary>Field number for the "status" field.</summary>
+        </member>
+        <member name="F:BreakfastProvider.Api.Grpc.OrderStatusReply.CustomerNameFieldNumber">
+            <summary>Field number for the "customer_name" field.</summary>
+        </member>
+        <member name="F:BreakfastProvider.Api.Grpc.OrderStatusReply.ItemCountFieldNumber">
+            <summary>Field number for the "item_count" field.</summary>
+        </member>
+        <member name="F:BreakfastProvider.Api.Grpc.OrderStatusReply.CreatedAtFieldNumber">
+            <summary>Field number for the "created_at" field.</summary>
+        </member>
+        <member name="P:BreakfastProvider.Api.Grpc.BreakfastGrpc.Descriptor">
+            <summary>Service descriptor</summary>
+        </member>
+        <member name="T:BreakfastProvider.Api.Grpc.BreakfastGrpc.BreakfastGrpcBase">
+            <summary>Base class for server-side implementations of BreakfastGrpc</summary>
+        </member>
+        <member name="T:BreakfastProvider.Api.Grpc.BreakfastGrpc.BreakfastGrpcClient">
+            <summary>Client for BreakfastGrpc</summary>
+        </member>
+        <member name="M:BreakfastProvider.Api.Grpc.BreakfastGrpc.BreakfastGrpcClient.#ctor(Grpc.Core.ChannelBase)">
+            <summary>Creates a new client for BreakfastGrpc</summary>
+            <param name="channel">The channel to use to make remote calls.</param>
+        </member>
+        <member name="M:BreakfastProvider.Api.Grpc.BreakfastGrpc.BreakfastGrpcClient.#ctor(Grpc.Core.CallInvoker)">
+            <summary>Creates a new client for BreakfastGrpc that uses a custom <c>CallInvoker</c>.</summary>
+            <param name="callInvoker">The callInvoker to use to make remote calls.</param>
+        </member>
+        <member name="M:BreakfastProvider.Api.Grpc.BreakfastGrpc.BreakfastGrpcClient.#ctor">
+            <summary>Protected parameterless constructor to allow creation of test doubles.</summary>
+        </member>
+        <member name="M:BreakfastProvider.Api.Grpc.BreakfastGrpc.BreakfastGrpcClient.#ctor(Grpc.Core.ClientBase.ClientBaseConfiguration)">
+            <summary>Protected constructor to allow creation of configured clients.</summary>
+            <param name="configuration">The client configuration.</param>
+        </member>
+        <member name="M:BreakfastProvider.Api.Grpc.BreakfastGrpc.BreakfastGrpcClient.NewInstance(Grpc.Core.ClientBase.ClientBaseConfiguration)">
+            <summary>Creates a new instance of client from given <c>ClientBaseConfiguration</c>.</summary>
+        </member>
+        <member name="M:BreakfastProvider.Api.Grpc.BreakfastGrpc.BindService(BreakfastProvider.Api.Grpc.BreakfastGrpc.BreakfastGrpcBase)">
+            <summary>Creates service definition that can be registered with a server</summary>
+            <param name="serviceImpl">An object implementing the server-side handling logic.</param>
+        </member>
+        <member name="M:BreakfastProvider.Api.Grpc.BreakfastGrpc.BindService(Grpc.Core.ServiceBinderBase,BreakfastProvider.Api.Grpc.BreakfastGrpc.BreakfastGrpcBase)">
+            <summary>Register service method with a service binder with or without implementation. Useful when customizing the service binding logic.
+            Note: this method is part of an experimental API that can change or be removed without any prior notice.</summary>
+            <param name="serviceBinder">Service methods will be bound by calling <c>AddMethod</c> on this object.</param>
+            <param name="serviceImpl">An object implementing the server-side handling logic.</param>
+        </member>
+        <member name="T:BreakfastProvider.Api.Grpc.NotificationsReflection">
+            <summary>Holder for reflection information generated from Protos/notifications.proto</summary>
+        </member>
+        <member name="P:BreakfastProvider.Api.Grpc.NotificationsReflection.Descriptor">
+            <summary>File descriptor for Protos/notifications.proto</summary>
+        </member>
+        <member name="F:BreakfastProvider.Api.Grpc.OrderConfirmationRequest.OrderIdFieldNumber">
+            <summary>Field number for the "order_id" field.</summary>
+        </member>
+        <member name="F:BreakfastProvider.Api.Grpc.OrderConfirmationRequest.CustomerNameFieldNumber">
+            <summary>Field number for the "customer_name" field.</summary>
+        </member>
+        <member name="F:BreakfastProvider.Api.Grpc.OrderConfirmationRequest.ItemCountFieldNumber">
+            <summary>Field number for the "item_count" field.</summary>
+        </member>
+        <member name="F:BreakfastProvider.Api.Grpc.OrderConfirmationRequest.ChannelFieldNumber">
+            <summary>Field number for the "channel" field.</summary>
+        </member>
+        <member name="F:BreakfastProvider.Api.Grpc.ReservationReminderRequest.ReservationIdFieldNumber">
+            <summary>Field number for the "reservation_id" field.</summary>
+        </member>
+        <member name="F:BreakfastProvider.Api.Grpc.ReservationReminderRequest.CustomerNameFieldNumber">
+            <summary>Field number for the "customer_name" field.</summary>
+        </member>
+        <member name="F:BreakfastProvider.Api.Grpc.ReservationReminderRequest.ReservedAtFieldNumber">
+            <summary>Field number for the "reserved_at" field.</summary>
+        </member>
+        <member name="F:BreakfastProvider.Api.Grpc.ReservationReminderRequest.TableNumberFieldNumber">
+            <summary>Field number for the "table_number" field.</summary>
+        </member>
+        <member name="F:BreakfastProvider.Api.Grpc.NotificationReply.SuccessFieldNumber">
+            <summary>Field number for the "success" field.</summary>
+        </member>
+        <member name="F:BreakfastProvider.Api.Grpc.NotificationReply.NotificationIdFieldNumber">
+            <summary>Field number for the "notification_id" field.</summary>
+        </member>
+        <member name="F:BreakfastProvider.Api.Grpc.NotificationReply.MessageFieldNumber">
+            <summary>Field number for the "message" field.</summary>
+        </member>
+        <member name="P:BreakfastProvider.Api.Grpc.NotificationGrpc.Descriptor">
+            <summary>Service descriptor</summary>
+        </member>
+        <member name="T:BreakfastProvider.Api.Grpc.NotificationGrpc.NotificationGrpcClient">
+            <summary>Client for NotificationGrpc</summary>
+        </member>
+        <member name="M:BreakfastProvider.Api.Grpc.NotificationGrpc.NotificationGrpcClient.#ctor(Grpc.Core.ChannelBase)">
+            <summary>Creates a new client for NotificationGrpc</summary>
+            <param name="channel">The channel to use to make remote calls.</param>
+        </member>
+        <member name="M:BreakfastProvider.Api.Grpc.NotificationGrpc.NotificationGrpcClient.#ctor(Grpc.Core.CallInvoker)">
+            <summary>Creates a new client for NotificationGrpc that uses a custom <c>CallInvoker</c>.</summary>
+            <param name="callInvoker">The callInvoker to use to make remote calls.</param>
+        </member>
+        <member name="M:BreakfastProvider.Api.Grpc.NotificationGrpc.NotificationGrpcClient.#ctor">
+            <summary>Protected parameterless constructor to allow creation of test doubles.</summary>
+        </member>
+        <member name="M:BreakfastProvider.Api.Grpc.NotificationGrpc.NotificationGrpcClient.#ctor(Grpc.Core.ClientBase.ClientBaseConfiguration)">
+            <summary>Protected constructor to allow creation of configured clients.</summary>
+            <param name="configuration">The client configuration.</param>
+        </member>
+        <member name="M:BreakfastProvider.Api.Grpc.NotificationGrpc.NotificationGrpcClient.NewInstance(Grpc.Core.ClientBase.ClientBaseConfiguration)">
+            <summary>Creates a new instance of client from given <c>ClientBaseConfiguration</c>.</summary>
+        </member>
+        <member name="T:BreakfastProvider.Api.Reporting.EventGridWebhookController">
+            <summary>
+            Receives EventGrid events delivered via webhook subscription.
+            In production, Azure EventGrid pushes events to this endpoint.
+            In component tests, events are POSTed directly to simulate delivery.
+            </summary>
+        </member>
+        <member name="M:BreakfastProvider.Api.Reporting.EventGridWebhookController.#ctor(BreakfastProvider.Api.Reporting.IReportingIngester,Microsoft.Extensions.Logging.ILogger{BreakfastProvider.Api.Reporting.EventGridWebhookController})">
+            <summary>
+            Receives EventGrid events delivered via webhook subscription.
+            In production, Azure EventGrid pushes events to this endpoint.
+            In component tests, events are POSTed directly to simulate delivery.
+            </summary>
+        </member>
+        <member name="M:BreakfastProvider.Api.Reporting.EventGridWebhookController.ReceiveEvents(System.Text.Json.JsonElement,System.Threading.CancellationToken)">
+            <summary>
+            Processes an array of EventGrid-schema events. Supports subscription
+            validation and <c>IngredientDeliveryEvent</c> processing.
+            </summary>
+        </member>
+        <member name="T:BreakfastProvider.Api.Reporting.PubSubBatchCompletionConsumerService">
+            <summary>
+            Background service that consumes <c>PancakeBatchCompletedEvent</c> messages from
+            Google Cloud Pub/Sub and feeds them into the reporting database via
+            <see cref="T:BreakfastProvider.Api.Reporting.IReportingIngester"/>.
+            </summary>
+        </member>
+        <member name="M:BreakfastProvider.Api.Reporting.PubSubBatchCompletionConsumerService.#ctor(Microsoft.Extensions.Options.IOptions{BreakfastProvider.Api.Configuration.PubSubConfig},Microsoft.Extensions.DependencyInjection.IServiceScopeFactory,Microsoft.Extensions.Logging.ILogger{BreakfastProvider.Api.Reporting.PubSubBatchCompletionConsumerService})">
+            <summary>
+            Background service that consumes <c>PancakeBatchCompletedEvent</c> messages from
+            Google Cloud Pub/Sub and feeds them into the reporting database via
+            <see cref="T:BreakfastProvider.Api.Reporting.IReportingIngester"/>.
+            </summary>
+        </member>
+        <member name="T:BreakfastProvider.Api.Reporting.ReportingKafkaConsumerService">
+            <summary>
+            Background service that consumes RecipeLogEvent messages from Kafka
+            and feeds them into the reporting database via <see cref="T:BreakfastProvider.Api.Reporting.IReportingIngester"/>.
+            </summary>
+        </member>
+        <member name="M:BreakfastProvider.Api.Reporting.ReportingKafkaConsumerService.#ctor(Microsoft.Extensions.Options.IOptions{BreakfastProvider.Api.Configuration.KafkaConfig},Microsoft.Extensions.DependencyInjection.IServiceScopeFactory,Microsoft.Extensions.Logging.ILogger{BreakfastProvider.Api.Reporting.ReportingKafkaConsumerService})">
+            <summary>
+            Background service that consumes RecipeLogEvent messages from Kafka
+            and feeds them into the reporting database via <see cref="T:BreakfastProvider.Api.Reporting.IReportingIngester"/>.
+            </summary>
+        </member>
+        <member name="P:BreakfastProvider.Api.Storage.QueryableExtensions.FeedIteratorFactory">
+            <summary>
+            Optional factory override for creating a <see cref="T:Microsoft.Azure.Cosmos.FeedIterator`1"/> from an
+            <see cref="T:System.Linq.IQueryable`1"/>. When <c>null</c> (default), the Cosmos SDK LINQ
+            provider (<see cref="M:Microsoft.Azure.Cosmos.Linq.CosmosLinqExtensions.ToFeedIterator``1(System.Linq.IQueryable{``0})"/>) is used.
+            </summary>
+        </member>
+        <member name="M:BreakfastProvider.Api.Validators.XssValidationExtensions.DangerousContentPattern">
+            <remarks>
+            Pattern:<br/>
+            <code>&lt;[^&gt;]*&gt;|javascript:|on\\w+=</code><br/>
+            Options:<br/>
+            <code>RegexOptions.IgnoreCase</code><br/>
+            Explanation:<br/>
+            <code>
+            ○ Match with 3 alternative expressions, atomically.<br/>
+                ○ Match a sequence of expressions.<br/>
+                    ○ Match '&lt;'.<br/>
+                    ○ Match a character other than '&gt;' atomically any number of times.<br/>
+                    ○ Match '&gt;'.<br/>
+                ○ Match a sequence of expressions.<br/>
+                    ○ Match a character in the set [Jj].<br/>
+                    ○ Match a character in the set [Aa].<br/>
+                    ○ Match a character in the set [Vv].<br/>
+                    ○ Match a character in the set [Aa].<br/>
+                    ○ Match a character in the set [Ss].<br/>
+                    ○ Match a character in the set [Cc].<br/>
+                    ○ Match a character in the set [Rr].<br/>
+                    ○ Match a character in the set [Ii].<br/>
+                    ○ Match a character in the set [Pp].<br/>
+                    ○ Match a character in the set [Tt].<br/>
+                    ○ Match ':'.<br/>
+                ○ Match a sequence of expressions.<br/>
+                    ○ Match a character in the set [Oo].<br/>
+                    ○ Match a character in the set [Nn].<br/>
+                    ○ Match a word character atomically at least once.<br/>
+                    ○ Match '='.<br/>
+            </code>
+            </remarks>
+        </member>
+        <member name="T:System.Text.RegularExpressions.Generated.DangerousContentPattern_0">
+            <summary>Custom <see cref="T:System.Text.RegularExpressions.Regex"/>-derived type for the DangerousContentPattern method.</summary>
+        </member>
+        <member name="F:System.Text.RegularExpressions.Generated.DangerousContentPattern_0.Instance">
+            <summary>Cached, thread-safe singleton instance.</summary>
+        </member>
+        <member name="M:System.Text.RegularExpressions.Generated.DangerousContentPattern_0.#ctor">
+            <summary>Initializes the instance.</summary>
+        </member>
+        <member name="T:System.Text.RegularExpressions.Generated.DangerousContentPattern_0.RunnerFactory">
+            <summary>Provides a factory for creating <see cref="T:System.Text.RegularExpressions.RegexRunner"/> instances to be used by methods on <see cref="T:System.Text.RegularExpressions.Regex"/>.</summary>
+        </member>
+        <member name="M:System.Text.RegularExpressions.Generated.DangerousContentPattern_0.RunnerFactory.CreateInstance">
+            <summary>Creates an instance of a <see cref="T:System.Text.RegularExpressions.RegexRunner"/> used by methods on <see cref="T:System.Text.RegularExpressions.Regex"/>.</summary>
+        </member>
+        <member name="T:System.Text.RegularExpressions.Generated.DangerousContentPattern_0.RunnerFactory.Runner">
+            <summary>Provides the runner that contains the custom logic implementing the specified regular expression.</summary>
+        </member>
+        <member name="M:System.Text.RegularExpressions.Generated.DangerousContentPattern_0.RunnerFactory.Runner.Scan(System.ReadOnlySpan{System.Char})">
+            <summary>Scan the <paramref name="inputSpan"/> starting from base.runtextstart for the next match.</summary>
+            <param name="inputSpan">The text being scanned by the regular expression.</param>
+        </member>
+        <member name="M:System.Text.RegularExpressions.Generated.DangerousContentPattern_0.RunnerFactory.Runner.TryFindNextPossibleStartingPosition(System.ReadOnlySpan{System.Char})">
+            <summary>Search <paramref name="inputSpan"/> starting from base.runtextpos for the next location a match could possibly start.</summary>
+            <param name="inputSpan">The text being scanned by the regular expression.</param>
+            <returns>true if a possible match was found; false if no more matches are possible.</returns>
+        </member>
+        <member name="M:System.Text.RegularExpressions.Generated.DangerousContentPattern_0.RunnerFactory.Runner.TryMatchAtCurrentPosition(System.ReadOnlySpan{System.Char})">
+            <summary>Determine whether <paramref name="inputSpan"/> at base.runtextpos is a match for the regular expression.</summary>
+            <param name="inputSpan">The text being scanned by the regular expression.</param>
+            <returns>true if the regular expression matches at the current position; otherwise, false.</returns>
+        </member>
+        <member name="T:System.Text.RegularExpressions.Generated.Utilities">
+            <summary>Helper methods used by generated <see cref="T:System.Text.RegularExpressions.Regex"/>-derived implementations.</summary>
+        </member>
+        <member name="F:System.Text.RegularExpressions.Generated.Utilities.s_defaultTimeout">
+            <summary>Default timeout value set in <see cref="T:System.AppContext"/>, or <see cref="F:System.Text.RegularExpressions.Regex.InfiniteMatchTimeout"/> if none was set.</summary>
+        </member>
+        <member name="F:System.Text.RegularExpressions.Generated.Utilities.s_hasTimeout">
+            <summary>Whether <see cref="F:System.Text.RegularExpressions.Generated.Utilities.s_defaultTimeout"/> is non-infinite.</summary>
+        </member>
+        <member name="M:System.Text.RegularExpressions.Generated.Utilities.IsWordChar(System.Char)">
+            <summary>Determines whether the character is part of the [\w] set.</summary>
+        </member>
+        <member name="F:System.Text.RegularExpressions.Generated.Utilities.WordCategoriesMask">
+            <summary>Provides a mask of Unicode categories that combine to form [\w].</summary>
+        </member>
+        <member name="P:System.Text.RegularExpressions.Generated.Utilities.WordCharBitmap">
+            <summary>Gets a bitmap for whether each character 0 through 127 is in [\w]</summary>
+        </member>
+        <member name="F:System.Text.RegularExpressions.Generated.Utilities.s_ascii_100084000000840000">
+            <summary>Supports searching for characters in or not in "&lt;JOjo".</summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OpenApi.Generated.DocumentationCommentIdHelper.CreateDocumentationId(System.Type)">
+            <summary>
+            Generates a documentation comment ID for a type.
+            Example: T:Namespace.Outer+Inner`1 becomes T:Namespace.Outer.Inner`1
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OpenApi.Generated.DocumentationCommentIdHelper.CreateDocumentationId(System.Reflection.PropertyInfo)">
+            <summary>
+            Generates a documentation comment ID for a property.
+            Example: P:Namespace.ContainingType.PropertyName or for an indexer P:Namespace.ContainingType.Item(System.Int32)
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OpenApi.Generated.DocumentationCommentIdHelper.CreateDocumentationId(System.Type,System.String)">
+            <summary>
+            Generates a documentation comment ID for a property given its container type and property name.
+            Example: P:Namespace.ContainingType.PropertyName
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OpenApi.Generated.DocumentationCommentIdHelper.CreateDocumentationId(System.Reflection.MethodInfo)">
+            <summary>
+            Generates a documentation comment ID for a method (or constructor).
+            For example:
+              M:Namespace.ContainingType.MethodName(ParamType1,ParamType2)~ReturnType
+              M:Namespace.ContainingType.#ctor(ParamType)
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OpenApi.Generated.DocumentationCommentIdHelper.GetTypeDocId(System.Type,System.Boolean,System.Boolean)">
+            <summary>
+            Generates a documentation ID string for a type.
+            This method handles nested types (replacing '+' with '.'),
+            generic types, arrays, pointers, by-ref types, and generic parameters.
+            The <paramref name="includeGenericArguments"/> flag controls whether
+            constructed generic type arguments are emitted, while <paramref name="omitGenericArity"/>
+            controls whether the generic arity marker (e.g. "`1") is appended.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OpenApi.Generated.DocumentationCommentIdHelper.NormalizeDocId(System.String)">
+            <summary>
+            Normalizes a documentation comment ID to match the compiler-style format.
+            Strips the return type suffix for ordinary methods but retains it for conversion operators.
+            </summary>
+            <param name="docId">The documentation comment ID to normalize.</param>
+            <returns>The normalized documentation comment ID.</returns>
+        </member>
+    </members>
+</doc>

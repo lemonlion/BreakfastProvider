@@ -27,14 +27,14 @@ public class GetStaffSteps(RequestContext context)
     public async Task ParseResponse()
     {
         var content = await ResponseMessage!.Content.ReadAsStringAsync();
-        Json.IsValid(content).Should().BeTrue();
+        Track.That(() => Json.IsValid(content).Should().BeTrue());
         Response = Json.Deserialize<TestStaffMemberResponse>(content)!;
     }
 
     public async Task ParseListResponse()
     {
         var content = await ResponseMessage!.Content.ReadAsStringAsync();
-        Json.IsValid(content).Should().BeTrue();
+        Track.That(() => Json.IsValid(content).Should().BeTrue());
         ListResponse = Json.Deserialize<List<TestStaffMemberResponse>>(content)!;
     }
 }

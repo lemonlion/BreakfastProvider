@@ -27,14 +27,14 @@ public class OutboxSteps(ICosmosRepository<OutboxMessage> outboxRepository)
 
     public void AssertOutboxContainsMessageForEventType(string eventType)
     {
-        OutboxMessages.Should().Contain(m => m.EventType == eventType,
-            $"an outbox message should exist for event type '{eventType}'");
+        Track.That(() => OutboxMessages.Should().Contain(m => m.EventType == eventType,
+            $"an outbox message should exist for event type '{eventType}'"));
     }
 
     public void AssertOutboxMessageWasProcessed(string eventType)
     {
-        OutboxMessages.Should().Contain(m =>
+        Track.That(() => OutboxMessages.Should().Contain(m =>
             m.EventType == eventType && m.Status == OutboxStatuses.Processed,
-            $"an outbox message for '{eventType}' should have been processed");
+            $"an outbox message for '{eventType}' should have been processed"));
     }
 }

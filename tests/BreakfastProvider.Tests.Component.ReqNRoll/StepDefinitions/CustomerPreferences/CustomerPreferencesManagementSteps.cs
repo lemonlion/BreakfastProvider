@@ -31,7 +31,7 @@ public class CustomerPreferencesManagementSteps(
     {
         GivenAValidCustomerPreferenceRequest();
         await putSteps.Send(_customerId);
-        putSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
+        Track.That(() => putSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
         await putSteps.ParseResponse();
     }
 
@@ -76,36 +76,36 @@ public class CustomerPreferencesManagementSteps(
     [Then("the preference response should contain the saved preferences")]
     public async Task ThenThePreferenceResponseShouldContainTheSavedPreferences()
     {
-        putSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
+        Track.That(() => putSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
         await putSteps.ParseResponse();
-        putSteps.Response!.PreferredMilkType.Should().Be("Oat");
-        putSteps.Response!.FavouriteItem.Should().Be("Blueberry Pancakes");
+        Track.That(() => putSteps.Response!.PreferredMilkType.Should().Be("Oat"));
+        Track.That(() => putSteps.Response!.FavouriteItem.Should().Be("Blueberry Pancakes"));
     }
 
     [Then("the preference get response should contain the preferences")]
     public async Task ThenThePreferenceGetResponseShouldContainThePreferences()
     {
-        getSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
+        Track.That(() => getSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
         await getSteps.ParseResponse();
-        getSteps.Response!.CustomerId.Should().Be(_customerId);
-        getSteps.Response!.PreferredMilkType.Should().Be("Oat");
-        getSteps.Response!.LikesExtraToppings.Should().BeTrue();
+        Track.That(() => getSteps.Response!.CustomerId.Should().Be(_customerId));
+        Track.That(() => getSteps.Response!.PreferredMilkType.Should().Be("Oat"));
+        Track.That(() => getSteps.Response!.LikesExtraToppings.Should().BeTrue());
     }
 
     [Then("the preference update response should contain the updated values")]
     public async Task ThenThePreferenceUpdateResponseShouldContainTheUpdatedValues()
     {
-        putSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
+        Track.That(() => putSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
         await putSteps.ParseResponse();
-        putSteps.Response!.PreferredMilkType.Should().Be("Almond");
-        putSteps.Response!.FavouriteItem.Should().Be("Belgian Waffles");
+        Track.That(() => putSteps.Response!.PreferredMilkType.Should().Be("Almond"));
+        Track.That(() => putSteps.Response!.FavouriteItem.Should().Be("Belgian Waffles"));
     }
 
     [Then("the preference get response should indicate not found")]
     public void ThenThePreferenceGetResponseShouldIndicateNotFound()
-        => getSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.NotFound);
+        => Track.That(() => getSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.NotFound));
 
     [Then("the preference response should indicate bad request")]
     public void ThenThePreferenceResponseShouldIndicateBadRequest()
-        => putSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        => Track.That(() => putSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.BadRequest));
 }

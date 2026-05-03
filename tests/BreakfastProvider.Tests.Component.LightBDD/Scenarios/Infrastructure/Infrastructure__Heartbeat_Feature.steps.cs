@@ -37,17 +37,17 @@ public partial class Infrastructure__Heartbeat_Feature : BaseFixture
     }
 
     private async Task The_heartbeat_response_status_should_be_ok()
-        => _heartbeatResponse!.StatusCode.Should().Be(HttpStatusCode.OK);
+        => Track.That(() => _heartbeatResponse!.StatusCode.Should().Be(HttpStatusCode.OK));
 
     private async Task The_heartbeat_response_should_be_valid_json()
     {
         var content = await _heartbeatResponse!.Content.ReadAsStringAsync();
         _heartbeatResult = Json.Deserialize<TestHeartbeatResponse>(content);
-        _heartbeatResult.Should().NotBeNull();
+        Track.That(() => _heartbeatResult.Should().NotBeNull());
     }
 
     private async Task The_heartbeat_status_should_be_ok()
-        => _heartbeatResult!.Status.Should().Be(Documentation.HeartbeatStatus);
+        => Track.That(() => _heartbeatResult!.Status.Should().Be(Documentation.HeartbeatStatus));
 
     #endregion
 

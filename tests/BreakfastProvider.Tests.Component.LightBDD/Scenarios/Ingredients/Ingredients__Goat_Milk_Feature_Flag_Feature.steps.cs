@@ -56,12 +56,12 @@ public partial class Ingredients__Goat_Milk_Feature_Flag_Feature : BaseFixture
     }
 
     private async Task The_goat_milk_response_http_status_should_be_not_found()
-        => _goatMilkSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.NotFound);
+        => Track.That(() => _goatMilkSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.NotFound));
 
     private async Task The_goat_milk_error_should_indicate_feature_disabled()
     {
-        var content = await _goatMilkSteps.ResponseMessage!.Content.ReadAsStringAsync();
-        content.Should().Contain(DownstreamErrorMessages.FeatureDisabled);
+        var goatMilkFeatureDisabledResponseBody = await _goatMilkSteps.ResponseMessage!.Content.ReadAsStringAsync();
+        Track.That(() => goatMilkFeatureDisabledResponseBody.Should().Contain(DownstreamErrorMessages.FeatureDisabled));
     }
 
     private async Task<CompositeStep> The_goat_milk_response_should_contain_fresh_goat_milk()
@@ -72,10 +72,10 @@ public partial class Ingredients__Goat_Milk_Feature_Flag_Feature : BaseFixture
     }
 
     private async Task The_goat_milk_response_http_status_should_be_ok()
-        => _goatMilkSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
+        => Track.That(() => _goatMilkSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
 
     private async Task The_goat_milk_should_be_fresh()
-        => _goatMilkSteps.GoatMilkResponse.GoatMilk.Should().Be(GoatServiceDefaults.FreshGoatMilk);
+        => Track.That(() => _goatMilkSteps.GoatMilkResponse.GoatMilk.Should().Be(GoatServiceDefaults.FreshGoatMilk));
 
     #endregion
 }

@@ -39,13 +39,14 @@ public partial class OpenApi__Specification_Feature : BaseFixture
 
     private async Task The_response_status_should_be_ok()
     {
-        _swaggerResponse!.StatusCode.Should().Be(HttpStatusCode.OK);
+        Track.That(() => _swaggerResponse!.StatusCode.Should().Be(HttpStatusCode.OK));
     }
 
     private async Task The_response_should_be_valid_json()
     {
         _swaggerJsonString = await _swaggerResponse!.Content.ReadAsStringAsync();
-        Json.TryParse(_swaggerJsonString, out _swaggerJson).Should().BeTrue();
+        var openApiResponseIsValidJson = Json.TryParse(_swaggerJsonString, out _swaggerJson);
+        Track.That(() => openApiResponseIsValidJson.Should().BeTrue());
     }
 
     private async Task<CompositeStep> The_response_should_contain_all_the_endpoints()
@@ -66,7 +67,7 @@ public partial class OpenApi__Specification_Feature : BaseFixture
 
     private async Task The_response_should_contain_the_endpoint_PATH(string path)
     {
-        _swaggerJson!.RootElement.GetProperty("paths").GetProperty(path).Should().NotBeNull();
+        Track.That(() => _swaggerJson!.RootElement.GetProperty("paths").GetProperty(path).Should().NotBeNull());
     }
     private async Task<CompositeStep> The_openapi_spec_is_written_to_disk()
     {

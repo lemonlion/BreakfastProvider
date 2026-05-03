@@ -27,14 +27,14 @@ public class GetFeedbackSteps(RequestContext context)
     public async Task ParseResponse()
     {
         var content = await ResponseMessage!.Content.ReadAsStringAsync();
-        Json.IsValid(content).Should().BeTrue();
+        Track.That(() => Json.IsValid(content).Should().BeTrue());
         Response = Json.Deserialize<TestFeedbackResponse>(content)!;
     }
 
     public async Task ParseListResponse()
     {
         var content = await ResponseMessage!.Content.ReadAsStringAsync();
-        Json.IsValid(content).Should().BeTrue();
+        Track.That(() => Json.IsValid(content).Should().BeTrue());
         ListResponse = Json.Deserialize<List<TestFeedbackResponse>>(content)!;
     }
 }

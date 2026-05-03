@@ -1,4 +1,5 @@
 global using AwesomeAssertions;
+global using TestTrackingDiagrams.Tracking;
 global using Xunit;
 global using BreakfastProvider.Tests.Component.LightBDD.Infrastructure;
 global using BreakfastProvider.Tests.Component.Shared.Infrastructure.Configuration;

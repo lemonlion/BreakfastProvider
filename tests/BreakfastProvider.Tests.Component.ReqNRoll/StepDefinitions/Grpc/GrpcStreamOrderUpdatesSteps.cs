@@ -38,16 +38,16 @@ public class GrpcStreamOrderUpdatesSteps(
     [Then("the streamed response should contain the order status")]
     public void ThenTheStreamedResponseShouldContainTheOrderStatus()
     {
-        _grpcSteps.StreamedReplies.Should().HaveCount(1);
-        _grpcSteps.StreamedReplies[0].OrderId.Should().Be(orderSteps.Response!.OrderId.ToString());
-        _grpcSteps.StreamedReplies[0].CustomerName.Should().Be(orderSteps.Request.CustomerName);
-        _grpcSteps.StreamedReplies[0].Status.Should().Be(OrderStatuses.Created);
+        Track.That(() => _grpcSteps.StreamedReplies.Should().HaveCount(1));
+        Track.That(() => _grpcSteps.StreamedReplies[0].OrderId.Should().Be(orderSteps.Response!.OrderId.ToString()));
+        Track.That(() => _grpcSteps.StreamedReplies[0].CustomerName.Should().Be(orderSteps.Request.CustomerName));
+        Track.That(() => _grpcSteps.StreamedReplies[0].Status.Should().Be(OrderStatuses.Created));
     }
 
     [Then("the gRPC stream should return a not found error")]
     public void ThenTheGrpcStreamShouldReturnANotFoundError()
     {
-        _grpcSteps.RpcException.Should().NotBeNull();
-        _grpcSteps.RpcException!.StatusCode.Should().Be(StatusCode.NotFound);
+        Track.That(() => _grpcSteps.RpcException.Should().NotBeNull());
+        Track.That(() => _grpcSteps.RpcException!.StatusCode.Should().Be(StatusCode.NotFound));
     }
 }

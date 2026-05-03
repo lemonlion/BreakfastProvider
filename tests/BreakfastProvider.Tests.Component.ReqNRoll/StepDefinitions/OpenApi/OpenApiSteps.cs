@@ -1,9 +1,6 @@
 using System.Net;
 using System.Text;
-using System.Text.Encodings.Web;
 using System.Text.Json;
-using System.Text.Json.Nodes;
-using System.Text.Json.Serialization;
 using BreakfastProvider.Tests.Component.ReqNRoll.Support;
 using BreakfastProvider.Tests.Component.Shared.Constants;
 using BreakfastProvider.Tests.Component.Shared.Util;
@@ -25,7 +22,6 @@ public class ApiSpecificationSteps(AppManager appManager)
     private string? _scalarHtml;
     private HttpResponseMessage? _asyncApiResponse;
     private string? _asyncApiJsonString;
-    private string? _asyncApiJsonStringToPublish;
     private JsonDocument? _asyncApiJson;
 
     // ── OpenAPI When ──
@@ -71,15 +67,17 @@ public class ApiSpecificationSteps(AppManager appManager)
     {
         if (_swaggerResponse != null)
         {
-            _swaggerResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+            Track.That(() => _swaggerResponse.StatusCode.Should().Be(HttpStatusCode.OK));
             _swaggerJsonString = await _swaggerResponse.Content.ReadAsStringAsync();
-            Json.TryParse(_swaggerJsonString, out _swaggerJson).Should().BeTrue();
+            var openApiResponseIsValidJson = Json.TryParse(_swaggerJsonString, out _swaggerJson);
+            Track.That(() => openApiResponseIsValidJson.Should().BeTrue());
         }
         else if (_asyncApiResponse != null)
         {
-            _asyncApiResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+            Track.That(() => _asyncApiResponse.StatusCode.Should().Be(HttpStatusCode.OK));
             _asyncApiJsonString = await _asyncApiResponse.Content.ReadAsStringAsync();
-            Json.TryParse(_asyncApiJsonString, out _asyncApiJson).Should().BeTrue();
+            var asyncApiResponseIsValidJson = Json.TryParse(_asyncApiJsonString, out _asyncApiJson);
+            Track.That(() => asyncApiResponseIsValidJson.Should().BeTrue());
         }
     }
 
@@ -89,17 +87,17 @@ public class ApiSpecificationSteps(AppManager appManager)
     public void ThenTheResponseShouldContainAllTheEndpoints()
     {
         var paths = _swaggerJson!.RootElement.GetProperty("paths");
-        paths.GetProperty(Endpoints.Swagger.PancakesPath).Should().NotBeNull();
-        paths.GetProperty(Endpoints.Swagger.WafflesPath).Should().NotBeNull();
-        paths.GetProperty(Endpoints.Swagger.OrdersPath).Should().NotBeNull();
-        paths.GetProperty(Endpoints.Swagger.OrderByIdPath).Should().NotBeNull();
-        paths.GetProperty(Endpoints.Swagger.ToppingsPath).Should().NotBeNull();
-        paths.GetProperty(Endpoints.Swagger.MenuPath).Should().NotBeNull();
-        paths.GetProperty(Endpoints.Swagger.MilkPath).Should().NotBeNull();
-        paths.GetProperty(Endpoints.Swagger.EggsPath).Should().NotBeNull();
-        paths.GetProperty(Endpoints.Swagger.FlourPath).Should().NotBeNull();
-        paths.GetProperty(Endpoints.Swagger.GoatMilkPath).Should().NotBeNull();
-        paths.GetProperty(Endpoints.Swagger.AuditLogsPath).Should().NotBeNull();
+        Track.That(() => paths.GetProperty(Endpoints.Swagger.PancakesPath).Should().NotBeNull());
+        Track.That(() => paths.GetProperty(Endpoints.Swagger.WafflesPath).Should().NotBeNull());
+        Track.That(() => paths.GetProperty(Endpoints.Swagger.OrdersPath).Should().NotBeNull());
+        Track.That(() => paths.GetProperty(Endpoints.Swagger.OrderByIdPath).Should().NotBeNull());
+        Track.That(() => paths.GetProperty(Endpoints.Swagger.ToppingsPath).Should().NotBeNull());
+        Track.That(() => paths.GetProperty(Endpoints.Swagger.MenuPath).Should().NotBeNull());
+        Track.That(() => paths.GetProperty(Endpoints.Swagger.MilkPath).Should().NotBeNull());
+        Track.That(() => paths.GetProperty(Endpoints.Swagger.EggsPath).Should().NotBeNull());
+        Track.That(() => paths.GetProperty(Endpoints.Swagger.FlourPath).Should().NotBeNull());
+        Track.That(() => paths.GetProperty(Endpoints.Swagger.GoatMilkPath).Should().NotBeNull());
+        Track.That(() => paths.GetProperty(Endpoints.Swagger.AuditLogsPath).Should().NotBeNull());
     }
 
     [Then("the openapi spec is written to disk")]
@@ -126,10 +124,11 @@ public class ApiSpecificationSteps(AppManager appManager)
     [Then("the response should be a valid scalar page")]
     public async Task ThenTheResponseShouldBeAValidScalarPage()
     {
-        _scalarResponse!.StatusCode.Should().Be(HttpStatusCode.OK);
+        Track.That(() => _scalarResponse!.StatusCode.Should().Be(HttpStatusCode.OK));
         _scalarHtml = await _scalarResponse.Content.ReadAsStringAsync();
-        _scalarHtml.Should().Contain("<html");
-        _scalarHtml.Should().Contain("scalar");
+        var scalarUiResponseBody = _scalarHtml;
+        Track.That(() => scalarUiResponseBody.Should().Contain("<html"));
+        Track.That(() => scalarUiResponseBody.Should().Contain("scalar"));
     }
 
     // ── AsyncAPI Then ──
@@ -137,37 +136,13 @@ public class ApiSpecificationSteps(AppManager appManager)
     [Then("the asyncapi spec is written to disk")]
     public async Task ThenTheAsyncapiSpecIsWrittenToDisk()
     {
-        // Add x-pub-settings section
-        var openApiDocument = (JsonObject)JsonNode.Parse(_asyncApiJsonString!)!;
-        var serializationOptions = new JsonSerializerOptions(Json.SerializerOptions)
-        {
-            Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
-            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
-        };
-
-        openApiDocument.Add("x-pub-settings", new JsonObject
-        {
-            { "pub-ready", true },
-            { "tags", new JsonArray { "Breakfast" } },
-            { "team", "Griddle" }
-        });
-
-        _asyncApiJsonStringToPublish = JsonSerializer.Serialize(openApiDocument, serializationOptions);
-        _asyncApiJson = JsonDocument.Parse(_asyncApiJsonStringToPublish);
-
         // Verify required sections
-        _asyncApiJson.RootElement.GetProperty("asyncapi").Should().NotBeNull();
-        _asyncApiJson.RootElement.GetProperty("info").Should().NotBeNull();
-        _asyncApiJson.RootElement.GetProperty("defaultContentType").Should().NotBeNull();
-        _asyncApiJson.RootElement.GetProperty("channels").Should().NotBeNull();
-        _asyncApiJson.RootElement.GetProperty("operations").Should().NotBeNull();
-        _asyncApiJson.RootElement.GetProperty("components").Should().NotBeNull();
-
-        // Verify x-pub-settings
-        var xPubSettings = _asyncApiJson.RootElement.GetProperty("x-pub-settings");
-        xPubSettings.GetProperty("pub-ready").GetBoolean().Should().BeTrue();
-        xPubSettings.GetProperty("team").GetString().Should().Be("Griddle");
-        xPubSettings.GetProperty("tags").EnumerateArray().Should().OnlyContain(x => x.GetString() == "Breakfast");
+        Track.That(() => _asyncApiJson!.RootElement.GetProperty("asyncapi").Should().NotBeNull());
+        Track.That(() => _asyncApiJson.RootElement.GetProperty("info").Should().NotBeNull());
+        Track.That(() => _asyncApiJson.RootElement.GetProperty("defaultContentType").Should().NotBeNull());
+        Track.That(() => _asyncApiJson.RootElement.GetProperty("channels").Should().NotBeNull());
+        Track.That(() => _asyncApiJson.RootElement.GetProperty("operations").Should().NotBeNull());
+        Track.That(() => _asyncApiJson.RootElement.GetProperty("components").Should().NotBeNull());
 
         // Write to disk
         var path = $"{AsyncApiSpecs.SpecificationsFolderPath}{AsyncApiSpecs.JsonFileName}";
@@ -176,7 +151,7 @@ public class ApiSpecificationSteps(AppManager appManager)
         {
             try
             {
-                await File.WriteAllTextAsync(path, _asyncApiJsonStringToPublish, Encoding.UTF8);
+                await File.WriteAllTextAsync(path, _asyncApiJsonString, Encoding.UTF8);
                 return;
             }
             catch (IOException) when (attempt < maxRetries)

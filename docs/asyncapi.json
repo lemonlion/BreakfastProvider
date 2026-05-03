@@ -722,12 +722,5 @@
         "summary": "Published when a waffle batch is completed."
       }
     }
-  },
-  "x-pub-settings": {
-    "pub-ready": true,
-    "tags": [
-      "Breakfast"
-    ],
-    "team": "Griddle"
   }
 }

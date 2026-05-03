@@ -44,24 +44,24 @@ public partial class Menu__Availability_Feature : BaseFixture
     }
 
     private async Task The_menu_response_http_status_should_be_ok()
-        => _menuSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
+        => Track.That(() => _menuSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
 
     private async Task The_menu_list_should_be_valid_json()
         => await _menuSteps.ParseResponse();
 
     private async Task The_menu_should_contain_classic_pancakes()
-        => _menuSteps.Response!.Should().Contain(m => m.Name == MenuDefaults.ClassicPancakes);
+        => Track.That(() => _menuSteps.Response!.Should().Contain(m => m.Name == MenuDefaults.ClassicPancakes));
 
     private async Task The_menu_should_contain_belgian_waffles()
-        => _menuSteps.Response!.Should().Contain(m => m.Name == MenuDefaults.BelgianWaffles);
+        => Track.That(() => _menuSteps.Response!.Should().Contain(m => m.Name == MenuDefaults.BelgianWaffles));
 
     private async Task The_menu_should_contain_goat_milk_pancakes()
-        => _menuSteps.Response!.Should().Contain(m => m.Name == MenuDefaults.GoatMilkPancakes);
+        => Track.That(() => _menuSteps.Response!.Should().Contain(m => m.Name == MenuDefaults.GoatMilkPancakes));
 
     private async Task The_menu_items_should_be_in_alphabetical_order()
     {
         await _menuSteps.ParseResponse();
-        _menuSteps.Response!.Should().BeInAscendingOrder(m => m.Name);
+        Track.That(() => _menuSteps.Response!.Should().BeInAscendingOrder(m => m.Name));
     }
 
     [SkipStepIf(nameof(Settings.RunAgainstExternalServiceUnderTest), DownstreamFakeRequestStoreIsUnavailableInPostDeploymentEnvironments)]

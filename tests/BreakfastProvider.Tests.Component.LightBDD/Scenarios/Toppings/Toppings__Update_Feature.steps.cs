@@ -89,22 +89,22 @@ public partial class Toppings__Update_Feature : BaseFixture
     }
 
     private async Task The_update_response_http_status_should_be_ok()
-        => _putSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
+        => Track.That(() => _putSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
 
     private async Task The_update_response_should_be_valid_json()
         => await _putSteps.ParseResponse();
 
     private async Task The_updated_topping_should_have_the_correct_id()
-        => _putSteps.Response!.ToppingId.Should().Be(KnownBlueberryToppingId);
+        => Track.That(() => _putSteps.Response!.ToppingId.Should().Be(KnownBlueberryToppingId));
 
     private async Task The_updated_topping_should_have_the_correct_name()
-        => _putSteps.Response!.Name.Should().Be(ToppingDefaults.Strawberries);
+        => Track.That(() => _putSteps.Response!.Name.Should().Be(ToppingDefaults.Strawberries));
 
     private async Task The_updated_topping_should_have_the_correct_category()
-        => _putSteps.Response!.Category.Should().Be(ToppingDefaults.FruitCategory);
+        => Track.That(() => _putSteps.Response!.Category.Should().Be(ToppingDefaults.FruitCategory));
 
     private async Task The_update_response_should_indicate_not_found()
-        => _putSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.NotFound);
+        => Track.That(() => _putSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.NotFound));
 
     private async Task The_update_responses_should_each_contain_the_validation_error_for_the_invalid_field(
         VerifiableDataTable<VerifiableErrorResult> expectedOutputs)

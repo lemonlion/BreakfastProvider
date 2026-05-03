@@ -60,19 +60,19 @@ public partial class Orders__Breakfast_Order_Feature : BaseFixture
         => await _milkSteps.Retrieve();
 
     private async Task The_milk_response_should_be_successful()
-        => _milkSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
+        => Track.That(() => _milkSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
 
     private async Task Eggs_are_retrieved_from_the_eggs_endpoint()
         => await _eggsSteps.Retrieve();
 
     private async Task The_eggs_response_should_be_successful()
-        => _eggsSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
+        => Track.That(() => _eggsSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
 
     private async Task Flour_is_retrieved_from_the_flour_endpoint()
         => await _flourSteps.Retrieve();
 
     private async Task The_flour_response_should_be_successful()
-        => _flourSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
+        => Track.That(() => _flourSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
 
     private async Task A_pancake_request_is_submitted_with_all_ingredients()
     {
@@ -87,10 +87,10 @@ public partial class Orders__Breakfast_Order_Feature : BaseFixture
 
     private async Task The_pancake_batch_response_should_be_successful()
     {
-        _pancakeSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
+        Track.That(() => _pancakeSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created));
         await _pancakeSteps.ParseResponse();
-        _pancakeSteps.Response.Should().NotBeNull();
-        _pancakeSteps.Response!.BatchId.Should().NotBeEmpty();
+        Track.That(() => _pancakeSteps.Response.Should().NotBeNull());
+        Track.That(() => _pancakeSteps.Response!.BatchId.Should().NotBeEmpty());
     }
 
     private async Task The_batch_id_is_captured_from_the_pancakes_response()
@@ -130,16 +130,16 @@ public partial class Orders__Breakfast_Order_Feature : BaseFixture
     }
 
     private async Task The_order_response_http_status_should_be_created()
-        => _orderSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
+        => Track.That(() => _orderSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created));
 
     private async Task The_order_response_should_be_valid_json()
         => await _orderSteps.ParseResponse();
 
     private async Task The_order_should_contain_the_customer_name()
-        => _orderSteps.Response!.CustomerName.Should().Be(_customerName);
+        => Track.That(() => _orderSteps.Response!.CustomerName.Should().Be(_customerName));
 
     private async Task The_order_should_contain_the_ordered_items()
-        => _orderSteps.Response!.Items.Should().HaveCount(1);
+        => Track.That(() => _orderSteps.Response!.Items.Should().HaveCount(1));
 
     [SkipStepIf(nameof(Settings.RunAgainstExternalServiceUnderTest), EventStoreIsUnavailableInPostDeploymentEnvironments)]
     private async Task An_order_created_event_should_have_been_published()
@@ -150,16 +150,16 @@ public partial class Orders__Breakfast_Order_Feature : BaseFixture
         const int maxRetries = 100;
         var retryDelay = TimeSpan.FromMilliseconds(300);
 
-        IReadOnlyList<TestOrderCreatedEvent> events = [];
+        IReadOnlyList<TestOrderCreatedEvent> orderCreatedEvents = [];
         for (var i = 0; i < maxRetries; i++)
         {
-            events = await eventStore.GetPublishedEventsAsync<TestOrderCreatedEvent>();
-            if (events.Any(e => e.CustomerName == _customerName))
+            orderCreatedEvents = await eventStore.GetPublishedEventsAsync<TestOrderCreatedEvent>();
+            if (orderCreatedEvents.Any(e => e.CustomerName == _customerName))
                 return;
             await Task.Delay(retryDelay);
         }
 
-        events.Should().Contain(e => e.CustomerName == _customerName);
+        Track.That(() => orderCreatedEvents.Should().Contain(e => e.CustomerName == _customerName));
     }
 
     [SkipStepIf(nameof(Settings.RunAgainstExternalServiceUnderTest), DownstreamFakeRequestStoreIsUnavailableInPostDeploymentEnvironments)]
@@ -175,17 +175,17 @@ public partial class Orders__Breakfast_Order_Feature : BaseFixture
         const int maxRetries = 50;
         var retryDelay = TimeSpan.FromMilliseconds(200);
 
-        IReadOnlyList<(string Key, TestRecipeLogEvent Message)> messages = [];
+        IReadOnlyList<(string Key, TestRecipeLogEvent Message)> recipeLogMessages = [];
         for (var i = 0; i < maxRetries; i++)
         {
-            messages = kafkaStore.GetMessages<TestRecipeLogEvent>();
-            if (messages.Any(m => m.Message.RecipeType == OrderDefaults.PancakeItemType))
+            recipeLogMessages = kafkaStore.GetMessages<TestRecipeLogEvent>();
+            if (recipeLogMessages.Any(m => m.Message.RecipeType == OrderDefaults.PancakeItemType))
                 return;
             await Task.Delay(retryDelay);
         }
 
-        messages.Should().Contain(m => m.Message.RecipeType == OrderDefaults.PancakeItemType,
-            "a RecipeLogEvent should have been published for the pancake recipe");
+        Track.That(() => recipeLogMessages.Should().Contain(m => m.Message.RecipeType == OrderDefaults.PancakeItemType,
+            "a RecipeLogEvent should have been published for the pancake recipe"));
     }
 
     [SkipStepIf(nameof(Settings.RunAgainstExternalServiceUnderTest), OutboxStoreIsUnavailableInPostDeploymentEnvironments)]

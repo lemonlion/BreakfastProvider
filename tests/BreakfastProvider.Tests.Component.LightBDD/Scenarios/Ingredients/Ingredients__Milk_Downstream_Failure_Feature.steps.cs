@@ -47,12 +47,12 @@ public partial class Ingredients__Milk_Downstream_Failure_Feature : BaseFixture
     }
 
     private async Task The_milk_response_http_status_should_be_bad_gateway()
-        => _milkSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.BadGateway);
+        => Track.That(() => _milkSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.BadGateway));
 
     private async Task The_milk_error_should_indicate_cow_service_unavailable()
     {
-        var content = await _milkSteps.ResponseMessage!.Content.ReadAsStringAsync();
-        content.Should().Contain(DownstreamErrorMessages.CowServiceUnavailableTitle);
+        var milkErrorResponseBody = await _milkSteps.ResponseMessage!.Content.ReadAsStringAsync();
+        Track.That(() => milkErrorResponseBody.Should().Contain(DownstreamErrorMessages.CowServiceUnavailableTitle));
     }
 
     #endregion

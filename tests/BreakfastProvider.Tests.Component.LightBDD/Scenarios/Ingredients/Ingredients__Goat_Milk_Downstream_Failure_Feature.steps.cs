@@ -44,12 +44,12 @@ public partial class Ingredients__Goat_Milk_Downstream_Failure_Feature : BaseFix
     }
 
     private async Task The_goat_milk_response_http_status_should_be_bad_gateway()
-        => _goatMilkSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.BadGateway);
+        => Track.That(() => _goatMilkSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.BadGateway));
 
     private async Task The_goat_milk_error_should_indicate_goat_service_unavailable()
     {
-        var content = await _goatMilkSteps.ResponseMessage!.Content.ReadAsStringAsync();
-        content.Should().Contain(DownstreamErrorMessages.GoatServiceUnavailableTitle);
+        var goatMilkErrorResponseBody = await _goatMilkSteps.ResponseMessage!.Content.ReadAsStringAsync();
+        Track.That(() => goatMilkErrorResponseBody.Should().Contain(DownstreamErrorMessages.GoatServiceUnavailableTitle));
     }
 
     #endregion

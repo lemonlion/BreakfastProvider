@@ -42,10 +42,10 @@ public class BreakfastOrderSteps(
     [Then("the order response should contain a complete order")]
     public async Task ThenTheOrderResponseShouldContainACompleteOrder()
     {
-        orderSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
+        Track.That(() => orderSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created));
         await orderSteps.ParseResponse();
-        orderSteps.Response!.CustomerName.Should().Be(_customerName);
-        orderSteps.Response!.Items.Should().HaveCount(1);
+        Track.That(() => orderSteps.Response!.CustomerName.Should().Be(_customerName));
+        Track.That(() => orderSteps.Response!.Items.Should().HaveCount(1));
     }
 
     [Then("an order created event should have been published")]
@@ -54,21 +54,21 @@ public class BreakfastOrderSteps(
         if (AppManager.Settings.RunAgainstExternalServiceUnderTest) return;
 
         var eventStore = appManager.AppFactory.Services.GetService<IPublishedEventStore>();
-        eventStore.Should().NotBeNull();
+        Track.That(() => eventStore.Should().NotBeNull());
 
         const int maxRetries = 100;
         var retryDelay = TimeSpan.FromMilliseconds(300);
 
-        IReadOnlyList<TestOrderCreatedEvent> events = [];
+        IReadOnlyList<TestOrderCreatedEvent> orderCreatedEvents = [];
         for (var i = 0; i < maxRetries; i++)
         {
-            events = await eventStore!.GetPublishedEventsAsync<TestOrderCreatedEvent>();
-            if (events.Any(e => e.CustomerName == _customerName))
+            orderCreatedEvents = await eventStore!.GetPublishedEventsAsync<TestOrderCreatedEvent>();
+            if (orderCreatedEvents.Any(e => e.CustomerName == _customerName))
                 return;
             await Task.Delay(retryDelay);
         }
 
-        events.Should().Contain(e => e.CustomerName == _customerName);
+        Track.That(() => orderCreatedEvents.Should().Contain(e => e.CustomerName == _customerName));
     }
 
     [Then("a recipe log should have been published to kafka")]
@@ -77,22 +77,22 @@ public class BreakfastOrderSteps(
         if (AppManager.Settings.RunAgainstExternalServiceUnderTest) return;
 
         var kafkaStore = appManager.AppFactory.Services.GetService<IKafkaMessageStore>();
-        kafkaStore.Should().NotBeNull();
+        Track.That(() => kafkaStore.Should().NotBeNull());
 
         const int maxRetries = 50;
         var retryDelay = TimeSpan.FromMilliseconds(200);
 
-        IReadOnlyList<(string Key, TestRecipeLogEvent Message)> messages = [];
+        IReadOnlyList<(string Key, TestRecipeLogEvent Message)> recipeLogMessages = [];
         for (var i = 0; i < maxRetries; i++)
         {
-            messages = kafkaStore!.GetMessages<TestRecipeLogEvent>();
-            if (messages.Any(m => m.Message.RecipeType == OrderDefaults.PancakeItemType))
+            recipeLogMessages = kafkaStore!.GetMessages<TestRecipeLogEvent>();
+            if (recipeLogMessages.Any(m => m.Message.RecipeType == OrderDefaults.PancakeItemType))
                 return;
             await Task.Delay(retryDelay);
         }
 
-        messages.Should().Contain(m => m.Message.RecipeType == OrderDefaults.PancakeItemType,
-            "a RecipeLogEvent should have been published for the pancake recipe");
+        Track.That(() => recipeLogMessages.Should().Contain(m => m.Message.RecipeType == OrderDefaults.PancakeItemType,
+            "a RecipeLogEvent should have been published for the pancake recipe"));
     }
 
     [Then("an outbox message should have been written for the order created event")]

@@ -45,7 +45,7 @@ public class CompleteLifecycleSteps(
             ]
         };
         await orderSteps.Send();
-        orderSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
+        Track.That(() => orderSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created));
         await orderSteps.ParseResponse();
         _orderId = orderSteps.Response!.OrderId;
     }
@@ -56,7 +56,7 @@ public class CompleteLifecycleSteps(
         foreach (var status in new[] { OrderStatuses.Preparing, OrderStatuses.Ready, OrderStatuses.Completed })
         {
             await patchSteps.Send(_orderId, status);
-            patchSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
+            Track.That(() => patchSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
         }
     }
 
@@ -64,22 +64,22 @@ public class CompleteLifecycleSteps(
     public async Task ThenTheCompletedOrderShouldBeRetrievableWithAllDetails()
     {
         await getOrderSteps.Retrieve(_orderId);
-        getOrderSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
+        Track.That(() => getOrderSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
         await getOrderSteps.ParseResponse();
-        getOrderSteps.Response!.OrderId.Should().Be(_orderId);
-        getOrderSteps.Response!.Status.Should().Be(OrderStatuses.Completed);
-        getOrderSteps.Response!.CustomerName.Should().Be(_customerName);
+        Track.That(() => getOrderSteps.Response!.OrderId.Should().Be(_orderId));
+        Track.That(() => getOrderSteps.Response!.Status.Should().Be(OrderStatuses.Completed));
+        Track.That(() => getOrderSteps.Response!.CustomerName.Should().Be(_customerName));
     }
 
     [Then("an audit log entry should exist for the order")]
     public async Task ThenAnAuditLogEntryShouldExistForTheOrder()
     {
         await auditSteps.Retrieve();
-        auditSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
+        Track.That(() => auditSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
         await auditSteps.ParseResponse();
-        auditSteps.Response!.Should().Contain(a =>
+        Track.That(() => auditSteps.Response!.Should().Contain(a =>
             a.Action == AuditLogDefaults.CreatedAction
             && a.EntityType == AuditLogDefaults.OrderEntityType
-            && a.Details.Contains(_customerName));
+            && a.Details.Contains(_customerName)));
     }
 }

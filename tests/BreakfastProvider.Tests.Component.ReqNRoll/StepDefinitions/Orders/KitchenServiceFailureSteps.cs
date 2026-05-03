@@ -26,8 +26,8 @@ public class KitchenServiceFailureSteps(
     [Then("the order should still be created successfully despite the kitchen failure")]
     public async Task ThenTheOrderShouldStillBeCreatedSuccessfully()
     {
-        orderSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
+        Track.That(() => orderSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created));
         await orderSteps.ParseResponse();
-        orderSteps.Response!.OrderId.Should().NotBeEmpty();
+        Track.That(() => orderSteps.Response!.OrderId.Should().NotBeEmpty());
     }
 }

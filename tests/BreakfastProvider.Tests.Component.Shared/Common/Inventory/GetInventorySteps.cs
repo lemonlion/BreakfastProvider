@@ -27,14 +27,14 @@ public class GetInventorySteps(RequestContext context)
     public async Task ParseResponse()
     {
         var content = await ResponseMessage!.Content.ReadAsStringAsync();
-        Json.IsValid(content).Should().BeTrue();
+        Track.That(() => Json.IsValid(content).Should().BeTrue());
         Response = Json.Deserialize<TestInventoryItemResponse>(content)!;
     }
 
     public async Task ParseListResponse()
     {
         var content = await ResponseMessage!.Content.ReadAsStringAsync();
-        Json.IsValid(content).Should().BeTrue();
+        Track.That(() => Json.IsValid(content).Should().BeTrue());
         ListResponse = Json.Deserialize<List<TestInventoryItemResponse>>(content)!;
     }
 }

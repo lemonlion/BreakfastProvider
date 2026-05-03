@@ -45,19 +45,19 @@ public partial class Reporting__Equipment_Alerts_Feature : BaseFixture
         => await _milkSteps.Retrieve();
 
     private async Task The_milk_response_should_be_successful()
-        => _milkSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
+        => Track.That(() => _milkSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
 
     private async Task Eggs_are_retrieved_from_the_eggs_endpoint()
         => await _eggsSteps.Retrieve();
 
     private async Task The_eggs_response_should_be_successful()
-        => _eggsSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
+        => Track.That(() => _eggsSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
 
     private async Task Flour_is_retrieved_from_the_flour_endpoint()
         => await _flourSteps.Retrieve();
 
     private async Task The_flour_response_should_be_successful()
-        => _flourSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
+        => Track.That(() => _flourSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
 
     private async Task A_pancake_request_is_submitted_with_all_ingredients()
     {
@@ -72,10 +72,10 @@ public partial class Reporting__Equipment_Alerts_Feature : BaseFixture
 
     private async Task The_pancake_batch_response_should_be_successful()
     {
-        _pancakeSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
+        Track.That(() => _pancakeSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created));
         await _pancakeSteps.ParseResponse();
-        _pancakeSteps.Response.Should().NotBeNull();
-        _pancakeSteps.Response!.BatchId.Should().NotBeEmpty();
+        Track.That(() => _pancakeSteps.Response.Should().NotBeNull());
+        Track.That(() => _pancakeSteps.Response!.BatchId.Should().NotBeEmpty());
     }
 
     #endregion
@@ -98,7 +98,7 @@ public partial class Reporting__Equipment_Alerts_Feature : BaseFixture
     }
 
     private async Task The_equipment_alerts_response_should_be_successful()
-        => _graphQlSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
+        => Track.That(() => _graphQlSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
 
     private async Task The_equipment_alerts_response_should_be_valid_json()
         => await _graphQlSteps.ParseEquipmentAlertsResponse();
@@ -106,10 +106,10 @@ public partial class Reporting__Equipment_Alerts_Feature : BaseFixture
     private async Task The_equipment_alerts_should_contain_the_pancake_batch_alert()
     {
         var batchId = _pancakeSteps.Response!.BatchId;
-        _graphQlSteps.EquipmentAlerts.Should().Contain(a =>
+        Track.That(() => _graphQlSteps.EquipmentAlerts.Should().Contain(a =>
             a.BatchId == batchId &&
             a.EquipmentName == "Griddle" &&
-            a.AlertType == "UsageCycleCompleted");
+            a.AlertType == "UsageCycleCompleted"));
     }
 
     #endregion

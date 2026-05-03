@@ -65,16 +65,16 @@ public partial class Toppings__Feature_Flag_Feature : BaseFixture
     }
 
     private async Task The_toppings_response_http_status_should_be_ok()
-        => _toppingsSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
+        => Track.That(() => _toppingsSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
 
     private async Task The_toppings_list_should_be_valid_json()
         => await _toppingsSteps.ParseResponse();
 
     private async Task The_toppings_list_should_not_contain_raspberries()
-        => _toppingsSteps.Response!.Should().NotContain(t => t.Name == ToppingDefaults.Raspberries);
+        => Track.That(() => _toppingsSteps.Response!.Should().NotContain(t => t.Name == ToppingDefaults.Raspberries));
 
     private async Task The_toppings_list_should_contain_raspberries()
-        => _toppingsSteps.Response!.Should().Contain(t => t.Name == ToppingDefaults.Raspberries);
+        => Track.That(() => _toppingsSteps.Response!.Should().Contain(t => t.Name == ToppingDefaults.Raspberries));
 
     #endregion
 }

@@ -44,7 +44,7 @@ public partial class Customer_Preferences__Management_Feature : BaseFixture
 
     private async Task The_setup_response_should_be_ok()
     {
-        _putSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
+        Track.That(() => _putSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
         await _putSteps.ParseResponse();
     }
 
@@ -101,16 +101,16 @@ public partial class Customer_Preferences__Management_Feature : BaseFixture
     }
 
     private async Task The_put_response_http_status_should_be_ok()
-        => _putSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
+        => Track.That(() => _putSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
 
     private async Task The_put_response_should_be_valid_json()
         => await _putSteps.ParseResponse();
 
     private async Task The_saved_preferences_should_have_the_correct_milk_type()
-        => _putSteps.Response!.PreferredMilkType.Should().Be("Oat");
+        => Track.That(() => _putSteps.Response!.PreferredMilkType.Should().Be("Oat"));
 
     private async Task The_saved_preferences_should_have_the_correct_favourite_item()
-        => _putSteps.Response!.FavouriteItem.Should().Be("Blueberry Pancakes");
+        => Track.That(() => _putSteps.Response!.FavouriteItem.Should().Be("Blueberry Pancakes"));
 
     private async Task<CompositeStep> The_preference_get_response_should_contain_the_preferences()
     {
@@ -121,16 +121,16 @@ public partial class Customer_Preferences__Management_Feature : BaseFixture
     }
 
     private async Task The_get_response_http_status_should_be_ok()
-        => _getSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
+        => Track.That(() => _getSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
 
     private async Task The_get_response_should_be_valid_json()
         => await _getSteps.ParseResponse();
 
     private async Task The_retrieved_preferences_should_match_the_saved_preferences()
     {
-        _getSteps.Response!.CustomerId.Should().Be(_customerId);
-        _getSteps.Response!.PreferredMilkType.Should().Be("Oat");
-        _getSteps.Response!.LikesExtraToppings.Should().BeTrue();
+        Track.That(() => _getSteps.Response!.CustomerId.Should().Be(_customerId));
+        Track.That(() => _getSteps.Response!.PreferredMilkType.Should().Be("Oat"));
+        Track.That(() => _getSteps.Response!.LikesExtraToppings.Should().BeTrue());
     }
 
     private async Task<CompositeStep> The_preference_update_response_should_contain_the_updated_values()
@@ -143,22 +143,22 @@ public partial class Customer_Preferences__Management_Feature : BaseFixture
     }
 
     private async Task The_update_response_http_status_should_be_ok()
-        => _putSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
+        => Track.That(() => _putSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
 
     private async Task The_update_response_should_be_valid_json()
         => await _putSteps.ParseResponse();
 
     private async Task The_updated_preferences_should_have_the_new_milk_type()
-        => _putSteps.Response!.PreferredMilkType.Should().Be("Almond");
+        => Track.That(() => _putSteps.Response!.PreferredMilkType.Should().Be("Almond"));
 
     private async Task The_updated_preferences_should_have_the_new_favourite_item()
-        => _putSteps.Response!.FavouriteItem.Should().Be("Belgian Waffles");
+        => Track.That(() => _putSteps.Response!.FavouriteItem.Should().Be("Belgian Waffles"));
 
     private async Task The_preference_get_response_should_indicate_not_found()
-        => _getSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.NotFound);
+        => Track.That(() => _getSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.NotFound));
 
     private async Task The_preference_response_should_indicate_bad_request()
-        => _putSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        => Track.That(() => _putSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.BadRequest));
 
     #endregion
 }

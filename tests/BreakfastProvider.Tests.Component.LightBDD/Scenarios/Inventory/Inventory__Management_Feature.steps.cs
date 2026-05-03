@@ -48,7 +48,7 @@ public partial class Inventory__Management_Feature : BaseFixture
 
     private async Task The_setup_response_should_be_created()
     {
-        _postSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
+        Track.That(() => _postSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created));
         await _postSteps.ParseResponse();
         _createdItemId = _postSteps.Response!.Id;
     }
@@ -99,16 +99,16 @@ public partial class Inventory__Management_Feature : BaseFixture
     }
 
     private async Task The_post_response_http_status_should_be_created()
-        => _postSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
+        => Track.That(() => _postSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created));
 
     private async Task The_post_response_should_be_valid_json()
         => await _postSteps.ParseResponse();
 
     private async Task The_created_item_should_have_the_correct_name()
-        => _postSteps.Response!.Name.Should().Be(_postSteps.Request.Name);
+        => Track.That(() => _postSteps.Response!.Name.Should().Be(_postSteps.Request.Name));
 
     private async Task The_created_item_should_have_the_correct_category()
-        => _postSteps.Response!.Category.Should().Be("Dry Goods");
+        => Track.That(() => _postSteps.Response!.Category.Should().Be("Dry Goods"));
 
     private async Task<CompositeStep> The_inventory_get_response_should_contain_the_item()
     {
@@ -119,15 +119,15 @@ public partial class Inventory__Management_Feature : BaseFixture
     }
 
     private async Task The_get_response_http_status_should_be_ok()
-        => _getSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
+        => Track.That(() => _getSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
 
     private async Task The_get_response_should_be_valid_json()
         => await _getSteps.ParseResponse();
 
     private async Task The_retrieved_item_should_match_the_created_item()
     {
-        _getSteps.Response!.Id.Should().Be(_createdItemId);
-        _getSteps.Response!.Name.Should().Be(_postSteps.Response!.Name);
+        Track.That(() => _getSteps.Response!.Id.Should().Be(_createdItemId));
+        Track.That(() => _getSteps.Response!.Name.Should().Be(_postSteps.Response!.Name));
     }
 
     private async Task<CompositeStep> The_inventory_list_response_should_contain_the_item()
@@ -139,13 +139,13 @@ public partial class Inventory__Management_Feature : BaseFixture
     }
 
     private async Task The_list_response_http_status_should_be_ok()
-        => _getSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
+        => Track.That(() => _getSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
 
     private async Task The_list_response_should_be_valid_json()
         => await _getSteps.ParseListResponse();
 
     private async Task The_list_should_contain_the_created_item()
-        => _getSteps.ListResponse!.Should().Contain(i => i.Id == _createdItemId);
+        => Track.That(() => _getSteps.ListResponse!.Should().Contain(i => i.Id == _createdItemId));
 
     private async Task<CompositeStep> The_inventory_update_response_should_contain_the_updated_values()
     {
@@ -156,19 +156,19 @@ public partial class Inventory__Management_Feature : BaseFixture
     }
 
     private async Task The_put_response_http_status_should_be_ok()
-        => _putSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
+        => Track.That(() => _putSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
 
     private async Task The_put_response_should_be_valid_json()
         => await _putSteps.ParseResponse();
 
     private async Task The_updated_item_should_have_the_new_category()
-        => _putSteps.Response!.Category.Should().Be("Updated Category");
+        => Track.That(() => _putSteps.Response!.Category.Should().Be("Updated Category"));
 
     private async Task The_inventory_delete_response_should_indicate_no_content()
-        => _deleteSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.NoContent);
+        => Track.That(() => _deleteSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.NoContent));
 
     private async Task The_inventory_get_response_should_indicate_not_found()
-        => _getSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.NotFound);
+        => Track.That(() => _getSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.NotFound));
 
     #endregion
 }

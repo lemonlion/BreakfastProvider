@@ -38,16 +38,16 @@ public class GrpcOrderStatusSteps(
     [Then("the gRPC response should contain the order details")]
     public void ThenTheGrpcResponseShouldContainTheOrderDetails()
     {
-        _grpcSteps.OrderStatusReply.Should().NotBeNull();
-        _grpcSteps.OrderStatusReply!.OrderId.Should().Be(orderSteps.Response!.OrderId.ToString());
-        _grpcSteps.OrderStatusReply.CustomerName.Should().Be(orderSteps.Request.CustomerName);
-        _grpcSteps.OrderStatusReply.Status.Should().Be(OrderStatuses.Created);
+        Track.That(() => _grpcSteps.OrderStatusReply.Should().NotBeNull());
+        Track.That(() => _grpcSteps.OrderStatusReply!.OrderId.Should().Be(orderSteps.Response!.OrderId.ToString()));
+        Track.That(() => _grpcSteps.OrderStatusReply.CustomerName.Should().Be(orderSteps.Request.CustomerName));
+        Track.That(() => _grpcSteps.OrderStatusReply.Status.Should().Be(OrderStatuses.Created));
     }
 
     [Then("the gRPC response should be a not found error")]
     public void ThenTheGrpcResponseShouldBeANotFoundError()
     {
-        _grpcSteps.RpcException.Should().NotBeNull();
-        _grpcSteps.RpcException!.StatusCode.Should().Be(StatusCode.NotFound);
+        Track.That(() => _grpcSteps.RpcException.Should().NotBeNull());
+        Track.That(() => _grpcSteps.RpcException!.StatusCode.Should().Be(StatusCode.NotFound));
     }
 }

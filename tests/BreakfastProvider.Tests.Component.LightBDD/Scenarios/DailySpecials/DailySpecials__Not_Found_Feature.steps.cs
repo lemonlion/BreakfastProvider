@@ -37,7 +37,7 @@ public partial class DailySpecials__Not_Found_Feature : BaseFixture
     #region Then
 
     private async Task The_response_should_indicate_not_found()
-        => _postSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.NotFound);
+        => Track.That(() => _postSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.NotFound));
 
     #endregion
 }

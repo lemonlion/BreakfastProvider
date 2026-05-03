@@ -42,7 +42,7 @@ public class OutboxRetryExhaustionSteps(
     public async Task WhenTheOrderIsSubmittedAndRetriesAreExhausted()
     {
         await orderSteps.Send();
-        orderSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
+        Track.That(() => orderSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created));
     }
 
     [Then("the outbox message should be in a failed state")]
@@ -64,9 +64,9 @@ public class OutboxRetryExhaustionSteps(
         }
 
         await outboxSteps.LoadOutboxMessages();
-        outboxSteps.OutboxMessages.Should().Contain(m =>
+        Track.That(() => outboxSteps.OutboxMessages.Should().Contain(m =>
                 m.EventType == EventTypes.OrderCreated && m.Status == OutboxStatuses.Failed,
-            "the outbox message should have transitioned to Failed after exhausting retries");
+            "the outbox message should have transitioned to Failed after exhausting retries"));
     }
 
     private class FailingOutboxDispatcher : IOutboxDispatcher

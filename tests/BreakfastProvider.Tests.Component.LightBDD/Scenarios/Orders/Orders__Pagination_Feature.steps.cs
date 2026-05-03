@@ -59,7 +59,7 @@ public partial class Orders__Pagination_Feature : BaseFixture
             Flour = _flourSteps.FlourResponse.Flour
         };
         await _pancakeSteps.Send();
-        _pancakeSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
+        Track.That(() => _pancakeSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created));
         await _pancakeSteps.ParseResponse();
     }
 
@@ -82,7 +82,7 @@ public partial class Orders__Pagination_Feature : BaseFixture
                 ]
             };
             await _orderSteps.Send();
-            _orderSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
+            Track.That(() => _orderSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created));
         }
 
         _createdOrderCount = 2;
@@ -122,32 +122,32 @@ public partial class Orders__Pagination_Feature : BaseFixture
     }
 
     private async Task The_list_response_should_be_ok()
-        => _listSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
+        => Track.That(() => _listSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
 
     private async Task The_list_response_should_be_valid_json()
         => await _listSteps.ParseResponse();
 
     private async Task The_response_should_contain_the_created_orders()
-        => _listSteps.Response!.Items.Should().HaveCountGreaterThanOrEqualTo(_createdOrderCount);
+        => Track.That(() => _listSteps.Response!.Items.Should().HaveCountGreaterThanOrEqualTo(_createdOrderCount));
 
     private async Task The_page_number_should_be_one()
-        => _listSteps.Response!.Page.Should().Be(1);
+        => Track.That(() => _listSteps.Response!.Page.Should().Be(1));
 
     private async Task The_total_count_should_match_the_created_order_count()
-        => _listSteps.Response!.TotalCount.Should().BeGreaterThanOrEqualTo(_createdOrderCount);
+        => Track.That(() => _listSteps.Response!.TotalCount.Should().BeGreaterThanOrEqualTo(_createdOrderCount));
 
     private async Task The_paginated_response_should_contain_only_one_item()
     {
-        _listSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
+        Track.That(() => _listSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
         await _listSteps.ParseResponse();
-        _listSteps.Response!.Items.Should().HaveCount(1);
+        Track.That(() => _listSteps.Response!.Items.Should().HaveCount(1));
     }
 
     private async Task The_total_pages_should_reflect_the_full_order_count()
-        => _listSteps.Response!.TotalPages.Should().BeGreaterThanOrEqualTo(_createdOrderCount);
+        => Track.That(() => _listSteps.Response!.TotalPages.Should().BeGreaterThanOrEqualTo(_createdOrderCount));
 
     private async Task The_page_number_should_be_two()
-        => _listSteps.Response!.Page.Should().Be(2);
+        => Track.That(() => _listSteps.Response!.Page.Should().Be(2));
 
     private async Task<CompositeStep> The_paginated_response_should_be_empty()
     {
@@ -159,10 +159,10 @@ public partial class Orders__Pagination_Feature : BaseFixture
     }
 
     private async Task The_items_list_should_be_empty()
-        => _listSteps.Response!.Items.Should().BeEmpty();
+        => Track.That(() => _listSteps.Response!.Items.Should().BeEmpty());
 
     private async Task The_total_count_should_be_zero()
-        => _listSteps.Response!.TotalCount.Should().Be(0);
+        => Track.That(() => _listSteps.Response!.TotalCount.Should().Be(0));
 
     #endregion
 }

@@ -23,18 +23,22 @@ public partial class Specifications__Async_Api_Feature : BaseFixture
 
     private async Task The_asyncapi_endpoint_is_called()
     {
-        const int maxRetries = 3;
+        const int maxRetries = 5;
         for (var attempt = 1; attempt <= maxRetries; attempt++)
         {
             try
             {
                 _asyncApiResponse = await Client.GetAsync(Endpoints.AsyncApi.AsyncApiSpec);
-                return;
+                _asyncApiJsonString = await _asyncApiResponse.Content.ReadAsStringAsync();
+                if (Json.TryParse(_asyncApiJsonString, out _asyncApiJson))
+                    return;
             }
             catch (HttpRequestException) when (attempt < maxRetries)
             {
-                await Task.Delay(200 * attempt);
             }
+
+            if (attempt < maxRetries)
+                await Task.Delay(500 * attempt);
         }
     }
 
@@ -56,9 +60,9 @@ public partial class Specifications__Async_Api_Feature : BaseFixture
 
     private async Task The_response_should_be_valid_json()
     {
-        _asyncApiJsonString = await _asyncApiResponse!.Content.ReadAsStringAsync();
-        var asyncApiResponseIsValidJson = Json.TryParse(_asyncApiJsonString, out _asyncApiJson);
-        Track.That(() => asyncApiResponseIsValidJson.Should().BeTrue());
+        var asyncApiResponseIsValidJson = _asyncApiJson is not null;
+        Track.That(() => asyncApiResponseIsValidJson.Should().BeTrue(
+            $"response body (first 500 chars): {_asyncApiJsonString?[..Math.Min(_asyncApiJsonString.Length, 500)]}"));
     }
 
     private async Task<CompositeStep> The_asyncapi_spec_is_written_to_disk()

@@ -1,4 +1,4 @@
-TtdVersion: 2.28.35+289050951f284b4e69509bb722c4873a7536a7a2
+TtdVersion: 2.28.38+6a9b7febed28ebdac0b4f2dd2d81a527b410137c
 Title: Breakfast Provider Specifications
 Features:
   - Feature: Audit Logs Filtering Feature

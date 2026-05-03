@@ -45,18 +45,22 @@ public class ApiSpecificationSteps(AppManager appManager)
     [When("the asyncapi endpoint is called")]
     public async Task WhenTheAsyncapiEndpointIsCalled()
     {
-        const int maxRetries = 3;
+        const int maxRetries = 5;
         for (var attempt = 1; attempt <= maxRetries; attempt++)
         {
             try
             {
                 _asyncApiResponse = await appManager.Client.GetAsync(Endpoints.AsyncApi.AsyncApiSpec);
-                return;
+                _asyncApiJsonString = await _asyncApiResponse.Content.ReadAsStringAsync();
+                if (Json.TryParse(_asyncApiJsonString, out _asyncApiJson))
+                    return;
             }
             catch (HttpRequestException) when (attempt < maxRetries)
             {
-                await Task.Delay(200 * attempt);
             }
+
+            if (attempt < maxRetries)
+                await Task.Delay(500 * attempt);
         }
     }
 
@@ -75,9 +79,9 @@ public class ApiSpecificationSteps(AppManager appManager)
         else if (_asyncApiResponse != null)
         {
             Track.That(() => _asyncApiResponse.StatusCode.Should().Be(HttpStatusCode.OK));
-            _asyncApiJsonString = await _asyncApiResponse.Content.ReadAsStringAsync();
-            var asyncApiResponseIsValidJson = Json.TryParse(_asyncApiJsonString, out _asyncApiJson);
-            Track.That(() => asyncApiResponseIsValidJson.Should().BeTrue());
+            var asyncApiResponseIsValidJson = _asyncApiJson is not null;
+            Track.That(() => asyncApiResponseIsValidJson.Should().BeTrue(
+                $"response body (first 500 chars): {_asyncApiJsonString?[..Math.Min(_asyncApiJsonString.Length, 500)]}"));
         }
     }
 

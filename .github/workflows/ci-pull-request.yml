@@ -15,31 +15,9 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  get-version:
-    name: Get version
-    runs-on: ubuntu-24.04
-    steps:
-      - name: Checkout source
-        uses: actions/checkout@v4
-        with:
-          sparse-checkout: .github/actions/
-
-      - name: Get version
-        id: get-version
-        uses: ./.github/actions/get-version
-
-    outputs:
-      version: ${{ steps.get-version.outputs.version }}
-      branch: ${{ steps.get-version.outputs.branch }}
-
-
   build:
     name: Build
-    needs: [get-version]
     uses: ./.github/workflows/_build.yml
-    with:
-      version: ${{ needs.get-version.outputs.version }}
-      branch: ${{ needs.get-version.outputs.branch }}
     secrets: inherit
 
 
@@ -145,28 +123,3 @@ jobs:
         run: echo "Checks complete"
 
 
-  publish:
-    name: Publish
-    needs: [get-version, checks-complete]
-    uses: ./.github/workflows/_publish.yml
-    with:
-      version: ${{ needs.get-version.outputs.version }}
-
-
-  # publish-fakes:
-  #   name: Publish fakes
-  #   uses: ./.github/workflows/_publish-fakes.yml
-  #   permissions:
-  #     contents: read
-  #     packages: write
-  #   secrets: inherit
-
-
-  # release-octopus:
-  #   name: Release (Octopus)
-  #   needs: [get-version, publish]
-  #   uses: ./.github/workflows/_release-octopus.yml
-  #   with:
-  #     version: ${{ needs.get-version.outputs.version }}
-  #     branch: ${{ needs.get-version.outputs.branch }}
-  #   secrets: inherit

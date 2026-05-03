@@ -2,9 +2,6 @@ name: Build
 
 on:
   workflow_call:
-    inputs:
-      version: { type: string, required: true }
-      branch: { type: string, required: true }
 
 jobs:
   build:
@@ -25,9 +22,7 @@ jobs:
           sed -i "s|GITHUB_NUGET_APIKEY|${{ secrets.ORGANISATION_PAT }}|g" nuget.config
 
       - name: Create output folders
-        run: |
-          mkdir -p ./output/publish-api
-          mkdir -p ./output/packages
+        run: mkdir -p ./output/publish-api
 
       - name: Build (dotnet build)
         run: >
@@ -60,18 +55,4 @@ jobs:
           -p:WarningLevel=0
           ./src/BreakfastProvider.Api/BreakfastProvider.Api.csproj
 
-      - name: Create package (API)
-        run: >
-          dotnet pack ./src/BreakfastProvider.Api/BreakfastProvider.Api.csproj
-          --no-build
-          -c Release
-          -o ./output/packages
-          /p:NuspecFile=BreakfastProvider.Api.nuspec
-          /p:NuspecBasePath=../../output/publish-api
-          /p:NuspecProperties="Configuration=Release%3Bbranch=${{ inputs.branch }}%3Bcommit=${{ github.sha }}%3Bversion=${{ inputs.version }}"
 
-      - name: Cache package (API)
-        uses: actions/cache/save@v4
-        with:
-          key: BreakfastProvider.API.nupkg-${{ github.run_id }}
-          path: ./output/packages/BreakfastProvider.Api.${{ inputs.version }}.nupkg

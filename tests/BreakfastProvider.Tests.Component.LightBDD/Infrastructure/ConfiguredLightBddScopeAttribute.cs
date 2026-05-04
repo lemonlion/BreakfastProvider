@@ -100,7 +100,9 @@ public class ConfiguredLightBddScopeAttribute : LightBddScope
             _kitchenServiceFake = InMemoryFakeHelper.Create<Dependencies.Fakes.KitchenService.Program>(Settings.KitchenServiceBaseUrl!);
 
         if (Settings.RunWithAnInMemoryNotificationService)
-            _notificationServiceFake = InMemoryFakeHelper.Create<Dependencies.Fakes.NotificationService.Program>(Settings.NotificationServiceBaseUrl!);
+        {
+            _notificationServiceFake = InMemoryFakeHelper.CreateForGrpc<Dependencies.Fakes.NotificationService.Program>(Settings.NotificationServiceBaseUrl!);
+        }
     }
 
     private void DisposeHttpFakes()

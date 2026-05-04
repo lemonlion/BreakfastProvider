@@ -78,7 +78,9 @@ public sealed class TestRunHooks
             _kitchenServiceFake = InMemoryFakeHelper.Create<Dependencies.Fakes.KitchenService.Program>(settings.KitchenServiceBaseUrl!);
 
         if (settings.RunWithAnInMemoryNotificationService)
-            _notificationServiceFake = InMemoryFakeHelper.Create<Dependencies.Fakes.NotificationService.Program>(settings.NotificationServiceBaseUrl!);
+        {
+            _notificationServiceFake = InMemoryFakeHelper.CreateForGrpc<Dependencies.Fakes.NotificationService.Program>(settings.NotificationServiceBaseUrl!);
+        }
     }
 
     private static void DisposeHttpFakes()

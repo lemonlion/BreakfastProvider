@@ -8,7 +8,8 @@ namespace BreakfastProvider.Tests.Component.Shared.Infrastructure.Hosting;
 
 public class WebApplicationFactoryForSpecificUrl<TProgram>(
     string hostUrl,
-    IConfiguration? config = null)
+    IConfiguration? config = null,
+    HttpProtocols protocols = HttpProtocols.Http1AndHttp2)
     : WebApplicationFactory<TProgram> where TProgram : class
 {
     private IHost? _realHost;
@@ -31,7 +32,7 @@ public class WebApplicationFactoryForSpecificUrl<TProgram>(
             {
                 kestrel.ConfigureEndpointDefaults(listenOptions =>
                 {
-                    listenOptions.Protocols = HttpProtocols.Http1AndHttp2;
+                    listenOptions.Protocols = protocols;
                 });
             });
             webHostBuilder.UseUrls(hostUrl);

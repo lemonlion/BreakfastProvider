@@ -1,5 +1,6 @@
 using System.Net;
 using BreakfastProvider.Tests.Component.Shared.Common.Reservations;
+using BreakfastProvider.Tests.Component.Shared.Constants;
 using BreakfastProvider.Tests.Component.Shared.Models.Reservations;
 using LightBDD.Framework;
 using BreakfastProvider.Tests.Component.LightBDD.Util;
@@ -86,7 +87,7 @@ public partial class Reservations__Management_Feature : BaseFixture
     private async Task The_reservation_is_deleted()
     {
         var request = new HttpRequestMessage(HttpMethod.Delete, $"reservations/{_createdReservationId}");
-        request.Headers.Add(Constants.CustomHeaders.ComponentTestRequestId, RequestId);
+        request.Headers.Add(CustomHeaders.ComponentTestRequestId, RequestId);
         _deleteResponse = await Client.SendAsync(request);
     }
 

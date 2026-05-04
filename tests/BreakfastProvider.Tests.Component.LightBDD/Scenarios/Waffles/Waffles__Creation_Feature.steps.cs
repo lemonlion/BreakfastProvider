@@ -10,6 +10,7 @@ using BreakfastProvider.Tests.Component.Shared.Models.Waffles;
 using LightBDD.Framework;
 using LightBDD.Framework.Parameters;
 using Microsoft.Extensions.DependencyInjection;
+using TestTrackingDiagrams.LightBDD;
 using Microsoft.Extensions.Options;
 using BreakfastProvider.Tests.Component.LightBDD.Util;
 
@@ -149,7 +150,8 @@ public partial class Waffles__Creation_Feature : BaseFixture
 
     private async Task The_invalid_waffle_requests_are_submitted()
         => _validationResponses.AddRange(
-            await ValidationHelper.SendValidationRequests(Client, RequestId, Endpoints.Waffles, _validationRequests, _validationInputs));
+            await ValidationHelper.SendValidationRequests(Client, RequestId, Endpoints.Waffles, _validationRequests, _validationInputs,
+                onTestDelimiter: TrackingDiagramOverride.InsertTestDelimiter));
 
     #endregion
 

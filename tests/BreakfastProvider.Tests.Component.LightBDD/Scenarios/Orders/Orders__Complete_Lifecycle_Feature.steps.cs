@@ -4,6 +4,7 @@ using BreakfastProvider.Tests.Component.Shared.Common.Ingredients;
 using BreakfastProvider.Tests.Component.Shared.Common.Orders;
 using BreakfastProvider.Tests.Component.Shared.Common.Pancakes;
 using BreakfastProvider.Tests.Component.Shared.Constants;
+using BreakfastProvider.Tests.Component.Shared.Models.AuditLogs;
 using BreakfastProvider.Tests.Component.Shared.Models.Orders;
 using BreakfastProvider.Tests.Component.Shared.Models.Pancakes;
 using BreakfastProvider.Tests.Component.Shared.Util;
@@ -217,7 +218,7 @@ public partial class Orders__Complete_Lifecycle_Feature : BaseFixture
     }
 
     private HttpResponseMessage? _auditLogResponse;
-    private List<Models.AuditLogs.TestAuditLogResponse>? _auditLogs;
+    private List<TestAuditLogResponse>? _auditLogs;
 
     private async Task Audit_logs_are_retrieved_for_the_order()
     {
@@ -226,7 +227,7 @@ public partial class Orders__Complete_Lifecycle_Feature : BaseFixture
         _auditLogResponse = await Client.SendAsync(request);
         Track.That(() => _auditLogResponse.StatusCode.Should().Be(HttpStatusCode.OK));
         var content = await _auditLogResponse.Content.ReadAsStringAsync();
-        _auditLogs = Json.Deserialize<List<Models.AuditLogs.TestAuditLogResponse>>(content)!;
+        _auditLogs = Json.Deserialize<List<TestAuditLogResponse>>(content)!;
     }
 
     private async Task The_audit_logs_should_contain_the_order_creation_entry()

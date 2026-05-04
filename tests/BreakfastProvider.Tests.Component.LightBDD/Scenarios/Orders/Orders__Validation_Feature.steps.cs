@@ -3,6 +3,7 @@ using BreakfastProvider.Tests.Component.Shared.Constants;
 using BreakfastProvider.Tests.Component.Shared.Models.Orders;
 using BreakfastProvider.Tests.Component.Shared.Models.Validation;
 using LightBDD.Framework.Parameters;
+using TestTrackingDiagrams.LightBDD;
 
 namespace BreakfastProvider.Tests.Component.LightBDD.Scenarios.Orders;
 
@@ -57,12 +58,14 @@ public partial class Orders__Validation_Feature : BaseFixture
 
     private async Task The_invalid_order_requests_are_submitted()
         => _orderValidationResponses.AddRange(
-            await ValidationHelper.SendValidationRequests(Client, RequestId, Endpoints.Orders, _orderValidationRequests, _orderValidationInputs));
+            await ValidationHelper.SendValidationRequests(Client, RequestId, Endpoints.Orders, _orderValidationRequests, _orderValidationInputs,
+                onTestDelimiter: TrackingDiagramOverride.InsertTestDelimiter));
 
     private async Task The_invalid_status_update_requests_are_submitted()
         => _statusValidationResponses.AddRange(
             await ValidationHelper.SendPatchValidationRequests(Client, RequestId,
-                $"{Endpoints.Orders}/{Guid.NewGuid()}/status", _statusValidationRequests, _statusValidationInputs));
+                $"{Endpoints.Orders}/{Guid.NewGuid()}/status", _statusValidationRequests, _statusValidationInputs,
+                onTestDelimiter: TrackingDiagramOverride.InsertTestDelimiter));
 
     #endregion
 

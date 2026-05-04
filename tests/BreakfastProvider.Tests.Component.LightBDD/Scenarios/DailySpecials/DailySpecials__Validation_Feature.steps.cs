@@ -3,6 +3,7 @@ using BreakfastProvider.Tests.Component.Shared.Constants;
 using BreakfastProvider.Tests.Component.Shared.Models.DailySpecials;
 using BreakfastProvider.Tests.Component.Shared.Models.Validation;
 using LightBDD.Framework.Parameters;
+using TestTrackingDiagrams.LightBDD;
 
 namespace BreakfastProvider.Tests.Component.LightBDD.Scenarios.DailySpecials;
 
@@ -33,7 +34,8 @@ public partial class DailySpecials__Validation_Feature : BaseFixture
 
     private async Task The_invalid_daily_special_order_requests_are_submitted()
         => _validationResponses.AddRange(
-            await ValidationHelper.SendValidationRequests(Client, RequestId, Endpoints.DailySpecialsOrders, _validationRequests, _validationInputs));
+            await ValidationHelper.SendValidationRequests(Client, RequestId, Endpoints.DailySpecialsOrders, _validationRequests, _validationInputs,
+                onTestDelimiter: TrackingDiagramOverride.InsertTestDelimiter));
 
     #endregion
 

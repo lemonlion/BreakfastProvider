@@ -7,6 +7,7 @@ using BreakfastProvider.Tests.Component.Shared.Models.Validation;
 using LightBDD.Framework;
 using LightBDD.Framework.Parameters;
 using BreakfastProvider.Tests.Component.LightBDD.Util;
+using TestTrackingDiagrams.LightBDD;
 
 
 namespace BreakfastProvider.Tests.Component.LightBDD.Scenarios.Toppings;
@@ -72,7 +73,8 @@ public partial class Toppings__Update_Feature : BaseFixture
     private async Task The_invalid_update_topping_requests_are_submitted()
         => _validationResponses.AddRange(
             await ValidationHelper.SendPutValidationRequests(
-                Client, RequestId, $"{Endpoints.Toppings}/{_toppingId}", _validationRequests, _validationInputs));
+                Client, RequestId, $"{Endpoints.Toppings}/{_toppingId}", _validationRequests, _validationInputs,
+                onTestDelimiter: TrackingDiagramOverride.InsertTestDelimiter));
 
     #endregion
 

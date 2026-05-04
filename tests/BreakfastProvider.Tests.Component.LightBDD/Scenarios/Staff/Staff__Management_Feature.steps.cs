@@ -1,5 +1,6 @@
 using System.Net;
 using BreakfastProvider.Tests.Component.Shared.Common.Staff;
+using BreakfastProvider.Tests.Component.Shared.Constants;
 using BreakfastProvider.Tests.Component.Shared.Models.Staff;
 using LightBDD.Framework;
 using BreakfastProvider.Tests.Component.LightBDD.Util;
@@ -72,7 +73,7 @@ public partial class Staff__Management_Feature : BaseFixture
     private async Task The_staff_member_is_deleted()
     {
         var request = new HttpRequestMessage(HttpMethod.Delete, $"staff/{_createdMemberId}");
-        request.Headers.Add(Constants.CustomHeaders.ComponentTestRequestId, RequestId);
+        request.Headers.Add(CustomHeaders.ComponentTestRequestId, RequestId);
         var response = await Client.SendAsync(request);
         _deleteResponse = response;
     }

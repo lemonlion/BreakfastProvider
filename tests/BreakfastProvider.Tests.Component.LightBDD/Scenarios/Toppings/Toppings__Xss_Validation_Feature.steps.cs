@@ -3,6 +3,7 @@ using BreakfastProvider.Tests.Component.Shared.Constants;
 using BreakfastProvider.Tests.Component.Shared.Models.Toppings;
 using BreakfastProvider.Tests.Component.Shared.Models.Validation;
 using LightBDD.Framework.Parameters;
+using TestTrackingDiagrams.LightBDD;
 
 namespace BreakfastProvider.Tests.Component.LightBDD.Scenarios.Toppings;
 
@@ -33,7 +34,8 @@ public partial class Toppings__Xss_Validation_Feature : BaseFixture
 
     private async Task The_invalid_topping_requests_are_submitted()
         => _validationResponses.AddRange(
-            await ValidationHelper.SendValidationRequests(Client, RequestId, Endpoints.Toppings, _validationRequests, _validationInputs));
+            await ValidationHelper.SendValidationRequests(Client, RequestId, Endpoints.Toppings, _validationRequests, _validationInputs,
+                onTestDelimiter: TrackingDiagramOverride.InsertTestDelimiter));
 
     #endregion
 

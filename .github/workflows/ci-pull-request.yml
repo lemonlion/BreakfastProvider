@@ -21,201 +21,298 @@ jobs:
     secrets: inherit
 
 
-  component-tests-in-memory:
-    name: Component tests in memory
+  # ─── LightBDD ───────────────────────────────────────────────────────────────
+
+  lightbdd-in-memory:
+    name: LightBDD in memory
     uses: ./.github/workflows/_tests.yml
     with:
       test-type: component
       test-run-type: memory
-      test-run-description: component-tests-in-memory
-      csproj-path: ./tests/BreakfastProvider.Tests.Component/BreakfastProvider.Tests.Component.csproj
+      test-run-description: lightbdd-in-memory
+      csproj-path: ./tests/BreakfastProvider.Tests.Component.LightBDD/BreakfastProvider.Tests.Component.LightBDD.csproj
+      features-report-path: tests/BreakfastProvider.Tests.Component.LightBDD/bin/Debug/net10.0/Reports/TestRunReport.html
     secrets: inherit
 
-
-  component-tests-in-memory-report:
-    name: Component tests in memory
-    needs: [component-tests-in-memory]
+  lightbdd-in-memory-report:
+    name: LightBDD in memory report
+    needs: [lightbdd-in-memory]
     uses: ./.github/workflows/_report-tests.yml
     with:
       test-type: component
       test-run-type: memory
-      trx-file: component-tests-in-memory-results.trx
+      trx-file: lightbdd-in-memory-results.trx
 
-
-  component-tests-in-memory-coverage:
-    name: Component tests in memory
-    needs: [component-tests-in-memory]
+  lightbdd-in-memory-coverage:
+    name: LightBDD in memory coverage
+    needs: [lightbdd-in-memory]
     uses: ./.github/workflows/_report-coverage.yml
     with:
       test-type: component
       test-run-type: memory
-      coverage-file: component-tests-in-memory.coverage.cobertura.xml
+      coverage-file: lightbdd-in-memory.coverage.cobertura.xml
 
 
-  component-tests-in-docker:
-    name: Component tests in docker
+  lightbdd-in-docker:
+    name: LightBDD in docker
     uses: ./.github/workflows/_tests.yml
     with:
       test-type: component
       test-run-type: docker
-      test-run-description: component-tests-in-docker
-      csproj-path: ./tests/BreakfastProvider.Tests.Component/BreakfastProvider.Tests.Component.csproj
+      test-run-description: lightbdd-in-docker
+      csproj-path: ./tests/BreakfastProvider.Tests.Component.LightBDD/BreakfastProvider.Tests.Component.LightBDD.csproj
+      features-report-path: tests/BreakfastProvider.Tests.Component.LightBDD/bin/Debug/net10.0/Reports/TestRunReport.html
     secrets: inherit
 
-
-  component-tests-in-docker-report:
-    name: Component tests in docker
-    needs: [component-tests-in-docker]
+  lightbdd-in-docker-report:
+    name: LightBDD in docker report
+    needs: [lightbdd-in-docker]
     uses: ./.github/workflows/_report-tests.yml
     with:
       test-type: component
       test-run-type: docker
-      trx-file: component-tests-in-docker-results.trx
+      trx-file: lightbdd-in-docker-results.trx
 
-
-  component-tests-in-docker-coverage:
-    name: Component tests in docker
-    needs: [component-tests-in-docker]
+  lightbdd-in-docker-coverage:
+    name: LightBDD in docker coverage
+    needs: [lightbdd-in-docker]
     uses: ./.github/workflows/_report-coverage.yml
     with:
       test-type: component
       test-run-type: docker
-      coverage-file: component-tests-in-docker.coverage.cobertura.xml
+      coverage-file: lightbdd-in-docker.coverage.cobertura.xml
 
 
-  component-tests-external-sut:
-    name: Component tests (external SUT)
+  lightbdd-external-sut:
+    name: LightBDD external SUT
     uses: ./.github/workflows/_tests.yml
     with:
       test-type: component
       test-run-type: external-sut
-      test-run-description: component-tests-external-sut
-      csproj-path: ./tests/BreakfastProvider.Tests.Component/BreakfastProvider.Tests.Component.csproj
+      test-run-description: lightbdd-external-sut
+      csproj-path: ./tests/BreakfastProvider.Tests.Component.LightBDD/BreakfastProvider.Tests.Component.LightBDD.csproj
+      features-report-path: tests/BreakfastProvider.Tests.Component.LightBDD/bin/Debug/net10.0/Reports/TestRunReport.html
     secrets: inherit
 
-
-  component-tests-external-sut-report:
-    name: Component tests (external SUT)
-    needs: [component-tests-external-sut]
+  lightbdd-external-sut-report:
+    name: LightBDD external SUT report
+    needs: [lightbdd-external-sut]
     uses: ./.github/workflows/_report-tests.yml
     with:
       test-type: component
       test-run-type: external-sut
-      trx-file: component-tests-external-sut-results.trx
+      trx-file: lightbdd-external-sut-results.trx
 
-
-  component-tests-external-sut-coverage:
-    name: Component tests (external SUT)
-    needs: [component-tests-external-sut]
+  lightbdd-external-sut-coverage:
+    name: LightBDD external SUT coverage
+    needs: [lightbdd-external-sut]
     uses: ./.github/workflows/_report-coverage.yml
     with:
       test-type: component
       test-run-type: external-sut
-      coverage-file: component-tests-external-sut.coverage.cobertura.xml
+      coverage-file: lightbdd-external-sut.coverage.cobertura.xml
 
 
-  xunit-component-tests-in-memory:
-    name: xUnit component tests in memory
+  # ─── ReqNRoll ───────────────────────────────────────────────────────────────
+
+  reqnroll-in-memory:
+    name: ReqNRoll in memory
     uses: ./.github/workflows/_tests.yml
     with:
       test-type: component
       test-run-type: memory
-      test-run-description: xunit-component-tests-in-memory
+      test-run-description: reqnroll-in-memory
+      csproj-path: ./tests/BreakfastProvider.Tests.Component.ReqNRoll/BreakfastProvider.Tests.Component.ReqNRoll.csproj
+      features-report-path: tests/BreakfastProvider.Tests.Component.ReqNRoll/bin/Debug/net10.0/Reports/TestRunReport.html
+    secrets: inherit
+
+  reqnroll-in-memory-report:
+    name: ReqNRoll in memory report
+    needs: [reqnroll-in-memory]
+    uses: ./.github/workflows/_report-tests.yml
+    with:
+      test-type: component
+      test-run-type: memory
+      trx-file: reqnroll-in-memory-results.trx
+
+  reqnroll-in-memory-coverage:
+    name: ReqNRoll in memory coverage
+    needs: [reqnroll-in-memory]
+    uses: ./.github/workflows/_report-coverage.yml
+    with:
+      test-type: component
+      test-run-type: memory
+      coverage-file: reqnroll-in-memory.coverage.cobertura.xml
+
+
+  reqnroll-in-docker:
+    name: ReqNRoll in docker
+    uses: ./.github/workflows/_tests.yml
+    with:
+      test-type: component
+      test-run-type: docker
+      test-run-description: reqnroll-in-docker
+      csproj-path: ./tests/BreakfastProvider.Tests.Component.ReqNRoll/BreakfastProvider.Tests.Component.ReqNRoll.csproj
+      features-report-path: tests/BreakfastProvider.Tests.Component.ReqNRoll/bin/Debug/net10.0/Reports/TestRunReport.html
+    secrets: inherit
+
+  reqnroll-in-docker-report:
+    name: ReqNRoll in docker report
+    needs: [reqnroll-in-docker]
+    uses: ./.github/workflows/_report-tests.yml
+    with:
+      test-type: component
+      test-run-type: docker
+      trx-file: reqnroll-in-docker-results.trx
+
+  reqnroll-in-docker-coverage:
+    name: ReqNRoll in docker coverage
+    needs: [reqnroll-in-docker]
+    uses: ./.github/workflows/_report-coverage.yml
+    with:
+      test-type: component
+      test-run-type: docker
+      coverage-file: reqnroll-in-docker.coverage.cobertura.xml
+
+
+  reqnroll-external-sut:
+    name: ReqNRoll external SUT
+    uses: ./.github/workflows/_tests.yml
+    with:
+      test-type: component
+      test-run-type: external-sut
+      test-run-description: reqnroll-external-sut
+      csproj-path: ./tests/BreakfastProvider.Tests.Component.ReqNRoll/BreakfastProvider.Tests.Component.ReqNRoll.csproj
+      features-report-path: tests/BreakfastProvider.Tests.Component.ReqNRoll/bin/Debug/net10.0/Reports/TestRunReport.html
+    secrets: inherit
+
+  reqnroll-external-sut-report:
+    name: ReqNRoll external SUT report
+    needs: [reqnroll-external-sut]
+    uses: ./.github/workflows/_report-tests.yml
+    with:
+      test-type: component
+      test-run-type: external-sut
+      trx-file: reqnroll-external-sut-results.trx
+
+  reqnroll-external-sut-coverage:
+    name: ReqNRoll external SUT coverage
+    needs: [reqnroll-external-sut]
+    uses: ./.github/workflows/_report-coverage.yml
+    with:
+      test-type: component
+      test-run-type: external-sut
+      coverage-file: reqnroll-external-sut.coverage.cobertura.xml
+
+
+  # ─── xUnit ─────────────────────────────────────────────────────────────────
+
+  xunit-in-memory:
+    name: xUnit in memory
+    uses: ./.github/workflows/_tests.yml
+    with:
+      test-type: component
+      test-run-type: memory
+      test-run-description: xunit-in-memory
       csproj-path: ./tests/BreakfastProvider.Tests.Component.xUnit/BreakfastProvider.Tests.Component.xUnit.csproj
       features-report-path: tests/BreakfastProvider.Tests.Component.xUnit/bin/Debug/net10.0/Reports/TestRunReport.html
     secrets: inherit
 
-
-  xunit-component-tests-in-memory-report:
-    name: xUnit component tests in memory
-    needs: [xunit-component-tests-in-memory]
+  xunit-in-memory-report:
+    name: xUnit in memory report
+    needs: [xunit-in-memory]
     uses: ./.github/workflows/_report-tests.yml
     with:
       test-type: component
       test-run-type: memory
-      trx-file: xunit-component-tests-in-memory-results.trx
+      trx-file: xunit-in-memory-results.trx
 
-
-  xunit-component-tests-in-memory-coverage:
-    name: xUnit component tests in memory
-    needs: [xunit-component-tests-in-memory]
+  xunit-in-memory-coverage:
+    name: xUnit in memory coverage
+    needs: [xunit-in-memory]
     uses: ./.github/workflows/_report-coverage.yml
     with:
       test-type: component
       test-run-type: memory
-      coverage-file: xunit-component-tests-in-memory.coverage.cobertura.xml
+      coverage-file: xunit-in-memory.coverage.cobertura.xml
 
 
-  xunit-component-tests-in-docker:
-    name: xUnit component tests in docker
+  xunit-in-docker:
+    name: xUnit in docker
     uses: ./.github/workflows/_tests.yml
     with:
       test-type: component
       test-run-type: docker
-      test-run-description: xunit-component-tests-in-docker
+      test-run-description: xunit-in-docker
       csproj-path: ./tests/BreakfastProvider.Tests.Component.xUnit/BreakfastProvider.Tests.Component.xUnit.csproj
       features-report-path: tests/BreakfastProvider.Tests.Component.xUnit/bin/Debug/net10.0/Reports/TestRunReport.html
     secrets: inherit
 
-
-  xunit-component-tests-in-docker-report:
-    name: xUnit component tests in docker
-    needs: [xunit-component-tests-in-docker]
+  xunit-in-docker-report:
+    name: xUnit in docker report
+    needs: [xunit-in-docker]
     uses: ./.github/workflows/_report-tests.yml
     with:
       test-type: component
       test-run-type: docker
-      trx-file: xunit-component-tests-in-docker-results.trx
+      trx-file: xunit-in-docker-results.trx
 
-
-  xunit-component-tests-in-docker-coverage:
-    name: xUnit component tests in docker
-    needs: [xunit-component-tests-in-docker]
+  xunit-in-docker-coverage:
+    name: xUnit in docker coverage
+    needs: [xunit-in-docker]
     uses: ./.github/workflows/_report-coverage.yml
     with:
       test-type: component
       test-run-type: docker
-      coverage-file: xunit-component-tests-in-docker.coverage.cobertura.xml
+      coverage-file: xunit-in-docker.coverage.cobertura.xml
 
 
-  xunit-component-tests-external-sut:
-    name: xUnit component tests (external SUT)
+  xunit-external-sut:
+    name: xUnit external SUT
     uses: ./.github/workflows/_tests.yml
     with:
       test-type: component
       test-run-type: external-sut
-      test-run-description: xunit-component-tests-external-sut
+      test-run-description: xunit-external-sut
       csproj-path: ./tests/BreakfastProvider.Tests.Component.xUnit/BreakfastProvider.Tests.Component.xUnit.csproj
       features-report-path: tests/BreakfastProvider.Tests.Component.xUnit/bin/Debug/net10.0/Reports/TestRunReport.html
     secrets: inherit
 
-
-  xunit-component-tests-external-sut-report:
-    name: xUnit component tests (external SUT)
-    needs: [xunit-component-tests-external-sut]
+  xunit-external-sut-report:
+    name: xUnit external SUT report
+    needs: [xunit-external-sut]
     uses: ./.github/workflows/_report-tests.yml
     with:
       test-type: component
       test-run-type: external-sut
-      trx-file: xunit-component-tests-external-sut-results.trx
+      trx-file: xunit-external-sut-results.trx
 
-
-  xunit-component-tests-external-sut-coverage:
-    name: xUnit component tests (external SUT)
-    needs: [xunit-component-tests-external-sut]
+  xunit-external-sut-coverage:
+    name: xUnit external SUT coverage
+    needs: [xunit-external-sut]
     uses: ./.github/workflows/_report-coverage.yml
     with:
       test-type: component
       test-run-type: external-sut
-      coverage-file: xunit-component-tests-external-sut.coverage.cobertura.xml
+      coverage-file: xunit-external-sut.coverage.cobertura.xml
 
+
+  # ─── Gate ───────────────────────────────────────────────────────────────────
 
   checks-complete:
     name: Checks complete
-    needs: [build, component-tests-in-memory, component-tests-in-docker, component-tests-external-sut, xunit-component-tests-in-memory, xunit-component-tests-in-docker, xunit-component-tests-external-sut]
+    needs:
+      - build
+      - lightbdd-in-memory
+      - lightbdd-in-docker
+      - lightbdd-external-sut
+      - reqnroll-in-memory
+      - reqnroll-in-docker
+      - reqnroll-external-sut
+      - xunit-in-memory
+      - xunit-in-docker
+      - xunit-external-sut
     runs-on: ubuntu-24.04
     steps:
       - name: Checks complete
         run: echo "Checks complete"
-
-

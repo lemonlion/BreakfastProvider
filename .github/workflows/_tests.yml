@@ -8,7 +8,7 @@ on:
       test-run-description: {type: string, required: false, default: "tests"}
       csproj-path: { type: string, required: true }
       filter: {type: string, required: false }
-      features-report-path: { type: string, required: false, default: "tests/BreakfastProvider.Tests.Component/bin/Debug/net10.0/Reports/FeaturesReport.html" }
+      features-report-path: { type: string, required: false, default: "tests/BreakfastProvider.Tests.Component.LightBDD/bin/Debug/net10.0/Reports/TestRunReport.html" }
       runs-on: { type: string, required: false, default: "ubuntu-24.04" }
       component-specifications-filename: { type: string, required: false, default: "Specifications" }
 

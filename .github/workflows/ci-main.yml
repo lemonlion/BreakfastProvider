@@ -19,153 +19,297 @@ jobs:
     secrets: inherit
 
 
-  component-tests-in-memory:
-    name: Component tests in memory (LightBDD)
+  # ─── LightBDD ───────────────────────────────────────────────────────────────
+
+  lightbdd-in-memory:
+    name: LightBDD in memory
     uses: ./.github/workflows/_tests.yml
     with:
       test-type: component
       test-run-type: memory
-      test-run-description: component-tests-in-memory
+      test-run-description: lightbdd-in-memory
       csproj-path: ./tests/BreakfastProvider.Tests.Component.LightBDD/BreakfastProvider.Tests.Component.LightBDD.csproj
       features-report-path: tests/BreakfastProvider.Tests.Component.LightBDD/bin/Debug/net10.0/Reports/TestRunReport.html
     secrets: inherit
 
-
-  component-tests-in-memory-report:
-    name: Component tests in memory
-    needs: [component-tests-in-memory]
+  lightbdd-in-memory-report:
+    name: LightBDD in memory report
+    needs: [lightbdd-in-memory]
     uses: ./.github/workflows/_report-tests.yml
     with:
       test-type: component
       test-run-type: memory
-      trx-file: component-tests-in-memory-results.trx
+      trx-file: lightbdd-in-memory-results.trx
 
-
-  component-tests-in-memory-coverage:
-    name: Component tests in memory
-    needs: [component-tests-in-memory]
+  lightbdd-in-memory-coverage:
+    name: LightBDD in memory coverage
+    needs: [lightbdd-in-memory]
     uses: ./.github/workflows/_report-coverage.yml
     with:
       test-type: component
       test-run-type: memory
-      coverage-file: component-tests-in-memory.coverage.cobertura.xml
+      coverage-file: lightbdd-in-memory.coverage.cobertura.xml
 
 
-  component-tests-in-docker:
-    name: Component tests in docker (LightBDD)
+  lightbdd-in-docker:
+    name: LightBDD in docker
     uses: ./.github/workflows/_tests.yml
     with:
       test-type: component
       test-run-type: docker
-      test-run-description: component-tests-in-docker
+      test-run-description: lightbdd-in-docker
       csproj-path: ./tests/BreakfastProvider.Tests.Component.LightBDD/BreakfastProvider.Tests.Component.LightBDD.csproj
       features-report-path: tests/BreakfastProvider.Tests.Component.LightBDD/bin/Debug/net10.0/Reports/TestRunReport.html
     secrets: inherit
 
-
-  component-tests-in-docker-report:
-    name: Component tests in docker
-    needs: [component-tests-in-docker]
+  lightbdd-in-docker-report:
+    name: LightBDD in docker report
+    needs: [lightbdd-in-docker]
     uses: ./.github/workflows/_report-tests.yml
     with:
       test-type: component
       test-run-type: docker
-      trx-file: component-tests-in-docker-results.trx
+      trx-file: lightbdd-in-docker-results.trx
 
-
-  component-tests-in-docker-coverage:
-    name: Component tests in docker
-    needs: [component-tests-in-docker]
+  lightbdd-in-docker-coverage:
+    name: LightBDD in docker coverage
+    needs: [lightbdd-in-docker]
     uses: ./.github/workflows/_report-coverage.yml
     with:
       test-type: component
       test-run-type: docker
-      coverage-file: component-tests-in-docker.coverage.cobertura.xml
+      coverage-file: lightbdd-in-docker.coverage.cobertura.xml
 
 
-  component-tests-external-sut:
-    name: Component tests (external SUT, LightBDD)
+  lightbdd-external-sut:
+    name: LightBDD external SUT
     uses: ./.github/workflows/_tests.yml
     with:
       test-type: component
       test-run-type: external-sut
-      test-run-description: component-tests-external-sut
+      test-run-description: lightbdd-external-sut
       csproj-path: ./tests/BreakfastProvider.Tests.Component.LightBDD/BreakfastProvider.Tests.Component.LightBDD.csproj
       features-report-path: tests/BreakfastProvider.Tests.Component.LightBDD/bin/Debug/net10.0/Reports/TestRunReport.html
     secrets: inherit
 
-
-  component-tests-external-sut-report:
-    name: Component tests (external SUT)
-    needs: [component-tests-external-sut]
+  lightbdd-external-sut-report:
+    name: LightBDD external SUT report
+    needs: [lightbdd-external-sut]
     uses: ./.github/workflows/_report-tests.yml
     with:
       test-type: component
       test-run-type: external-sut
-      trx-file: component-tests-external-sut-results.trx
+      trx-file: lightbdd-external-sut-results.trx
 
-
-  component-tests-external-sut-coverage:
-    name: Component tests (external SUT)
-    needs: [component-tests-external-sut]
+  lightbdd-external-sut-coverage:
+    name: LightBDD external SUT coverage
+    needs: [lightbdd-external-sut]
     uses: ./.github/workflows/_report-coverage.yml
     with:
       test-type: component
       test-run-type: external-sut
-      coverage-file: component-tests-external-sut.coverage.cobertura.xml
+      coverage-file: lightbdd-external-sut.coverage.cobertura.xml
 
 
-  component-tests-reqnroll-in-memory:
-    name: Component tests in memory (ReqNRoll)
+  # ─── ReqNRoll ───────────────────────────────────────────────────────────────
+
+  reqnroll-in-memory:
+    name: ReqNRoll in memory
     uses: ./.github/workflows/_tests.yml
     with:
       test-type: component
       test-run-type: memory
-      test-run-description: component-tests-reqnroll-in-memory
+      test-run-description: reqnroll-in-memory
       csproj-path: ./tests/BreakfastProvider.Tests.Component.ReqNRoll/BreakfastProvider.Tests.Component.ReqNRoll.csproj
       features-report-path: tests/BreakfastProvider.Tests.Component.ReqNRoll/bin/Debug/net10.0/Reports/TestRunReport.html
     secrets: inherit
 
-
-  xunit-component-tests-in-memory:
-    name: Component tests in memory (xUnit)
-    uses: ./.github/workflows/_tests.yml
+  reqnroll-in-memory-report:
+    name: ReqNRoll in memory report
+    needs: [reqnroll-in-memory]
+    uses: ./.github/workflows/_report-tests.yml
     with:
       test-type: component
       test-run-type: memory
-      test-run-description: xunit-component-tests-in-memory
-      csproj-path: ./tests/BreakfastProvider.Tests.Component.xUnit/BreakfastProvider.Tests.Component.xUnit.csproj
-      features-report-path: tests/BreakfastProvider.Tests.Component.xUnit/bin/Debug/net10.0/Reports/TestRunReport.html
-    secrets: inherit
+      trx-file: reqnroll-in-memory-results.trx
+
+  reqnroll-in-memory-coverage:
+    name: ReqNRoll in memory coverage
+    needs: [reqnroll-in-memory]
+    uses: ./.github/workflows/_report-coverage.yml
+    with:
+      test-type: component
+      test-run-type: memory
+      coverage-file: reqnroll-in-memory.coverage.cobertura.xml
 
 
-  xunit-component-tests-in-docker:
-    name: Component tests in docker (xUnit)
+  reqnroll-in-docker:
+    name: ReqNRoll in docker
     uses: ./.github/workflows/_tests.yml
     with:
       test-type: component
       test-run-type: docker
-      test-run-description: xunit-component-tests-in-docker
-      csproj-path: ./tests/BreakfastProvider.Tests.Component.xUnit/BreakfastProvider.Tests.Component.xUnit.csproj
-      features-report-path: tests/BreakfastProvider.Tests.Component.xUnit/bin/Debug/net10.0/Reports/TestRunReport.html
+      test-run-description: reqnroll-in-docker
+      csproj-path: ./tests/BreakfastProvider.Tests.Component.ReqNRoll/BreakfastProvider.Tests.Component.ReqNRoll.csproj
+      features-report-path: tests/BreakfastProvider.Tests.Component.ReqNRoll/bin/Debug/net10.0/Reports/TestRunReport.html
     secrets: inherit
 
+  reqnroll-in-docker-report:
+    name: ReqNRoll in docker report
+    needs: [reqnroll-in-docker]
+    uses: ./.github/workflows/_report-tests.yml
+    with:
+      test-type: component
+      test-run-type: docker
+      trx-file: reqnroll-in-docker-results.trx
 
-  xunit-component-tests-external-sut:
-    name: Component tests (external SUT, xUnit)
+  reqnroll-in-docker-coverage:
+    name: ReqNRoll in docker coverage
+    needs: [reqnroll-in-docker]
+    uses: ./.github/workflows/_report-coverage.yml
+    with:
+      test-type: component
+      test-run-type: docker
+      coverage-file: reqnroll-in-docker.coverage.cobertura.xml
+
+
+  reqnroll-external-sut:
+    name: ReqNRoll external SUT
     uses: ./.github/workflows/_tests.yml
     with:
       test-type: component
       test-run-type: external-sut
-      test-run-description: xunit-component-tests-external-sut
+      test-run-description: reqnroll-external-sut
+      csproj-path: ./tests/BreakfastProvider.Tests.Component.ReqNRoll/BreakfastProvider.Tests.Component.ReqNRoll.csproj
+      features-report-path: tests/BreakfastProvider.Tests.Component.ReqNRoll/bin/Debug/net10.0/Reports/TestRunReport.html
+    secrets: inherit
+
+  reqnroll-external-sut-report:
+    name: ReqNRoll external SUT report
+    needs: [reqnroll-external-sut]
+    uses: ./.github/workflows/_report-tests.yml
+    with:
+      test-type: component
+      test-run-type: external-sut
+      trx-file: reqnroll-external-sut-results.trx
+
+  reqnroll-external-sut-coverage:
+    name: ReqNRoll external SUT coverage
+    needs: [reqnroll-external-sut]
+    uses: ./.github/workflows/_report-coverage.yml
+    with:
+      test-type: component
+      test-run-type: external-sut
+      coverage-file: reqnroll-external-sut.coverage.cobertura.xml
+
+
+  # ─── xUnit ─────────────────────────────────────────────────────────────────
+
+  xunit-in-memory:
+    name: xUnit in memory
+    uses: ./.github/workflows/_tests.yml
+    with:
+      test-type: component
+      test-run-type: memory
+      test-run-description: xunit-in-memory
       csproj-path: ./tests/BreakfastProvider.Tests.Component.xUnit/BreakfastProvider.Tests.Component.xUnit.csproj
       features-report-path: tests/BreakfastProvider.Tests.Component.xUnit/bin/Debug/net10.0/Reports/TestRunReport.html
     secrets: inherit
 
+  xunit-in-memory-report:
+    name: xUnit in memory report
+    needs: [xunit-in-memory]
+    uses: ./.github/workflows/_report-tests.yml
+    with:
+      test-type: component
+      test-run-type: memory
+      trx-file: xunit-in-memory-results.trx
+
+  xunit-in-memory-coverage:
+    name: xUnit in memory coverage
+    needs: [xunit-in-memory]
+    uses: ./.github/workflows/_report-coverage.yml
+    with:
+      test-type: component
+      test-run-type: memory
+      coverage-file: xunit-in-memory.coverage.cobertura.xml
+
+
+  xunit-in-docker:
+    name: xUnit in docker
+    uses: ./.github/workflows/_tests.yml
+    with:
+      test-type: component
+      test-run-type: docker
+      test-run-description: xunit-in-docker
+      csproj-path: ./tests/BreakfastProvider.Tests.Component.xUnit/BreakfastProvider.Tests.Component.xUnit.csproj
+      features-report-path: tests/BreakfastProvider.Tests.Component.xUnit/bin/Debug/net10.0/Reports/TestRunReport.html
+    secrets: inherit
+
+  xunit-in-docker-report:
+    name: xUnit in docker report
+    needs: [xunit-in-docker]
+    uses: ./.github/workflows/_report-tests.yml
+    with:
+      test-type: component
+      test-run-type: docker
+      trx-file: xunit-in-docker-results.trx
+
+  xunit-in-docker-coverage:
+    name: xUnit in docker coverage
+    needs: [xunit-in-docker]
+    uses: ./.github/workflows/_report-coverage.yml
+    with:
+      test-type: component
+      test-run-type: docker
+      coverage-file: xunit-in-docker.coverage.cobertura.xml
+
+
+  xunit-external-sut:
+    name: xUnit external SUT
+    uses: ./.github/workflows/_tests.yml
+    with:
+      test-type: component
+      test-run-type: external-sut
+      test-run-description: xunit-external-sut
+      csproj-path: ./tests/BreakfastProvider.Tests.Component.xUnit/BreakfastProvider.Tests.Component.xUnit.csproj
+      features-report-path: tests/BreakfastProvider.Tests.Component.xUnit/bin/Debug/net10.0/Reports/TestRunReport.html
+    secrets: inherit
+
+  xunit-external-sut-report:
+    name: xUnit external SUT report
+    needs: [xunit-external-sut]
+    uses: ./.github/workflows/_report-tests.yml
+    with:
+      test-type: component
+      test-run-type: external-sut
+      trx-file: xunit-external-sut-results.trx
+
+  xunit-external-sut-coverage:
+    name: xUnit external SUT coverage
+    needs: [xunit-external-sut]
+    uses: ./.github/workflows/_report-coverage.yml
+    with:
+      test-type: component
+      test-run-type: external-sut
+      coverage-file: xunit-external-sut.coverage.cobertura.xml
+
+
+  # ─── Gate ───────────────────────────────────────────────────────────────────
 
   checks-complete:
     name: Checks complete
-    needs: [build, component-tests-in-memory, component-tests-in-docker, component-tests-external-sut, component-tests-reqnroll-in-memory, xunit-component-tests-in-memory, xunit-component-tests-in-docker, xunit-component-tests-external-sut]
+    needs:
+      - build
+      - lightbdd-in-memory
+      - lightbdd-in-docker
+      - lightbdd-external-sut
+      - reqnroll-in-memory
+      - reqnroll-in-docker
+      - reqnroll-external-sut
+      - xunit-in-memory
+      - xunit-in-docker
+      - xunit-external-sut
     runs-on: ubuntu-24.04
     steps:
       - name: Checks complete
@@ -181,9 +325,11 @@ jobs:
     secrets: inherit
 
 
+  # ─── GitHub Pages ───────────────────────────────────────────────────────────
+
   deploy-pages:
-    name: Deploy test reports to GitHub Pages
-    needs: [component-tests-in-memory, component-tests-reqnroll-in-memory, xunit-component-tests-in-memory]
+    name: Deploy to GitHub Pages
+    needs: [lightbdd-in-memory, reqnroll-in-memory, xunit-in-memory]
     runs-on: ubuntu-24.04
     permissions:
       pages: write
@@ -192,54 +338,169 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - name: Download LightBDD report artifact
+      - name: Checkout source
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            docs/openapi.json
+            docs/asyncapi.json
+
+      - name: Download LightBDD report
         uses: actions/download-artifact@v4
         with:
-          name: LightBDD-component-tests-in-memory-report
-          path: site/lightbdd
+          name: LightBDD-lightbdd-in-memory-report
+          path: site/reports/lightbdd
 
-      - name: Download ReqNRoll report artifact
+      - name: Download ReqNRoll report
         uses: actions/download-artifact@v4
         with:
-          name: LightBDD-component-tests-reqnroll-in-memory-report
-          path: site/reqnroll
+          name: LightBDD-reqnroll-in-memory-report
+          path: site/reports/reqnroll
 
-      - name: Download xUnit report artifact
+      - name: Download xUnit report
         uses: actions/download-artifact@v4
         with:
-          name: LightBDD-xunit-component-tests-in-memory-report
-          path: site/xunit
+          name: LightBDD-xunit-in-memory-report
+          path: site/reports/xunit
 
-      - name: Generate index page
+      - name: Copy API specs
         run: |
-          cat > site/index.html << 'EOF'
+          mkdir -p site/api
+          cp docs/openapi.json site/api/openapi.json
+          cp docs/asyncapi.json site/api/asyncapi.json
+
+      - name: Generate landing page
+        run: |
+          cat > site/index.html << 'LANDING_EOF'
           <!DOCTYPE html>
           <html lang="en">
           <head>
             <meta charset="utf-8">
             <meta name="viewport" content="width=device-width, initial-scale=1">
-            <title>Breakfast Provider — Test Reports</title>
+            <title>Breakfast Provider — TestTrackingDiagrams</title>
             <style>
-              body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 4rem auto; padding: 0 1rem; }
-              h1 { margin-bottom: 0.5rem; }
-              p { color: #555; }
-              ul { list-style: none; padding: 0; }
-              li { margin: 1rem 0; }
-              a { font-size: 1.1rem; color: #0366d6; text-decoration: none; }
-              a:hover { text-decoration: underline; }
+              :root {
+                --primary: #6366f1;
+                --primary-dark: #4f46e5;
+                --surface: #ffffff;
+                --surface-alt: #f8fafc;
+                --border: #e2e8f0;
+                --text: #1e293b;
+                --text-muted: #64748b;
+                --radius: 12px;
+                --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06);
+                --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.08), 0 4px 6px -4px rgba(0,0,0,0.04);
+              }
+              * { box-sizing: border-box; margin: 0; padding: 0; }
+              body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Inter, Roboto, sans-serif;
+                color: var(--text);
+                background: var(--surface-alt);
+                line-height: 1.6;
+                min-height: 100vh;
+              }
+              .hero {
+                background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+                color: white;
+                padding: 3rem 1.5rem 2.5rem;
+                text-align: center;
+              }
+              .hero h1 { font-size: 2rem; font-weight: 700; margin-bottom: 0.5rem; }
+              .hero p { font-size: 1.1rem; opacity: 0.9; }
+              .badge {
+                display: inline-block;
+                background: rgba(255,255,255,0.2);
+                border: 1px solid rgba(255,255,255,0.3);
+                border-radius: 20px;
+                padding: 0.25rem 0.75rem;
+                font-size: 0.8rem;
+                margin-top: 1rem;
+                font-weight: 500;
+              }
+              .container { max-width: 900px; margin: 0 auto; padding: 2rem 1.5rem 3rem; }
+              .section-title {
+                font-size: 0.75rem;
+                font-weight: 600;
+                text-transform: uppercase;
+                letter-spacing: 0.05em;
+                color: var(--text-muted);
+                margin-bottom: 0.75rem;
+              }
+              .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1rem; margin-bottom: 2.5rem; }
+              .card {
+                background: var(--surface);
+                border: 1px solid var(--border);
+                border-radius: var(--radius);
+                padding: 1.5rem;
+                text-decoration: none;
+                color: var(--text);
+                transition: box-shadow 0.2s, transform 0.2s;
+                box-shadow: var(--shadow);
+              }
+              .card:hover { box-shadow: var(--shadow-lg); transform: translateY(-2px); }
+              .card-icon { font-size: 1.5rem; margin-bottom: 0.5rem; }
+              .card h3 { font-size: 1rem; font-weight: 600; margin-bottom: 0.25rem; }
+              .card p { font-size: 0.875rem; color: var(--text-muted); }
+              .footer {
+                text-align: center;
+                padding: 1.5rem;
+                color: var(--text-muted);
+                font-size: 0.8rem;
+                border-top: 1px solid var(--border);
+              }
+              .footer a { color: var(--primary); text-decoration: none; }
+              .footer a:hover { text-decoration: underline; }
             </style>
           </head>
           <body>
-            <h1>Breakfast Provider</h1>
-            <p>Component Test Reports (updated on every push to main)</p>
-            <ul>
-              <li><a href="lightbdd/TestRunReport.html">LightBDD Test Run Report</a></li>
-              <li><a href="reqnroll/TestRunReport.html">ReqNRoll Test Run Report</a></li>
-              <li><a href="xunit/TestRunReport.html">xUnit Test Run Report</a></li>
-            </ul>
+            <div class="hero">
+              <h1>Breakfast Provider</h1>
+              <p>Component Test Reports &amp; API Documentation</p>
+              <span class="badge">Powered by TestTrackingDiagrams</span>
+            </div>
+
+            <div class="container">
+              <p class="section-title">Test Run Reports</p>
+              <div class="card-grid">
+                <a href="reports/lightbdd/TestRunReport.html" class="card">
+                  <div class="card-icon">📋</div>
+                  <h3>LightBDD</h3>
+                  <p>BDD-style component test report with interaction diagrams</p>
+                </a>
+                <a href="reports/reqnroll/TestRunReport.html" class="card">
+                  <div class="card-icon">🥒</div>
+                  <h3>ReqNRoll</h3>
+                  <p>Gherkin-based component test report with feature specifications</p>
+                </a>
+                <a href="reports/xunit/TestRunReport.html" class="card">
+                  <div class="card-icon">🧪</div>
+                  <h3>xUnit</h3>
+                  <p>Standard xUnit component test report with sequence diagrams</p>
+                </a>
+              </div>
+
+              <p class="section-title">API Specifications</p>
+              <div class="card-grid">
+                <a href="api/openapi.json" class="card">
+                  <div class="card-icon">🔌</div>
+                  <h3>OpenAPI</h3>
+                  <p>REST API specification (OpenAPI 3.x JSON)</p>
+                </a>
+                <a href="api/asyncapi.json" class="card">
+                  <div class="card-icon">⚡</div>
+                  <h3>AsyncAPI</h3>
+                  <p>Event-driven API specification (AsyncAPI JSON)</p>
+                </a>
+              </div>
+            </div>
+
+            <div class="footer">
+              Generated by <a href="https://github.com/lemonlion/TestTrackingDiagrams" target="_blank">TestTrackingDiagrams</a>
+              &middot; Updated on every push to main
+            </div>
           </body>
           </html>
-          EOF
+          LANDING_EOF
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3

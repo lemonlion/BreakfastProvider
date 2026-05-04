@@ -244,6 +244,9 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.Muffins
 #line 22
         await testRunner.AndAsync(string.Format("the muffin response should include {0} toppings", expectedToppingCount), ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
 #line hidden
+#line 23
+        await testRunner.AndAsync("the muffin response should include baking information", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
+#line hidden
             }
             await this.ScenarioCleanupAsync();
         }
@@ -273,7 +276,7 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.Muffins
                     "e", null, tagsOfScenario, argumentsOfScenario, featureTags, pickleIndex);
             string[] tagsOfRule = ((string[])(null));
             global::Reqnroll.RuleInfo ruleInfo = null;
-#line 30
+#line 31
     this.ScenarioInitialize(scenarioInfo, ruleInfo);
 #line hidden
             if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
@@ -283,13 +286,13 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.Muffins
             else
             {
                 await this.ScenarioStartAsync();
-#line 31
+#line 32
         await testRunner.GivenAsync(string.Format("a valid muffin request with \"{0}\" set to \"{1}\"", field, value), ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
 #line hidden
-#line 32
+#line 33
         await testRunner.WhenAsync("the invalid muffin request is submitted", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
 #line hidden
-#line 33
+#line 34
         await testRunner.ThenAsync(string.Format("the muffin response should contain error \"{0}\" with status \"{1}\"", errorMessage, responseStatus), ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
 #line hidden
             }

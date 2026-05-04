@@ -1,4 +1,4 @@
-TtdVersion: 2.29.1-beta+e62c78d592a552ee19c2e39e0c13cfb72656aaf5
+TtdVersion: 2.29.2-beta+7dc08c45591eb1b91443ba93175d07f09c0caa9c
 Title: Breakfast Provider Specifications
 Features:
   - Feature: Auditlogs Filtering Tests

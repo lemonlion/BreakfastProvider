@@ -1,3 +1,4 @@
+using Google.Api.Gax;
 using Google.Cloud.PubSub.V1;
 using Google.Protobuf;
 using Grpc.Core;
@@ -33,7 +34,10 @@ public class RawJsonPubSubConsumer : BackgroundService
         var subscriptionId = $"{topicId}-test-{Guid.NewGuid():N}";
         _subscriptionName = SubscriptionName.FromProjectSubscription(projectId, subscriptionId);
 
-        _subscriberClient = new SubscriberServiceApiClientBuilder().Build();
+        _subscriberClient = new SubscriberServiceApiClientBuilder
+        {
+            EmulatorDetection = EmulatorDetection.EmulatorOrProduction
+        }.Build();
     }
 
     public override async Task StartAsync(CancellationToken cancellationToken)

@@ -27,7 +27,7 @@
     <PackageReference Include="ReqNRoll" Version="3.3.4" />
     <PackageReference Include="ReqNRoll.xUnit.V3" Version="3.3.4" />
     <PackageReference Include="ReqNRoll.Microsoft.Extensions.DependencyInjection" Version="3.3.4" />
-    <PackageReference Include="TestTrackingDiagrams.ReqNRoll.xUnit3" Version="2.28.41" />
+    <PackageReference Include="TestTrackingDiagrams.ReqNRoll.xUnit3" Version="2.29.0-beta" />
     <PackageReference Include="xunit.v3" Version="3.2.2" />
     <PackageReference Include="coverlet.collector" Version="6.0.4">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

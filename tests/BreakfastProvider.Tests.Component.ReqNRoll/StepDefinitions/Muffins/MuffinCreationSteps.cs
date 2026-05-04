@@ -158,6 +158,12 @@ public class MuffinCreationSteps(
         Track.That(() => muffinSteps.Response!.Toppings.Should().HaveCount(expectedCount));
     }
 
+    [Then("the muffin response should include baking information")]
+    public void ThenTheMuffinResponseShouldIncludeBakingInformation()
+    {
+        Track.That(() => muffinSteps.Response!.BakingTemperature.Should().BeGreaterThan(0));
+    }
+
     [Then(@"the muffin response should contain error ""(.*)"" with status ""(.*)""")]
     public async Task ThenTheMuffinResponseShouldContainError(string errorMessage, string responseStatus)
     {

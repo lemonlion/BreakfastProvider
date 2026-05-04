@@ -20,6 +20,7 @@ Feature: Muffins Creation
         When the muffins are prepared
         Then the muffin batch should have <ExpectedIngredientCount> ingredients
         And the muffin response should include <ExpectedToppingCount> toppings
+        And the muffin response should include baking information
 
         Examples:
             | RecipeName       | Flour       | AppleVariety | CinnamonType | Temperature | Duration | PanType   | Topping1          | Amount1 | Topping2           | Amount2 | ExpectedIngredientCount | ExpectedToppingCount |

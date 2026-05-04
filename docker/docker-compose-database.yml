@@ -130,7 +130,7 @@ services:
         EMULATOR=http://pubsub-emulator.local:8085
 
         echo "Creating PubSub topics..."
-        for topic in pancake-batch-completed waffle-batch-completed inventory-item-added inventory-stock-updated menu-availability-changed topping-created staff-member-added reservation-confirmed reservation-cancelled daily-special-ordered; do
+        for topic in pancake-batch-completed waffle-batch-completed muffin-batch-completed inventory-item-added inventory-stock-updated menu-availability-changed topping-created staff-member-added reservation-confirmed reservation-cancelled daily-special-ordered; do
           curl -sf -X PUT "$$EMULATOR/v1/projects/breakfast-provider-project/topics/$$topic" || true
           echo " -> Created topic: $$topic"
         done

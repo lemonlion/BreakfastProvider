@@ -4,6 +4,7 @@ public static class Endpoints
 {
     public const string Pancakes = "pancakes";
     public const string Waffles = "waffles";
+    public const string Muffins = "muffins";
     public const string Orders = "orders";
     public const string Milk = "milk";
     public const string Eggs = "eggs";

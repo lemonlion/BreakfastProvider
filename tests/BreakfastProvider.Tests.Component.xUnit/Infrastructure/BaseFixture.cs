@@ -14,6 +14,7 @@ using BreakfastProvider.Tests.Component.Shared.Common.Ingredients;
 using BreakfastProvider.Tests.Component.Shared.Common.Inventory;
 using BreakfastProvider.Tests.Component.Shared.Common.Menu;
 using BreakfastProvider.Tests.Component.Shared.Common.Orders;
+using BreakfastProvider.Tests.Component.Shared.Common.Muffins;
 using BreakfastProvider.Tests.Component.Shared.Common.Pancakes;
 using BreakfastProvider.Tests.Component.Shared.Common.Reporting;
 using BreakfastProvider.Tests.Component.Shared.Common.Reservations;
@@ -104,6 +105,7 @@ public abstract class BaseFixture : DiagrammedComponentTest, IDisposable
         services.AddTransient<GetGoatMilkSteps>();
         services.AddTransient<PostPancakesSteps>();
         services.AddTransient<PostWafflesSteps>();
+        services.AddTransient<PostMuffinsSteps>();
         services.AddTransient<PostOrderSteps>();
         services.AddTransient<GetOrderSteps>();
         services.AddTransient<ListOrdersSteps>();

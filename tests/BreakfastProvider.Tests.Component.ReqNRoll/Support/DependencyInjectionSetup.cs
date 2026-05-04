@@ -8,6 +8,7 @@ using BreakfastProvider.Tests.Component.Shared.Common.Ingredients;
 using BreakfastProvider.Tests.Component.Shared.Common.Inventory;
 using BreakfastProvider.Tests.Component.Shared.Common.Menu;
 using BreakfastProvider.Tests.Component.Shared.Common.Orders;
+using BreakfastProvider.Tests.Component.Shared.Common.Muffins;
 using BreakfastProvider.Tests.Component.Shared.Common.Pancakes;
 using BreakfastProvider.Tests.Component.Shared.Common.Reporting;
 using BreakfastProvider.Tests.Component.Shared.Common.Reservations;
@@ -44,6 +45,7 @@ public class DependencyInjectionSetup
         services.AddScoped<GetGoatMilkSteps>();
         services.AddScoped<PostPancakesSteps>();
         services.AddScoped<PostWafflesSteps>();
+        services.AddScoped<PostMuffinsSteps>();
         services.AddScoped<PostOrderSteps>();
         services.AddScoped<GetOrderSteps>();
         services.AddScoped<ListOrdersSteps>();

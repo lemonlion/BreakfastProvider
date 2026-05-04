@@ -766,6 +766,50 @@
         }
       }
     },
+    "/muffins": {
+      "post": {
+        "tags": [
+          "Muffins"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MuffinRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/MuffinRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MuffinResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/orders": {
       "post": {
         "tags": [
@@ -1719,6 +1763,33 @@
           }
         }
       },
+      "BakingProfile": {
+        "type": "object",
+        "properties": {
+          "temperature": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "durationMinutes": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "panType": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
       "CustomerPreferenceRequest": {
         "type": "object",
         "properties": {
@@ -2042,6 +2113,115 @@
         "properties": {
           "milk": {
             "type": "string"
+          }
+        }
+      },
+      "MuffinRequest": {
+        "type": "object",
+        "properties": {
+          "milk": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "flour": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "eggs": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "apples": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "cinnamon": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "baking": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/BakingProfile"
+              }
+            ]
+          },
+          "toppings": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MuffinTopping"
+            }
+          }
+        }
+      },
+      "MuffinResponse": {
+        "type": "object",
+        "properties": {
+          "batchId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "ingredients": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "toppings": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "bakingTemperature": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "bakingDuration": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "MuffinTopping": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "amount": {
+            "type": [
+              "null",
+              "string"
+            ]
           }
         }
       },
@@ -2596,6 +2776,9 @@
     },
     {
       "name": "Milk"
+    },
+    {
+      "name": "Muffins"
     },
     {
       "name": "Orders"

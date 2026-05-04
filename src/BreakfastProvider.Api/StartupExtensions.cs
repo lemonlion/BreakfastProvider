@@ -69,6 +69,7 @@ public static class StartupExtensions
             services.AddSingleton(_ => new PubSubEventPublisher<DailySpecialOrderedEvent>());
             services.AddSingleton(_ => new PubSubEventPublisher<PancakeBatchCompletedEvent>());
             services.AddSingleton(_ => new PubSubEventPublisher<WaffleBatchCompletedEvent>());
+            services.AddSingleton(_ => new PubSubEventPublisher<MuffinBatchCompletedEvent>());
             return services;
         }
 
@@ -95,6 +96,7 @@ public static class StartupExtensions
         RegisterKeyedPublisher<ReservationCancelledEvent>(services);
         RegisterKeyedPublisher<DailySpecialOrderedEvent>(services);
         RegisterKeyedPublisher<PancakeBatchCompletedEvent>(services);
+        RegisterKeyedPublisher<MuffinBatchCompletedEvent>(services);
         RegisterKeyedPublisher<WaffleBatchCompletedEvent>(services);
 
         return services;

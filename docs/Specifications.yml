@@ -1,4 +1,4 @@
-TtdVersion: 2.28.38+6a9b7febed28ebdac0b4f2dd2d81a527b410137c
+TtdVersion: 2.28.41+5adc6efa87565a9016bd3eecdba341793095cf0b
 Title: Breakfast Provider Specifications
 Features:
   - Feature: Audit Logs Filtering Feature
@@ -702,6 +702,82 @@ Features:
             - The menu response http status should be ok
             - The menu list should be valid json
             - All menu items should be marked as unavailable
+
+  - Feature: Muffins Creation Feature
+    Description: /muffins - Creating apple cinnamon muffins with baking profiles and toppings
+    Scenarios:
+      - Scenario: A Valid Apple Cinnamon Muffin Request Should Return A Fresh Batch
+        IsHappyPath: true
+        Labels:
+          - Happy Path
+        Steps:
+          - GIVEN A valid muffin recipe with all ingredients
+          - WHEN The muffins are prepared
+          - THEN The muffin response should contain a valid batch with all ingredients
+          - AND The cow service should have received a milk request
+
+      - Scenario: Different Muffin Recipes Should Produce The Expected "MuffinBatchExpectation ( ExpectedIngredientCount = 5, ExpectedToppingCount = 2, HasBakingInfo = True )" Batch <recipeName = "Classic"> <recipe = "MuffinRecipeTestData ( Ingredients = IngredientSet ( Flour = Plain Flour, Apples = Granny Smith, Cinnamon = Ceylon ), Baking = BakingProfileData ( Temperature = 180, DurationMinutes = 25, PanType = Standard ), Toppings = System.Collections.Generic.List'1<BreakfastProvider.Tests.Component.Shared.Models.Muffins.ToppingData> )">
+        IsHappyPath: false
+        Steps:
+          - GIVEN A muffin recipe "MuffinRecipeTestData ( Ingredients = IngredientSet ( Flour = Plain Flour, Apples = Granny Smith, Cinnamon = Ceylon ), Baking = BakingProfileData ( Temperature = 180, DurationMinutes = 25, PanType = Standard ), Toppings = System.Collections.Generic.List'1<BreakfastProvider.Tests.Component.Shared.Models.Muffins.ToppingData> )" with ingredients and baking profile <recipeName = "Classic">
+          - WHEN The muffins are prepared
+          - THEN The muffin batch should match the expected "MuffinBatchExpectation ( ExpectedIngredientCount = 5, ExpectedToppingCount = 2, HasBakingInfo = True )" outcome
+
+      - Scenario: Different Muffin Recipes Should Produce The Expected "MuffinBatchExpectation ( ExpectedIngredientCount = 5, ExpectedToppingCount = 2, HasBakingInfo = True )" Batch <recipeName = "Rustic Wholesome"> <recipe = "MuffinRecipeTestData ( Ingredients = IngredientSet ( Flour = Whole Wheat, Apples = Honeycrisp, Cinnamon = Cassia ), Baking = BakingProfileData ( Temperature = 175, DurationMinutes = 30, PanType = Cast Iron ), Toppings = System.Collections.Generic.List'1<BreakfastProvider.Tests.Component.Shared.Models.Muffins.ToppingData> )">
+        IsHappyPath: false
+        Steps:
+          - GIVEN A muffin recipe "MuffinRecipeTestData ( Ingredients = IngredientSet ( Flour = Whole Wheat, Apples = Honeycrisp, Cinnamon = Cassia ), Baking = BakingProfileData ( Temperature = 175, DurationMinutes = 30, PanType = Cast Iron ), Toppings = System.Collections.Generic.List'1<BreakfastProvider.Tests.Component.Shared.Models.Muffins.ToppingData> )" with ingredients and baking profile <recipeName = "Rustic Wholesome">
+          - WHEN The muffins are prepared
+          - THEN The muffin batch should match the expected "MuffinBatchExpectation ( ExpectedIngredientCount = 5, ExpectedToppingCount = 2, HasBakingInfo = True )" outcome
+
+      - Scenario: Different Muffin Recipes Should Produce The Expected "MuffinBatchExpectation ( ExpectedIngredientCount = 5, ExpectedToppingCount = 2, HasBakingInfo = True )" Batch <recipeName = "Spiced Deluxe"> <recipe = "MuffinRecipeTestData ( Ingredients = IngredientSet ( Flour = Almond Flour, Apples = Pink Lady, Cinnamon = Saigon ), Baking = BakingProfileData ( Temperature = 190, DurationMinutes = 20, PanType = Silicone ), Toppings = System.Collections.Generic.List'1<BreakfastProvider.Tests.Component.Shared.Models.Muffins.ToppingData> )">
+        IsHappyPath: false
+        Steps:
+          - GIVEN A muffin recipe "MuffinRecipeTestData ( Ingredients = IngredientSet ( Flour = Almond Flour, Apples = Pink Lady, Cinnamon = Saigon ), Baking = BakingProfileData ( Temperature = 190, DurationMinutes = 20, PanType = Silicone ), Toppings = System.Collections.Generic.List'1<BreakfastProvider.Tests.Component.Shared.Models.Muffins.ToppingData> )" with ingredients and baking profile <recipeName = "Spiced Deluxe">
+          - WHEN The muffins are prepared
+          - THEN The muffin batch should match the expected "MuffinBatchExpectation ( ExpectedIngredientCount = 5, ExpectedToppingCount = 2, HasBakingInfo = True )" outcome
+
+      - Scenario: Muffins Endpoint Is Called With An Invalid Field "Apples" Should Return A Bad Request Response <value = ""> <reason = "Apples is required"> <expectedError = "'Apples' is required."> <expectedStatus = "Bad Request">
+        IsHappyPath: false
+        Steps:
+          - GIVEN A valid muffin request with an invalid field "Apples" <value = "">
+          - WHEN The invalid muffin request is submitted
+          - THEN The muffin response should contain the validation error <expectedError = "'Apples' is required."> <expectedStatus = "Bad Request">
+
+      - Scenario: Muffins Endpoint Is Called With An Invalid Field "Cinnamon" Should Return A Bad Request Response <value = ""> <reason = "Cinnamon is required"> <expectedError = "'Cinnamon' is required."> <expectedStatus = "Bad Request">
+        IsHappyPath: false
+        Steps:
+          - GIVEN A valid muffin request with an invalid field "Cinnamon" <value = "">
+          - WHEN The invalid muffin request is submitted
+          - THEN The muffin response should contain the validation error <expectedError = "'Cinnamon' is required."> <expectedStatus = "Bad Request">
+
+      - Scenario: Muffins Endpoint Is Called With An Invalid Field "Cinnamon" Should Return A Bad Request Response <value = "<script>alert('xss')</script>"> <reason = "XSS in cinnamon"> <expectedError = "Cinnamon contains potentially dangerous content."> <expectedStatus = "Bad Request">
+        IsHappyPath: false
+        Steps:
+          - GIVEN A valid muffin request with an invalid field "Cinnamon" <value = "<script>alert('xss')</script>">
+          - WHEN The invalid muffin request is submitted
+          - THEN The muffin response should contain the validation error <expectedError = "Cinnamon contains potentially dangerous content."> <expectedStatus = "Bad Request">
+
+      - Scenario: Muffins Endpoint Is Called With An Invalid Field "Eggs" Should Return A Bad Request Response <value = ""> <reason = "Eggs is required"> <expectedError = "'Eggs' is required."> <expectedStatus = "Bad Request">
+        IsHappyPath: false
+        Steps:
+          - GIVEN A valid muffin request with an invalid field "Eggs" <value = "">
+          - WHEN The invalid muffin request is submitted
+          - THEN The muffin response should contain the validation error <expectedError = "'Eggs' is required."> <expectedStatus = "Bad Request">
+
+      - Scenario: Muffins Endpoint Is Called With An Invalid Field "Flour" Should Return A Bad Request Response <value = ""> <reason = "Flour is required"> <expectedError = "'Flour' is required."> <expectedStatus = "Bad Request">
+        IsHappyPath: false
+        Steps:
+          - GIVEN A valid muffin request with an invalid field "Flour" <value = "">
+          - WHEN The invalid muffin request is submitted
+          - THEN The muffin response should contain the validation error <expectedError = "'Flour' is required."> <expectedStatus = "Bad Request">
+
+      - Scenario: Muffins Endpoint Is Called With An Invalid Field "Milk" Should Return A Bad Request Response <value = ""> <reason = "Milk is required"> <expectedError = "'Milk' is required."> <expectedStatus = "Bad Request">
+        IsHappyPath: false
+        Steps:
+          - GIVEN A valid muffin request with an invalid field "Milk" <value = "">
+          - WHEN The invalid muffin request is submitted
+          - THEN The muffin response should contain the validation error <expectedError = "'Milk' is required."> <expectedStatus = "Bad Request">
 
   - Feature: Orders Breakfast Order Feature
     Description: /orders - Creating and managing breakfast orders with event publishing

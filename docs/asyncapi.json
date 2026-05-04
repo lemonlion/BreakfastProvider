@@ -58,6 +58,15 @@
       },
       "description": "Published when a menu item becomes available or unavailable."
     },
+    "muffin-batch-completed": {
+      "address": "muffin-batch-completed",
+      "messages": {
+        "muffinBatchCompletedMessage": {
+          "$ref": "#/components/messages/muffinBatchCompletedMessage"
+        }
+      },
+      "description": "Published when an apple cinnamon muffin batch is completed."
+    },
     "pancake-batch-completed": {
       "address": "pancake-batch-completed",
       "messages": {
@@ -181,6 +190,20 @@
       "messages": [
         {
           "$ref": "#/channels/menu-availability-changed/messages/menuAvailabilityChangedMessage"
+        }
+      ]
+    },
+    "PubSubMuffinBatchCompleted": {
+      "action": "send",
+      "channel": {
+        "$ref": "#/channels/muffin-batch-completed"
+      },
+      "title": "PubSubMuffinBatchCompleted",
+      "summary": "Muffin Batch Completed",
+      "description": "Published when an apple cinnamon muffin batch is completed.",
+      "messages": [
+        {
+          "$ref": "#/channels/muffin-batch-completed/messages/muffinBatchCompletedMessage"
         }
       ]
     },
@@ -421,6 +444,41 @@
           "content-type": {
             "type": "string",
             "description": "Content type."
+          }
+        },
+        "additionalProperties": false
+      },
+      "muffinBatchCompletedEvent": {
+        "type": "object",
+        "description": "Published when an apple cinnamon muffin batch is completed.",
+        "properties": {
+          "batchId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Batch ID."
+          },
+          "ingredients": {
+            "type": "array",
+            "description": "List of ingredients used.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "toppings": {
+            "type": "array",
+            "description": "List of toppings applied.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "bakingTemperature": {
+            "type": "integer",
+            "description": "Baking temperature in degrees Celsius."
+          },
+          "completedAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp when the batch was completed (ISO 8601 format)."
           }
         },
         "additionalProperties": false
@@ -672,6 +730,14 @@
         "name": "menuAvailabilityChangedMessage",
         "title": "Menu Availability Changed Message",
         "summary": "Published when a menu item becomes available or unavailable."
+      },
+      "muffinBatchCompletedMessage": {
+        "payload": {
+          "$ref": "#/components/schemas/muffinBatchCompletedEvent"
+        },
+        "name": "muffinBatchCompletedMessage",
+        "title": "Muffin Batch Completed Message",
+        "summary": "Published when an apple cinnamon muffin batch is completed."
       },
       "pancakeBatchCompletedMessage": {
         "payload": {

@@ -46,7 +46,8 @@ public class ConfiguredLightBddScopeAttribute : LightBddScope
         configuration.ReportWritersConfiguration().CreateStandardReportsWithDiagrams(
                 new ReportConfigurationOptions
                 {
-                    SpecificationsTitle = "Breakfast Provider Specifications"
+                    SpecificationsTitle = "Breakfast Provider Specifications",
+                    WriteCiSummary = true
                 });
 
         // To stop the output repeating the step name each step

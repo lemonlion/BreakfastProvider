@@ -49,7 +49,8 @@ public sealed class TestRunHooks
         ReqNRollReportGenerator.CreateStandardReportsWithDiagrams(
             new ReportConfigurationOptions
             {
-                SpecificationsTitle = "Breakfast Provider Specifications"
+                SpecificationsTitle = "Breakfast Provider Specifications",
+                WriteCiSummary = true
             });
 
         Support.AppManager.DisposeFactory();

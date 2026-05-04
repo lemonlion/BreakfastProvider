@@ -62,7 +62,8 @@ public class GlobalTestSetup : IAsyncLifetime
             DateTime.UtcNow,
             new ReportConfigurationOptions
             {
-                SpecificationsTitle = "Breakfast Provider Specifications"
+                SpecificationsTitle = "Breakfast Provider Specifications",
+                WriteCiSummary = true
             });
 
         await SourceControlSpecificationsFile();

@@ -16,6 +16,6 @@ public class StatusUpdateNotFoundSteps(PatchOrderStatusSteps patchSteps)
     [Then("the status update response should indicate not found")]
     public void ThenTheStatusUpdateResponseShouldIndicateNotFound()
     {
-        Track.That(() => patchSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.NotFound));
+        patchSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 }

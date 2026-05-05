@@ -41,26 +41,26 @@ public class Pancakes_Creation_Tests : BaseFixture
     {
         // Given a valid pancake recipe with all ingredients
         await _milkSteps.Retrieve();
-        Track.That(() => _milkSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
+        _milkSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
         _pancakeSteps.Request.Milk = _milkSteps.MilkResponse.Milk;
 
         await _eggsSteps.Retrieve();
-        Track.That(() => _eggsSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
+        _eggsSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
         _pancakeSteps.Request.Eggs = _eggsSteps.EggsResponse.Eggs;
 
         await _flourSteps.Retrieve();
-        Track.That(() => _flourSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
+        _flourSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
         _pancakeSteps.Request.Flour = _flourSteps.FlourResponse.Flour;
 
         // When the pancakes are prepared
         await _pancakeSteps.Send();
 
         // Then the response should contain a valid batch with all ingredients
-        Track.That(() => _pancakeSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created));
+        _pancakeSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
         await _pancakeSteps.ParseResponse();
-        Track.That(() => _pancakeSteps.Response!.Ingredients.Should().Contain(_milkSteps.MilkResponse.Milk));
-        Track.That(() => _pancakeSteps.Response!.Ingredients.Should().Contain(_eggsSteps.EggsResponse.Eggs));
-        Track.That(() => _pancakeSteps.Response!.Ingredients.Should().Contain(_flourSteps.FlourResponse.Flour));
+        _pancakeSteps.Response!.Ingredients.Should().Contain(_milkSteps.MilkResponse.Milk);
+        _pancakeSteps.Response!.Ingredients.Should().Contain(_eggsSteps.EggsResponse.Eggs);
+        _pancakeSteps.Response!.Ingredients.Should().Contain(_flourSteps.FlourResponse.Flour);
 
         // And the cow service should have received a milk request
         if (!Settings.RunAgainstExternalServiceUnderTest)
@@ -95,8 +95,8 @@ public class Pancakes_Creation_Tests : BaseFixture
         // Then the responses should contain the validation error
         var actualResults = await ValidationHelper.ParseValidationResponses(responses);
         var actual = actualResults.Single();
-        Track.That(() => actual.ErrorMessage.Should().Be(expectedError));
-        Track.That(() => actual.ResponseStatus.Should().Be(expectedStatus));
+        actual.ErrorMessage.Should().Be(expectedError);
+        actual.ResponseStatus.Should().Be(expectedStatus);
     }
 
     [Test]
@@ -123,8 +123,8 @@ public class Pancakes_Creation_Tests : BaseFixture
         await _pancakeSteps.Send();
 
         // Then the response should indicate too many toppings
-        Track.That(() => _pancakeSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.BadRequest));
+        _pancakeSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         var body = await _pancakeSteps.ResponseMessage!.Content.ReadAsStringAsync();
-        Track.That(() => body.Should().Contain(PancakeValidationMessages.MaxToppingsExceeded));
+        body.Should().Contain(PancakeValidationMessages.MaxToppingsExceeded);
     }
 }

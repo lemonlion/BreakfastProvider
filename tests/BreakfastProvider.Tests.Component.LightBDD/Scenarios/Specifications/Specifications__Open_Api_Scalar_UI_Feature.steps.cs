@@ -36,20 +36,20 @@ public partial class Specifications__Open_Api_Scalar_UI_Feature : BaseFixture
 
     private async Task The_response_status_should_be_ok()
     {
-        Track.That(() => _scalarResponse!.StatusCode.Should().Be(HttpStatusCode.OK));
+        _scalarResponse!.StatusCode.Should().Be(HttpStatusCode.OK);
     }
 
     private async Task The_response_should_be_valid_html()
     {
         _scalarHtml = await _scalarResponse!.Content.ReadAsStringAsync();
         var scalarUiResponseBody = _scalarHtml;
-        Track.That(() => scalarUiResponseBody.Should().Contain("<html"));
+        scalarUiResponseBody.Should().Contain("<html");
     }
 
     private async Task The_response_should_refer_to_scalar()
     {
         var scalarUiResponseBody = _scalarHtml;
-        Track.That(() => scalarUiResponseBody.Should().Contain("scalar"));
+        scalarUiResponseBody.Should().Contain("scalar");
     }
 
     #endregion

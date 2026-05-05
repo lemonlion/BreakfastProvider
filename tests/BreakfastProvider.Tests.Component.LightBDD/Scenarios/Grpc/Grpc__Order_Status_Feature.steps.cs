@@ -67,7 +67,7 @@ public partial class Grpc__Order_Status_Feature : BaseFixture
 
     private async Task The_pancake_batch_response_should_be_successful()
     {
-        Track.That(() => _pancakeSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created));
+        _pancakeSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
         await _pancakeSteps.ParseResponse();
     }
 
@@ -99,7 +99,7 @@ public partial class Grpc__Order_Status_Feature : BaseFixture
 
     private async Task The_order_creation_response_should_be_successful()
     {
-        Track.That(() => _orderSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created));
+        _orderSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
         await _orderSteps.ParseResponse();
         _createdOrderId = _orderSteps.Response!.OrderId;
     }
@@ -127,18 +127,18 @@ public partial class Grpc__Order_Status_Feature : BaseFixture
     }
 
     private async Task The_grpc_order_id_should_match()
-        => Track.That(() => _grpcSteps.OrderStatusReply!.OrderId.Should().Be(_createdOrderId.ToString()));
+        => _grpcSteps.OrderStatusReply!.OrderId.Should().Be(_createdOrderId.ToString());
 
     private async Task The_grpc_customer_name_should_match()
-        => Track.That(() => _grpcSteps.OrderStatusReply!.CustomerName.Should().Be(_customerName));
+        => _grpcSteps.OrderStatusReply!.CustomerName.Should().Be(_customerName);
 
     private async Task The_grpc_status_should_be_created()
-        => Track.That(() => _grpcSteps.OrderStatusReply!.Status.Should().Be(OrderStatuses.Created));
+        => _grpcSteps.OrderStatusReply!.Status.Should().Be(OrderStatuses.Created);
 
     private async Task The_grpc_response_should_be_a_not_found_error()
     {
-        Track.That(() => _grpcSteps.RpcException.Should().NotBeNull());
-        Track.That(() => _grpcSteps.RpcException!.StatusCode.Should().Be(StatusCode.NotFound));
+        _grpcSteps.RpcException.Should().NotBeNull();
+        _grpcSteps.RpcException!.StatusCode.Should().Be(StatusCode.NotFound);
     }
 
     #endregion

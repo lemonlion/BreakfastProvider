@@ -55,12 +55,12 @@ public class RateLimitingSteps(
     [Then("the first request should succeed")]
     public void ThenTheFirstRequestShouldSucceed()
     {
-        Track.That(() => _firstResponse!.StatusCode.Should().Be(HttpStatusCode.Created));
+        _firstResponse!.StatusCode.Should().Be(HttpStatusCode.Created);
     }
 
     [Then("the second request should be rate limited")]
     public void ThenTheSecondRequestShouldBeRateLimited()
     {
-        Track.That(() => _secondResponse!.StatusCode.Should().Be(HttpStatusCode.TooManyRequests));
+        _secondResponse!.StatusCode.Should().Be(HttpStatusCode.TooManyRequests);
     }
 }

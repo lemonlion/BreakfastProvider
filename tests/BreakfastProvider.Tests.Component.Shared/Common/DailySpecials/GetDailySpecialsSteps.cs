@@ -20,7 +20,7 @@ public class GetDailySpecialsSteps(RequestContext context)
     {
         var content = await ResponseMessage!.Content.ReadAsStringAsync();
         var responseContentIsValidJson = Json.IsValid(content);
-        Track.That(() => responseContentIsValidJson.Should().BeTrue());
+        responseContentIsValidJson.Should().BeTrue();
         Response = Json.Deserialize<List<TestDailySpecialResponse>>(content)!;
     }
 }

@@ -26,9 +26,9 @@ public class Ingredients_Goat_Milk_Downstream_Failure_Tests : BaseFixture
         await _goatMilkSteps.Retrieve();
 
         // Then the goat milk response should indicate a bad gateway
-        Track.That(() => _goatMilkSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.BadGateway));
+        _goatMilkSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.BadGateway);
         var goatMilkErrorResponseBody = await _goatMilkSteps.ResponseMessage!.Content.ReadAsStringAsync();
-        Track.That(() => goatMilkErrorResponseBody.Should().Contain(DownstreamErrorMessages.GoatServiceUnavailableTitle));
+        goatMilkErrorResponseBody.Should().Contain(DownstreamErrorMessages.GoatServiceUnavailableTitle);
     }
 
     [Test]
@@ -44,8 +44,8 @@ public class Ingredients_Goat_Milk_Downstream_Failure_Tests : BaseFixture
         await _goatMilkSteps.Retrieve();
 
         // Then the goat milk response should indicate a bad gateway
-        Track.That(() => _goatMilkSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.BadGateway));
+        _goatMilkSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.BadGateway);
         var goatMilkErrorResponseBody = await _goatMilkSteps.ResponseMessage!.Content.ReadAsStringAsync();
-        Track.That(() => goatMilkErrorResponseBody.Should().Contain(DownstreamErrorMessages.GoatServiceUnavailableTitle));
+        goatMilkErrorResponseBody.Should().Contain(DownstreamErrorMessages.GoatServiceUnavailableTitle);
     }
 }

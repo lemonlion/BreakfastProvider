@@ -64,14 +64,14 @@ public class OrderRetrievalSteps(
     [Then("the order retrieval response should contain the order")]
     public async Task ThenTheOrderRetrievalResponseShouldContainTheOrder()
     {
-        Track.That(() => getOrderSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
+        getOrderSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
         await getOrderSteps.ParseResponse();
-        Track.That(() => getOrderSteps.Response!.OrderId.Should().Be(_orderId));
+        getOrderSteps.Response!.OrderId.Should().Be(_orderId);
     }
 
     [Then("the order retrieval response should indicate not found")]
     public void ThenTheOrderRetrievalResponseShouldIndicateNotFound()
     {
-        Track.That(() => getOrderSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.NotFound));
+        getOrderSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 }

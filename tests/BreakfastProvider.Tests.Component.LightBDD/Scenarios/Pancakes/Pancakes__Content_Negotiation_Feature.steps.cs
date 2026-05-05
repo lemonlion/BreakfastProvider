@@ -36,7 +36,7 @@ public partial class Pancakes__Content_Negotiation_Feature : BaseFixture
     #region Then
 
     private async Task The_response_should_indicate_unsupported_media_type()
-        => Track.That(() => _response!.StatusCode.Should().Be(HttpStatusCode.UnsupportedMediaType));
+        => _response!.StatusCode.Should().Be(HttpStatusCode.UnsupportedMediaType);
 
     #endregion
 }

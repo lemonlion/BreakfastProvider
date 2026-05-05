@@ -43,35 +43,35 @@ public partial class Infrastructure__Health_Check_Feature : BaseFixture
     }
 
     private async Task The_health_check_response_status_should_be_ok()
-        => Track.That(() => _healthResponse!.StatusCode.Should().Be(HttpStatusCode.OK));
+        => _healthResponse!.StatusCode.Should().Be(HttpStatusCode.OK);
 
     private async Task The_health_check_response_should_be_valid_json()
     {
         var content = await _healthResponse!.Content.ReadAsStringAsync();
         _healthCheckResult = Json.Deserialize<TestHealthCheckResponse>(content)!;
-        Track.That(() => _healthCheckResult.Should().NotBeNull());
+        _healthCheckResult.Should().NotBeNull();
     }
 
     private async Task The_overall_status_should_be_healthy()
-        => Track.That(() => _healthCheckResult!.Status.Should().Be(HealthCheckStatuses.Healthy));
+        => _healthCheckResult!.Status.Should().Be(HealthCheckStatuses.Healthy);
 
     private async Task The_response_should_include_cow_service_check()
-        => Track.That(() => _healthCheckResult!.Results.Should().ContainKey(HealthCheckNames.CowService));
+        => _healthCheckResult!.Results.Should().ContainKey(HealthCheckNames.CowService);
 
     private async Task The_response_should_include_goat_service_check()
-        => Track.That(() => _healthCheckResult!.Results.Should().ContainKey(HealthCheckNames.GoatService));
+        => _healthCheckResult!.Results.Should().ContainKey(HealthCheckNames.GoatService);
 
     private async Task The_response_should_include_supplier_service_check()
-        => Track.That(() => _healthCheckResult!.Results.Should().ContainKey(HealthCheckNames.SupplierService));
+        => _healthCheckResult!.Results.Should().ContainKey(HealthCheckNames.SupplierService);
 
     private async Task The_response_should_include_kitchen_service_check()
-        => Track.That(() => _healthCheckResult!.Results.Should().ContainKey(HealthCheckNames.KitchenService));
+        => _healthCheckResult!.Results.Should().ContainKey(HealthCheckNames.KitchenService);
 
     private async Task The_response_should_include_cosmos_db_check()
-        => Track.That(() => _healthCheckResult!.Results.Should().ContainKey(HealthCheckNames.CosmosDb));
+        => _healthCheckResult!.Results.Should().ContainKey(HealthCheckNames.CosmosDb);
 
     private async Task The_response_should_include_kafka_check()
-        => Track.That(() => _healthCheckResult!.Results.Should().ContainKey(HealthCheckNames.Kafka));
+        => _healthCheckResult!.Results.Should().ContainKey(HealthCheckNames.Kafka);
 
     #endregion
 }

@@ -46,7 +46,7 @@ public class Orders_Pagination_Tests : BaseFixture
             Flour = _flourSteps.FlourResponse.Flour
         };
         await _pancakeSteps.Send();
-        Track.That(() => _pancakeSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created));
+        _pancakeSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
         await _pancakeSteps.ParseResponse();
 
         // Create two orders
@@ -67,7 +67,7 @@ public class Orders_Pagination_Tests : BaseFixture
                 ]
             };
             await _orderSteps.Send();
-            Track.That(() => _orderSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created));
+            _orderSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
         }
 
         _createdOrderCount = 2;
@@ -84,11 +84,11 @@ public class Orders_Pagination_Tests : BaseFixture
         await _listSteps.Retrieve();
 
         // Then
-        Track.That(() => _listSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
+        _listSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
         await _listSteps.ParseResponse();
-        Track.That(() => _listSteps.Response!.Items.Should().HaveCountGreaterThanOrEqualTo(_createdOrderCount));
-        Track.That(() => _listSteps.Response!.Page.Should().Be(1));
-        Track.That(() => _listSteps.Response!.TotalCount.Should().BeGreaterThanOrEqualTo(_createdOrderCount));
+        _listSteps.Response!.Items.Should().HaveCountGreaterThanOrEqualTo(_createdOrderCount);
+        _listSteps.Response!.Page.Should().Be(1);
+        _listSteps.Response!.TotalCount.Should().BeGreaterThanOrEqualTo(_createdOrderCount);
     }
 
     [Test]
@@ -101,10 +101,10 @@ public class Orders_Pagination_Tests : BaseFixture
         await _listSteps.Retrieve(page: 1, pageSize: 1);
 
         // Then
-        Track.That(() => _listSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
+        _listSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
         await _listSteps.ParseResponse();
-        Track.That(() => _listSteps.Response!.Items.Should().HaveCount(1));
-        Track.That(() => _listSteps.Response!.TotalPages.Should().BeGreaterThanOrEqualTo(_createdOrderCount));
+        _listSteps.Response!.Items.Should().HaveCount(1);
+        _listSteps.Response!.TotalPages.Should().BeGreaterThanOrEqualTo(_createdOrderCount);
     }
 
     [Test]
@@ -117,10 +117,10 @@ public class Orders_Pagination_Tests : BaseFixture
         await _listSteps.Retrieve(page: 2, pageSize: 1);
 
         // Then
-        Track.That(() => _listSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
+        _listSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
         await _listSteps.ParseResponse();
-        Track.That(() => _listSteps.Response!.Items.Should().HaveCount(1));
-        Track.That(() => _listSteps.Response!.Page.Should().Be(2));
+        _listSteps.Response!.Items.Should().HaveCount(1);
+        _listSteps.Response!.Page.Should().Be(2);
     }
 
     [Test]
@@ -133,9 +133,9 @@ public class Orders_Pagination_Tests : BaseFixture
         await _listSteps.Retrieve();
 
         // Then
-        Track.That(() => _listSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
+        _listSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
         await _listSteps.ParseResponse();
-        Track.That(() => _listSteps.Response!.Items.Should().BeEmpty());
-        Track.That(() => _listSteps.Response!.TotalCount.Should().Be(0));
+        _listSteps.Response!.Items.Should().BeEmpty();
+        _listSteps.Response!.TotalCount.Should().Be(0);
     }
 }

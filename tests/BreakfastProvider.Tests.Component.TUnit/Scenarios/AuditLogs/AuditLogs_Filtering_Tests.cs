@@ -71,8 +71,8 @@ public class AuditLogs_Filtering_Tests : BaseFixture
         _auditLogs = Json.Deserialize<List<TestAuditLogResponse>>(content)!;
 
         // Then the audit log response should only contain order entries
-        Track.That(() => _auditLogResponse!.StatusCode.Should().Be(HttpStatusCode.OK));
-        Track.That(() => _auditLogs!.Should().OnlyContain(l => l.EntityType == AuditLogDefaults.OrderEntityType));
+        _auditLogResponse!.StatusCode.Should().Be(HttpStatusCode.OK);
+        _auditLogs!.Should().OnlyContain(l => l.EntityType == AuditLogDefaults.OrderEntityType);
     }
 
     [Test]
@@ -89,8 +89,8 @@ public class AuditLogs_Filtering_Tests : BaseFixture
         _auditLogs = Json.Deserialize<List<TestAuditLogResponse>>(content)!;
 
         // Then the audit log response should contain the specific order entry
-        Track.That(() => _auditLogResponse!.StatusCode.Should().Be(HttpStatusCode.OK));
-        Track.That(() => _auditLogs!.Should().Contain(l => l.EntityId == _orderId));
+        _auditLogResponse!.StatusCode.Should().Be(HttpStatusCode.OK);
+        _auditLogs!.Should().Contain(l => l.EntityId == _orderId);
     }
 
     [Test]
@@ -102,10 +102,10 @@ public class AuditLogs_Filtering_Tests : BaseFixture
         _auditLogResponse = await Client.SendAsync(request);
 
         // Then the audit log response should be an empty collection
-        Track.That(() => _auditLogResponse!.StatusCode.Should().Be(HttpStatusCode.OK));
+        _auditLogResponse!.StatusCode.Should().Be(HttpStatusCode.OK);
         var content = await _auditLogResponse!.Content.ReadAsStringAsync();
         var auditLogs = Json.Deserialize<List<TestAuditLogResponse>>(content)!;
-        Track.That(() => auditLogs.Should().BeEmpty());
+        auditLogs.Should().BeEmpty();
     }
 
     [Test]
@@ -122,7 +122,7 @@ public class AuditLogs_Filtering_Tests : BaseFixture
         _auditLogs = Json.Deserialize<List<TestAuditLogResponse>>(content)!;
 
         // Then the audit logs should be ordered by timestamp descending
-        Track.That(() => _auditLogs.Should().NotBeNullOrEmpty());
-        Track.That(() => _auditLogs!.Should().BeInDescendingOrder(l => l.Timestamp));
+        _auditLogs.Should().NotBeNullOrEmpty();
+        _auditLogs!.Should().BeInDescendingOrder(l => l.Timestamp);
     }
 }

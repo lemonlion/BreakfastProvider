@@ -28,7 +28,7 @@ public class GetStaffSteps(RequestContext context)
     {
         var content = await ResponseMessage!.Content.ReadAsStringAsync();
         var responseContentIsValidJson = Json.IsValid(content);
-        Track.That(() => responseContentIsValidJson.Should().BeTrue());
+        responseContentIsValidJson.Should().BeTrue();
         Response = Json.Deserialize<TestStaffMemberResponse>(content)!;
     }
 
@@ -36,7 +36,7 @@ public class GetStaffSteps(RequestContext context)
     {
         var content = await ResponseMessage!.Content.ReadAsStringAsync();
         var responseContentIsValidJson = Json.IsValid(content);
-        Track.That(() => responseContentIsValidJson.Should().BeTrue());
+        responseContentIsValidJson.Should().BeTrue();
         ListResponse = Json.Deserialize<List<TestStaffMemberResponse>>(content)!;
     }
 }

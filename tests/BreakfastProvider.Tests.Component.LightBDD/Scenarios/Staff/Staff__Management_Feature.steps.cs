@@ -45,7 +45,7 @@ public partial class Staff__Management_Feature : BaseFixture
 
     private async Task The_setup_response_should_be_created()
     {
-        Track.That(() => _postSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created));
+        _postSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
         await _postSteps.ParseResponse();
         _createdMemberId = _postSteps.Response!.Id;
     }
@@ -94,16 +94,16 @@ public partial class Staff__Management_Feature : BaseFixture
     }
 
     private async Task The_post_response_http_status_should_be_created()
-        => Track.That(() => _postSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created));
+        => _postSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
 
     private async Task The_post_response_should_be_valid_json()
         => await _postSteps.ParseResponse();
 
     private async Task The_created_member_should_have_the_correct_name()
-        => Track.That(() => _postSteps.Response!.Name.Should().Be(_postSteps.Request.Name));
+        => _postSteps.Response!.Name.Should().Be(_postSteps.Request.Name);
 
     private async Task The_created_member_should_have_the_correct_role()
-        => Track.That(() => _postSteps.Response!.Role.Should().Be("Chef"));
+        => _postSteps.Response!.Role.Should().Be("Chef");
 
     private async Task<CompositeStep> The_staff_get_response_should_contain_the_member()
     {
@@ -114,23 +114,23 @@ public partial class Staff__Management_Feature : BaseFixture
     }
 
     private async Task The_get_response_http_status_should_be_ok()
-        => Track.That(() => _getSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
+        => _getSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
 
     private async Task The_get_response_should_be_valid_json()
         => await _getSteps.ParseResponse();
 
     private async Task The_retrieved_member_should_match_the_created_member()
     {
-        Track.That(() => _getSteps.Response!.Id.Should().Be(_createdMemberId));
-        Track.That(() => _getSteps.Response!.Name.Should().Be(_postSteps.Response!.Name));
-        Track.That(() => _getSteps.Response!.Role.Should().Be("Chef"));
+        _getSteps.Response!.Id.Should().Be(_createdMemberId);
+        _getSteps.Response!.Name.Should().Be(_postSteps.Response!.Name);
+        _getSteps.Response!.Role.Should().Be("Chef");
     }
 
     private async Task The_staff_delete_response_should_indicate_no_content()
-        => Track.That(() => _deleteResponse!.StatusCode.Should().Be(HttpStatusCode.NoContent));
+        => _deleteResponse!.StatusCode.Should().Be(HttpStatusCode.NoContent);
 
     private async Task The_staff_response_should_indicate_bad_request()
-        => Track.That(() => _postSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.BadRequest));
+        => _postSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.BadRequest);
 
     #endregion
 }

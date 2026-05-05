@@ -47,7 +47,7 @@ public partial class Reservations__Management_Feature : BaseFixture
 
     private async Task The_setup_response_should_be_created()
     {
-        Track.That(() => _postSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created));
+        _postSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
         await _postSteps.ParseResponse();
         _createdReservationId = _postSteps.Response!.Id;
     }
@@ -66,7 +66,7 @@ public partial class Reservations__Management_Feature : BaseFixture
         => await _cancelSteps.Send(_createdReservationId);
 
     private async Task The_setup_cancellation_should_succeed()
-        => Track.That(() => _cancelSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
+        => _cancelSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
 
     #endregion
 
@@ -107,16 +107,16 @@ public partial class Reservations__Management_Feature : BaseFixture
     }
 
     private async Task The_post_response_http_status_should_be_created()
-        => Track.That(() => _postSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created));
+        => _postSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
 
     private async Task The_post_response_should_be_valid_json()
         => await _postSteps.ParseResponse();
 
     private async Task The_reservation_status_should_be_confirmed()
-        => Track.That(() => _postSteps.Response!.Status.Should().Be("Confirmed"));
+        => _postSteps.Response!.Status.Should().Be("Confirmed");
 
     private async Task The_reservation_customer_name_should_match()
-        => Track.That(() => _postSteps.Response!.CustomerName.Should().Be(_postSteps.Request.CustomerName));
+        => _postSteps.Response!.CustomerName.Should().Be(_postSteps.Request.CustomerName);
 
     private async Task<CompositeStep> The_reservation_get_response_should_contain_the_reservation()
     {
@@ -127,16 +127,16 @@ public partial class Reservations__Management_Feature : BaseFixture
     }
 
     private async Task The_get_response_http_status_should_be_ok()
-        => Track.That(() => _getSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
+        => _getSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
 
     private async Task The_get_response_should_be_valid_json()
         => await _getSteps.ParseResponse();
 
     private async Task The_retrieved_reservation_should_match_the_created_booking()
     {
-        Track.That(() => _getSteps.Response!.Id.Should().Be(_createdReservationId));
-        Track.That(() => _getSteps.Response!.CustomerName.Should().Be(_postSteps.Response!.CustomerName));
-        Track.That(() => _getSteps.Response!.Status.Should().Be("Confirmed"));
+        _getSteps.Response!.Id.Should().Be(_createdReservationId);
+        _getSteps.Response!.CustomerName.Should().Be(_postSteps.Response!.CustomerName);
+        _getSteps.Response!.Status.Should().Be("Confirmed");
     }
 
     private async Task<CompositeStep> The_cancellation_response_should_indicate_the_reservation_is_cancelled()
@@ -148,19 +148,19 @@ public partial class Reservations__Management_Feature : BaseFixture
     }
 
     private async Task The_cancel_response_http_status_should_be_ok()
-        => Track.That(() => _cancelSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
+        => _cancelSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
 
     private async Task The_cancel_response_should_be_valid_json()
         => await _cancelSteps.ParseResponse();
 
     private async Task The_cancelled_reservation_status_should_be_cancelled()
-        => Track.That(() => _cancelSteps.Response!.Status.Should().Be("Cancelled"));
+        => _cancelSteps.Response!.Status.Should().Be("Cancelled");
 
     private async Task The_cancellation_response_should_indicate_a_conflict()
-        => Track.That(() => _cancelSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Conflict));
+        => _cancelSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Conflict);
 
     private async Task The_reservation_delete_response_should_indicate_no_content()
-        => Track.That(() => _deleteResponse!.StatusCode.Should().Be(HttpStatusCode.NoContent));
+        => _deleteResponse!.StatusCode.Should().Be(HttpStatusCode.NoContent);
 
     #endregion
 }

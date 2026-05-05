@@ -24,9 +24,9 @@ public class Grpc_Recipe_Summary_Tests : BaseFixture
         await _grpcSteps.GetRecipeSummary("Pancakes");
 
         // Then the recipe summary should contain pancake data
-        Track.That(() => _grpcSteps.RecipeSummaryReply!.RecipeType.Should().Be("Pancakes"));
-        Track.That(() => _grpcSteps.RecipeSummaryReply!.TotalBatches.Should().Be(42));
-        Track.That(() => _grpcSteps.RecipeSummaryReply!.CommonIngredients.Should().BeEquivalentTo(["Milk", "Flour", "Eggs"]));
+        _grpcSteps.RecipeSummaryReply!.RecipeType.Should().Be("Pancakes");
+        _grpcSteps.RecipeSummaryReply!.TotalBatches.Should().Be(42);
+        _grpcSteps.RecipeSummaryReply!.CommonIngredients.Should().BeEquivalentTo(["Milk", "Flour", "Eggs"]);
     }
 
     [Test]
@@ -37,9 +37,9 @@ public class Grpc_Recipe_Summary_Tests : BaseFixture
         await _grpcSteps.GetRecipeSummary("Waffles");
 
         // Then the recipe summary should contain waffle data
-        Track.That(() => _grpcSteps.RecipeSummaryReply!.RecipeType.Should().Be("Waffles"));
-        Track.That(() => _grpcSteps.RecipeSummaryReply!.TotalBatches.Should().Be(28));
-        Track.That(() => _grpcSteps.RecipeSummaryReply!.CommonIngredients.Should().BeEquivalentTo(["Milk", "Flour", "Eggs", "Butter"]));
+        _grpcSteps.RecipeSummaryReply!.RecipeType.Should().Be("Waffles");
+        _grpcSteps.RecipeSummaryReply!.TotalBatches.Should().Be(28);
+        _grpcSteps.RecipeSummaryReply!.CommonIngredients.Should().BeEquivalentTo(["Milk", "Flour", "Eggs", "Butter"]);
     }
 
     [Test]
@@ -49,8 +49,8 @@ public class Grpc_Recipe_Summary_Tests : BaseFixture
         await _grpcSteps.GetRecipeSummary("Unknown");
 
         // Then the recipe summary should contain zero batches and no ingredients
-        Track.That(() => _grpcSteps.RecipeSummaryReply!.RecipeType.Should().Be("Unknown"));
-        Track.That(() => _grpcSteps.RecipeSummaryReply!.TotalBatches.Should().Be(0));
-        Track.That(() => _grpcSteps.RecipeSummaryReply!.CommonIngredients.Should().BeEmpty());
+        _grpcSteps.RecipeSummaryReply!.RecipeType.Should().Be("Unknown");
+        _grpcSteps.RecipeSummaryReply!.TotalBatches.Should().Be(0);
+        _grpcSteps.RecipeSummaryReply!.CommonIngredients.Should().BeEmpty();
     }
 }

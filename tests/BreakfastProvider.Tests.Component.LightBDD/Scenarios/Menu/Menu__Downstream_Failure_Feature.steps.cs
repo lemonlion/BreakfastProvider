@@ -47,13 +47,13 @@ public partial class Menu__Downstream_Failure_Feature : BaseFixture
     }
 
     private async Task The_menu_response_http_status_should_be_ok()
-        => Track.That(() => _menuSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
+        => _menuSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
 
     private async Task The_menu_list_should_be_valid_json()
         => await _menuSteps.ParseResponse();
 
     private async Task All_menu_items_should_be_marked_as_unavailable()
-        => Track.That(() => _menuSteps.Response!.Should().OnlyContain(m => m.IsAvailable == false));
+        => _menuSteps.Response!.Should().OnlyContain(m => m.IsAvailable == false);
 
     #endregion
 }

@@ -31,7 +31,7 @@ public class Staff_Management_Tests : BaseFixture
     {
         _postSteps.Request = CreateValidRequest();
         await _postSteps.Send();
-        Track.That(() => _postSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created));
+        _postSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
         await _postSteps.ParseResponse();
         return _postSteps.Response!.Id;
     }
@@ -47,10 +47,10 @@ public class Staff_Management_Tests : BaseFixture
         await _postSteps.Send();
 
         // Then the response should contain the created member
-        Track.That(() => _postSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created));
+        _postSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
         await _postSteps.ParseResponse();
-        Track.That(() => _postSteps.Response!.Name.Should().Be(_postSteps.Request.Name));
-        Track.That(() => _postSteps.Response!.Role.Should().Be("Chef"));
+        _postSteps.Response!.Name.Should().Be(_postSteps.Request.Name);
+        _postSteps.Response!.Role.Should().Be("Chef");
     }
 
     [Test]
@@ -63,11 +63,11 @@ public class Staff_Management_Tests : BaseFixture
         await _getSteps.RetrieveById(createdMemberId);
 
         // Then the response should contain the member
-        Track.That(() => _getSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
+        _getSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
         await _getSteps.ParseResponse();
-        Track.That(() => _getSteps.Response!.Id.Should().Be(createdMemberId));
-        Track.That(() => _getSteps.Response!.Name.Should().Be(_postSteps.Response!.Name));
-        Track.That(() => _getSteps.Response!.Role.Should().Be("Chef"));
+        _getSteps.Response!.Id.Should().Be(createdMemberId);
+        _getSteps.Response!.Name.Should().Be(_postSteps.Response!.Name);
+        _getSteps.Response!.Role.Should().Be("Chef");
     }
 
     [Test]
@@ -82,7 +82,7 @@ public class Staff_Management_Tests : BaseFixture
         var deleteResponse = await Client.SendAsync(request);
 
         // Then the response should indicate no content
-        Track.That(() => deleteResponse.StatusCode.Should().Be(HttpStatusCode.NoContent));
+        deleteResponse.StatusCode.Should().Be(HttpStatusCode.NoContent);
     }
 
     [Test]
@@ -100,6 +100,6 @@ public class Staff_Management_Tests : BaseFixture
         await _postSteps.Send();
 
         // Then the response should indicate bad request
-        Track.That(() => _postSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.BadRequest));
+        _postSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     }
 }

@@ -46,17 +46,17 @@ public class Reporting_EventGrid_Webhook_Tests : BaseFixture
         };
         request.Headers.Add(CustomHeaders.ComponentTestRequestId, RequestId);
         var webhookResponse = await Client.SendAsync(request);
-        Track.That(() => webhookResponse.StatusCode.Should().Be(HttpStatusCode.OK));
+        webhookResponse.StatusCode.Should().Be(HttpStatusCode.OK);
 
         // When the ingredient shipments are queried via GraphQL
         await _graphQlSteps.QueryIngredientShipments();
 
         // Then the response should contain the ingredient shipment
-        Track.That(() => _graphQlSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
+        _graphQlSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
         await _graphQlSteps.ParseIngredientShipmentsResponse();
-        Track.That(() => _graphQlSteps.IngredientShipments.Should().Contain(s =>
+        _graphQlSteps.IngredientShipments.Should().Contain(s =>
             s.DeliveryId == _deliveryId &&
             s.IngredientName == "Milk" &&
-            s.Quantity == 50.0m));
+            s.Quantity == 50.0m);
     }
 }

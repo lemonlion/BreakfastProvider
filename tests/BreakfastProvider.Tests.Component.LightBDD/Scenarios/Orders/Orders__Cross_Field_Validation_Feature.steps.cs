@@ -69,7 +69,7 @@ public partial class Orders__Cross_Field_Validation_Feature : BaseFixture
 
     private async Task The_pancake_batch_should_be_successful()
     {
-        Track.That(() => _pancakeSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created));
+        _pancakeSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
         await _pancakeSteps.ParseResponse();
     }
 
@@ -120,18 +120,18 @@ public partial class Orders__Cross_Field_Validation_Feature : BaseFixture
     }
 
     private async Task The_order_response_status_should_be_bad_request()
-        => Track.That(() => _orderSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.BadRequest));
+        => _orderSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.BadRequest);
 
     private async Task The_error_message_should_reference_the_item_limit()
     {
         var content = await _orderSteps.ResponseMessage!.Content.ReadAsStringAsync();
         var problemDetails = Json.Deserialize<ValidationProblemDetails>(content);
         var orderValidationErrors = problemDetails?.Errors.Values.SelectMany(v => v).ToList();
-        Track.That(() => orderValidationErrors.Should().Contain(e => e.Contains("cannot contain more than 2 items")));
+        orderValidationErrors.Should().Contain(e => e.Contains("cannot contain more than 2 items"));
     }
 
     private async Task The_response_should_indicate_success()
-        => Track.That(() => _orderSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created));
+        => _orderSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
 
     #endregion
 }

@@ -55,14 +55,14 @@ public partial class Specifications__Async_Api_Feature : BaseFixture
 
     private async Task The_response_status_should_be_ok()
     {
-        Track.That(() => _asyncApiResponse!.StatusCode.Should().Be(HttpStatusCode.OK));
+        _asyncApiResponse!.StatusCode.Should().Be(HttpStatusCode.OK);
     }
 
     private async Task The_response_should_be_valid_json()
     {
         var asyncApiResponseIsValidJson = _asyncApiJson is not null;
-        Track.That(() => asyncApiResponseIsValidJson.Should().BeTrue(
-            $"response body (first 500 chars): {_asyncApiJsonString?[..Math.Min(_asyncApiJsonString.Length, 500)]}"));
+        asyncApiResponseIsValidJson.Should().BeTrue(
+            $"response body (first 500 chars): {_asyncApiJsonString?[..Math.Min(_asyncApiJsonString.Length, 500)]}");
     }
 
     private async Task<CompositeStep> The_asyncapi_spec_is_written_to_disk()
@@ -78,7 +78,7 @@ public partial class Specifications__Async_Api_Feature : BaseFixture
     }
 
     private async Task The_asyncapi_spec_should_contain_NAME(string name)
-        => Track.That(() => _asyncApiJson!.RootElement.GetProperty(name).Should().NotBeNull());
+        => _asyncApiJson!.RootElement.GetProperty(name).Should().NotBeNull();
 
     private async Task The_asyncapi_spec_is_written_to_disk_as_json()
     {

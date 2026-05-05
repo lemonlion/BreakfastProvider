@@ -39,13 +39,13 @@ public partial class Infrastructure__Health_Check_Detail_Feature : BaseFixture
     }
 
     private async Task The_health_check_response_status_should_be_ok()
-        => Track.That(() => _healthResponse!.StatusCode.Should().Be(HttpStatusCode.OK));
+        => _healthResponse!.StatusCode.Should().Be(HttpStatusCode.OK);
 
     private async Task The_health_check_response_should_be_valid_json()
     {
         var content = await _healthResponse!.Content.ReadAsStringAsync();
         _healthCheckResult = Json.Deserialize<TestHealthCheckResponse>(content)!;
-        Track.That(() => _healthCheckResult.Should().NotBeNull());
+        _healthCheckResult.Should().NotBeNull();
     }
 
     private async Task Each_entry_should_have_a_status()
@@ -53,8 +53,8 @@ public partial class Infrastructure__Health_Check_Detail_Feature : BaseFixture
         foreach (var entry in _healthCheckResult!.Results)
         {
             var healthCheckEntryStatus = entry.Value.Status;
-            Track.That(() => healthCheckEntryStatus.Should().NotBeNullOrEmpty(
-                $"health check entry '{entry.Key}' should have a status"));
+            healthCheckEntryStatus.Should().NotBeNullOrEmpty(
+                $"health check entry '{entry.Key}' should have a status");
         }
     }
 
@@ -70,10 +70,10 @@ public partial class Infrastructure__Health_Check_Detail_Feature : BaseFixture
 
         foreach (var checkName in downstreamChecks)
         {
-            Track.That(() => _healthCheckResult!.Results.Should().ContainKey(checkName));
+            _healthCheckResult!.Results.Should().ContainKey(checkName);
             var healthCheckDescription = _healthCheckResult.Results[checkName].Description;
-            Track.That(() => healthCheckDescription.Should().NotBeNullOrEmpty(
-                $"health check entry '{checkName}' should have a description"));
+            healthCheckDescription.Should().NotBeNullOrEmpty(
+                $"health check entry '{checkName}' should have a description");
         }
     }
 
@@ -82,8 +82,8 @@ public partial class Infrastructure__Health_Check_Detail_Feature : BaseFixture
         foreach (var entry in _healthCheckResult!.Results)
         {
             var healthCheckEntryData = entry.Value.Data;
-            Track.That(() => healthCheckEntryData.Should().NotBeNull(
-                $"health check entry '{entry.Key}' should have a data object"));
+            healthCheckEntryData.Should().NotBeNull(
+                $"health check entry '{entry.Key}' should have a data object");
         }
     }
 

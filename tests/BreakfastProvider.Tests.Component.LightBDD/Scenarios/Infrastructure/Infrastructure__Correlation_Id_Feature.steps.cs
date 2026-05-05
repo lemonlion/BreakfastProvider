@@ -41,17 +41,17 @@ public partial class Infrastructure__Correlation_Id_Feature : BaseFixture
     private async Task The_response_should_contain_the_same_correlation_id()
     {
         var responseContainsCorrelationIdHeader = _response!.Headers.TryGetValues(CustomHeaders.CorrelationId, out var values);
-        Track.That(() => responseContainsCorrelationIdHeader.Should().BeTrue());
+        responseContainsCorrelationIdHeader.Should().BeTrue();
         var firstCorrelationIdHeaderValue = values!.First();
-        Track.That(() => firstCorrelationIdHeaderValue.Should().Be(_knownCorrelationId));
+        firstCorrelationIdHeaderValue.Should().Be(_knownCorrelationId);
     }
 
     private async Task The_response_should_contain_a_generated_correlation_id()
     {
         var responseContainsCorrelationIdHeader = _response!.Headers.TryGetValues(CustomHeaders.CorrelationId, out var values);
-        Track.That(() => responseContainsCorrelationIdHeader.Should().BeTrue());
+        responseContainsCorrelationIdHeader.Should().BeTrue();
         var firstCorrelationIdHeaderValue = values!.First();
-        Track.That(() => firstCorrelationIdHeaderValue.Should().NotBeNullOrEmpty());
+        firstCorrelationIdHeaderValue.Should().NotBeNullOrEmpty();
     }
 
     #endregion

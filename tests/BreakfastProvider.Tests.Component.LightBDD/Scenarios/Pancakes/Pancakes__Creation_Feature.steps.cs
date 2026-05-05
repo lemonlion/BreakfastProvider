@@ -72,7 +72,7 @@ public partial class Pancakes__Creation_Feature : BaseFixture
         => await _milkSteps.Retrieve();
 
     private async Task The_milk_response_should_be_successful()
-        => Track.That(() => _milkSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
+        => _milkSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
 
     private async Task Retrieved_milk_is_set_on_the_body()
         => _pancakeSteps.Request.Milk = _milkSteps.MilkResponse.Milk;
@@ -89,7 +89,7 @@ public partial class Pancakes__Creation_Feature : BaseFixture
         => await _eggsSteps.Retrieve();
 
     private async Task The_eggs_response_should_be_successful()
-        => Track.That(() => _eggsSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
+        => _eggsSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
 
     private async Task Retrieved_eggs_are_set_on_the_body()
         => _pancakeSteps.Request.Eggs = _eggsSteps.EggsResponse.Eggs;
@@ -106,7 +106,7 @@ public partial class Pancakes__Creation_Feature : BaseFixture
         => await _flourSteps.Retrieve();
 
     private async Task The_flour_response_should_be_successful()
-        => Track.That(() => _flourSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
+        => _flourSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
 
     private async Task Retrieved_flour_is_set_on_the_body()
         => _pancakeSteps.Request.Flour = _flourSteps.FlourResponse.Flour;
@@ -163,19 +163,19 @@ public partial class Pancakes__Creation_Feature : BaseFixture
     }
 
     private async Task The_response_http_status_should_be_created()
-        => Track.That(() => _pancakeSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created));
+        => _pancakeSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
 
     private async Task The_response_should_be_valid_json()
         => await _pancakeSteps.ParseResponse();
 
     private async Task The_response_ingredients_should_include_milk()
-        => Track.That(() => _pancakeSteps.Response!.Ingredients.Should().Contain(_milkSteps.MilkResponse.Milk));
+        => _pancakeSteps.Response!.Ingredients.Should().Contain(_milkSteps.MilkResponse.Milk);
 
     private async Task The_response_ingredients_should_include_eggs()
-        => Track.That(() => _pancakeSteps.Response!.Ingredients.Should().Contain(_eggsSteps.EggsResponse.Eggs));
+        => _pancakeSteps.Response!.Ingredients.Should().Contain(_eggsSteps.EggsResponse.Eggs);
 
     private async Task The_response_ingredients_should_include_flour()
-        => Track.That(() => _pancakeSteps.Response!.Ingredients.Should().Contain(_flourSteps.FlourResponse.Flour));
+        => _pancakeSteps.Response!.Ingredients.Should().Contain(_flourSteps.FlourResponse.Flour);
 
     private async Task The_responses_should_each_contain_the_validation_error_for_the_invalid_field(
         VerifiableDataTable<VerifiableErrorResult> expectedOutputs)
@@ -192,12 +192,12 @@ public partial class Pancakes__Creation_Feature : BaseFixture
     }
 
     private async Task The_response_http_status_should_be_bad_request()
-        => Track.That(() => _pancakeSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.BadRequest));
+        => _pancakeSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.BadRequest);
 
     private async Task The_response_should_contain_max_toppings_error()
     {
         var pancakeErrorResponseBody = await _pancakeSteps.ResponseMessage!.Content.ReadAsStringAsync();
-        Track.That(() => pancakeErrorResponseBody.Should().Contain(PancakeValidationMessages.MaxToppingsExceeded));
+        pancakeErrorResponseBody.Should().Contain(PancakeValidationMessages.MaxToppingsExceeded);
     }
 
     [SkipStepIf(nameof(Settings.RunAgainstExternalServiceUnderTest), DownstreamFakeRequestStoreIsUnavailableInPostDeploymentEnvironments)]

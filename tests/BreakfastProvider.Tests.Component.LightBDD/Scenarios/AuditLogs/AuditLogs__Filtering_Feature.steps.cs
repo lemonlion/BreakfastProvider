@@ -120,13 +120,13 @@ public partial class AuditLogs__Filtering_Feature : BaseFixture
     }
 
     private async Task The_audit_log_response_status_should_be_ok()
-        => Track.That(() => _auditLogResponse!.StatusCode.Should().Be(HttpStatusCode.OK));
+        => _auditLogResponse!.StatusCode.Should().Be(HttpStatusCode.OK);
 
     private async Task The_audit_logs_should_only_contain_order_entity_type()
-        => Track.That(() => _auditLogs!.Should().OnlyContain(l => l.EntityType == AuditLogDefaults.OrderEntityType));
+        => _auditLogs!.Should().OnlyContain(l => l.EntityType == AuditLogDefaults.OrderEntityType);
 
     private async Task The_audit_logs_should_contain_the_created_order()
-        => Track.That(() => _auditLogs!.Should().Contain(l => l.EntityId == _orderId));
+        => _auditLogs!.Should().Contain(l => l.EntityId == _orderId);
 
     private async Task<CompositeStep> The_audit_log_response_should_be_an_empty_collection()
     {
@@ -139,13 +139,13 @@ public partial class AuditLogs__Filtering_Feature : BaseFixture
     {
         var content = await _auditLogResponse!.Content.ReadAsStringAsync();
         var auditLogsFromDifferentTimeRange = Json.Deserialize<List<TestAuditLogResponse>>(content)!;
-        Track.That(() => auditLogsFromDifferentTimeRange.Should().BeEmpty());
+        auditLogsFromDifferentTimeRange.Should().BeEmpty();
     }
 
     private async Task The_audit_logs_should_be_ordered_by_timestamp_descending()
     {
-        Track.That(() => _auditLogs.Should().NotBeNullOrEmpty());
-        Track.That(() => _auditLogs!.Should().BeInDescendingOrder(l => l.Timestamp));
+        _auditLogs.Should().NotBeNullOrEmpty();
+        _auditLogs!.Should().BeInDescendingOrder(l => l.Timestamp);
     }
 
     #endregion

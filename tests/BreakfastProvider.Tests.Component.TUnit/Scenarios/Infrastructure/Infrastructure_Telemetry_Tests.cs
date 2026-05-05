@@ -48,7 +48,7 @@ public class Infrastructure_Telemetry_Tests : BaseFixture
             Flour = flourSteps.FlourResponse.Flour
         };
         await pancakeSteps.Send();
-        Track.That(() => pancakeSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created));
+        pancakeSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
         await pancakeSteps.ParseResponse();
 
         // And a valid order request
@@ -70,11 +70,11 @@ public class Infrastructure_Telemetry_Tests : BaseFixture
 
         // When the order is submitted
         await orderSteps.Send();
-        Track.That(() => orderSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created));
+        orderSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
 
         // Then a structured log entry should have been captured for order creation
-        Track.That(() => _logProvider.Entries.Should().Contain(e => e.Message.Contains("created for customer")));
-        Track.That(() => _logProvider.Entries.Should().Contain(e => e.Message.Contains(customerName)));
-        Track.That(() => _logProvider.Entries.Should().Contain(e => e.Message.Contains("1 items")));
+        _logProvider.Entries.Should().Contain(e => e.Message.Contains("created for customer"));
+        _logProvider.Entries.Should().Contain(e => e.Message.Contains(customerName));
+        _logProvider.Entries.Should().Contain(e => e.Message.Contains("1 items"));
     }
 }

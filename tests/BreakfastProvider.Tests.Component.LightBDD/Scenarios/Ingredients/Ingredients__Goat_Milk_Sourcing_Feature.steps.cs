@@ -41,13 +41,13 @@ public partial class Ingredients__Goat_Milk_Sourcing_Feature : BaseFixture
     }
 
     private async Task The_goat_milk_response_http_status_should_be_ok()
-        => Track.That(() => _goatMilkSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
+        => _goatMilkSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
 
     private async Task The_goat_milk_response_should_be_valid_json()
-        => Track.That(() => _goatMilkSteps.GoatMilkResponse.Should().NotBeNull());
+        => _goatMilkSteps.GoatMilkResponse.Should().NotBeNull();
 
     private async Task The_goat_milk_should_be_fresh()
-        => Track.That(() => _goatMilkSteps.GoatMilkResponse.GoatMilk.Should().Be(GoatServiceDefaults.FreshGoatMilk));
+        => _goatMilkSteps.GoatMilkResponse.GoatMilk.Should().Be(GoatServiceDefaults.FreshGoatMilk);
 
     [SkipStepIf(nameof(Settings.RunAgainstExternalServiceUnderTest), DownstreamFakeRequestStoreIsUnavailableInPostDeploymentEnvironments)]
     private async Task The_goat_service_should_have_received_a_goat_milk_request()

@@ -44,23 +44,23 @@ public class ToppingsSteps(
     [Then("the toppings response should contain the default toppings")]
     public async Task ThenTheToppingsResponseShouldContainTheDefaultToppings()
     {
-        Track.That(() => getSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
+        getSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
         await getSteps.ParseResponse();
-        Track.That(() => getSteps.Response.Should().HaveCount(ToppingDefaults.ExpectedToppingCount));
-        Track.That(() => getSteps.Response!.Should().Contain(t => t.Name == ToppingDefaults.Raspberries));
-        Track.That(() => getSteps.Response!.Should().Contain(t => t.Name == ToppingDefaults.Blueberries));
-        Track.That(() => getSteps.Response!.Should().Contain(t => t.Name == ToppingDefaults.MapleSyrup));
-        Track.That(() => getSteps.Response!.Should().Contain(t => t.Name == ToppingDefaults.WhippedCream));
-        Track.That(() => getSteps.Response!.Should().Contain(t => t.Name == ToppingDefaults.ChocolateChips));
+        getSteps.Response.Should().HaveCount(ToppingDefaults.ExpectedToppingCount);
+        getSteps.Response!.Should().Contain(t => t.Name == ToppingDefaults.Raspberries);
+        getSteps.Response!.Should().Contain(t => t.Name == ToppingDefaults.Blueberries);
+        getSteps.Response!.Should().Contain(t => t.Name == ToppingDefaults.MapleSyrup);
+        getSteps.Response!.Should().Contain(t => t.Name == ToppingDefaults.WhippedCream);
+        getSteps.Response!.Should().Contain(t => t.Name == ToppingDefaults.ChocolateChips);
     }
 
     [Then("the topping response should contain the created topping")]
     public async Task ThenTheToppingResponseShouldContainTheCreatedTopping()
     {
-        Track.That(() => postSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created));
+        postSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
         await postSteps.ParseResponse();
-        Track.That(() => postSteps.Response!.Name.Should().Be(ToppingDefaults.Strawberries));
-        Track.That(() => postSteps.Response!.Category.Should().Be(ToppingDefaults.FruitCategory));
+        postSteps.Response!.Name.Should().Be(ToppingDefaults.Strawberries);
+        postSteps.Response!.Category.Should().Be(ToppingDefaults.FruitCategory);
     }
 
     // --- Deletion ---
@@ -75,11 +75,11 @@ public class ToppingsSteps(
 
     [Then("the delete response should indicate success")]
     public void ThenTheDeleteResponseShouldIndicateSuccess()
-        => Track.That(() => deleteSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.NoContent));
+        => deleteSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.NoContent);
 
     [Then("the delete response should indicate not found")]
     public void ThenTheDeleteResponseShouldIndicateNotFound()
-        => Track.That(() => deleteSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.NotFound));
+        => deleteSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.NotFound);
 
     // --- Update ---
     [Given("a known blueberry topping exists")]
@@ -122,22 +122,22 @@ public class ToppingsSteps(
     [Then("the update response should contain the updated topping")]
     public async Task ThenTheUpdateResponseShouldContainTheUpdatedTopping()
     {
-        Track.That(() => putSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
+        putSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
         await putSteps.ParseResponse();
-        Track.That(() => putSteps.Response!.ToppingId.Should().Be(ToppingDefaults.KnownBlueberryToppingId));
-        Track.That(() => putSteps.Response!.Name.Should().Be(ToppingDefaults.Strawberries));
-        Track.That(() => putSteps.Response!.Category.Should().Be(ToppingDefaults.FruitCategory));
+        putSteps.Response!.ToppingId.Should().Be(ToppingDefaults.KnownBlueberryToppingId);
+        putSteps.Response!.Name.Should().Be(ToppingDefaults.Strawberries);
+        putSteps.Response!.Category.Should().Be(ToppingDefaults.FruitCategory);
     }
 
     [Then("the update response should indicate not found")]
     public void ThenTheUpdateResponseShouldIndicateNotFound()
-        => Track.That(() => putSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.NotFound));
+        => putSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.NotFound);
 
     [Then(@"the update response should contain error ""(.*)"" with status ""(.*)""")]
     public async Task ThenTheUpdateResponseShouldContainErrorWithStatus(string errorMessage, string responseStatus)
     {
         var actualResults = await ValidationHelper.ParseValidationResponses(_validationResponses);
-        Track.That(() => actualResults.Should().Contain(r => r.ErrorMessage.Contains(errorMessage)));
+        actualResults.Should().Contain(r => r.ErrorMessage.Contains(errorMessage));
     }
 
     // --- XSS Validation ---
@@ -166,7 +166,7 @@ public class ToppingsSteps(
     public async Task ThenTheToppingResponseShouldContainErrorWithStatus(string errorMessage, string responseStatus)
     {
         var actualResults = await ValidationHelper.ParseValidationResponses(_validationResponses);
-        Track.That(() => actualResults.Should().Contain(r => r.ErrorMessage.Contains(errorMessage)));
+        actualResults.Should().Contain(r => r.ErrorMessage.Contains(errorMessage));
     }
 
     // --- Feature Flag ---
@@ -194,16 +194,16 @@ public class ToppingsSteps(
     [Then("the toppings response should not include raspberries")]
     public async Task ThenTheToppingsResponseShouldNotIncludeRaspberries()
     {
-        Track.That(() => getSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
+        getSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
         await getSteps.ParseResponse();
-        Track.That(() => getSteps.Response!.Should().NotContain(t => t.Name == ToppingDefaults.Raspberries));
+        getSteps.Response!.Should().NotContain(t => t.Name == ToppingDefaults.Raspberries);
     }
 
     [Then("the toppings response should include raspberries")]
     public async Task ThenTheToppingsResponseShouldIncludeRaspberries()
     {
-        Track.That(() => getSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
+        getSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
         await getSteps.ParseResponse();
-        Track.That(() => getSteps.Response!.Should().Contain(t => t.Name == ToppingDefaults.Raspberries));
+        getSteps.Response!.Should().Contain(t => t.Name == ToppingDefaults.Raspberries);
     }
 }

@@ -15,13 +15,13 @@ public class Specifications_Open_Api_Scalar_UI_Tests : BaseFixture
         var scalarResponse = await Client.GetAsync(Endpoints.Swagger.ScalarUI);
 
         // Then the response status should be ok
-        Track.That(() => scalarResponse.StatusCode.Should().Be(HttpStatusCode.OK));
+        scalarResponse.StatusCode.Should().Be(HttpStatusCode.OK);
 
         // And the response should be valid html
         var scalarUiResponseBody = await scalarResponse.Content.ReadAsStringAsync();
-        Track.That(() => scalarUiResponseBody.Should().Contain("<html"));
+        scalarUiResponseBody.Should().Contain("<html");
 
         // And the response should refer to scalar
-        Track.That(() => scalarUiResponseBody.Should().Contain("scalar"));
+        scalarUiResponseBody.Should().Contain("scalar");
     }
 }

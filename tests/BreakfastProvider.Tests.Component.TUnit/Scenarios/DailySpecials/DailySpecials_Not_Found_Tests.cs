@@ -27,6 +27,6 @@ public class DailySpecials_Not_Found_Tests : BaseFixture
         await _postSteps.Send();
 
         // Then the response should indicate not found
-        Track.That(() => _postSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.NotFound));
+        _postSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 }

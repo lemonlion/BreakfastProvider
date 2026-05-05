@@ -71,17 +71,17 @@ public class ApiSpecificationSteps(AppManager appManager)
     {
         if (_swaggerResponse != null)
         {
-            Track.That(() => _swaggerResponse.StatusCode.Should().Be(HttpStatusCode.OK));
+            _swaggerResponse.StatusCode.Should().Be(HttpStatusCode.OK);
             _swaggerJsonString = await _swaggerResponse.Content.ReadAsStringAsync();
             var openApiResponseIsValidJson = Json.TryParse(_swaggerJsonString, out _swaggerJson);
-            Track.That(() => openApiResponseIsValidJson.Should().BeTrue());
+            openApiResponseIsValidJson.Should().BeTrue();
         }
         else if (_asyncApiResponse != null)
         {
-            Track.That(() => _asyncApiResponse.StatusCode.Should().Be(HttpStatusCode.OK));
+            _asyncApiResponse.StatusCode.Should().Be(HttpStatusCode.OK);
             var asyncApiResponseIsValidJson = _asyncApiJson is not null;
-            Track.That(() => asyncApiResponseIsValidJson.Should().BeTrue(
-                $"response body (first 500 chars): {_asyncApiJsonString?[..Math.Min(_asyncApiJsonString.Length, 500)]}"));
+            asyncApiResponseIsValidJson.Should().BeTrue(
+                $"response body (first 500 chars): {_asyncApiJsonString?[..Math.Min(_asyncApiJsonString.Length, 500)]}");
         }
     }
 
@@ -91,17 +91,17 @@ public class ApiSpecificationSteps(AppManager appManager)
     public void ThenTheResponseShouldContainAllTheEndpoints()
     {
         var paths = _swaggerJson!.RootElement.GetProperty("paths");
-        Track.That(() => paths.GetProperty(Endpoints.Swagger.PancakesPath).Should().NotBeNull());
-        Track.That(() => paths.GetProperty(Endpoints.Swagger.WafflesPath).Should().NotBeNull());
-        Track.That(() => paths.GetProperty(Endpoints.Swagger.OrdersPath).Should().NotBeNull());
-        Track.That(() => paths.GetProperty(Endpoints.Swagger.OrderByIdPath).Should().NotBeNull());
-        Track.That(() => paths.GetProperty(Endpoints.Swagger.ToppingsPath).Should().NotBeNull());
-        Track.That(() => paths.GetProperty(Endpoints.Swagger.MenuPath).Should().NotBeNull());
-        Track.That(() => paths.GetProperty(Endpoints.Swagger.MilkPath).Should().NotBeNull());
-        Track.That(() => paths.GetProperty(Endpoints.Swagger.EggsPath).Should().NotBeNull());
-        Track.That(() => paths.GetProperty(Endpoints.Swagger.FlourPath).Should().NotBeNull());
-        Track.That(() => paths.GetProperty(Endpoints.Swagger.GoatMilkPath).Should().NotBeNull());
-        Track.That(() => paths.GetProperty(Endpoints.Swagger.AuditLogsPath).Should().NotBeNull());
+        paths.GetProperty(Endpoints.Swagger.PancakesPath).Should().NotBeNull();
+        paths.GetProperty(Endpoints.Swagger.WafflesPath).Should().NotBeNull();
+        paths.GetProperty(Endpoints.Swagger.OrdersPath).Should().NotBeNull();
+        paths.GetProperty(Endpoints.Swagger.OrderByIdPath).Should().NotBeNull();
+        paths.GetProperty(Endpoints.Swagger.ToppingsPath).Should().NotBeNull();
+        paths.GetProperty(Endpoints.Swagger.MenuPath).Should().NotBeNull();
+        paths.GetProperty(Endpoints.Swagger.MilkPath).Should().NotBeNull();
+        paths.GetProperty(Endpoints.Swagger.EggsPath).Should().NotBeNull();
+        paths.GetProperty(Endpoints.Swagger.FlourPath).Should().NotBeNull();
+        paths.GetProperty(Endpoints.Swagger.GoatMilkPath).Should().NotBeNull();
+        paths.GetProperty(Endpoints.Swagger.AuditLogsPath).Should().NotBeNull();
     }
 
     [Then("the openapi spec is written to disk")]
@@ -128,11 +128,11 @@ public class ApiSpecificationSteps(AppManager appManager)
     [Then("the response should be a valid scalar page")]
     public async Task ThenTheResponseShouldBeAValidScalarPage()
     {
-        Track.That(() => _scalarResponse!.StatusCode.Should().Be(HttpStatusCode.OK));
+        _scalarResponse!.StatusCode.Should().Be(HttpStatusCode.OK);
         _scalarHtml = await _scalarResponse.Content.ReadAsStringAsync();
         var scalarUiResponseBody = _scalarHtml;
-        Track.That(() => scalarUiResponseBody.Should().Contain("<html"));
-        Track.That(() => scalarUiResponseBody.Should().Contain("scalar"));
+        scalarUiResponseBody.Should().Contain("<html");
+        scalarUiResponseBody.Should().Contain("scalar");
     }
 
     // ── AsyncAPI Then ──
@@ -141,12 +141,12 @@ public class ApiSpecificationSteps(AppManager appManager)
     public async Task ThenTheAsyncapiSpecIsWrittenToDisk()
     {
         // Verify required sections
-        Track.That(() => _asyncApiJson!.RootElement.GetProperty("asyncapi").Should().NotBeNull());
-        Track.That(() => _asyncApiJson.RootElement.GetProperty("info").Should().NotBeNull());
-        Track.That(() => _asyncApiJson.RootElement.GetProperty("defaultContentType").Should().NotBeNull());
-        Track.That(() => _asyncApiJson.RootElement.GetProperty("channels").Should().NotBeNull());
-        Track.That(() => _asyncApiJson.RootElement.GetProperty("operations").Should().NotBeNull());
-        Track.That(() => _asyncApiJson.RootElement.GetProperty("components").Should().NotBeNull());
+        _asyncApiJson!.RootElement.GetProperty("asyncapi").Should().NotBeNull();
+        _asyncApiJson.RootElement.GetProperty("info").Should().NotBeNull();
+        _asyncApiJson.RootElement.GetProperty("defaultContentType").Should().NotBeNull();
+        _asyncApiJson.RootElement.GetProperty("channels").Should().NotBeNull();
+        _asyncApiJson.RootElement.GetProperty("operations").Should().NotBeNull();
+        _asyncApiJson.RootElement.GetProperty("components").Should().NotBeNull();
 
         // Write to disk
         var path = $"{AsyncApiSpecs.SpecificationsFolderPath}{AsyncApiSpecs.JsonFileName}";

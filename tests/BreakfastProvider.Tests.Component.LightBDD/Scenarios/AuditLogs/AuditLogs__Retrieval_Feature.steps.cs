@@ -63,10 +63,10 @@ public partial class AuditLogs__Retrieval_Feature : BaseFixture
 
     private async Task The_pancake_batch_response_should_be_successful()
     {
-        Track.That(() => _pancakeSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created));
+        _pancakeSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
         await _pancakeSteps.ParseResponse();
-        Track.That(() => _pancakeSteps.Response.Should().NotBeNull());
-        Track.That(() => _pancakeSteps.Response!.BatchId.Should().NotBeEmpty());
+        _pancakeSteps.Response.Should().NotBeNull();
+        _pancakeSteps.Response!.BatchId.Should().NotBeEmpty();
     }
 
     private async Task<CompositeStep> An_order_has_been_created_for_the_batch()
@@ -97,10 +97,10 @@ public partial class AuditLogs__Retrieval_Feature : BaseFixture
 
     private async Task The_order_creation_response_should_be_successful()
     {
-        Track.That(() => _orderSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created));
+        _orderSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
         await _orderSteps.ParseResponse();
-        Track.That(() => _orderSteps.Response.Should().NotBeNull());
-        Track.That(() => _orderSteps.Response!.OrderId.Should().NotBeEmpty());
+        _orderSteps.Response.Should().NotBeNull();
+        _orderSteps.Response!.OrderId.Should().NotBeEmpty();
     }
 
     #endregion
@@ -123,17 +123,17 @@ public partial class AuditLogs__Retrieval_Feature : BaseFixture
     }
 
     private async Task The_audit_log_response_http_status_should_be_ok()
-        => Track.That(() => _auditSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
+        => _auditSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
 
     private async Task The_audit_log_response_should_be_valid_json()
         => await _auditSteps.ParseResponse();
 
     private async Task The_audit_log_should_contain_an_order_created_entry()
     {
-        Track.That(() => _auditSteps.Response!.Should().Contain(a =>
+        _auditSteps.Response!.Should().Contain(a =>
             a.Action == AuditLogDefaults.CreatedAction
             && a.EntityType == AuditLogDefaults.OrderEntityType
-            && a.Details.Contains(_customerName)));
+            && a.Details.Contains(_customerName));
     }
 
     [SkipStepIf(nameof(Settings.RunAgainstExternalServiceUnderTest), DownstreamFakeRequestStoreIsUnavailableInPostDeploymentEnvironments)]

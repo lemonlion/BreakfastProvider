@@ -33,15 +33,15 @@ public class Apple_Cinnamon_Muffins_Creation_Tests : BaseFixture
     {
         // Given a valid muffin recipe with all ingredients
         await _milkSteps.Retrieve();
-        Track.That(() => _milkSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
+        _milkSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
         _muffinSteps.Request.Milk = _milkSteps.MilkResponse.Milk;
 
         await _eggsSteps.Retrieve();
-        Track.That(() => _eggsSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
+        _eggsSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
         _muffinSteps.Request.Eggs = _eggsSteps.EggsResponse.Eggs;
 
         await _flourSteps.Retrieve();
-        Track.That(() => _flourSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
+        _flourSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
         _muffinSteps.Request.Flour = _flourSteps.FlourResponse.Flour;
 
         _muffinSteps.Request.Apples = MuffinDefaults.GrannySmithApples;
@@ -58,16 +58,16 @@ public class Apple_Cinnamon_Muffins_Creation_Tests : BaseFixture
         await _muffinSteps.Send();
 
         // Then the response should contain a valid batch with all ingredients
-        Track.That(() => _muffinSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created));
+        _muffinSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
         await _muffinSteps.ParseResponse();
-        Track.That(() => _muffinSteps.Response!.Ingredients.Should().Contain(_milkSteps.MilkResponse.Milk));
-        Track.That(() => _muffinSteps.Response!.Ingredients.Should().Contain(_eggsSteps.EggsResponse.Eggs));
-        Track.That(() => _muffinSteps.Response!.Ingredients.Should().Contain(_flourSteps.FlourResponse.Flour));
-        Track.That(() => _muffinSteps.Response!.Ingredients.Should().Contain(MuffinDefaults.GrannySmithApples));
-        Track.That(() => _muffinSteps.Response!.Ingredients.Should().Contain(MuffinDefaults.CeylonCinnamon));
-        Track.That(() => _muffinSteps.Response!.Toppings.Should().HaveCount(1));
-        Track.That(() => _muffinSteps.Response!.BakingTemperature.Should().Be(MuffinDefaults.DefaultTemperature));
-        Track.That(() => _muffinSteps.Response!.BakingDuration.Should().Be(MuffinDefaults.DefaultDuration));
+        _muffinSteps.Response!.Ingredients.Should().Contain(_milkSteps.MilkResponse.Milk);
+        _muffinSteps.Response!.Ingredients.Should().Contain(_eggsSteps.EggsResponse.Eggs);
+        _muffinSteps.Response!.Ingredients.Should().Contain(_flourSteps.FlourResponse.Flour);
+        _muffinSteps.Response!.Ingredients.Should().Contain(MuffinDefaults.GrannySmithApples);
+        _muffinSteps.Response!.Ingredients.Should().Contain(MuffinDefaults.CeylonCinnamon);
+        _muffinSteps.Response!.Toppings.Should().HaveCount(1);
+        _muffinSteps.Response!.BakingTemperature.Should().Be(MuffinDefaults.DefaultTemperature);
+        _muffinSteps.Response!.BakingDuration.Should().Be(MuffinDefaults.DefaultDuration);
 
         // And the cow service should have received a milk request
         if (!Settings.RunAgainstExternalServiceUnderTest)
@@ -81,11 +81,11 @@ public class Apple_Cinnamon_Muffins_Creation_Tests : BaseFixture
     {
         // Given a muffin recipe with specific ingredients and baking profile
         await _milkSteps.Retrieve();
-        Track.That(() => _milkSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
+        _milkSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
         _muffinSteps.Request.Milk = _milkSteps.MilkResponse.Milk;
 
         await _eggsSteps.Retrieve();
-        Track.That(() => _eggsSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
+        _eggsSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
         _muffinSteps.Request.Eggs = _eggsSteps.EggsResponse.Eggs;
 
         _muffinSteps.Request.Flour = recipe.Ingredients.Flour;
@@ -105,13 +105,13 @@ public class Apple_Cinnamon_Muffins_Creation_Tests : BaseFixture
         await _muffinSteps.Send();
 
         // Then the batch should match expectations
-        Track.That(() => _muffinSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created));
+        _muffinSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
         await _muffinSteps.ParseResponse();
-        Track.That(() => _muffinSteps.Response!.Ingredients.Should().HaveCount(expected.ExpectedIngredientCount));
-        Track.That(() => _muffinSteps.Response!.Toppings.Should().HaveCount(expected.ExpectedToppingCount));
-        Track.That(() => (expected.HasBakingInfo
+        _muffinSteps.Response!.Ingredients.Should().HaveCount(expected.ExpectedIngredientCount);
+        _muffinSteps.Response!.Toppings.Should().HaveCount(expected.ExpectedToppingCount);
+        (expected.HasBakingInfo
             ? _muffinSteps.Response!.BakingTemperature > 0
-            : _muffinSteps.Response!.BakingTemperature == 0).Should().BeTrue());
+            : _muffinSteps.Response!.BakingTemperature == 0).Should().BeTrue();
     }
 
     [Test]
@@ -121,11 +121,11 @@ public class Apple_Cinnamon_Muffins_Creation_Tests : BaseFixture
     {
         // Given a muffin recipe with specific ingredients and baking profile but no toppings
         await _milkSteps.Retrieve();
-        Track.That(() => _milkSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
+        _milkSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
         _muffinSteps.Request.Milk = _milkSteps.MilkResponse.Milk;
 
         await _eggsSteps.Retrieve();
-        Track.That(() => _eggsSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
+        _eggsSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
         _muffinSteps.Request.Eggs = _eggsSteps.EggsResponse.Eggs;
 
         _muffinSteps.Request.Flour = recipe.Ingredients.Flour;
@@ -142,13 +142,13 @@ public class Apple_Cinnamon_Muffins_Creation_Tests : BaseFixture
         await _muffinSteps.Send();
 
         // Then the batch should match expectations
-        Track.That(() => _muffinSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created));
+        _muffinSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
         await _muffinSteps.ParseResponse();
-        Track.That(() => _muffinSteps.Response!.Ingredients.Should().HaveCount(expected.ExpectedIngredientCount));
-        Track.That(() => _muffinSteps.Response!.Toppings.Should().HaveCount(expected.ExpectedToppingCount));
-        Track.That(() => (expected.HasBakingInfo
+        _muffinSteps.Response!.Ingredients.Should().HaveCount(expected.ExpectedIngredientCount);
+        _muffinSteps.Response!.Toppings.Should().HaveCount(expected.ExpectedToppingCount);
+        (expected.HasBakingInfo
             ? _muffinSteps.Response!.BakingTemperature > 0
-            : _muffinSteps.Response!.BakingTemperature == 0).Should().BeTrue());
+            : _muffinSteps.Response!.BakingTemperature == 0).Should().BeTrue();
     }
 
     [Test]
@@ -188,7 +188,7 @@ public class Apple_Cinnamon_Muffins_Creation_Tests : BaseFixture
         // Then the response should contain the validation error
         var actualResults = await ValidationHelper.ParseValidationResponses(responses);
         var actual = actualResults.Single();
-        Track.That(() => actual.ErrorMessage.Should().Contain(expectedError));
-        Track.That(() => actual.ResponseStatus.Should().Be(expectedStatus));
+        actual.ErrorMessage.Should().Contain(expectedError);
+        actual.ResponseStatus.Should().Be(expectedStatus);
     }
 }

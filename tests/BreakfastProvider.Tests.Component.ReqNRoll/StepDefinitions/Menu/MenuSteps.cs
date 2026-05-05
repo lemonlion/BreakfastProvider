@@ -39,18 +39,18 @@ public class MenuSteps(
     [Then("the menu response should contain all menu items")]
     public async Task ThenTheMenuResponseShouldContainAllMenuItems()
     {
-        Track.That(() => menuSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
+        menuSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
         await menuSteps.ParseResponse();
-        Track.That(() => menuSteps.Response!.Should().Contain(m => m.Name == MenuDefaults.ClassicPancakes));
-        Track.That(() => menuSteps.Response!.Should().Contain(m => m.Name == MenuDefaults.BelgianWaffles));
-        Track.That(() => menuSteps.Response!.Should().Contain(m => m.Name == MenuDefaults.GoatMilkPancakes));
+        menuSteps.Response!.Should().Contain(m => m.Name == MenuDefaults.ClassicPancakes);
+        menuSteps.Response!.Should().Contain(m => m.Name == MenuDefaults.BelgianWaffles);
+        menuSteps.Response!.Should().Contain(m => m.Name == MenuDefaults.GoatMilkPancakes);
     }
 
     [Then("the menu items should be in alphabetical order")]
     public async Task ThenTheMenuItemsShouldBeInAlphabeticalOrder()
     {
         await menuSteps.ParseResponse();
-        Track.That(() => menuSteps.Response!.Should().BeInAscendingOrder(m => m.Name));
+        menuSteps.Response!.Should().BeInAscendingOrder(m => m.Name);
     }
 
     [Then("the supplier service should have received an availability request")]
@@ -66,7 +66,7 @@ public class MenuSteps(
     {
         await appManager.Client.DeleteAsync(Endpoints.MenuCache);
         await menuSteps.Retrieve();
-        Track.That(() => menuSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
+        menuSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
     }
 
     [Given("the supplier service is then made unavailable")]
@@ -83,9 +83,9 @@ public class MenuSteps(
     public async Task ThenTheMenuResponseShouldStillReturnAvailableItems()
     {
         var steps = _secondMenuSteps ?? menuSteps;
-        Track.That(() => steps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
+        steps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
         await steps.ParseResponse();
-        Track.That(() => steps.Response!.Should().Contain(m => m.IsAvailable));
+        steps.Response!.Should().Contain(m => m.IsAvailable);
     }
 
     // --- Downstream Failure ---
@@ -99,8 +99,8 @@ public class MenuSteps(
     [Then("the menu response should mark all items as unavailable")]
     public async Task ThenTheMenuResponseShouldMarkAllItemsAsUnavailable()
     {
-        Track.That(() => menuSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
+        menuSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
         await menuSteps.ParseResponse();
-        Track.That(() => menuSteps.Response!.Should().OnlyContain(m => m.IsAvailable == false));
+        menuSteps.Response!.Should().OnlyContain(m => m.IsAvailable == false);
     }
 }

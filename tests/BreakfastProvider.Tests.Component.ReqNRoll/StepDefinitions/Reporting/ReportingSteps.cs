@@ -122,54 +122,54 @@ public class ReportingSteps(
     [Then("the graphql response should contain the ingested order summary")]
     public async Task ThenTheGraphqlResponseShouldContainTheIngestedOrderSummary()
     {
-        Track.That(() => graphQlSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
+        graphQlSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
         await graphQlSteps.ParseOrderSummariesResponse();
-        Track.That(() => graphQlSteps.OrderSummaries.Should().Contain(o =>
+        graphQlSteps.OrderSummaries.Should().Contain(o =>
             o.OrderId == _testOrderId &&
             o.CustomerName == _customerName &&
             o.ItemCount == 3 &&
-            o.TableNumber == 7));
+            o.TableNumber == 7);
     }
 
     [Then("the graphql response should be successful")]
     public void ThenTheGraphqlResponseShouldBeSuccessful()
-        => Track.That(() => graphQlSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
+        => graphQlSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
 
     [Then("the order summaries list should be empty or not contain the test order")]
     public async Task ThenTheOrderSummariesListShouldBeEmptyOrNotContainTheTestOrder()
     {
         await graphQlSteps.ParseOrderSummariesResponse();
-        Track.That(() => graphQlSteps.OrderSummaries.Should().NotContain(o => o.OrderId == _testOrderId));
+        graphQlSteps.OrderSummaries.Should().NotContain(o => o.OrderId == _testOrderId);
     }
 
     [Then("the graphql response should contain the ingested recipe reports")]
     public async Task ThenTheGraphqlResponseShouldContainTheIngestedRecipeReports()
     {
-        Track.That(() => graphQlSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
+        graphQlSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
         await graphQlSteps.ParseRecipeReportsResponse();
-        Track.That(() => graphQlSteps.RecipeReports.Should().Contain(r =>
+        graphQlSteps.RecipeReports.Should().Contain(r =>
             r.OrderId == _recipeOrderId1 &&
             r.RecipeType == "Pancakes" &&
-            r.Ingredients.Contains("Milk")));
+            r.Ingredients.Contains("Milk"));
     }
 
     [Then("the ingredient usage should reflect aggregated counts")]
     public async Task ThenTheIngredientUsageShouldReflectAggregatedCounts()
     {
-        Track.That(() => graphQlSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
+        graphQlSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
         await graphQlSteps.ParseIngredientUsageResponse();
-        Track.That(() => graphQlSteps.IngredientUsage.Should().Contain(i => i.Ingredient == "Milk" && i.Count >= 2));
-        Track.That(() => graphQlSteps.IngredientUsage.Should().Contain(i => i.Ingredient == "Butter" && i.Count >= 1));
+        graphQlSteps.IngredientUsage.Should().Contain(i => i.Ingredient == "Milk" && i.Count >= 2);
+        graphQlSteps.IngredientUsage.Should().Contain(i => i.Ingredient == "Butter" && i.Count >= 1);
     }
 
     [Then("the popular recipes should be ordered by count descending")]
     public async Task ThenThePopularRecipesShouldBeOrderedByCountDescending()
     {
-        Track.That(() => graphQlSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
+        graphQlSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
         await graphQlSteps.ParsePopularRecipesResponse();
         var pancakes = graphQlSteps.PopularRecipes!.FirstOrDefault(r => r.RecipeType == "Pancakes");
-        Track.That(() => pancakes.Should().NotBeNull());
-        Track.That(() => pancakes!.Count.Should().BeGreaterThanOrEqualTo(2));
-        Track.That(() => graphQlSteps.PopularRecipes.Should().Contain(r => r.RecipeType == "Waffles" && r.Count >= 1));
+        pancakes.Should().NotBeNull();
+        pancakes!.Count.Should().BeGreaterThanOrEqualTo(2);
+        graphQlSteps.PopularRecipes.Should().Contain(r => r.RecipeType == "Waffles" && r.Count >= 1);
     }
 }

@@ -54,19 +54,19 @@ public partial class Toppings__Management_Feature : BaseFixture
     }
 
     private async Task The_toppings_get_response_http_status_should_be_ok()
-        => Track.That(() => _getSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
+        => _getSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
 
     private async Task The_toppings_list_should_be_valid_json()
         => await _getSteps.ParseResponse();
 
     private async Task The_toppings_list_should_contain_the_expected_items()
     {
-        Track.That(() => _getSteps.Response.Should().HaveCount(ToppingDefaults.ExpectedToppingCount));
-        Track.That(() => _getSteps.Response!.Should().Contain(t => t.Name == ToppingDefaults.Raspberries));
-        Track.That(() => _getSteps.Response!.Should().Contain(t => t.Name == ToppingDefaults.Blueberries));
-        Track.That(() => _getSteps.Response!.Should().Contain(t => t.Name == ToppingDefaults.MapleSyrup));
-        Track.That(() => _getSteps.Response!.Should().Contain(t => t.Name == ToppingDefaults.WhippedCream));
-        Track.That(() => _getSteps.Response!.Should().Contain(t => t.Name == ToppingDefaults.ChocolateChips));
+        _getSteps.Response.Should().HaveCount(ToppingDefaults.ExpectedToppingCount);
+        _getSteps.Response!.Should().Contain(t => t.Name == ToppingDefaults.Raspberries);
+        _getSteps.Response!.Should().Contain(t => t.Name == ToppingDefaults.Blueberries);
+        _getSteps.Response!.Should().Contain(t => t.Name == ToppingDefaults.MapleSyrup);
+        _getSteps.Response!.Should().Contain(t => t.Name == ToppingDefaults.WhippedCream);
+        _getSteps.Response!.Should().Contain(t => t.Name == ToppingDefaults.ChocolateChips);
     }
 
     private async Task<CompositeStep> The_topping_response_should_contain_the_created_topping()
@@ -79,16 +79,16 @@ public partial class Toppings__Management_Feature : BaseFixture
     }
 
     private async Task The_topping_post_response_http_status_should_be_created()
-        => Track.That(() => _postSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created));
+        => _postSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
 
     private async Task The_topping_post_response_should_be_valid_json()
         => await _postSteps.ParseResponse();
 
     private async Task The_created_topping_should_have_the_correct_name()
-        => Track.That(() => _postSteps.Response!.Name.Should().Be(ToppingDefaults.Strawberries));
+        => _postSteps.Response!.Name.Should().Be(ToppingDefaults.Strawberries);
 
     private async Task The_created_topping_should_have_the_correct_category()
-        => Track.That(() => _postSteps.Response!.Category.Should().Be(ToppingDefaults.FruitCategory));
+        => _postSteps.Response!.Category.Should().Be(ToppingDefaults.FruitCategory);
 
     #endregion
 }

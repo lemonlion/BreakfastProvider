@@ -35,10 +35,10 @@ public class Feedback_Management_Tests : BaseFixture
         await _postSteps.Send();
 
         // Then the response should contain the created feedback
-        Track.That(() => _postSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created));
+        _postSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
         await _postSteps.ParseResponse();
-        Track.That(() => _postSteps.Response!.CustomerName.Should().Be(_postSteps.Request.CustomerName));
-        Track.That(() => _postSteps.Response!.Rating.Should().Be(4));
+        _postSteps.Response!.CustomerName.Should().Be(_postSteps.Request.CustomerName);
+        _postSteps.Response!.Rating.Should().Be(4);
     }
 
     [Test]
@@ -54,7 +54,7 @@ public class Feedback_Management_Tests : BaseFixture
             Comment = "Great pancakes!"
         };
         await _postSteps.Send();
-        Track.That(() => _postSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created));
+        _postSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
         await _postSteps.ParseResponse();
         var createdFeedbackId = _postSteps.Response!.FeedbackId;
 
@@ -62,11 +62,11 @@ public class Feedback_Management_Tests : BaseFixture
         await _getSteps.RetrieveById(createdFeedbackId);
 
         // Then the response should contain the feedback
-        Track.That(() => _getSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
+        _getSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
         await _getSteps.ParseResponse();
-        Track.That(() => _getSteps.Response!.FeedbackId.Should().Be(createdFeedbackId));
-        Track.That(() => _getSteps.Response!.CustomerName.Should().Be(_postSteps.Response!.CustomerName));
-        Track.That(() => _getSteps.Response!.Rating.Should().Be(4));
+        _getSteps.Response!.FeedbackId.Should().Be(createdFeedbackId);
+        _getSteps.Response!.CustomerName.Should().Be(_postSteps.Response!.CustomerName);
+        _getSteps.Response!.Rating.Should().Be(4);
     }
 
     [Test]
@@ -82,7 +82,7 @@ public class Feedback_Management_Tests : BaseFixture
             Comment = "Great pancakes!"
         };
         await _postSteps.Send();
-        Track.That(() => _postSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created));
+        _postSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
         await _postSteps.ParseResponse();
         var createdFeedbackId = _postSteps.Response!.FeedbackId;
 
@@ -90,9 +90,9 @@ public class Feedback_Management_Tests : BaseFixture
         await _getSteps.RetrieveByOrderId(orderId);
 
         // Then the list response should contain the feedback
-        Track.That(() => _getSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
+        _getSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
         await _getSteps.ParseListResponse();
-        Track.That(() => _getSteps.ListResponse!.Should().Contain(f => f.FeedbackId == createdFeedbackId));
+        _getSteps.ListResponse!.Should().Contain(f => f.FeedbackId == createdFeedbackId);
     }
 
     [Test]
@@ -102,7 +102,7 @@ public class Feedback_Management_Tests : BaseFixture
         await _getSteps.RetrieveById(Guid.NewGuid().ToString());
 
         // Then the response should indicate not found
-        Track.That(() => _getSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.NotFound));
+        _getSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 
     [Test]
@@ -121,7 +121,7 @@ public class Feedback_Management_Tests : BaseFixture
         await _postSteps.Send();
 
         // Then the response should indicate bad request
-        Track.That(() => _postSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.BadRequest));
+        _postSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     }
 
     [Test]
@@ -140,6 +140,6 @@ public class Feedback_Management_Tests : BaseFixture
         await _postSteps.Send();
 
         // Then the response should indicate bad request
-        Track.That(() => _postSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.BadRequest));
+        _postSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     }
 }

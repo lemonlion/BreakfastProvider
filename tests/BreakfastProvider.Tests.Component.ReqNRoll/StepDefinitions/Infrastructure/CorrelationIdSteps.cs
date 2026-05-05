@@ -38,18 +38,18 @@ public class CorrelationIdSteps(AppManager appManager, DownstreamRequestSteps do
     public void ThenTheResponseShouldContainTheSameCorrelationId()
     {
         var responseContainsCorrelationIdHeader = _response!.Headers.TryGetValues(CustomHeaders.CorrelationId, out var values);
-        Track.That(() => responseContainsCorrelationIdHeader.Should().BeTrue());
+        responseContainsCorrelationIdHeader.Should().BeTrue();
         var firstCorrelationIdHeaderValue = values!.First();
-        Track.That(() => firstCorrelationIdHeaderValue.Should().Be(_knownCorrelationId));
+        firstCorrelationIdHeaderValue.Should().Be(_knownCorrelationId);
     }
 
     [Then("the response should contain a generated correlation id")]
     public void ThenTheResponseShouldContainAGeneratedCorrelationId()
     {
         var responseContainsCorrelationIdHeader = _response!.Headers.TryGetValues(CustomHeaders.CorrelationId, out var values);
-        Track.That(() => responseContainsCorrelationIdHeader.Should().BeTrue());
+        responseContainsCorrelationIdHeader.Should().BeTrue();
         var firstCorrelationIdHeaderValue = values!.First();
-        Track.That(() => firstCorrelationIdHeaderValue.Should().NotBeNullOrEmpty());
+        firstCorrelationIdHeaderValue.Should().NotBeNullOrEmpty();
     }
 
     // --- Header Propagation ---

@@ -71,19 +71,19 @@ public partial class Orders__Outbox_Retry_Exhaustion_Feature : BaseFixture
         => await _milkSteps.Retrieve();
 
     private async Task The_milk_response_should_be_successful()
-        => Track.That(() => _milkSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
+        => _milkSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
 
     private async Task Eggs_are_retrieved()
         => await _eggsSteps.Retrieve();
 
     private async Task The_eggs_response_should_be_successful()
-        => Track.That(() => _eggsSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
+        => _eggsSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
 
     private async Task Flour_is_retrieved()
         => await _flourSteps.Retrieve();
 
     private async Task The_flour_response_should_be_successful()
-        => Track.That(() => _flourSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
+        => _flourSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
 
     private async Task A_pancake_request_is_submitted()
     {
@@ -98,9 +98,9 @@ public partial class Orders__Outbox_Retry_Exhaustion_Feature : BaseFixture
 
     private async Task The_pancake_response_should_be_successful()
     {
-        Track.That(() => _pancakeSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created));
+        _pancakeSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
         await _pancakeSteps.ParseResponse();
-        Track.That(() => _pancakeSteps.Response.Should().NotBeNull());
+        _pancakeSteps.Response.Should().NotBeNull();
     }
 
     private async Task A_valid_order_request_for_the_created_batch()
@@ -127,7 +127,7 @@ public partial class Orders__Outbox_Retry_Exhaustion_Feature : BaseFixture
     #region Then
 
     private async Task The_order_should_be_created_successfully()
-        => Track.That(() => _orderSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created));
+        => _orderSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
 
     private async Task The_outbox_message_should_transition_to_failed()
     {
@@ -144,9 +144,9 @@ public partial class Orders__Outbox_Retry_Exhaustion_Feature : BaseFixture
         }
 
         await _outboxSteps.LoadOutboxMessages();
-        Track.That(() => _outboxSteps.OutboxMessages.Should().Contain(m =>
+        _outboxSteps.OutboxMessages.Should().Contain(m =>
                 m.EventType == EventTypes.OrderCreated && m.Status == OutboxStatuses.Failed,
-            "the outbox message should have transitioned to Failed after exhausting retries"));
+            "the outbox message should have transitioned to Failed after exhausting retries");
     }
 
     #endregion

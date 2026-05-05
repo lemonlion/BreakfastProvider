@@ -58,7 +58,7 @@ public partial class DailySpecials__Ordering_Feature : BaseFixture
             Quantity = MaxOrdersPerSpecial
         };
         await _postSteps.Send();
-        Track.That(() => _postSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created));
+        _postSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
     }
 
     private async Task A_daily_special_order_for_lemon_ricotta_of_quantity_one_is_placed()
@@ -69,7 +69,7 @@ public partial class DailySpecials__Ordering_Feature : BaseFixture
             Quantity = 1
         };
         await _postSteps.Send();
-        Track.That(() => _postSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created));
+        _postSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
     }
 
     #endregion
@@ -106,16 +106,16 @@ public partial class DailySpecials__Ordering_Feature : BaseFixture
     }
 
     private async Task The_post_response_http_status_should_be_created()
-        => Track.That(() => _postSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created));
+        => _postSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
 
     private async Task The_order_response_should_be_valid_json()
         => await _postSteps.ParseResponse();
 
     private async Task The_order_response_should_contain_the_correct_special_id()
-        => Track.That(() => _postSteps.Response!.SpecialId.Should().Be(DailySpecialDefaults.CinnamonSwirlId));
+        => _postSteps.Response!.SpecialId.Should().Be(DailySpecialDefaults.CinnamonSwirlId);
 
     private async Task The_order_response_should_have_a_valid_confirmation_id()
-        => Track.That(() => _postSteps.Response!.OrderConfirmationId.Should().NotBeEmpty());
+        => _postSteps.Response!.OrderConfirmationId.Should().NotBeEmpty();
 
     private async Task<CompositeStep> The_daily_specials_response_should_contain_all_expected_specials()
     {
@@ -126,23 +126,23 @@ public partial class DailySpecials__Ordering_Feature : BaseFixture
     }
 
     private async Task The_get_response_http_status_should_be_ok()
-        => Track.That(() => _getSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
+        => _getSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
 
     private async Task The_daily_specials_response_should_be_valid_json()
         => await _getSteps.ParseResponse();
 
     private async Task The_daily_specials_list_should_contain_all_expected_specials()
-        => Track.That(() => _getSteps.Response.Should().HaveCount(DailySpecialDefaults.ExpectedSpecialsCount));
+        => _getSteps.Response.Should().HaveCount(DailySpecialDefaults.ExpectedSpecialsCount);
 
     private async Task The_response_should_indicate_the_daily_special_is_sold_out()
-        => Track.That(() => _postSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Conflict));
+        => _postSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Conflict);
 
     private async Task The_lemon_ricotta_special_should_have_one_fewer_remaining()
     {
         await _getSteps.ParseResponse();
         var lemonRicottaSpecial = _getSteps.Response!.Single(s => s.SpecialId == DailySpecialDefaults.LemonRicottaId);
         var lemonRicottaRemainingQuantity = lemonRicottaSpecial.RemainingQuantity;
-        Track.That(() => lemonRicottaRemainingQuantity.Should().Be(MaxOrdersPerSpecial - 1));
+        lemonRicottaRemainingQuantity.Should().Be(MaxOrdersPerSpecial - 1);
     }
 
     #endregion

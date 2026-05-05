@@ -34,9 +34,9 @@ public class IngredientsSteps(
     [Then("the milk response should indicate a bad gateway")]
     public async Task ThenTheMilkResponseShouldIndicateABadGateway()
     {
-        Track.That(() => milkSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.BadGateway));
+        milkSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.BadGateway);
         var milkErrorResponseBody = await milkSteps.ResponseMessage!.Content.ReadAsStringAsync();
-        Track.That(() => milkErrorResponseBody.Should().Contain(DownstreamErrorMessages.CowServiceUnavailableTitle));
+        milkErrorResponseBody.Should().Contain(DownstreamErrorMessages.CowServiceUnavailableTitle);
     }
 
     // --- Goat Milk Sourcing ---
@@ -46,8 +46,8 @@ public class IngredientsSteps(
     [Then("the goat milk response should contain fresh goat milk")]
     public void ThenTheGoatMilkResponseShouldContainFreshGoatMilk()
     {
-        Track.That(() => goatMilkSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
-        Track.That(() => goatMilkSteps.GoatMilkResponse.GoatMilk.Should().Be(GoatServiceDefaults.FreshGoatMilk));
+        goatMilkSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
+        goatMilkSteps.GoatMilkResponse.GoatMilk.Should().Be(GoatServiceDefaults.FreshGoatMilk);
     }
 
     [Then("the goat service should have received a goat milk request")]
@@ -79,16 +79,16 @@ public class IngredientsSteps(
     [Then("the goat milk response should indicate feature disabled")]
     public async Task ThenTheGoatMilkResponseShouldIndicateFeatureDisabled()
     {
-        Track.That(() => goatMilkSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.NotFound));
+        goatMilkSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.NotFound);
         var goatMilkFeatureDisabledResponseBody = await goatMilkSteps.ResponseMessage!.Content.ReadAsStringAsync();
-        Track.That(() => goatMilkFeatureDisabledResponseBody.Should().Contain(DownstreamErrorMessages.FeatureDisabled));
+        goatMilkFeatureDisabledResponseBody.Should().Contain(DownstreamErrorMessages.FeatureDisabled);
     }
 
     [Then("the goat milk response should contain fresh goat milk when enabled")]
     public void ThenTheGoatMilkResponseShouldContainFreshGoatMilkWhenEnabled()
     {
-        Track.That(() => goatMilkSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
-        Track.That(() => goatMilkSteps.GoatMilkResponse.GoatMilk.Should().Be(GoatServiceDefaults.FreshGoatMilk));
+        goatMilkSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
+        goatMilkSteps.GoatMilkResponse.GoatMilk.Should().Be(GoatServiceDefaults.FreshGoatMilk);
     }
 
     // --- Goat Milk Downstream Failure ---
@@ -103,9 +103,9 @@ public class IngredientsSteps(
     [Then("the goat milk response should indicate a bad gateway")]
     public async Task ThenTheGoatMilkResponseShouldIndicateABadGateway()
     {
-        Track.That(() => goatMilkSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.BadGateway));
+        goatMilkSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.BadGateway);
         var goatMilkErrorResponseBody = await goatMilkSteps.ResponseMessage!.Content.ReadAsStringAsync();
-        Track.That(() => goatMilkErrorResponseBody.Should().Contain(DownstreamErrorMessages.GoatServiceUnavailableTitle));
+        goatMilkErrorResponseBody.Should().Contain(DownstreamErrorMessages.GoatServiceUnavailableTitle);
     }
 
 }

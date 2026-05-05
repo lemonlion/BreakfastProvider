@@ -31,16 +31,16 @@ public class Infrastructure_Degraded_Health_Check_Tests : BaseFixture
         var response = await Client.GetAsync(Endpoints.Health);
 
         // Then the response should indicate a degraded status
-        Track.That(() => response.StatusCode.Should().Be(HttpStatusCode.OK));
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
 
         var content = await response.Content.ReadAsStringAsync();
         var result = Json.Deserialize<TestHealthCheckResponse>(content)!;
-        Track.That(() => result.Should().NotBeNull());
-        Track.That(() => result.Status.Should().Be(HealthCheckStatuses.Degraded));
+        result.Should().NotBeNull();
+        result.Status.Should().Be(HealthCheckStatuses.Degraded);
 
         // And the cow service dependency should report degraded
-        Track.That(() => result.Results.Should().ContainKey(HealthCheckNames.CowService));
-        Track.That(() => result.Results[HealthCheckNames.CowService].Status.Should().Be(HealthCheckStatuses.Degraded));
+        result.Results.Should().ContainKey(HealthCheckNames.CowService);
+        result.Results[HealthCheckNames.CowService].Status.Should().Be(HealthCheckStatuses.Degraded);
     }
 
     [Test]
@@ -66,17 +66,17 @@ public class Infrastructure_Degraded_Health_Check_Tests : BaseFixture
         var response = await Client.GetAsync(Endpoints.Health);
 
         // Then the response should indicate a degraded status
-        Track.That(() => response.StatusCode.Should().Be(HttpStatusCode.OK));
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
 
         var content = await response.Content.ReadAsStringAsync();
         var result = Json.Deserialize<TestHealthCheckResponse>(content)!;
-        Track.That(() => result.Should().NotBeNull());
-        Track.That(() => result.Status.Should().Be(HealthCheckStatuses.Degraded));
+        result.Should().NotBeNull();
+        result.Status.Should().Be(HealthCheckStatuses.Degraded);
 
         // And both dependencies should report degraded
-        Track.That(() => result.Results.Should().ContainKey(HealthCheckNames.CowService));
-        Track.That(() => result.Results[HealthCheckNames.CowService].Status.Should().Be(HealthCheckStatuses.Degraded));
-        Track.That(() => result.Results.Should().ContainKey(HealthCheckNames.SupplierService));
-        Track.That(() => result.Results[HealthCheckNames.SupplierService].Status.Should().Be(HealthCheckStatuses.Degraded));
+        result.Results.Should().ContainKey(HealthCheckNames.CowService);
+        result.Results[HealthCheckNames.CowService].Status.Should().Be(HealthCheckStatuses.Degraded);
+        result.Results.Should().ContainKey(HealthCheckNames.SupplierService);
+        result.Results[HealthCheckNames.SupplierService].Status.Should().Be(HealthCheckStatuses.Degraded);
     }
 }

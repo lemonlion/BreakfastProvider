@@ -50,10 +50,10 @@ public class AuditLogs_Retrieval_Tests : BaseFixture
             Flour = _flourSteps.FlourResponse.Flour
         };
         await _pancakeSteps.Send();
-        Track.That(() => _pancakeSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created));
+        _pancakeSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
         await _pancakeSteps.ParseResponse();
-        Track.That(() => _pancakeSteps.Response.Should().NotBeNull());
-        Track.That(() => _pancakeSteps.Response!.BatchId.Should().NotBeEmpty());
+        _pancakeSteps.Response.Should().NotBeNull();
+        _pancakeSteps.Response!.BatchId.Should().NotBeEmpty();
 
         // And an order has been created for the batch
         _orderSteps.Request = new TestOrderRequest
@@ -71,21 +71,21 @@ public class AuditLogs_Retrieval_Tests : BaseFixture
             ]
         };
         await _orderSteps.Send();
-        Track.That(() => _orderSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created));
+        _orderSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
         await _orderSteps.ParseResponse();
-        Track.That(() => _orderSteps.Response.Should().NotBeNull());
-        Track.That(() => _orderSteps.Response!.OrderId.Should().NotBeEmpty());
+        _orderSteps.Response.Should().NotBeNull();
+        _orderSteps.Response!.OrderId.Should().NotBeEmpty();
 
         // When the audit logs are retrieved
         await _auditSteps.Retrieve();
 
         // Then the audit log response should contain the order creation entry
-        Track.That(() => _auditSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
+        _auditSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
         await _auditSteps.ParseResponse();
-        Track.That(() => _auditSteps.Response!.Should().Contain(a =>
+        _auditSteps.Response!.Should().Contain(a =>
             a.Action == AuditLogDefaults.CreatedAction
             && a.EntityType == AuditLogDefaults.OrderEntityType
-            && a.Details.Contains(_customerName)));
+            && a.Details.Contains(_customerName));
 
         // And the downstream services should have received requests (if not post-deployment)
         if (!Settings.RunAgainstExternalServiceUnderTest)

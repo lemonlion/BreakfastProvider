@@ -44,8 +44,8 @@ public class Orders_Validation_Tests : BaseFixture
         // Then the responses should contain the validation error
         var actualResults = await ValidationHelper.ParseValidationResponses(responses);
         var actual = actualResults.Single();
-        Track.That(() => actual.ErrorMessage.Should().Be(expectedError));
-        Track.That(() => actual.ResponseStatus.Should().Be(expectedStatus));
+        actual.ErrorMessage.Should().Be(expectedError);
+        actual.ResponseStatus.Should().Be(expectedStatus);
     }
 
     #endregion
@@ -74,8 +74,8 @@ public class Orders_Validation_Tests : BaseFixture
         // Then the responses should contain the validation error
         var actualResults = await ValidationHelper.ParseValidationResponses(responses);
         var actual = actualResults.Single();
-        Track.That(() => actual.ErrorMessage.Should().Be(expectedError));
-        Track.That(() => actual.ResponseStatus.Should().Be(expectedStatus));
+        actual.ErrorMessage.Should().Be(expectedError);
+        actual.ResponseStatus.Should().Be(expectedStatus);
     }
 
     #endregion

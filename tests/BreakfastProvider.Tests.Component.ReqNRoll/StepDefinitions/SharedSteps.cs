@@ -33,13 +33,13 @@ public class SharedSteps(
     public async Task GivenAPancakeBatchHasBeenCreated()
     {
         await milkSteps.Retrieve();
-        Track.That(() => milkSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
+        milkSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
 
         await eggsSteps.Retrieve();
-        Track.That(() => eggsSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
+        eggsSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
 
         await flourSteps.Retrieve();
-        Track.That(() => flourSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
+        flourSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
 
         pancakeSteps.Request = new TestPancakeRequest
         {
@@ -49,10 +49,10 @@ public class SharedSteps(
         };
         await pancakeSteps.Send();
 
-        Track.That(() => pancakeSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created));
+        pancakeSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
         await pancakeSteps.ParseResponse();
-        Track.That(() => pancakeSteps.Response.Should().NotBeNull());
-        Track.That(() => pancakeSteps.Response!.BatchId.Should().NotBeEmpty());
+        pancakeSteps.Response.Should().NotBeNull();
+        pancakeSteps.Response!.BatchId.Should().NotBeEmpty();
     }
 
     // ── Given: a valid order request ──

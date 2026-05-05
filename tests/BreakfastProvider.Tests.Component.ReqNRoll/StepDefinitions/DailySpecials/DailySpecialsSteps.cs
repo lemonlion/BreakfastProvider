@@ -63,7 +63,7 @@ public class DailySpecialsSteps(
             Quantity = MaxOrdersPerSpecial
         };
         await postSteps.Send();
-        Track.That(() => postSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created));
+        postSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
     }
 
     [Given("a daily special order for lemon ricotta of quantity one is placed")]
@@ -75,7 +75,7 @@ public class DailySpecialsSteps(
             Quantity = 1
         };
         await postSteps.Send();
-        Track.That(() => postSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created));
+        postSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
     }
 
     [When("the daily special order is submitted")]
@@ -98,23 +98,23 @@ public class DailySpecialsSteps(
     [Then("the daily special order response should contain a valid confirmation")]
     public async Task ThenTheDailySpecialOrderResponseShouldContainAValidConfirmation()
     {
-        Track.That(() => postSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created));
+        postSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
         await postSteps.ParseResponse();
-        Track.That(() => postSteps.Response!.SpecialId.Should().Be(DailySpecialDefaults.CinnamonSwirlId));
-        Track.That(() => postSteps.Response!.OrderConfirmationId.Should().NotBeEmpty());
+        postSteps.Response!.SpecialId.Should().Be(DailySpecialDefaults.CinnamonSwirlId);
+        postSteps.Response!.OrderConfirmationId.Should().NotBeEmpty();
     }
 
     [Then("the daily specials response should contain all expected specials")]
     public async Task ThenTheDailySpecialsResponseShouldContainAllExpectedSpecials()
     {
-        Track.That(() => getSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
+        getSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
         await getSteps.ParseResponse();
-        Track.That(() => getSteps.Response.Should().HaveCount(DailySpecialDefaults.ExpectedSpecialsCount));
+        getSteps.Response.Should().HaveCount(DailySpecialDefaults.ExpectedSpecialsCount);
     }
 
     [Then("the response should indicate the daily special is sold out")]
     public void ThenTheResponseShouldIndicateTheDailySpecialIsSoldOut()
-        => Track.That(() => postSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Conflict));
+        => postSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Conflict);
 
     [Then("the lemon ricotta special should have one fewer remaining")]
     public async Task ThenTheLemonRicottaSpecialShouldHaveOneFewerRemaining()
@@ -122,7 +122,7 @@ public class DailySpecialsSteps(
         await getSteps.ParseResponse();
         var lemonRicottaSpecial = getSteps.Response!.Single(s => s.SpecialId == DailySpecialDefaults.LemonRicottaId);
         var lemonRicottaRemainingQuantity = lemonRicottaSpecial.RemainingQuantity;
-        Track.That(() => lemonRicottaRemainingQuantity.Should().Be(MaxOrdersPerSpecial - 1));
+        lemonRicottaRemainingQuantity.Should().Be(MaxOrdersPerSpecial - 1);
     }
 
     // --- Idempotency ---
@@ -153,12 +153,12 @@ public class DailySpecialsSteps(
         postSteps.AddHeader(CustomHeaders.IdempotencyKey, _idempotencyKey);
 
         await postSteps.Send();
-        Track.That(() => postSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created));
+        postSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
         await postSteps.ParseResponse();
         _firstConfirmationId = postSteps.Response!.OrderConfirmationId;
 
         await postSteps.Send();
-        Track.That(() => postSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created));
+        postSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
         await postSteps.ParseResponse();
         _secondConfirmationId = postSteps.Response!.OrderConfirmationId;
     }
@@ -168,24 +168,24 @@ public class DailySpecialsSteps(
     {
         postSteps.AddHeader(CustomHeaders.IdempotencyKey, Guid.NewGuid().ToString());
         await postSteps.Send();
-        Track.That(() => postSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created));
+        postSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
         await postSteps.ParseResponse();
         _firstConfirmationId = postSteps.Response!.OrderConfirmationId;
 
         postSteps.AddHeader(CustomHeaders.IdempotencyKey, Guid.NewGuid().ToString());
         await postSteps.Send();
-        Track.That(() => postSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created));
+        postSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
         await postSteps.ParseResponse();
         _secondConfirmationId = postSteps.Response!.OrderConfirmationId;
     }
 
     [Then("both responses should return the same confirmation id")]
     public void ThenBothResponsesShouldReturnTheSameConfirmationId()
-        => Track.That(() => _firstConfirmationId.Should().Be(_secondConfirmationId));
+        => _firstConfirmationId.Should().Be(_secondConfirmationId);
 
     [Then("the responses should have different confirmation ids")]
     public void ThenTheResponsesShouldHaveDifferentConfirmationIds()
-        => Track.That(() => _firstConfirmationId.Should().NotBe(_secondConfirmationId));
+        => _firstConfirmationId.Should().NotBe(_secondConfirmationId);
 
     // --- Validation ---
     [Given(@"a valid daily special order request with ""(.*)"" set to ""(.*)""")]
@@ -213,7 +213,7 @@ public class DailySpecialsSteps(
     public async Task ThenTheDailySpecialResponseShouldContainErrorWithStatus(string errorMessage, string responseStatus)
     {
         var actualResults = await ValidationHelper.ParseValidationResponses(_validationResponses);
-        Track.That(() => actualResults.Should().Contain(r => r.ErrorMessage.Contains(errorMessage)));
+        actualResults.Should().Contain(r => r.ErrorMessage.Contains(errorMessage));
     }
 
     // --- Not Found ---
@@ -229,5 +229,5 @@ public class DailySpecialsSteps(
 
     [Then("the daily special response should indicate not found")]
     public void ThenTheDailySpecialResponseShouldIndicateNotFound()
-        => Track.That(() => postSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.NotFound));
+        => postSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.NotFound);
 }

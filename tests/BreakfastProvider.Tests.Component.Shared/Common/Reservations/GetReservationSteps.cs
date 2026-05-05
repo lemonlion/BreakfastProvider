@@ -28,7 +28,7 @@ public class GetReservationSteps(RequestContext context)
     {
         var content = await ResponseMessage!.Content.ReadAsStringAsync();
         var responseContentIsValidJson = Json.IsValid(content);
-        Track.That(() => responseContentIsValidJson.Should().BeTrue());
+        responseContentIsValidJson.Should().BeTrue();
         Response = Json.Deserialize<TestReservationResponse>(content)!;
     }
 
@@ -36,7 +36,7 @@ public class GetReservationSteps(RequestContext context)
     {
         var content = await ResponseMessage!.Content.ReadAsStringAsync();
         var responseContentIsValidJson = Json.IsValid(content);
-        Track.That(() => responseContentIsValidJson.Should().BeTrue());
+        responseContentIsValidJson.Should().BeTrue();
         ListResponse = Json.Deserialize<List<TestReservationResponse>>(content)!;
     }
 }

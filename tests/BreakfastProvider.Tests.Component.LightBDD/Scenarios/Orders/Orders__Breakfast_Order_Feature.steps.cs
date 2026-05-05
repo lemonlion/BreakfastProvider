@@ -60,19 +60,19 @@ public partial class Orders__Breakfast_Order_Feature : BaseFixture
         => await _milkSteps.Retrieve();
 
     private async Task The_milk_response_should_be_successful()
-        => Track.That(() => _milkSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
+        => _milkSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
 
     private async Task Eggs_are_retrieved_from_the_eggs_endpoint()
         => await _eggsSteps.Retrieve();
 
     private async Task The_eggs_response_should_be_successful()
-        => Track.That(() => _eggsSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
+        => _eggsSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
 
     private async Task Flour_is_retrieved_from_the_flour_endpoint()
         => await _flourSteps.Retrieve();
 
     private async Task The_flour_response_should_be_successful()
-        => Track.That(() => _flourSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
+        => _flourSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
 
     private async Task A_pancake_request_is_submitted_with_all_ingredients()
     {
@@ -87,10 +87,10 @@ public partial class Orders__Breakfast_Order_Feature : BaseFixture
 
     private async Task The_pancake_batch_response_should_be_successful()
     {
-        Track.That(() => _pancakeSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created));
+        _pancakeSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
         await _pancakeSteps.ParseResponse();
-        Track.That(() => _pancakeSteps.Response.Should().NotBeNull());
-        Track.That(() => _pancakeSteps.Response!.BatchId.Should().NotBeEmpty());
+        _pancakeSteps.Response.Should().NotBeNull();
+        _pancakeSteps.Response!.BatchId.Should().NotBeEmpty();
     }
 
     private async Task The_batch_id_is_captured_from_the_pancakes_response()
@@ -130,16 +130,16 @@ public partial class Orders__Breakfast_Order_Feature : BaseFixture
     }
 
     private async Task The_order_response_http_status_should_be_created()
-        => Track.That(() => _orderSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created));
+        => _orderSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
 
     private async Task The_order_response_should_be_valid_json()
         => await _orderSteps.ParseResponse();
 
     private async Task The_order_should_contain_the_customer_name()
-        => Track.That(() => _orderSteps.Response!.CustomerName.Should().Be(_customerName));
+        => _orderSteps.Response!.CustomerName.Should().Be(_customerName);
 
     private async Task The_order_should_contain_the_ordered_items()
-        => Track.That(() => _orderSteps.Response!.Items.Should().HaveCount(1));
+        => _orderSteps.Response!.Items.Should().HaveCount(1);
 
     [SkipStepIf(nameof(Settings.RunAgainstExternalServiceUnderTest), EventStoreIsUnavailableInPostDeploymentEnvironments)]
     private async Task An_order_created_event_should_have_been_published()
@@ -159,7 +159,7 @@ public partial class Orders__Breakfast_Order_Feature : BaseFixture
             await Task.Delay(retryDelay);
         }
 
-        Track.That(() => orderCreatedEvents.Should().Contain(e => e.CustomerName == _customerName));
+        orderCreatedEvents.Should().Contain(e => e.CustomerName == _customerName);
     }
 
     [SkipStepIf(nameof(Settings.RunAgainstExternalServiceUnderTest), DownstreamFakeRequestStoreIsUnavailableInPostDeploymentEnvironments)]
@@ -184,8 +184,8 @@ public partial class Orders__Breakfast_Order_Feature : BaseFixture
             await Task.Delay(retryDelay);
         }
 
-        Track.That(() => recipeLogMessages.Should().Contain(m => m.Message.RecipeType == OrderDefaults.PancakeItemType,
-            "a RecipeLogEvent should have been published for the pancake recipe"));
+        recipeLogMessages.Should().Contain(m => m.Message.RecipeType == OrderDefaults.PancakeItemType,
+            "a RecipeLogEvent should have been published for the pancake recipe");
     }
 
     [SkipStepIf(nameof(Settings.RunAgainstExternalServiceUnderTest), OutboxStoreIsUnavailableInPostDeploymentEnvironments)]

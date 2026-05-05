@@ -35,7 +35,7 @@ public class ReservationsManagementSteps(
     {
         GivenAValidReservationRequest();
         await postSteps.Send();
-        Track.That(() => postSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created));
+        postSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
         await postSteps.ParseResponse();
         _createdReservationId = postSteps.Response!.Id;
     }
@@ -45,7 +45,7 @@ public class ReservationsManagementSteps(
     {
         await GivenAReservationExists();
         await cancelSteps.Send(_createdReservationId);
-        Track.That(() => cancelSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
+        cancelSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
     }
 
     [When("the reservation is submitted")]
@@ -71,35 +71,35 @@ public class ReservationsManagementSteps(
     [Then("the reservation response should contain the confirmed booking")]
     public async Task ThenTheReservationResponseShouldContainTheConfirmedBooking()
     {
-        Track.That(() => postSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created));
+        postSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
         await postSteps.ParseResponse();
-        Track.That(() => postSteps.Response!.Status.Should().Be("Confirmed"));
-        Track.That(() => postSteps.Response!.CustomerName.Should().Be(postSteps.Request.CustomerName));
+        postSteps.Response!.Status.Should().Be("Confirmed");
+        postSteps.Response!.CustomerName.Should().Be(postSteps.Request.CustomerName);
     }
 
     [Then("the reservation get response should contain the reservation")]
     public async Task ThenTheReservationGetResponseShouldContainTheReservation()
     {
-        Track.That(() => getSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
+        getSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
         await getSteps.ParseResponse();
-        Track.That(() => getSteps.Response!.Id.Should().Be(_createdReservationId));
-        Track.That(() => getSteps.Response!.CustomerName.Should().Be(postSteps.Response!.CustomerName));
-        Track.That(() => getSteps.Response!.Status.Should().Be("Confirmed"));
+        getSteps.Response!.Id.Should().Be(_createdReservationId);
+        getSteps.Response!.CustomerName.Should().Be(postSteps.Response!.CustomerName);
+        getSteps.Response!.Status.Should().Be("Confirmed");
     }
 
     [Then("the cancellation response should indicate the reservation is cancelled")]
     public async Task ThenTheCancellationResponseShouldIndicateTheReservationIsCancelled()
     {
-        Track.That(() => cancelSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
+        cancelSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
         await cancelSteps.ParseResponse();
-        Track.That(() => cancelSteps.Response!.Status.Should().Be("Cancelled"));
+        cancelSteps.Response!.Status.Should().Be("Cancelled");
     }
 
     [Then("the cancellation response should indicate a conflict")]
     public void ThenTheCancellationResponseShouldIndicateAConflict()
-        => Track.That(() => cancelSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Conflict));
+        => cancelSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Conflict);
 
     [Then("the reservation delete response should indicate no content")]
     public void ThenTheReservationDeleteResponseShouldIndicateNoContent()
-        => Track.That(() => _deleteResponse!.StatusCode.Should().Be(HttpStatusCode.NoContent));
+        => _deleteResponse!.StatusCode.Should().Be(HttpStatusCode.NoContent);
 }

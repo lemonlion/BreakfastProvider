@@ -26,15 +26,15 @@ public class MuffinCreationSteps(
     public async Task GivenAValidAppleCinnamonMuffinRecipeWithAllIngredients()
     {
         await milkSteps.Retrieve();
-        Track.That(() => milkSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
+        milkSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
         muffinSteps.Request.Milk = milkSteps.MilkResponse.Milk;
 
         await eggsSteps.Retrieve();
-        Track.That(() => eggsSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
+        eggsSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
         muffinSteps.Request.Eggs = eggsSteps.EggsResponse.Eggs;
 
         await flourSteps.Retrieve();
-        Track.That(() => flourSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
+        flourSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
         muffinSteps.Request.Flour = flourSteps.FlourResponse.Flour;
 
         muffinSteps.Request.Apples = MuffinDefaults.GrannySmithApples;
@@ -52,11 +52,11 @@ public class MuffinCreationSteps(
     public async Task GivenAMuffinRecipeWithIngredients(string recipeName, Table table)
     {
         await milkSteps.Retrieve();
-        Track.That(() => milkSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
+        milkSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
         muffinSteps.Request.Milk = milkSteps.MilkResponse.Milk;
 
         await eggsSteps.Retrieve();
-        Track.That(() => eggsSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
+        eggsSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
         muffinSteps.Request.Eggs = eggsSteps.EggsResponse.Eggs;
 
         var row = table.Rows[0];
@@ -129,16 +129,16 @@ public class MuffinCreationSteps(
     [Then("the muffin response should contain a valid batch with all ingredients")]
     public async Task ThenTheMuffinResponseShouldContainAValidBatchWithAllIngredients()
     {
-        Track.That(() => muffinSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created));
+        muffinSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
         await muffinSteps.ParseResponse();
-        Track.That(() => muffinSteps.Response!.Ingredients.Should().Contain(milkSteps.MilkResponse.Milk));
-        Track.That(() => muffinSteps.Response!.Ingredients.Should().Contain(eggsSteps.EggsResponse.Eggs));
-        Track.That(() => muffinSteps.Response!.Ingredients.Should().Contain(flourSteps.FlourResponse.Flour));
-        Track.That(() => muffinSteps.Response!.Ingredients.Should().Contain(MuffinDefaults.GrannySmithApples));
-        Track.That(() => muffinSteps.Response!.Ingredients.Should().Contain(MuffinDefaults.CeylonCinnamon));
-        Track.That(() => muffinSteps.Response!.Toppings.Should().HaveCount(1));
-        Track.That(() => muffinSteps.Response!.BakingTemperature.Should().Be(MuffinDefaults.DefaultTemperature));
-        Track.That(() => muffinSteps.Response!.BakingDuration.Should().Be(MuffinDefaults.DefaultDuration));
+        muffinSteps.Response!.Ingredients.Should().Contain(milkSteps.MilkResponse.Milk);
+        muffinSteps.Response!.Ingredients.Should().Contain(eggsSteps.EggsResponse.Eggs);
+        muffinSteps.Response!.Ingredients.Should().Contain(flourSteps.FlourResponse.Flour);
+        muffinSteps.Response!.Ingredients.Should().Contain(MuffinDefaults.GrannySmithApples);
+        muffinSteps.Response!.Ingredients.Should().Contain(MuffinDefaults.CeylonCinnamon);
+        muffinSteps.Response!.Toppings.Should().HaveCount(1);
+        muffinSteps.Response!.BakingTemperature.Should().Be(MuffinDefaults.DefaultTemperature);
+        muffinSteps.Response!.BakingDuration.Should().Be(MuffinDefaults.DefaultDuration);
     }
 
     [Then("the cow service should have received a milk request for the muffins")]
@@ -153,28 +153,28 @@ public class MuffinCreationSteps(
     [Then(@"the muffin batch should have (\d+) ingredients")]
     public async Task ThenTheMuffinBatchShouldHaveIngredients(int expectedCount)
     {
-        Track.That(() => muffinSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created));
+        muffinSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
         await muffinSteps.ParseResponse();
-        Track.That(() => muffinSteps.Response!.Ingredients.Should().HaveCount(expectedCount));
+        muffinSteps.Response!.Ingredients.Should().HaveCount(expectedCount);
     }
 
     [Then(@"the muffin response should include (\d+) toppings")]
     public void ThenTheMuffinResponseShouldIncludeToppings(int expectedCount)
     {
-        Track.That(() => muffinSteps.Response!.Toppings.Should().HaveCount(expectedCount));
+        muffinSteps.Response!.Toppings.Should().HaveCount(expectedCount);
     }
 
     [Then("the muffin response should include baking information")]
     public void ThenTheMuffinResponseShouldIncludeBakingInformation()
     {
-        Track.That(() => muffinSteps.Response!.BakingTemperature.Should().BeGreaterThan(0));
+        muffinSteps.Response!.BakingTemperature.Should().BeGreaterThan(0);
     }
 
     [Then(@"the muffin response should contain error ""(.*)"" with status ""(.*)""")]
     public async Task ThenTheMuffinResponseShouldContainError(string errorMessage, string responseStatus)
     {
         var responseBody = await muffinSteps.ResponseMessage!.Content.ReadAsStringAsync();
-        Track.That(() => responseBody.Should().Contain(errorMessage));
-        Track.That(() => muffinSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.BadRequest));
+        responseBody.Should().Contain(errorMessage);
+        muffinSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     }
 }

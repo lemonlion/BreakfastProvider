@@ -56,11 +56,11 @@ public class Orders_Outbox_Retry_Exhaustion_Tests : BaseFixture
 
         // Given a pancake batch has been created
         await _milkSteps.Retrieve();
-        Track.That(() => _milkSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
+        _milkSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
         await _eggsSteps.Retrieve();
-        Track.That(() => _eggsSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
+        _eggsSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
         await _flourSteps.Retrieve();
-        Track.That(() => _flourSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
+        _flourSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
 
         _pancakeSteps.Request = new TestPancakeRequest
         {
@@ -69,9 +69,9 @@ public class Orders_Outbox_Retry_Exhaustion_Tests : BaseFixture
             Flour = _flourSteps.FlourResponse.Flour
         };
         await _pancakeSteps.Send();
-        Track.That(() => _pancakeSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created));
+        _pancakeSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
         await _pancakeSteps.ParseResponse();
-        Track.That(() => _pancakeSteps.Response.Should().NotBeNull());
+        _pancakeSteps.Response.Should().NotBeNull();
 
         // And a valid order request for the created batch
         _orderSteps.Request.CustomerName = _customerName;
@@ -87,7 +87,7 @@ public class Orders_Outbox_Retry_Exhaustion_Tests : BaseFixture
         await _orderSteps.Send();
 
         // Then the order should be created successfully
-        Track.That(() => _orderSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created));
+        _orderSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
 
         // And the outbox message should transition to failed
         const int maxRetries = 60;
@@ -103,9 +103,9 @@ public class Orders_Outbox_Retry_Exhaustion_Tests : BaseFixture
         }
 
         await _outboxSteps.LoadOutboxMessages();
-        Track.That(() => _outboxSteps.OutboxMessages.Should().Contain(m =>
+        _outboxSteps.OutboxMessages.Should().Contain(m =>
                 m.EventType == EventTypes.OrderCreated && m.Status == OutboxStatuses.Failed,
-            "the outbox message should have transitioned to Failed after exhausting retries"));
+            "the outbox message should have transitioned to Failed after exhausting retries");
     }
 
     private class FailingOutboxDispatcher : IOutboxDispatcher

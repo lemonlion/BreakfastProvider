@@ -93,9 +93,9 @@ public class Apple_Cinnamon_Muffins_Creation_Tests : BaseFixture
         _muffinSteps.Request.Cinnamon = recipe.Ingredients.Cinnamon;
         _muffinSteps.Request.Baking = new TestBakingProfile
         {
-            Temperature = recipe.Baking.Temperature,
-            DurationMinutes = recipe.Baking.DurationMinutes,
-            PanType = recipe.Baking.PanType
+            Temperature = recipe.Temperature,
+            DurationMinutes = recipe.DurationMinutes,
+            PanType = recipe.PanType
         };
         _muffinSteps.Request.Toppings = recipe.Toppings?
             .Select(t => new TestMuffinTopping { Name = t.Name, Amount = t.Amount })
@@ -133,9 +133,9 @@ public class Apple_Cinnamon_Muffins_Creation_Tests : BaseFixture
         _muffinSteps.Request.Cinnamon = recipe.Ingredients.Cinnamon;
         _muffinSteps.Request.Baking = new TestBakingProfile
         {
-            Temperature = recipe.Baking.Temperature,
-            DurationMinutes = recipe.Baking.DurationMinutes,
-            PanType = recipe.Baking.PanType
+            Temperature = recipe.Temperature,
+            DurationMinutes = recipe.DurationMinutes,
+            PanType = recipe.PanType
         };
 
         // When the muffins are prepared

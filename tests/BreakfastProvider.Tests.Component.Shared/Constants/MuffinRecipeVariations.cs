@@ -16,12 +16,9 @@ public static class MuffinRecipeVariations
                     Apples = "Granny Smith",
                     Cinnamon = "Ceylon"
                 },
-                Baking = new BakingProfileData
-                {
-                    Temperature = 180,
-                    DurationMinutes = 25,
-                    PanType = "Standard"
-                },
+                Temperature = 180,
+                DurationMinutes = 25,
+                PanType = "Standard",
                 Toppings =
                 [
                     new ToppingData { Name = "Streusel", Amount = "Light" },
@@ -45,12 +42,9 @@ public static class MuffinRecipeVariations
                     Apples = "Honeycrisp",
                     Cinnamon = "Cassia"
                 },
-                Baking = new BakingProfileData
-                {
-                    Temperature = 175,
-                    DurationMinutes = 30,
-                    PanType = "Cast Iron"
-                },
+                Temperature = 175,
+                DurationMinutes = 30,
+                PanType = "Cast Iron",
                 Toppings =
                 [
                     new ToppingData { Name = "Brown Sugar Crumb", Amount = "Heavy" },
@@ -74,12 +68,9 @@ public static class MuffinRecipeVariations
                     Apples = "Pink Lady",
                     Cinnamon = "Saigon"
                 },
-                Baking = new BakingProfileData
-                {
-                    Temperature = 190,
-                    DurationMinutes = 20,
-                    PanType = "Silicone"
-                },
+                Temperature = 190,
+                DurationMinutes = 20,
+                PanType = "Silicone",
                 Toppings =
                 [
                     new ToppingData { Name = "Cinnamon Sugar", Amount = "Heavy" },
@@ -107,12 +98,9 @@ public static class MuffinRecipeVariations
                     Apples = "Granny Smith",
                     Cinnamon = "Ceylon"
                 },
-                Baking = new BakingProfileData
-                {
-                    Temperature = 180,
-                    DurationMinutes = 25,
-                    PanType = "Standard"
-                }
+                Temperature = 180,
+                DurationMinutes = 25,
+                PanType = "Standard"
             },
             new MuffinBatchExpectation
             {
@@ -131,12 +119,9 @@ public static class MuffinRecipeVariations
                     Apples = "Honeycrisp",
                     Cinnamon = "Cassia"
                 },
-                Baking = new BakingProfileData
-                {
-                    Temperature = 175,
-                    DurationMinutes = 30,
-                    PanType = "Cast Iron"
-                }
+                Temperature = 175,
+                DurationMinutes = 30,
+                PanType = "Cast Iron"
             },
             new MuffinBatchExpectation
             {
@@ -155,12 +140,9 @@ public static class MuffinRecipeVariations
                     Apples = "Pink Lady",
                     Cinnamon = "Saigon"
                 },
-                Baking = new BakingProfileData
-                {
-                    Temperature = 190,
-                    DurationMinutes = 20,
-                    PanType = "Silicone"
-                }
+                Temperature = 190,
+                DurationMinutes = 20,
+                PanType = "Silicone"
             },
             new MuffinBatchExpectation
             {

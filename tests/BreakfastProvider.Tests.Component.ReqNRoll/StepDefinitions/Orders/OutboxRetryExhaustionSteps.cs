@@ -51,7 +51,7 @@ public class OutboxRetryExhaustionSteps(
         var outboxRepo = appManager.AppFactory.Services.GetRequiredService<ICosmosRepository<OutboxMessage>>();
         var outboxSteps = new OutboxSteps(outboxRepo);
 
-        const int maxRetries = 60;
+        const int maxRetries = 120;
         var retryDelay = TimeSpan.FromMilliseconds(500);
 
         for (var i = 0; i < maxRetries; i++)

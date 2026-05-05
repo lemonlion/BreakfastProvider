@@ -220,6 +220,11 @@ public abstract class BaseFixture : DiagrammedComponentTest, IDisposable
             _fakeSpannerServer.Database.ExecuteDdl("CREATE TABLE CustomerPreferences (CustomerId STRING(MAX) NOT NULL, CustomerName STRING(MAX), PreferredMilkType STRING(MAX), LikesExtraToppings BOOL, FavouriteItem STRING(MAX), UpdatedAt TIMESTAMP) PRIMARY KEY (CustomerId)");
         }
 
+        // Eagerly init the EventGrid queue drainer before ConfigureTestServices
+        // captures SharedQueueDrainer, since [Before(Assembly)] may run late.
+        if (!Settings.RunWithAnInMemoryEventGrid && !string.IsNullOrEmpty(Settings.ExternalBlobStorageConnectionString))
+            TestServiceCollectionExtensions.InitQueueDrainer(Settings.ExternalBlobStorageConnectionString!);
+
         _staticFactory = new WebApplicationFactory<Program>().WithWebHostBuilder(builder =>
         {
             builder.ConfigureAppConfiguration((_, config) =>
@@ -374,7 +379,14 @@ public abstract class BaseFixture : DiagrammedComponentTest, IDisposable
             var handler = new TestTrackingMessageHandler(
                 new TUnitTestTrackingMessageHandlerOptions
                 {
-                    FixedNameForReceivingService = Documentation.ServiceNames.BreakfastProvider
+                    FixedNameForReceivingService = Documentation.ServiceNames.BreakfastProvider,
+                    CurrentTestInfoFetcher = () =>
+                    {
+                        var (name, id) = TUnitTestTrackingMessageHandlerOptions.TestInfoFetcher();
+                        // TUnit replaces '.' with '·' (U+00B7) in display names which breaks HTTP headers
+                        var asciiName = new string(name.Select(c => c > 127 ? '.' : c).ToArray());
+                        return (asciiName, id);
+                    }
                 })
             {
                 InnerHandler = new HttpClientHandler()

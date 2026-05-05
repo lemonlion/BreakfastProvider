@@ -168,27 +168,6 @@ Features:
       - Scenario: Request without correlation id should have one generated in response
         IsHappyPath: false
 
-  - Feature: Infrastructure Degraded Health Check Tests
-    Scenarios:
-      - Scenario: Health check should report degraded when cow service is unavailable
-        IsHappyPath: false
-
-      - Scenario: Health check should report degraded when multiple downstream services are unavailable
-        IsHappyPath: false
-
-  - Feature: Infrastructure Downstream Error Health Check Tests
-    Scenarios:
-      - Scenario: Health check should report degraded when downstream service returns non success status
-        IsHappyPath: false
-
-  - Feature: Infrastructure Header Propagation Tests
-    Scenarios:
-      - Scenario: Request with correlation id should forward it to cow service
-        IsHappyPath: true
-
-      - Scenario: Request with correlation id should forward it to supplier service
-        IsHappyPath: false
-
   - Feature: Infrastructure Health Check Detail Tests
     Scenarios:
       - Scenario: Health check response should include description and data for each entry
@@ -204,25 +183,12 @@ Features:
       - Scenario: Heartbeat endpoint should return a running message
         IsHappyPath: true
 
-  - Feature: Infrastructure Telemetry Tests
-    Scenarios:
-      - Scenario: Creating an order should emit a structured log entry
-        IsHappyPath: true
-
   - Feature: Ingredients Goat Milk Downstream Failure Tests
     Scenarios:
       - Scenario: Requesting goat milk when goat service returns invalid response should return bad gateway
         IsHappyPath: false
 
       - Scenario: Requesting goat milk when goat service unavailable should return bad gateway
-        IsHappyPath: false
-
-  - Feature: Ingredients Goat Milk Feature Flag Tests
-    Scenarios:
-      - Scenario: Goat milk endpoint should return fresh goat milk when feature is enabled
-        IsHappyPath: false
-
-      - Scenario: Goat milk endpoint should return not found when feature is disabled
         IsHappyPath: false
 
   - Feature: Ingredients Goat Milk Sourcing Tests
@@ -261,21 +227,6 @@ Features:
       - Scenario: Updating an inventory item should return the updated item
         IsHappyPath: false
 
-  - Feature: Menu Availability Tests
-    Scenarios:
-      - Scenario: Menu endpoint should return all menu items with availability
-        IsHappyPath: true
-
-  - Feature: Menu Caching Tests
-    Scenarios:
-      - Scenario: Menu should return cached results on subsequent requests
-        IsHappyPath: false
-
-  - Feature: Menu Downstream Failure Tests
-    Scenarios:
-      - Scenario: Requesting menu when supplier service unavailable should mark items as unavailable
-        IsHappyPath: false
-
   - Feature: Orders Breakfast Order Tests
     Scenarios:
       - Scenario: Valid order should be created and an event published
@@ -292,14 +243,6 @@ Features:
       - Scenario: Order should progress through all status transitions to completion
         IsHappyPath: true
 
-  - Feature: Orders Cross Field Validation Tests
-    Scenarios:
-      - Scenario: Order at maximum items per order should be accepted
-        IsHappyPath: false
-
-      - Scenario: Order exceeding maximum items per order should be rejected
-        IsHappyPath: false
-
   - Feature: Orders Kitchen Service Failure Tests
     Scenarios:
       - Scenario: Creating an order when kitchen service returns error should still create the order
@@ -311,30 +254,6 @@ Features:
         IsHappyPath: true
 
       - Scenario: Retrieving a non existent order should return not found
-        IsHappyPath: false
-
-  - Feature: Orders Outbox Retry Exhaustion Tests
-    Scenarios:
-      - Scenario: Outbox message should transition to failed after exhausting retries
-        IsHappyPath: false
-
-  - Feature: Orders Pagination Tests
-    Scenarios:
-      - Scenario: Listing orders should return a paginated response
-        IsHappyPath: true
-
-      - Scenario: Listing orders when none exist should return an empty page
-        IsHappyPath: false
-
-      - Scenario: Listing orders with small page size should limit results
-        IsHappyPath: false
-
-      - Scenario: Requesting second page should return different orders
-        IsHappyPath: false
-
-  - Feature: Orders Rate Limiting Tests
-    Scenarios:
-      - Scenario: Exceeding rate limit should return too many requests
         IsHappyPath: false
 
   - Feature: Orders Status Transition Tests
@@ -520,14 +439,6 @@ Features:
         IsHappyPath: true
 
       - Scenario: Deleting a non existent topping should return not found
-        IsHappyPath: false
-
-  - Feature: Toppings Feature Flag Tests
-    Scenarios:
-      - Scenario: Toppings should exclude raspberries when feature flag is disabled
-        IsHappyPath: false
-
-      - Scenario: Toppings should include raspberries when feature flag is enabled
         IsHappyPath: false
 
   - Feature: Toppings Management Tests

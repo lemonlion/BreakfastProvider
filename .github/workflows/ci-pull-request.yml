@@ -297,6 +297,33 @@ jobs:
       coverage-file: xunit-external-sut.coverage.cobertura.xml
 
 
+  # ─── TUnit ──────────────────────────────────────────────────────────────────
+
+  tunit-in-memory:
+    name: TUnit in memory
+    uses: ./.github/workflows/_tests-tunit.yml
+    with:
+      test-run-type: memory
+      test-run-description: tunit-in-memory
+    secrets: inherit
+
+  tunit-in-docker:
+    name: TUnit in docker
+    uses: ./.github/workflows/_tests-tunit.yml
+    with:
+      test-run-type: docker
+      test-run-description: tunit-in-docker
+    secrets: inherit
+
+  tunit-external-sut:
+    name: TUnit external SUT
+    uses: ./.github/workflows/_tests-tunit.yml
+    with:
+      test-run-type: external-sut
+      test-run-description: tunit-external-sut
+    secrets: inherit
+
+
   # ─── Gate ───────────────────────────────────────────────────────────────────
 
   checks-complete:
@@ -312,6 +339,9 @@ jobs:
       - xunit-in-memory
       - xunit-in-docker
       - xunit-external-sut
+      - tunit-in-memory
+      - tunit-in-docker
+      - tunit-external-sut
     runs-on: ubuntu-24.04
     steps:
       - name: Checks complete

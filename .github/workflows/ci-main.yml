@@ -295,6 +295,33 @@ jobs:
       coverage-file: xunit-external-sut.coverage.cobertura.xml
 
 
+  # ─── TUnit ──────────────────────────────────────────────────────────────────
+
+  tunit-in-memory:
+    name: TUnit in memory
+    uses: ./.github/workflows/_tests-tunit.yml
+    with:
+      test-run-type: memory
+      test-run-description: tunit-in-memory
+    secrets: inherit
+
+  tunit-in-docker:
+    name: TUnit in docker
+    uses: ./.github/workflows/_tests-tunit.yml
+    with:
+      test-run-type: docker
+      test-run-description: tunit-in-docker
+    secrets: inherit
+
+  tunit-external-sut:
+    name: TUnit external SUT
+    uses: ./.github/workflows/_tests-tunit.yml
+    with:
+      test-run-type: external-sut
+      test-run-description: tunit-external-sut
+    secrets: inherit
+
+
   # ─── Gate ───────────────────────────────────────────────────────────────────
 
   checks-complete:
@@ -310,6 +337,9 @@ jobs:
       - xunit-in-memory
       - xunit-in-docker
       - xunit-external-sut
+      - tunit-in-memory
+      - tunit-in-docker
+      - tunit-external-sut
     runs-on: ubuntu-24.04
     steps:
       - name: Checks complete
@@ -329,7 +359,7 @@ jobs:
 
   deploy-pages:
     name: Deploy to GitHub Pages
-    needs: [lightbdd-in-memory, reqnroll-in-memory, xunit-in-memory]
+    needs: [lightbdd-in-memory, reqnroll-in-memory, xunit-in-memory, tunit-in-memory]
     runs-on: ubuntu-24.04
     permissions:
       pages: write
@@ -362,6 +392,12 @@ jobs:
         with:
           name: LightBDD-xunit-in-memory-report
           path: site/reports/xunit
+
+      - name: Download TUnit report
+        uses: actions/download-artifact@v4
+        with:
+          name: LightBDD-tunit-in-memory-report
+          path: site/reports/tunit
 
       - name: Copy API specs
         run: |
@@ -476,6 +512,11 @@ jobs:
                   <div class="card-icon">🧪</div>
                   <h3>xUnit</h3>
                   <p>Standard xUnit component test report with sequence diagrams</p>
+                </a>
+                <a href="reports/tunit/TestRunReport.html" class="card">
+                  <div class="card-icon">🚀</div>
+                  <h3>TUnit</h3>
+                  <p>Modern TUnit component test report with sequence diagrams</p>
                 </a>
               </div>
 

@@ -2160,7 +2160,10 @@
             ]
           },
           "toppings": {
-            "type": "array",
+            "type": [
+              "null",
+              "array"
+            ],
             "items": {
               "$ref": "#/components/schemas/MuffinTopping"
             }

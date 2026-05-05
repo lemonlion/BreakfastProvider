@@ -38,17 +38,6 @@ namespace BreakfastProvider.Tests.Component.TUnit.Infrastructure;
 
 public abstract class BaseFixture : DiagrammedComponentTest, IDisposable
 {
-    private static readonly Func<(string Name, string Id)> SafeTestInfoFetcher = () =>
-    {
-        try
-        {
-            var ctx = TestContext.Current;
-            if (ctx != null)
-                return (ctx.Metadata.DisplayName, ctx.Id);
-        }
-        catch { /* ignored */ }
-        return ("Unknown", Guid.NewGuid().ToString());
-    };
     private static WebApplicationFactory<Program>? _staticFactory;
     private static readonly ConcurrentDictionary<string, Lazy<WebApplicationFactory<Program>>> SharedFactoryCache = new();
     private WebApplicationFactory<Program>? _appFactory;
@@ -254,7 +243,7 @@ public abstract class BaseFixture : DiagrammedComponentTest, IDisposable
 
         if (Settings.RunWithAnInMemoryDatabase)
         {
-            services.UseInMemoryDatabase(SafeTestInfoFetcher);
+            services.UseInMemoryDatabase(CurrentTestInfo.Fetcher);
             services.ReplaceCosmosDbHealthCheckWithNoOp();
         }
         else if (_staticServiceProvider != null)
@@ -301,7 +290,7 @@ public abstract class BaseFixture : DiagrammedComponentTest, IDisposable
 
         if (Settings.RunWithAnInMemorySpannerDatabase)
         {
-            services.UseInMemorySpannerDatabase(_fakeSpannerServer!, SafeTestInfoFetcher);
+            services.UseInMemorySpannerDatabase(_fakeSpannerServer!, CurrentTestInfo.Fetcher);
             services.ReplaceSpannerHealthCheckWithNoOp();
         }
 
@@ -369,13 +358,13 @@ public abstract class BaseFixture : DiagrammedComponentTest, IDisposable
             services.UseRealEventHub();
 
         if (Settings.RunWithAnInMemoryNotificationService)
-            services.UseTrackedGrpcNotificationClient(SafeTestInfoFetcher, Settings.NotificationServiceBaseUrl!);
+            services.UseTrackedGrpcNotificationClient(CurrentTestInfo.Fetcher, Settings.NotificationServiceBaseUrl!);
 
-        services.UseTrackedOutboxWriter(SafeTestInfoFetcher);
-        services.UseTrackedKafkaProducer(SafeTestInfoFetcher);
+        services.UseTrackedOutboxWriter(CurrentTestInfo.Fetcher);
+        services.UseTrackedKafkaProducer(CurrentTestInfo.Fetcher);
         services.UseTrackedPubSubPublishers();
 
-        services.AddTestTypedEventStores(ConsumedKafkaMessageStore, ConsumedEventHubMessageStore, SafeTestInfoFetcher);
+        services.AddTestTypedEventStores(ConsumedKafkaMessageStore, ConsumedEventHubMessageStore, CurrentTestInfo.Fetcher);
     }
 
     private HttpClient CreateTestClient()

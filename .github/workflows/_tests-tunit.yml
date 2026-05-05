@@ -1,0 +1,229 @@
+name: Tests (TUnit)
+
+on:
+  workflow_call:
+    inputs:
+      test-run-type: { type: string, required: true }  # ["memory", "docker", "external-sut" ]
+      test-run-description: {type: string, required: false, default: "tunit-tests"}
+      features-report-path: { type: string, required: false, default: "tests/BreakfastProvider.Tests.Component.TUnit/bin/Debug/net10.0/Reports/TestRunReport.html" }
+      runs-on: { type: string, required: false, default: "ubuntu-24.04" }
+
+env:
+  BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
+
+jobs:
+  run-tests:
+    name: Run tests
+    runs-on: ${{ inputs.runs-on }}
+    steps:
+      - name: Clear repository
+        run: sudo rm -fr $GITHUB_WORKSPACE && mkdir $GITHUB_WORKSPACE
+
+      - name: Checkout source
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.PUSH_SPECS_IN_CI_TOKEN != '' && secrets.PUSH_SPECS_IN_CI_TOKEN || github.token }}
+          fetch-depth: 2
+
+      - name: Setup .NET v10
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Set nuget.config credentials
+        run: |
+          cp nuget.config.github nuget.config
+          sed -i "s|GITHUB_NUGET_APIKEY|${{ secrets.ORGANISATION_PAT }}|g" nuget.config
+
+      - name: Set component test settings to InMemory
+        if: ${{ inputs.test-run-type == 'memory' }}
+        run: |
+          chmod +x .github/scripts/set-inmemory-flags.sh
+          .github/scripts/set-inmemory-flags.sh true
+
+      - name: Generate and install Kafka certificate
+        if: ${{ inputs.test-run-type == 'docker' || inputs.test-run-type == 'external-sut' }}
+        run: |
+          cd docker
+          echo "KAFKA_CERTIFICATES_PASSWORD=certificatePassword123" > .env
+          if [ -n "$KAFKA_CERT_PASSWORD" ]; then
+            sed -i "s|certificatePassword123|$KAFKA_CERT_PASSWORD|g" .env
+          fi
+
+          cd kafka-config
+          if [ -n "$KAFKA_CERT_PASSWORD" ]; then
+            sed -i "s|certificatePassword123|$KAFKA_CERT_PASSWORD|g" generate-certs.sh
+            sed -i "s|certificatePassword123|$KAFKA_CERT_PASSWORD|g" client.properties
+          fi
+
+          chmod u+x generate-certs.sh
+          ./generate-certs.sh
+
+          chmod u+x update-hostfile.sh
+          ./update-hostfile.sh
+        env:
+          KAFKA_CERT_PASSWORD: ${{secrets.KAFKA_CERTIFICATES_PASSWORD}}
+
+      - name: Generate EventGrid certificate
+        if: ${{ inputs.test-run-type == 'docker' || inputs.test-run-type == 'external-sut' }}
+        run: |
+          mkdir -p certificates
+          openssl req -x509 -newkey rsa:2048 -keyout certificates/eventgrid.local.key -out certificates/eventgrid.local.crt \
+            -days 365 -nodes -subj "/CN=eventgrid.local"
+          openssl pkcs12 -export -out certificates/eventgrid.local.pfx \
+            -inkey certificates/eventgrid.local.key -in certificates/eventgrid.local.crt \
+            -password pass:Y0urSup3rCrypt1cPa55w0rd!
+
+      - name: Tune Docker Compose for CI
+        if: ${{ inputs.test-run-type == 'docker' || inputs.test-run-type == 'external-sut' }}
+        run: |
+          sed -i 's/start_period: 30s/start_period: 120s/' docker/docker-compose-sut.yml
+          sed -i 's/retries: 30/retries: 60/' docker/docker-compose-sut.yml
+
+      - name: Spin up docker
+        if: ${{ inputs.test-run-type == 'docker' }}
+        run: |
+            docker compose -f docker/docker-compose-database.yml -f docker/docker-compose-storage.yml -f docker/docker-compose-fakes.yml -f docker/docker-compose-messaging.yml -f docker/docker-compose-eventhub.yml down
+            docker compose -f docker/docker-compose-database.yml -f docker/docker-compose-storage.yml -f docker/docker-compose-fakes.yml -f docker/docker-compose-messaging.yml -f docker/docker-compose-eventhub.yml up -d
+
+      - name: Wait for Docker infrastructure readiness
+        if: ${{ inputs.test-run-type == 'docker' }}
+        run: |
+          echo "Waiting for Cosmos DB emulator..."
+          timeout_seconds=300
+          start_time=$(date +%s)
+          while true; do
+            elapsed=$(( $(date +%s) - start_time ))
+            if [ $elapsed -ge $timeout_seconds ]; then
+              echo "::error::Cosmos DB emulator did not become ready within ${timeout_seconds}s"
+              docker ps -a --format "table {{.Names}}\t{{.Status}}" || true
+              exit 1
+            fi
+            status=$(curl -s -o /dev/null -w '%{http_code}' -k https://localhost:8081/ 2>/dev/null || echo "000")
+            if [ "$status" = "200" ]; then
+              echo "Cosmos DB emulator ready after ${elapsed}s"
+              break
+            fi
+            echo "Cosmos status: $status (${elapsed}s elapsed), retrying in 5s..."
+            sleep 5
+          done
+
+          echo "Waiting for SQL Server..."
+          for i in $(seq 1 60); do
+            if docker exec sqlserver-database /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P 'YourStr0ngP@ssword' -C -Q "SELECT 1" > /dev/null 2>&1; then
+              echo "SQL Server ready after $((i*5))s"
+              break
+            fi
+            sleep 5
+          done
+
+      - name: Set component test settings to InDocker
+        if: ${{ inputs.test-run-type == 'docker' }}
+        run: |
+          chmod +x .github/scripts/set-inmemory-flags.sh
+          .github/scripts/set-inmemory-flags.sh false
+          echo "SPANNER_EMULATOR_HOST=localhost:9010" >> $GITHUB_ENV
+          echo "PUBSUB_EMULATOR_HOST=localhost:8085" >> $GITHUB_ENV
+          echo "CosmosConfig__RequestTimeoutSeconds=60" >> $GITHUB_ENV
+
+      - name: Make entrypoint script executable
+        if: ${{ inputs.test-run-type == 'external-sut' }}
+        run: chmod +x docker/docker-entrypoint.sh
+
+      - name: Spin up docker (external SUT)
+        if: ${{ inputs.test-run-type == 'external-sut' }}
+        run: |
+            docker compose -f docker/docker-compose-database.yml -f docker/docker-compose-storage.yml -f docker/docker-compose-fakes.yml -f docker/docker-compose-messaging.yml -f docker/docker-compose-eventhub.yml -f docker/docker-compose-sut.yml down
+            docker compose -f docker/docker-compose-database.yml -f docker/docker-compose-storage.yml -f docker/docker-compose-fakes.yml -f docker/docker-compose-messaging.yml -f docker/docker-compose-eventhub.yml -f docker/docker-compose-sut.yml up -d
+
+      - name: Wait for SUT to be healthy
+        if: ${{ inputs.test-run-type == 'external-sut' }}
+        run: |
+          echo "Waiting for SUT health endpoint at http://localhost:5080/health ..."
+          timeout_seconds=300
+          start_time=$(date +%s)
+          while true; do
+            elapsed=$(( $(date +%s) - start_time ))
+            if [ $elapsed -ge $timeout_seconds ]; then
+              echo "::error::SUT did not become healthy within ${timeout_seconds}s"
+              echo "=== SUT Container Logs ==="
+              docker logs docker.breakfast-provider-api 2>&1 | tail -80 || true
+              echo "=== Container Status ==="
+              docker ps -a --format "table {{.Names}}\t{{.Status}}" || true
+              exit 1
+            fi
+            status=$(curl -s -o /dev/null -w '%{http_code}' http://localhost:5080/health 2>/dev/null || echo "000")
+            if [ "$status" = "200" ]; then
+              echo "SUT is healthy after ${elapsed}s"
+              break
+            fi
+            echo "Health check returned $status (${elapsed}s elapsed), retrying in 5s..."
+            sleep 5
+          done
+
+      - name: Set component test settings for external SUT
+        if: ${{ inputs.test-run-type == 'external-sut' }}
+        run: |
+          chmod +x .github/scripts/set-inmemory-flags.sh
+          .github/scripts/set-inmemory-flags.sh false
+          echo "RunAgainstExternalServiceUnderTest=true" >> $GITHUB_ENV
+          echo "ExternalServiceUnderTestUrl=http://localhost:5080" >> $GITHUB_ENV
+          echo "ExternalGrpcUrl=http://localhost:5081" >> $GITHUB_ENV
+
+      - name: Wait until the Cosmos DB Emulator is ready
+        if: ${{ inputs.test-run-type == 'docker' }}
+        run: |
+          timeout_seconds=120
+          start_time=$(date +%s)
+          while true; do
+            current_time=$(date +%s)
+            elapsed_time=$((current_time - start_time))
+            if [ $elapsed_time -ge $timeout_seconds ]; then
+                echo Timeout reached, aborting
+                exit 1
+            fi
+
+            curl -sf http://localhost:8080/ready && break
+
+            echo "Cosmos DB emulator not ready yet (${elapsed_time}s), retrying..."
+            sleep 2
+          done
+          echo Cosmos DB emulator started successfully
+
+      - name: Build TUnit project
+        run: >
+          dotnet build tests/BreakfastProvider.Tests.Component.TUnit/BreakfastProvider.Tests.Component.TUnit.csproj
+          -c Debug
+          -p:WarningLevel=0
+
+      - name: Run TUnit tests
+        run: |
+          cd tests/BreakfastProvider.Tests.Component.TUnit/bin/Debug/net10.0
+          ./BreakfastProvider.Tests.Component.TUnit
+
+      - name: Dump container logs on failure
+        if: ${{ failure() && (inputs.test-run-type == 'docker' || inputs.test-run-type == 'external-sut') }}
+        run: |
+          echo "=== Container Status ==="
+          docker ps -a --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}" || true
+          if [ "${{ inputs.test-run-type }}" = "external-sut" ]; then
+            echo ""
+            echo "=== SUT Container Logs (last 100 lines) ==="
+            docker logs docker.breakfast-provider-api 2>&1 | tail -100 || true
+          fi
+          echo ""
+          echo "=== Cosmos DB Emulator Logs (last 30 lines) ==="
+          docker logs azure-cosmosdb-emulator 2>&1 | tail -30 || true
+
+      - name: Spin down docker
+        if: ${{ always() && (inputs.test-run-type == 'docker' || inputs.test-run-type == 'external-sut') }}
+        run: |
+          docker compose -f docker/docker-compose-database.yml -f docker/docker-compose-storage.yml -f docker/docker-compose-fakes.yml -f docker/docker-compose-messaging.yml -f docker/docker-compose-eventhub.yml ${{ inputs.test-run-type == 'external-sut' && '-f docker/docker-compose-sut.yml' || '' }} down
+
+      - name: Upload report artifact
+        uses: actions/upload-artifact@v5
+        if: ${{ !cancelled() }}
+        with:
+          name: LightBDD-${{ inputs.test-run-description }}-report
+          path: ${{ inputs.features-report-path }}
+          retention-days: 1

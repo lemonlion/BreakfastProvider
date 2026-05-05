@@ -35,7 +35,7 @@ public partial class Apple_Cinnamon_Muffins__Creation_Feature
     [Scenario]
     [MemberData(nameof(MuffinRecipeVariations.RecipeVariationsWithoutToppings), MemberType = typeof(MuffinRecipeVariations))]
     public async Task Different_Muffin_Recipes_Without_Toppings_Should_Produce_The_Expected_Batch(
-        string recipeName, MuffinRecipeTestData recipe, MuffinBatchExpectation expected)
+        string recipeName, MuffinRecipeTestDataWithoutToppings recipe, MuffinBatchExpectation expected)
     {
         await Runner.RunScenarioAsync(
             given => A_muffin_recipe_with_ingredients_and_baking_profile(recipeName, recipe),

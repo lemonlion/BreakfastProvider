@@ -117,7 +117,7 @@ public class Apple_Cinnamon_Muffins_Creation_Tests : BaseFixture
     [Test]
     [MethodDataSource(typeof(MuffinRecipeVariations), nameof(MuffinRecipeVariations.RecipeVariationsWithoutToppings))]
     public async Task Different_muffin_recipes_without_toppings_should_produce_the_expected_batch(
-        string recipeName, MuffinRecipeTestData recipe, MuffinBatchExpectation expected)
+        string recipeName, MuffinRecipeTestDataWithoutToppings recipe, MuffinBatchExpectation expected)
     {
         // Given a muffin recipe with specific ingredients and baking profile but no toppings
         await _milkSteps.Retrieve();

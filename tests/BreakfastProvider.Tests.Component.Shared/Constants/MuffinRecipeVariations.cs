@@ -99,7 +99,7 @@ public static class MuffinRecipeVariations
     [
         [
             "Classic Plain",
-            new MuffinRecipeTestData
+            new MuffinRecipeTestDataWithoutToppings
             {
                 Ingredients = new IngredientSet
                 {
@@ -123,7 +123,7 @@ public static class MuffinRecipeVariations
         ],
         [
             "Rustic Wholesome Plain",
-            new MuffinRecipeTestData
+            new MuffinRecipeTestDataWithoutToppings
             {
                 Ingredients = new IngredientSet
                 {
@@ -147,7 +147,7 @@ public static class MuffinRecipeVariations
         ],
         [
             "Spiced Deluxe Plain",
-            new MuffinRecipeTestData
+            new MuffinRecipeTestDataWithoutToppings
             {
                 Ingredients = new IngredientSet
                 {

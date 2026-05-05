@@ -34,6 +34,12 @@ public record ToppingData
     public required string Amount { get; init; }
 }
 
+public record MuffinRecipeTestDataWithoutToppings
+{
+    public required IngredientSet Ingredients { get; init; }
+    public required BakingProfileData Baking { get; init; }
+}
+
 public record MuffinBatchExpectation
 {
     public required int ExpectedIngredientCount { get; init; }

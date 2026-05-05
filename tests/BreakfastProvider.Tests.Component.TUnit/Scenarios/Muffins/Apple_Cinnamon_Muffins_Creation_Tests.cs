@@ -97,7 +97,7 @@ public class Apple_Cinnamon_Muffins_Creation_Tests : BaseFixture
             DurationMinutes = recipe.Baking.DurationMinutes,
             PanType = recipe.Baking.PanType
         };
-        _muffinSteps.Request.Toppings = recipe.Toppings
+        _muffinSteps.Request.Toppings = recipe.Toppings?
             .Select(t => new TestMuffinTopping { Name = t.Name, Amount = t.Amount })
             .ToList();
 
@@ -137,7 +137,6 @@ public class Apple_Cinnamon_Muffins_Creation_Tests : BaseFixture
             DurationMinutes = recipe.Baking.DurationMinutes,
             PanType = recipe.Baking.PanType
         };
-        _muffinSteps.Request.Toppings = [];
 
         // When the muffins are prepared
         await _muffinSteps.Send();

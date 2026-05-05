@@ -14,7 +14,7 @@ public record MuffinRequest
 
     public BakingProfile? Baking { get; init; }
 
-    public List<MuffinTopping> Toppings { get; init; } = [];
+    public List<MuffinTopping>? Toppings { get; init; }
 }
 
 public record BakingProfile

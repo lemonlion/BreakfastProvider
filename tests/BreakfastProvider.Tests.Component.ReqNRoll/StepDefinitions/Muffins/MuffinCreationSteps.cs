@@ -87,7 +87,7 @@ public class MuffinCreationSteps(
     [Given("no muffin toppings")]
     public void GivenNoMuffinToppings()
     {
-        muffinSteps.Request.Toppings = [];
+        muffinSteps.Request.Toppings = null;
     }
 
     [Given(@"a valid muffin request with ""(.*)"" set to ""(.*)""")]

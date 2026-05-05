@@ -112,8 +112,7 @@ public static class MuffinRecipeVariations
                     Temperature = 180,
                     DurationMinutes = 25,
                     PanType = "Standard"
-                },
-                Toppings = []
+                }
             },
             new MuffinBatchExpectation
             {
@@ -137,8 +136,7 @@ public static class MuffinRecipeVariations
                     Temperature = 175,
                     DurationMinutes = 30,
                     PanType = "Cast Iron"
-                },
-                Toppings = []
+                }
             },
             new MuffinBatchExpectation
             {
@@ -162,8 +160,7 @@ public static class MuffinRecipeVariations
                     Temperature = 190,
                     DurationMinutes = 20,
                     PanType = "Silicone"
-                },
-                Toppings = []
+                }
             },
             new MuffinBatchExpectation
             {

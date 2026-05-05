@@ -33,16 +33,19 @@ public class MuffinRequestValidator : AbstractValidator<MuffinRequest>
             RuleFor(x => x.Baking!.PanType).MustNotContainHtmlOrScript("Pan Type").When(x => x.Baking!.PanType is not null);
         });
 
-        RuleForEach(x => x.Toppings).ChildRules(topping =>
+        When(x => x.Toppings is not null, () =>
         {
-            topping.RuleFor(t => t.Name).NotEmpty().WithMessage("Topping 'Name' is required.");
-            topping.RuleFor(t => t.Name).MustNotContainHtmlOrScript("Topping Name").When(t => t.Name is not null);
-            topping.RuleFor(t => t.Amount).NotEmpty().WithMessage("Topping 'Amount' is required.");
-            topping.RuleFor(t => t.Amount).MustNotContainHtmlOrScript("Topping Amount").When(t => t.Amount is not null);
-        });
+            RuleForEach(x => x.Toppings).ChildRules(topping =>
+            {
+                topping.RuleFor(t => t.Name).NotEmpty().WithMessage("Topping 'Name' is required.");
+                topping.RuleFor(t => t.Name).MustNotContainHtmlOrScript("Topping Name").When(t => t.Name is not null);
+                topping.RuleFor(t => t.Amount).NotEmpty().WithMessage("Topping 'Amount' is required.");
+                topping.RuleFor(t => t.Amount).MustNotContainHtmlOrScript("Topping Amount").When(t => t.Amount is not null);
+            });
 
-        RuleFor(x => x.Toppings)
-            .Must(t => t.Count <= toppingRules.Value.MaxToppingsPerItem)
-            .WithMessage($"Maximum toppings exceeded. Limit is {toppingRules.Value.MaxToppingsPerItem}.");
+            RuleFor(x => x.Toppings)
+                .Must(t => t!.Count <= toppingRules.Value.MaxToppingsPerItem)
+                .WithMessage($"Maximum toppings exceeded. Limit is {toppingRules.Value.MaxToppingsPerItem}.");
+        });
     }
 }

@@ -8,7 +8,7 @@ public class TestMuffinRequest
     public string? Apples { get; set; }
     public string? Cinnamon { get; set; }
     public TestBakingProfile? Baking { get; set; }
-    public List<TestMuffinTopping> Toppings { get; set; } = [];
+    public List<TestMuffinTopping>? Toppings { get; set; }
 }
 
 public class TestBakingProfile

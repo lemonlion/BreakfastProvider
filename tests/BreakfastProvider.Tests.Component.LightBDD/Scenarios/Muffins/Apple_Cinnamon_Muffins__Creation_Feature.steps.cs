@@ -79,7 +79,7 @@ public partial class Apple_Cinnamon_Muffins__Creation_Feature : BaseFixture
             DurationMinutes = recipe.Baking.DurationMinutes,
             PanType = recipe.Baking.PanType
         };
-        _muffinSteps.Request.Toppings = recipe.Toppings
+        _muffinSteps.Request.Toppings = recipe.Toppings?
             .Select(t => new TestMuffinTopping { Name = t.Name, Amount = t.Amount })
             .ToList();
     }

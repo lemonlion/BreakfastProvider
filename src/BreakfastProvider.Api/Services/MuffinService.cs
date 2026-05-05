@@ -18,7 +18,7 @@ public class MuffinService(
 
         var batchId = Guid.NewGuid();
         var ingredients = new List<string> { request.Milk!, request.Flour!, request.Eggs!, request.Apples!, request.Cinnamon! };
-        var toppings = request.Toppings.Select(t => t.Name!).ToList();
+        var toppings = (request.Toppings ?? []).Select(t => t.Name!).ToList();
 
         activity?.SetTag("muffin.batch_id", batchId.ToString());
         activity?.SetTag("muffin.ingredient_count", ingredients.Count);

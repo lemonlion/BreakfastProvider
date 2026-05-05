@@ -11,7 +11,7 @@ public record MuffinRecipeTestData
 {
     public required IngredientSet Ingredients { get; init; }
     public required BakingProfileData Baking { get; init; }
-    public required List<ToppingData> Toppings { get; init; }
+    public List<ToppingData>? Toppings { get; init; }
 }
 
 public record IngredientSet

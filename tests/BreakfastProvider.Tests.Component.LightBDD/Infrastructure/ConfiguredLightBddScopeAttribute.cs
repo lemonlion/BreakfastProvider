@@ -43,7 +43,7 @@ public class ConfiguredLightBddScopeAttribute : LightBddScope
             ThreadPool.SetMinThreads(100, 100);
 
         var testAssembly = Assembly.GetAssembly(typeof(ConfiguredLightBddScopeAttribute))!;
-        configuration.ReportWritersConfiguration().CreateStandardReportsWithDiagrams(
+        configuration.CreateStandardReportsWithDiagrams(
                 new ReportConfigurationOptions
                 {
                     SpecificationsTitle = "Breakfast Provider Specifications",

@@ -28,6 +28,23 @@ Feature: Muffins Creation
             | Rustic Wholesome | Whole Wheat | Honeycrisp   | Cassia       | 175         | 30       | Cast Iron | Brown Sugar Crumb | Heavy   | Maple Drizzle      | Light   | 5                       | 2                    |
             | Spiced Deluxe    | Almond      | Pink Lady    | Saigon       | 190         | 20       | Silicone  | Cinnamon Sugar    | Heavy   | Cream Cheese Swirl | Thick   | 5                       | 2                    |
 
+    Scenario Outline: Different muffin recipes without toppings should produce the expected batch
+        Given a muffin recipe "<RecipeName>" with the following ingredients:
+            | Flour   | Apples         | Cinnamon       |
+            | <Flour> | <AppleVariety> | <CinnamonType> |
+        And with baking at <Temperature> degrees for <Duration> minutes in a "<PanType>" pan
+        And no muffin toppings
+        When the muffins are prepared
+        Then the muffin batch should have <ExpectedIngredientCount> ingredients
+        And the muffin response should include <ExpectedToppingCount> toppings
+        And the muffin response should include baking information
+
+        Examples:
+            | RecipeName           | Flour       | AppleVariety | CinnamonType | Temperature | Duration | PanType   | ExpectedIngredientCount | ExpectedToppingCount |
+            | Classic Plain        | Plain Flour | Granny Smith | Ceylon       | 180         | 25       | Standard  | 5                       | 0                    |
+            | Rustic Wholesome Plain | Whole Wheat | Honeycrisp   | Cassia       | 175         | 30       | Cast Iron | 5                       | 0                    |
+            | Spiced Deluxe Plain  | Almond      | Pink Lady    | Saigon       | 190         | 20       | Silicone  | 5                       | 0                    |
+
     Scenario Outline: Muffins endpoint called with an invalid field should return a bad request response
         Given a valid muffin request with "<Field>" set to "<Value>"
         When the invalid muffin request is submitted

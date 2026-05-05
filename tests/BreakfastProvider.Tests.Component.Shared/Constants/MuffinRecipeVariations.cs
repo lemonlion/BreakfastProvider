@@ -94,4 +94,83 @@ public static class MuffinRecipeVariations
             }
         ]
     ];
+
+    public static IEnumerable<object[]> RecipeVariationsWithoutToppings =>
+    [
+        [
+            "Classic Plain",
+            new MuffinRecipeTestData
+            {
+                Ingredients = new IngredientSet
+                {
+                    Flour = "Plain Flour",
+                    Apples = "Granny Smith",
+                    Cinnamon = "Ceylon"
+                },
+                Baking = new BakingProfileData
+                {
+                    Temperature = 180,
+                    DurationMinutes = 25,
+                    PanType = "Standard"
+                },
+                Toppings = []
+            },
+            new MuffinBatchExpectation
+            {
+                ExpectedIngredientCount = 5,
+                ExpectedToppingCount = 0,
+                HasBakingInfo = true
+            }
+        ],
+        [
+            "Rustic Wholesome Plain",
+            new MuffinRecipeTestData
+            {
+                Ingredients = new IngredientSet
+                {
+                    Flour = "Whole Wheat",
+                    Apples = "Honeycrisp",
+                    Cinnamon = "Cassia"
+                },
+                Baking = new BakingProfileData
+                {
+                    Temperature = 175,
+                    DurationMinutes = 30,
+                    PanType = "Cast Iron"
+                },
+                Toppings = []
+            },
+            new MuffinBatchExpectation
+            {
+                ExpectedIngredientCount = 5,
+                ExpectedToppingCount = 0,
+                HasBakingInfo = true
+            }
+        ],
+        [
+            "Spiced Deluxe Plain",
+            new MuffinRecipeTestData
+            {
+                Ingredients = new IngredientSet
+                {
+                    Flour = "Almond Flour",
+                    Apples = "Pink Lady",
+                    Cinnamon = "Saigon"
+                },
+                Baking = new BakingProfileData
+                {
+                    Temperature = 190,
+                    DurationMinutes = 20,
+                    PanType = "Silicone"
+                },
+                Toppings = []
+            },
+            new MuffinBatchExpectation
+            {
+                ExpectedIngredientCount = 5,
+                ExpectedToppingCount = 0,
+                HasBakingInfo = true
+            }
+        ]
+    ];
 }

@@ -33,6 +33,17 @@ public partial class Muffins__Creation_Feature
     }
 
     [Scenario]
+    [MemberData(nameof(MuffinRecipeVariations.RecipeVariationsWithoutToppings), MemberType = typeof(MuffinRecipeVariations))]
+    public async Task Different_Muffin_Recipes_Without_Toppings_Should_Produce_The_Expected_Batch(
+        string recipeName, MuffinRecipeTestData recipe, MuffinBatchExpectation expected)
+    {
+        await Runner.RunScenarioAsync(
+            given => A_muffin_recipe_with_ingredients_and_baking_profile(recipeName, recipe),
+            when => The_muffins_are_prepared(),
+            then => The_muffin_batch_should_match_the_expected_outcome(expected));
+    }
+
+    [Scenario]
     [InlineData("Flour", "", "Flour is required", "'Flour' is required.", "Bad Request")]
     [InlineData("Apples", "", "Apples is required", "'Apples' is required.", "Bad Request")]
     [InlineData("Cinnamon", "", "Cinnamon is required", "'Cinnamon' is required.", "Bad Request")]

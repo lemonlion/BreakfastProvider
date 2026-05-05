@@ -105,7 +105,7 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.Muffins
         
         private static global::Reqnroll.Formatters.RuntimeSupport.FeatureLevelCucumberMessages InitializeCucumberMessages()
         {
-            return new global::Reqnroll.Formatters.RuntimeSupport.FeatureLevelCucumberMessages("Features/Muffins/MuffinsCreation.feature.ndjson", 12);
+            return new global::Reqnroll.Formatters.RuntimeSupport.FeatureLevelCucumberMessages("Features/Muffins/MuffinsCreation.feature.ndjson", 15);
         }
         
         async System.Threading.Tasks.ValueTask Xunit.IAsyncLifetime.InitializeAsync()
@@ -251,17 +251,83 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.Muffins
             await this.ScenarioCleanupAsync();
         }
         
+        [global::Xunit.TheoryAttribute(DisplayName="Different muffin recipes without toppings should produce the expected batch")]
+        [global::Xunit.TraitAttribute("FeatureTitle", "Muffins Creation")]
+        [global::Xunit.TraitAttribute("Description", "Different muffin recipes without toppings should produce the expected batch")]
+        [global::Xunit.InlineDataAttribute("Classic Plain", "Plain Flour", "Granny Smith", "Ceylon", "180", "25", "Standard", "5", "0", "4", new string[0])]
+        [global::Xunit.InlineDataAttribute("Rustic Wholesome Plain", "Whole Wheat", "Honeycrisp", "Cassia", "175", "30", "Cast Iron", "5", "0", "5", new string[0])]
+        [global::Xunit.InlineDataAttribute("Spiced Deluxe Plain", "Almond", "Pink Lady", "Saigon", "190", "20", "Silicone", "5", "0", "6", new string[0])]
+        public async global::System.Threading.Tasks.Task DifferentMuffinRecipesWithoutToppingsShouldProduceTheExpectedBatch(string recipeName, string flour, string appleVariety, string cinnamonType, string temperature, string duration, string panType, string expectedIngredientCount, string expectedToppingCount, string @__pickleIndex, string[] exampleTags)
+        {
+            string[] tagsOfScenario = exampleTags;
+            global::System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new global::System.Collections.Specialized.OrderedDictionary();
+            argumentsOfScenario.Add("RecipeName", recipeName);
+            argumentsOfScenario.Add("Flour", flour);
+            argumentsOfScenario.Add("AppleVariety", appleVariety);
+            argumentsOfScenario.Add("CinnamonType", cinnamonType);
+            argumentsOfScenario.Add("Temperature", temperature);
+            argumentsOfScenario.Add("Duration", duration);
+            argumentsOfScenario.Add("PanType", panType);
+            argumentsOfScenario.Add("ExpectedIngredientCount", expectedIngredientCount);
+            argumentsOfScenario.Add("ExpectedToppingCount", expectedToppingCount);
+            string pickleIndex = @__pickleIndex;
+            global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("Different muffin recipes without toppings should produce the expected batch", null, tagsOfScenario, argumentsOfScenario, featureTags, pickleIndex);
+            string[] tagsOfRule = ((string[])(null));
+            global::Reqnroll.RuleInfo ruleInfo = null;
+#line 31
+    this.ScenarioInitialize(scenarioInfo, ruleInfo);
+#line hidden
+            if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                await testRunner.SkipScenarioAsync();
+            }
+            else
+            {
+                await this.ScenarioStartAsync();
+                global::Reqnroll.Table table3 = new global::Reqnroll.Table(new string[] {
+                            "Flour",
+                            "Apples",
+                            "Cinnamon"});
+                table3.AddRow(new string[] {
+                            string.Format("{0}", flour),
+                            string.Format("{0}", appleVariety),
+                            string.Format("{0}", cinnamonType)});
+#line 32
+        await testRunner.GivenAsync(string.Format("a muffin recipe \"{0}\" with the following ingredients:", recipeName), ((string)(null)), table3, "Given ");
+#line hidden
+#line 35
+        await testRunner.AndAsync(string.Format("with baking at {0} degrees for {1} minutes in a \"{2}\" pan", temperature, duration, panType), ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
+#line hidden
+#line 36
+        await testRunner.AndAsync("no muffin toppings", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
+#line hidden
+#line 37
+        await testRunner.WhenAsync("the muffins are prepared", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
+#line hidden
+#line 38
+        await testRunner.ThenAsync(string.Format("the muffin batch should have {0} ingredients", expectedIngredientCount), ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
+#line hidden
+#line 39
+        await testRunner.AndAsync(string.Format("the muffin response should include {0} toppings", expectedToppingCount), ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
+#line hidden
+#line 40
+        await testRunner.AndAsync("the muffin response should include baking information", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
+#line hidden
+            }
+            await this.ScenarioCleanupAsync();
+        }
+        
         [global::Xunit.TheoryAttribute(DisplayName="Muffins endpoint called with an invalid field should return a bad request respons" +
             "e")]
         [global::Xunit.TraitAttribute("FeatureTitle", "Muffins Creation")]
         [global::Xunit.TraitAttribute("Description", "Muffins endpoint called with an invalid field should return a bad request respons" +
             "e")]
-        [global::Xunit.InlineDataAttribute("Flour", "", "Flour is required", "\'Flour\' is required.", "Bad Request", "4", new string[0])]
-        [global::Xunit.InlineDataAttribute("Apples", "", "Apples is required", "\'Apples\' is required.", "Bad Request", "5", new string[0])]
-        [global::Xunit.InlineDataAttribute("Cinnamon", "", "Cinnamon is required", "\'Cinnamon\' is required.", "Bad Request", "6", new string[0])]
-        [global::Xunit.InlineDataAttribute("Milk", "", "Milk is required", "\'Milk\' is required.", "Bad Request", "7", new string[0])]
-        [global::Xunit.InlineDataAttribute("Eggs", "", "Eggs is required", "\'Eggs\' is required.", "Bad Request", "8", new string[0])]
-        [global::Xunit.InlineDataAttribute("Cinnamon", "<script>alert(\'xss\')</script>", "XSS in cinnamon", "Cinnamon contains potentially dangerous content.", "Bad Request", "9", new string[0])]
+        [global::Xunit.InlineDataAttribute("Flour", "", "Flour is required", "\'Flour\' is required.", "Bad Request", "7", new string[0])]
+        [global::Xunit.InlineDataAttribute("Apples", "", "Apples is required", "\'Apples\' is required.", "Bad Request", "8", new string[0])]
+        [global::Xunit.InlineDataAttribute("Cinnamon", "", "Cinnamon is required", "\'Cinnamon\' is required.", "Bad Request", "9", new string[0])]
+        [global::Xunit.InlineDataAttribute("Milk", "", "Milk is required", "\'Milk\' is required.", "Bad Request", "10", new string[0])]
+        [global::Xunit.InlineDataAttribute("Eggs", "", "Eggs is required", "\'Eggs\' is required.", "Bad Request", "11", new string[0])]
+        [global::Xunit.InlineDataAttribute("Cinnamon", "<script>alert(\'xss\')</script>", "XSS in cinnamon", "Cinnamon contains potentially dangerous content.", "Bad Request", "12", new string[0])]
         public async global::System.Threading.Tasks.Task MuffinsEndpointCalledWithAnInvalidFieldShouldReturnABadRequestResponse(string field, string value, string reason, string errorMessage, string responseStatus, string @__pickleIndex, string[] exampleTags)
         {
             string[] tagsOfScenario = exampleTags;
@@ -276,7 +342,7 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.Muffins
                     "e", null, tagsOfScenario, argumentsOfScenario, featureTags, pickleIndex);
             string[] tagsOfRule = ((string[])(null));
             global::Reqnroll.RuleInfo ruleInfo = null;
-#line 31
+#line 48
     this.ScenarioInitialize(scenarioInfo, ruleInfo);
 #line hidden
             if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
@@ -286,13 +352,13 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.Muffins
             else
             {
                 await this.ScenarioStartAsync();
-#line 32
+#line 49
         await testRunner.GivenAsync(string.Format("a valid muffin request with \"{0}\" set to \"{1}\"", field, value), ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
 #line hidden
-#line 33
+#line 50
         await testRunner.WhenAsync("the invalid muffin request is submitted", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
 #line hidden
-#line 34
+#line 51
         await testRunner.ThenAsync(string.Format("the muffin response should contain error \"{0}\" with status \"{1}\"", errorMessage, responseStatus), ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
 #line hidden
             }

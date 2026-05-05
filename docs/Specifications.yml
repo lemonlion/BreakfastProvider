@@ -1,4 +1,4 @@
-TtdVersion: 2.29.9-beta+58cf8b1a8a02071d7e800d940687047301787a74
+TtdVersion: 2.29.14-beta+6d3e31f0523844031dfe4845c2e165154b3d02d1
 Title: Breakfast Provider Specifications
 Features:
   - Feature: Apple Cinnamon Muffins Creation Tests
@@ -6,165 +6,44 @@ Features:
       - Scenario: Valid apple cinnamon muffin request should return a fresh batch
         IsHappyPath: true
 
-      - Scenario: Different muffin recipes should produce the expected batch <recipeName = "Classic", recipe = MuffinRecipeTestData ( Ingredients = IngredientSet ( Flour = Plain Flour, Apples = Granny Smith, Cinnamon = Ceylon ), Baking = BakingProfileData ( Temperature = 180, Dur...>
+      - Scenario: Different muffin recipes should produce the expected batch <Classic, MuffinRecipeTestData ( Ingredients = IngredientSet ( Flour = Plain Flour, Apples = Granny Smith, Cinnamon = Ceylon ), Baking = BakingProfileData ( Temperature = 180, DurationMinutes = 25, Pan...>
         IsHappyPath: false
 
-      - Scenario: Different muffin recipes should produce the expected batch <recipeName = "Rustic Wholesome", recipe = MuffinRecipeTestData ( Ingredients = IngredientSet ( Flour = Whole Wheat, Apples = Honeycrisp, Cinnamon = Cassia ), Baking = BakingProfileData ( Temperature = 1...>
+      - Scenario: Different muffin recipes should produce the expected batch <Rustic Wholesome, MuffinRecipeTestData ( Ingredients = IngredientSet ( Flour = Whole Wheat, Apples = Honeycrisp, Cinnamon = Cassia ), Baking = BakingProfileData ( Temperature = 175, DurationMinutes = ...>
         IsHappyPath: false
 
-      - Scenario: Different muffin recipes should produce the expected batch <recipeName = "Spiced Deluxe", recipe = MuffinRecipeTestData ( Ingredients = IngredientSet ( Flour = Almond Flour, Apples = Pink Lady, Cinnamon = Saigon ), Baking = BakingProfileData ( Temperature = 190,...>
+      - Scenario: Different muffin recipes should produce the expected batch <Spiced Deluxe, MuffinRecipeTestData ( Ingredients = IngredientSet ( Flour = Almond Flour, Apples = Pink Lady, Cinnamon = Saigon ), Baking = BakingProfileData ( Temperature = 190, DurationMinutes = 20,...>
         IsHappyPath: false
 
-      - Scenario: Different muffin recipes without toppings should produce the expected batch <recipeName = "Classic Plain", recipe = MuffinRecipeTestData ( Ingredients = IngredientSet ( Flour = Plain Flour, Apples = Granny Smith, Cinnamon = Ceylon ), Baking = BakingProfileData ( Temperature = 18...>
+      - Scenario: Different muffin recipes without toppings should produce the expected batch <Classic Plain, MuffinRecipeTestData ( Ingredients = IngredientSet ( Flour = Plain Flour, Apples = Granny Smith, Cinnamon = Ceylon ), Baking = BakingProfileData ( Temperature = 180, DurationMinutes = 2...>
         IsHappyPath: false
 
-      - Scenario: Different muffin recipes without toppings should produce the expected batch <recipeName = "Rustic Wholesome Plain", recipe = MuffinRecipeTestData ( Ingredients = IngredientSet ( Flour = Whole Wheat, Apples = Honeycrisp, Cinnamon = Cassia ), Baking = BakingProfileData ( Temperatu...>
+      - Scenario: Different muffin recipes without toppings should produce the expected batch <Rustic Wholesome Plain, MuffinRecipeTestData ( Ingredients = IngredientSet ( Flour = Whole Wheat, Apples = Honeycrisp, Cinnamon = Cassia ), Baking = BakingProfileData ( Temperature = 175, DurationMinu...>
         IsHappyPath: false
 
-      - Scenario: Different muffin recipes without toppings should produce the expected batch <recipeName = "Spiced Deluxe Plain", recipe = MuffinRecipeTestData ( Ingredients = IngredientSet ( Flour = Almond Flour, Apples = Pink Lady, Cinnamon = Saigon ), Baking = BakingProfileData ( Temperature ...>
+      - Scenario: Different muffin recipes without toppings should produce the expected batch <Spiced Deluxe Plain, MuffinRecipeTestData ( Ingredients = IngredientSet ( Flour = Almond Flour, Apples = Pink Lady, Cinnamon = Saigon ), Baking = BakingProfileData ( Temperature = 190, DurationMinutes...>
         IsHappyPath: false
 
-      - Scenario: Muffin request with invalid field should return bad request <field = "Apples", value = "", reason = "Apples is required", expectedError = "'Apples' is required.", expectedStatus = "Bad Request">
+      - Scenario: Muffin request with invalid field should return bad request <Apples, , Apples is required, 'Apples' is required·, Bad Request>
         IsHappyPath: false
 
-      - Scenario: Muffin request with invalid field should return bad request <field = "Cinnamon", value = "", reason = "Cinnamon is required", expectedError = "'Cinnamon' is required.", expectedStatus = "Bad Request">
+      - Scenario: Muffin request with invalid field should return bad request <Cinnamon, , Cinnamon is required, 'Cinnamon' is required·, Bad Request>
         IsHappyPath: false
 
-      - Scenario: Muffin request with invalid field should return bad request <field = "Cinnamon", value = "<script>alert('xss')</script>", reason = "XSS in cinnamon", expectedError = "Cinnamon contains potentially dangerous content.", expectedStatus = "Bad Request">
+      - Scenario: Muffin request with invalid field should return bad request <Cinnamon, <script>alert('xss')</script>, XSS in cinnamon, Cinnamon contains potentially dangerous content·, Bad Request>
         IsHappyPath: false
 
-      - Scenario: Muffin request with invalid field should return bad request <field = "Eggs", value = "", reason = "Eggs is required", expectedError = "'Eggs' is required.", expectedStatus = "Bad Request">
+      - Scenario: Muffin request with invalid field should return bad request <Eggs, , Eggs is required, 'Eggs' is required·, Bad Request>
         IsHappyPath: false
 
-      - Scenario: Muffin request with invalid field should return bad request <field = "Flour", value = "", reason = "Flour is required", expectedError = "'Flour' is required.", expectedStatus = "Bad Request">
+      - Scenario: Muffin request with invalid field should return bad request <Flour, , Flour is required, 'Flour' is required·, Bad Request>
         IsHappyPath: false
 
-      - Scenario: Muffin request with invalid field should return bad request <field = "Milk", value = "", reason = "Milk is required", expectedError = "'Milk' is required.", expectedStatus = "Bad Request">
-        IsHappyPath: false
-
-  - Feature: Auditlogs Filtering Tests
-    Scenarios:
-      - Scenario: Audit logs should be filterable by entity id
-        IsHappyPath: false
-
-      - Scenario: Audit logs should be filterable by entity type
-        IsHappyPath: false
-
-      - Scenario: Audit logs should be returned in descending timestamp order
-        IsHappyPath: false
-
-      - Scenario: Filtering audit logs by a non existent entity type should return an empty collection
-        IsHappyPath: false
-
-  - Feature: Auditlogs Retrieval Tests
-    Scenarios:
-      - Scenario: Creating an order should produce a retrievable audit log entry
-        IsHappyPath: true
-
-  - Feature: Customerpreferences Management Tests
-    Scenarios:
-      - Scenario: Saving customer preferences should return the saved preferences
-        IsHappyPath: true
-
-      - Scenario: Retrieving existing customer preferences should return the preferences
-        IsHappyPath: false
-
-      - Scenario: Retrieving non existent customer preferences should return not found
-        IsHappyPath: false
-
-      - Scenario: Saving customer preferences with missing customer name should return bad request
-        IsHappyPath: false
-
-      - Scenario: Updating customer preferences should return the updated preferences
-        IsHappyPath: false
-
-  - Feature: Dailyspecials Idempotency Tests
-    Scenarios:
-      - Scenario: Same order with different idempotency keys should return different confirmations
-        IsHappyPath: false
-
-      - Scenario: Same order with same idempotency key should return same confirmation
-        IsHappyPath: false
-
-  - Feature: Dailyspecials Not Found Tests
-    Scenarios:
-      - Scenario: Ordering non existent daily special should return not found
-        IsHappyPath: false
-
-  - Feature: Dailyspecials Ordering Tests
-    Scenarios:
-      - Scenario: Valid daily special order should return a confirmation
-        IsHappyPath: true
-
-      - Scenario: Daily specials endpoint should return all available specials
-        IsHappyPath: false
-
-      - Scenario: Ordering daily special beyond threshold should return conflict
-        IsHappyPath: false
-
-      - Scenario: Remaining quantity should decrease after each order
-        IsHappyPath: false
-
-  - Feature: Dailyspecials Validation Tests
-    Scenarios:
-      - Scenario: Daily special order with invalid field should return bad request <field = "Quantity", value = "0", reason = "Quantity must be greater than zero", expectedError = "Quantity must be greater than zero.", expectedStatus = "Bad Request">
-        IsHappyPath: false
-
-      - Scenario: Daily special order with invalid field should return bad request <field = "SpecialId", value = null, reason = "Special ID is required", expectedError = "'Special Id' is required.", expectedStatus = "Bad Request">
-        IsHappyPath: false
-
-  - Feature: Feedback Management Tests
-    Scenarios:
-      - Scenario: Submitting feedback should return the created feedback
-        IsHappyPath: true
-
-      - Scenario: Listing feedback for an order should return the feedback
-        IsHappyPath: false
-
-      - Scenario: Retrieving existing feedback by id should return the feedback
-        IsHappyPath: false
-
-      - Scenario: Retrieving non existent feedback should return not found
-        IsHappyPath: false
-
-      - Scenario: Submitting feedback with invalid rating should return bad request
-        IsHappyPath: false
-
-      - Scenario: Submitting feedback with missing customer name should return bad request
-        IsHappyPath: false
-
-  - Feature: Grpc Order Status Tests
-    Scenarios:
-      - Scenario: Order status via grpc should return order details
-        IsHappyPath: true
-
-      - Scenario: Order status for non existent order should return not found
-        IsHappyPath: false
-
-  - Feature: Grpc Recipe Summary Tests
-    Scenarios:
-      - Scenario: Pancake recipe summary should return correct data
-        IsHappyPath: true
-
-      - Scenario: Waffle recipe summary should return correct data
-        IsHappyPath: true
-
-      - Scenario: Unknown recipe type should return zero batches
-        IsHappyPath: false
-
-  - Feature: Grpc Stream Order Updates Tests
-    Scenarios:
-      - Scenario: Streaming order updates should return the current status
-        IsHappyPath: true
-
-      - Scenario: Streaming updates for non existent order should return not found
+      - Scenario: Muffin request with invalid field should return bad request <Milk, , Milk is required, 'Milk' is required·, Bad Request>
         IsHappyPath: false
 
   - Feature: Infrastructure Correlation Id Tests
     Scenarios:
-      - Scenario: Request with correlation id should return same id in response
-        IsHappyPath: true
-
       - Scenario: Request without correlation id should have one generated in response
         IsHappyPath: false
 
@@ -339,37 +218,37 @@ Features:
 
   - Feature: Orders Status Transition Tests
     Scenarios:
-      - Scenario: Invalid status transition should return conflict <fromStatus = "Cancelled", toStatus = "Preparing">
+      - Scenario: Invalid status transition should return conflict <Cancelled, Preparing>
         IsHappyPath: false
 
-      - Scenario: Invalid status transition should return conflict <fromStatus = "Cancelled", toStatus = "Ready">
+      - Scenario: Invalid status transition should return conflict <Cancelled, Ready>
         IsHappyPath: false
 
-      - Scenario: Invalid status transition should return conflict <fromStatus = "Completed", toStatus = "Preparing">
+      - Scenario: Invalid status transition should return conflict <Completed, Preparing>
         IsHappyPath: false
 
-      - Scenario: Invalid status transition should return conflict <fromStatus = "Created", toStatus = "Completed">
+      - Scenario: Invalid status transition should return conflict <Created, Completed>
         IsHappyPath: false
 
-      - Scenario: Invalid status transition should return conflict <fromStatus = "Created", toStatus = "Ready">
+      - Scenario: Invalid status transition should return conflict <Created, Ready>
         IsHappyPath: false
 
-      - Scenario: Invalid status transition should return conflict <fromStatus = "Preparing", toStatus = "Cancelled">
+      - Scenario: Invalid status transition should return conflict <Preparing, Cancelled>
         IsHappyPath: false
 
-      - Scenario: Invalid status transition should return conflict <fromStatus = "Ready", toStatus = "Preparing">
+      - Scenario: Invalid status transition should return conflict <Ready, Preparing>
         IsHappyPath: false
 
-      - Scenario: Valid status transition should update the order <fromStatus = "Created", toStatus = "Cancelled">
+      - Scenario: Valid status transition should update the order <Created, Cancelled>
         IsHappyPath: false
 
-      - Scenario: Valid status transition should update the order <fromStatus = "Created", toStatus = "Preparing">
+      - Scenario: Valid status transition should update the order <Created, Preparing>
         IsHappyPath: false
 
-      - Scenario: Valid status transition should update the order <fromStatus = "Preparing", toStatus = "Ready">
+      - Scenario: Valid status transition should update the order <Preparing, Ready>
         IsHappyPath: false
 
-      - Scenario: Valid status transition should update the order <fromStatus = "Ready", toStatus = "Completed">
+      - Scenario: Valid status transition should update the order <Ready, Completed>
         IsHappyPath: false
 
   - Feature: Orders Status Update Not Found Tests
@@ -379,33 +258,33 @@ Features:
 
   - Feature: Orders Validation Tests
     Scenarios:
-      - Scenario: Order status update with invalid field should return bad request <field = "Status", value = "", reason = "Status is required", expectedError = "'Status' is required.", expectedStatus = "Bad Request">
+      - Scenario: Order status update with invalid field should return bad request <Status, , Status is required, 'Status' is required·, Bad Request>
         IsHappyPath: false
 
-      - Scenario: Order with invalid field should return bad request <field = "CustomerName", value = "", reason = "Customer name is required", expectedError = "'Customer Name' is required.", expectedStatus = "Bad Request">
+      - Scenario: Order with invalid field should return bad request <CustomerName, , Customer name is required, 'Customer Name' is required·, Bad Request>
         IsHappyPath: false
 
-      - Scenario: Order with invalid field should return bad request <field = "Items", value = null, reason = "At least one item is required", expectedError = "The Items field is required.", expectedStatus = "Bad Request">
+      - Scenario: Order with invalid field should return bad request <Items, null, At least one item is required, The Items field is required·, Bad Request>
         IsHappyPath: false
 
-      - Scenario: Order with invalid field should return bad request <field = "Items<0>.BatchId", value = null, reason = "Batch ID is required", expectedError = "'Batch Id' is required.", expectedStatus = "Bad Request">
+      - Scenario: Order with invalid field should return bad request <Items<0>·BatchId, null, Batch ID is required, 'Batch Id' is required·, Bad Request>
         IsHappyPath: false
 
-      - Scenario: Order with invalid field should return bad request <field = "Items<0>.ItemType", value = "", reason = "Item type is required", expectedError = "'Item Type' is required.", expectedStatus = "Bad Request">
+      - Scenario: Order with invalid field should return bad request <Items<0>·ItemType, , Item type is required, 'Item Type' is required·, Bad Request>
         IsHappyPath: false
 
-      - Scenario: Order with invalid field should return bad request <field = "Items<0>.Quantity", value = "0", reason = "Quantity must be greater than zero", expectedError = "Quantity must be greater than zero.", expectedStatus = "Bad Request">
+      - Scenario: Order with invalid field should return bad request <Items<0>·Quantity, 0, Quantity must be greater than zero, Quantity must be greater than zero·, Bad Request>
         IsHappyPath: false
 
   - Feature: Pancakes Content Negotiation Tests
     Scenarios:
-      - Scenario: Request with unsupported content type should return unsupported media type <contentType = "application/xml">
+      - Scenario: Request with unsupported content type should return unsupported media type <application/xml>
         IsHappyPath: false
 
-      - Scenario: Request with unsupported content type should return unsupported media type <contentType = "text/html">
+      - Scenario: Request with unsupported content type should return unsupported media type <text/html>
         IsHappyPath: false
 
-      - Scenario: Request with unsupported content type should return unsupported media type <contentType = "text/plain">
+      - Scenario: Request with unsupported content type should return unsupported media type <text/plain>
         IsHappyPath: false
 
   - Feature: Pancakes Creation Tests
@@ -413,22 +292,22 @@ Features:
       - Scenario: Valid pancake request with all ingredients should return a fresh batch
         IsHappyPath: true
 
-      - Scenario: Pancake request with invalid ingredient should return bad request <field = "Eggs", value = "", reason = "Eggs is required", expectedError = "'Eggs' is required.", expectedStatus = "Bad Request">
+      - Scenario: Pancake request with invalid ingredient should return bad request <Eggs, , Eggs is required, 'Eggs' is required·, Bad Request>
         IsHappyPath: false
 
-      - Scenario: Pancake request with invalid ingredient should return bad request <field = "Eggs", value = "javascript:void(0)", reason = "XSS in eggs", expectedError = "Eggs contains potentially dangerous content.", expectedStatus = "Bad Request">
+      - Scenario: Pancake request with invalid ingredient should return bad request <Eggs, javascript:void(0), XSS in eggs, Eggs contains potentially dangerous content·, Bad Request>
         IsHappyPath: false
 
-      - Scenario: Pancake request with invalid ingredient should return bad request <field = "Flour", value = "", reason = "Flour is required", expectedError = "'Flour' is required.", expectedStatus = "Bad Request">
+      - Scenario: Pancake request with invalid ingredient should return bad request <Flour, , Flour is required, 'Flour' is required·, Bad Request>
         IsHappyPath: false
 
-      - Scenario: Pancake request with invalid ingredient should return bad request <field = "Flour", value = "<img onerror=x>", reason = "XSS in flour", expectedError = "Flour contains potentially dangerous content.", expectedStatus = "Bad Request">
+      - Scenario: Pancake request with invalid ingredient should return bad request <Flour, <img onerror=x>, XSS in flour, Flour contains potentially dangerous content·, Bad Request>
         IsHappyPath: false
 
-      - Scenario: Pancake request with invalid ingredient should return bad request <field = "Milk", value = "", reason = "Milk is required", expectedError = "'Milk' is required.", expectedStatus = "Bad Request">
+      - Scenario: Pancake request with invalid ingredient should return bad request <Milk, , Milk is required, 'Milk' is required·, Bad Request>
         IsHappyPath: false
 
-      - Scenario: Pancake request with invalid ingredient should return bad request <field = "Milk", value = "<script>alert</script>", reason = "XSS in milk", expectedError = "Milk contains potentially dangerous content.", expectedStatus = "Bad Request">
+      - Scenario: Pancake request with invalid ingredient should return bad request <Milk, <script>alert</script>, XSS in milk, Milk contains potentially dangerous content·, Bad Request>
         IsHappyPath: false
 
       - Scenario: Pancake request with more toppings than allowed should return bad request
@@ -444,7 +323,7 @@ Features:
       - Scenario: Equipment alerts should contain data ingested via event hub consumer
         IsHappyPath: true
 
-  - Feature: Reporting Eventgrid Webhook Tests
+  - Feature: Reporting Event Grid Webhook Tests
     Scenarios:
       - Scenario: Ingredient shipments should be recorded when delivered via eventgrid webhook
         IsHappyPath: true
@@ -543,22 +422,22 @@ Features:
       - Scenario: Updating an existing topping should return the updated topping
         IsHappyPath: true
 
-      - Scenario: Update topping with invalid or dangerous input should return bad request <field = "Category", value = "", reason = "Category is required", expectedError = "'Category' is required.", expectedStatus = "Bad Request">
+      - Scenario: Update topping with invalid or dangerous input should return bad request <Category, , Category is required, 'Category' is required·, Bad Request>
         IsHappyPath: false
 
-      - Scenario: Update topping with invalid or dangerous input should return bad request <field = "Category", value = "<script>alert('xss')</script>", reason = "Script tag in category", expectedError = "Category contains potentially dangerous content.", expectedStatus = "Bad Request">
+      - Scenario: Update topping with invalid or dangerous input should return bad request <Category, <script>alert('xss')</script>, Script tag in category, Category contains potentially dangerous content·, Bad Request>
         IsHappyPath: false
 
-      - Scenario: Update topping with invalid or dangerous input should return bad request <field = "Category", value = "javascript:alert(1)", reason = "Javascript protocol", expectedError = "Category contains potentially dangerous content.", expectedStatus = "Bad Request">
+      - Scenario: Update topping with invalid or dangerous input should return bad request <Category, javascript:alert(1), Javascript protocol, Category contains potentially dangerous content·, Bad Request>
         IsHappyPath: false
 
-      - Scenario: Update topping with invalid or dangerous input should return bad request <field = "Name", value = "", reason = "Name is required", expectedError = "'Name' is required.", expectedStatus = "Bad Request">
+      - Scenario: Update topping with invalid or dangerous input should return bad request <Name, , Name is required, 'Name' is required·, Bad Request>
         IsHappyPath: false
 
-      - Scenario: Update topping with invalid or dangerous input should return bad request <field = "Name", value = "<img src=x onerror=alert(1)>", reason = "Event handler in name", expectedError = "Name contains potentially dangerous content.", expectedStatus = "Bad Request">
+      - Scenario: Update topping with invalid or dangerous input should return bad request <Name, <img src=x onerror=alert(1)>, Event handler in name, Name contains potentially dangerous content·, Bad Request>
         IsHappyPath: false
 
-      - Scenario: Update topping with invalid or dangerous input should return bad request <field = "Name", value = "<script>alert('xss')</script>", reason = "Script tag in name", expectedError = "Name contains potentially dangerous content.", expectedStatus = "Bad Request">
+      - Scenario: Update topping with invalid or dangerous input should return bad request <Name, <script>alert('xss')</script>, Script tag in name, Name contains potentially dangerous content·, Bad Request>
         IsHappyPath: false
 
       - Scenario: Updating a non existent topping should return not found
@@ -566,33 +445,33 @@ Features:
 
   - Feature: Toppings Xss Validation Tests
     Scenarios:
-      - Scenario: Topping request with invalid or dangerous input should return bad request <field = "Category", value = "", reason = "Category is required", expectedError = "'Category' is required.", expectedStatus = "Bad Request">
+      - Scenario: Topping request with invalid or dangerous input should return bad request <Category, , Category is required, 'Category' is required·, Bad Request>
         IsHappyPath: false
 
-      - Scenario: Topping request with invalid or dangerous input should return bad request <field = "Category", value = "<script>alert('xss')</script>", reason = "Script tag in category", expectedError = "Category contains potentially dangerous content.", expectedStatus = "Bad Request">
+      - Scenario: Topping request with invalid or dangerous input should return bad request <Category, <script>alert('xss')</script>, Script tag in category, Category contains potentially dangerous content·, Bad Request>
         IsHappyPath: false
 
-      - Scenario: Topping request with invalid or dangerous input should return bad request <field = "Category", value = "javascript:alert(1)", reason = "Javascript protocol", expectedError = "Category contains potentially dangerous content.", expectedStatus = "Bad Request">
+      - Scenario: Topping request with invalid or dangerous input should return bad request <Category, javascript:alert(1), Javascript protocol, Category contains potentially dangerous content·, Bad Request>
         IsHappyPath: false
 
-      - Scenario: Topping request with invalid or dangerous input should return bad request <field = "Name", value = "", reason = "Name is required", expectedError = "'Name' is required.", expectedStatus = "Bad Request">
+      - Scenario: Topping request with invalid or dangerous input should return bad request <Name, , Name is required, 'Name' is required·, Bad Request>
         IsHappyPath: false
 
-      - Scenario: Topping request with invalid or dangerous input should return bad request <field = "Name", value = "<img src=x onerror=alert(1)>", reason = "Event handler in name", expectedError = "Name contains potentially dangerous content.", expectedStatus = "Bad Request">
+      - Scenario: Topping request with invalid or dangerous input should return bad request <Name, <img src=x onerror=alert(1)>, Event handler in name, Name contains potentially dangerous content·, Bad Request>
         IsHappyPath: false
 
-      - Scenario: Topping request with invalid or dangerous input should return bad request <field = "Name", value = "<script>alert('xss')</script>", reason = "Script tag in name", expectedError = "Name contains potentially dangerous content.", expectedStatus = "Bad Request">
+      - Scenario: Topping request with invalid or dangerous input should return bad request <Name, <script>alert('xss')</script>, Script tag in name, Name contains potentially dangerous content·, Bad Request>
         IsHappyPath: false
 
   - Feature: Waffles Content Negotiation Tests
     Scenarios:
-      - Scenario: Sending request with unsupported content type should return unsupported media type <contentType = "application/xml">
+      - Scenario: Sending request with unsupported content type should return unsupported media type <application/xml>
         IsHappyPath: false
 
-      - Scenario: Sending request with unsupported content type should return unsupported media type <contentType = "text/html">
+      - Scenario: Sending request with unsupported content type should return unsupported media type <text/html>
         IsHappyPath: false
 
-      - Scenario: Sending request with unsupported content type should return unsupported media type <contentType = "text/plain">
+      - Scenario: Sending request with unsupported content type should return unsupported media type <text/plain>
         IsHappyPath: false
 
   - Feature: Waffles Creation Tests
@@ -600,22 +479,22 @@ Features:
       - Scenario: Valid waffle request with all ingredients should return a fresh batch
         IsHappyPath: true
 
-      - Scenario: Waffle request with invalid ingredient should return bad request <field = "Butter", value = "", reason = "Butter is required", expectedError = "'Butter' is required.", expectedStatus = "Bad Request">
+      - Scenario: Waffle request with invalid ingredient should return bad request <Butter, , Butter is required, 'Butter' is required·, Bad Request>
         IsHappyPath: false
 
-      - Scenario: Waffle request with invalid ingredient should return bad request <field = "Butter", value = "<img onerror=x>", reason = "XSS in butter", expectedError = "Butter contains potentially dangerous content.", expectedStatus = "Bad Request">
+      - Scenario: Waffle request with invalid ingredient should return bad request <Butter, <img onerror=x>, XSS in butter, Butter contains potentially dangerous content·, Bad Request>
         IsHappyPath: false
 
-      - Scenario: Waffle request with invalid ingredient should return bad request <field = "Eggs", value = "", reason = "Eggs is required", expectedError = "'Eggs' is required.", expectedStatus = "Bad Request">
+      - Scenario: Waffle request with invalid ingredient should return bad request <Eggs, , Eggs is required, 'Eggs' is required·, Bad Request>
         IsHappyPath: false
 
-      - Scenario: Waffle request with invalid ingredient should return bad request <field = "Flour", value = "", reason = "Flour is required", expectedError = "'Flour' is required.", expectedStatus = "Bad Request">
+      - Scenario: Waffle request with invalid ingredient should return bad request <Flour, , Flour is required, 'Flour' is required·, Bad Request>
         IsHappyPath: false
 
-      - Scenario: Waffle request with invalid ingredient should return bad request <field = "Milk", value = "", reason = "Milk is required", expectedError = "'Milk' is required.", expectedStatus = "Bad Request">
+      - Scenario: Waffle request with invalid ingredient should return bad request <Milk, , Milk is required, 'Milk' is required·, Bad Request>
         IsHappyPath: false
 
-      - Scenario: Waffle request with invalid ingredient should return bad request <field = "Milk", value = "<script>alert</script>", reason = "XSS in milk", expectedError = "Milk contains potentially dangerous content.", expectedStatus = "Bad Request">
+      - Scenario: Waffle request with invalid ingredient should return bad request <Milk, <script>alert</script>, XSS in milk, Milk contains potentially dangerous content·, Bad Request>
         IsHappyPath: false
 
       - Scenario: Waffle request with more toppings than allowed should return bad request

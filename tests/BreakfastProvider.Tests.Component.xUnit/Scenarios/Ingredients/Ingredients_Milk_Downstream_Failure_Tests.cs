@@ -26,9 +26,9 @@ public class Ingredients_Milk_Downstream_Failure_Tests : BaseFixture
         await _milkSteps.Retrieve();
 
         // Then the milk response should indicate a bad gateway
-        Track.That(() => _milkSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.BadGateway));
+        _milkSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.BadGateway);
         var milkErrorResponseBody = await _milkSteps.ResponseMessage!.Content.ReadAsStringAsync();
-        Track.That(() => milkErrorResponseBody.Should().Contain(DownstreamErrorMessages.CowServiceUnavailableTitle));
+        milkErrorResponseBody.Should().Contain(DownstreamErrorMessages.CowServiceUnavailableTitle);
     }
 
     [Fact]
@@ -44,9 +44,9 @@ public class Ingredients_Milk_Downstream_Failure_Tests : BaseFixture
         await _milkSteps.Retrieve();
 
         // Then the milk response should indicate a bad gateway
-        Track.That(() => _milkSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.BadGateway));
+        _milkSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.BadGateway);
         var milkErrorResponseBody = await _milkSteps.ResponseMessage!.Content.ReadAsStringAsync();
-        Track.That(() => milkErrorResponseBody.Should().Contain(DownstreamErrorMessages.CowServiceUnavailableTitle));
+        milkErrorResponseBody.Should().Contain(DownstreamErrorMessages.CowServiceUnavailableTitle);
     }
 
     [Fact]
@@ -62,8 +62,8 @@ public class Ingredients_Milk_Downstream_Failure_Tests : BaseFixture
         await _milkSteps.Retrieve();
 
         // Then the milk response should indicate a bad gateway
-        Track.That(() => _milkSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.BadGateway));
+        _milkSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.BadGateway);
         var milkErrorResponseBody = await _milkSteps.ResponseMessage!.Content.ReadAsStringAsync();
-        Track.That(() => milkErrorResponseBody.Should().Contain(DownstreamErrorMessages.CowServiceUnavailableTitle));
+        milkErrorResponseBody.Should().Contain(DownstreamErrorMessages.CowServiceUnavailableTitle);
     }
 }

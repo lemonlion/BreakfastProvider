@@ -39,20 +39,20 @@ public class Specifications_Async_Api_Tests : BaseFixture
         }
 
         // Then the response status should be ok
-        Track.That(() => asyncApiResponse!.StatusCode.Should().Be(HttpStatusCode.OK));
+        asyncApiResponse!.StatusCode.Should().Be(HttpStatusCode.OK);
 
         // And the response should be valid json
         var asyncApiResponseIsValidJson = asyncApiJson is not null;
-        Track.That(() => asyncApiResponseIsValidJson.Should().BeTrue(
-            $"response body (first 500 chars): {asyncApiJsonString?[..Math.Min(asyncApiJsonString.Length, 500)]}"));
+        asyncApiResponseIsValidJson.Should().BeTrue(
+            $"response body (first 500 chars): {asyncApiJsonString?[..Math.Min(asyncApiJsonString.Length, 500)]}");
 
         // And the asyncapi spec should contain expected top-level properties
-        Track.That(() => asyncApiJson!.RootElement.GetProperty("asyncapi").Should().NotBeNull());
-        Track.That(() => asyncApiJson!.RootElement.GetProperty("info").Should().NotBeNull());
-        Track.That(() => asyncApiJson!.RootElement.GetProperty("defaultContentType").Should().NotBeNull());
-        Track.That(() => asyncApiJson!.RootElement.GetProperty("channels").Should().NotBeNull());
-        Track.That(() => asyncApiJson!.RootElement.GetProperty("operations").Should().NotBeNull());
-        Track.That(() => asyncApiJson!.RootElement.GetProperty("components").Should().NotBeNull());
+        asyncApiJson!.RootElement.GetProperty("asyncapi").Should().NotBeNull();
+        asyncApiJson!.RootElement.GetProperty("info").Should().NotBeNull();
+        asyncApiJson!.RootElement.GetProperty("defaultContentType").Should().NotBeNull();
+        asyncApiJson!.RootElement.GetProperty("channels").Should().NotBeNull();
+        asyncApiJson!.RootElement.GetProperty("operations").Should().NotBeNull();
+        asyncApiJson!.RootElement.GetProperty("components").Should().NotBeNull();
 
         // And the asyncapi spec is written to disk as json
         var path = $"{AsyncApiSpecs.SpecificationsFolderPath}{AsyncApiSpecs.JsonFileName}";

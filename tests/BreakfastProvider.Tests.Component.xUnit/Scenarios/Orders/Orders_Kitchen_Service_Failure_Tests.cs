@@ -36,11 +36,11 @@ public class Orders_Kitchen_Service_Failure_Tests : BaseFixture
 
         // Given a pancake batch has been created
         await _milkSteps.Retrieve();
-        Track.That(() => _milkSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
+        _milkSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
         await _eggsSteps.Retrieve();
-        Track.That(() => _eggsSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
+        _eggsSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
         await _flourSteps.Retrieve();
-        Track.That(() => _flourSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
+        _flourSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
 
         _pancakeSteps.Request = new TestPancakeRequest
         {
@@ -49,9 +49,9 @@ public class Orders_Kitchen_Service_Failure_Tests : BaseFixture
             Flour = _flourSteps.FlourResponse.Flour
         };
         await _pancakeSteps.Send();
-        Track.That(() => _pancakeSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created));
+        _pancakeSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
         await _pancakeSteps.ParseResponse();
-        Track.That(() => _pancakeSteps.Response.Should().NotBeNull());
+        _pancakeSteps.Response.Should().NotBeNull();
 
         // And a valid order request for the created batch
         _orderSteps.Request.CustomerName = _customerName;
@@ -70,12 +70,12 @@ public class Orders_Kitchen_Service_Failure_Tests : BaseFixture
         await _orderSteps.Send();
 
         // Then the order should still be created successfully
-        Track.That(() => _orderSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created));
+        _orderSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
         await _orderSteps.ParseResponse();
-        Track.That(() => _orderSteps.Response!.CustomerName.Should().Be(_customerName));
+        _orderSteps.Response!.CustomerName.Should().Be(_customerName);
 
         // And the order should be retrievable by its id
         await _getOrderSteps.Retrieve(_orderSteps.Response!.OrderId);
-        Track.That(() => _getOrderSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
+        _getOrderSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
     }
 }

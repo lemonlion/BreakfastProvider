@@ -35,9 +35,9 @@ public class Ingredients_Goat_Milk_Feature_Flag_Tests : BaseFixture
         await _goatMilkSteps.Retrieve();
 
         // Then the goat milk response should indicate feature disabled
-        Track.That(() => _goatMilkSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.NotFound));
+        _goatMilkSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.NotFound);
         var goatMilkFeatureDisabledResponseBody = await _goatMilkSteps.ResponseMessage!.Content.ReadAsStringAsync();
-        Track.That(() => goatMilkFeatureDisabledResponseBody.Should().Contain(DownstreamErrorMessages.FeatureDisabled));
+        goatMilkFeatureDisabledResponseBody.Should().Contain(DownstreamErrorMessages.FeatureDisabled);
     }
 
     [Fact]
@@ -56,7 +56,7 @@ public class Ingredients_Goat_Milk_Feature_Flag_Tests : BaseFixture
         await _goatMilkSteps.Retrieve();
 
         // Then the goat milk response should contain fresh goat milk
-        Track.That(() => _goatMilkSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
-        Track.That(() => _goatMilkSteps.GoatMilkResponse.GoatMilk.Should().Be(GoatServiceDefaults.FreshGoatMilk));
+        _goatMilkSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
+        _goatMilkSteps.GoatMilkResponse.GoatMilk.Should().Be(GoatServiceDefaults.FreshGoatMilk);
     }
 }

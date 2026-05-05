@@ -25,9 +25,9 @@ public class Ingredients_Goat_Milk_Sourcing_Tests : BaseFixture
         await _goatMilkSteps.Retrieve();
 
         // Then the goat milk response should contain fresh goat milk
-        Track.That(() => _goatMilkSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
-        Track.That(() => _goatMilkSteps.GoatMilkResponse.Should().NotBeNull());
-        Track.That(() => _goatMilkSteps.GoatMilkResponse.GoatMilk.Should().Be(GoatServiceDefaults.FreshGoatMilk));
+        _goatMilkSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
+        _goatMilkSteps.GoatMilkResponse.Should().NotBeNull();
+        _goatMilkSteps.GoatMilkResponse.GoatMilk.Should().Be(GoatServiceDefaults.FreshGoatMilk);
 
         // And the goat service should have received a goat milk request
         if (!Settings.RunAgainstExternalServiceUnderTest)

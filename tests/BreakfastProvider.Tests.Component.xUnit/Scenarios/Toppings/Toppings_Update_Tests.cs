@@ -36,11 +36,11 @@ public class Toppings_Update_Tests : BaseFixture
         await _putSteps.Send(toppingId);
 
         // Then the update response should contain the updated topping
-        Track.That(() => _putSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
+        _putSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
         await _putSteps.ParseResponse();
-        Track.That(() => _putSteps.Response!.ToppingId.Should().Be(KnownBlueberryToppingId));
-        Track.That(() => _putSteps.Response!.Name.Should().Be(ToppingDefaults.Strawberries));
-        Track.That(() => _putSteps.Response!.Category.Should().Be(ToppingDefaults.FruitCategory));
+        _putSteps.Response!.ToppingId.Should().Be(KnownBlueberryToppingId);
+        _putSteps.Response!.Name.Should().Be(ToppingDefaults.Strawberries);
+        _putSteps.Response!.Category.Should().Be(ToppingDefaults.FruitCategory);
     }
 
     [Fact]
@@ -58,7 +58,7 @@ public class Toppings_Update_Tests : BaseFixture
         await _putSteps.Send(toppingId);
 
         // Then the update response should indicate not found
-        Track.That(() => _putSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.NotFound));
+        _putSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 
     [Theory]
@@ -89,7 +89,7 @@ public class Toppings_Update_Tests : BaseFixture
         // Then the responses should contain the validation error
         var actualResults = await ValidationHelper.ParseValidationResponses(responses);
         var actual = actualResults.Single();
-        Track.That(() => actual.ErrorMessage.Should().Be(expectedError));
-        Track.That(() => actual.ResponseStatus.Should().Be(expectedStatus));
+        actual.ErrorMessage.Should().Be(expectedError);
+        actual.ResponseStatus.Should().Be(expectedStatus);
     }
 }

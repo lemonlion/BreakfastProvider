@@ -52,7 +52,7 @@ public class Grpc_Order_Status_Tests : BaseFixture
             Flour = _flourSteps.FlourResponse.Flour
         };
         await _pancakeSteps.Send();
-        Track.That(() => _pancakeSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created));
+        _pancakeSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
         await _pancakeSteps.ParseResponse();
 
         // And an order has been created for the batch
@@ -71,7 +71,7 @@ public class Grpc_Order_Status_Tests : BaseFixture
             ]
         };
         await _orderSteps.Send();
-        Track.That(() => _orderSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created));
+        _orderSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
         await _orderSteps.ParseResponse();
         var createdOrderId = _orderSteps.Response!.OrderId;
 
@@ -79,9 +79,9 @@ public class Grpc_Order_Status_Tests : BaseFixture
         await _grpcSteps.GetOrderStatus(createdOrderId.ToString());
 
         // Then the gRPC response should contain the order details
-        Track.That(() => _grpcSteps.OrderStatusReply!.OrderId.Should().Be(createdOrderId.ToString()));
-        Track.That(() => _grpcSteps.OrderStatusReply!.CustomerName.Should().Be(_customerName));
-        Track.That(() => _grpcSteps.OrderStatusReply!.Status.Should().Be(OrderStatuses.Created));
+        _grpcSteps.OrderStatusReply!.OrderId.Should().Be(createdOrderId.ToString());
+        _grpcSteps.OrderStatusReply!.CustomerName.Should().Be(_customerName);
+        _grpcSteps.OrderStatusReply!.Status.Should().Be(OrderStatuses.Created);
     }
 
     [Fact]
@@ -91,7 +91,7 @@ public class Grpc_Order_Status_Tests : BaseFixture
         await _grpcSteps.GetOrderStatus(Guid.NewGuid().ToString());
 
         // Then the gRPC response should be a not-found error
-        Track.That(() => _grpcSteps.RpcException.Should().NotBeNull());
-        Track.That(() => _grpcSteps.RpcException!.StatusCode.Should().Be(StatusCode.NotFound));
+        _grpcSteps.RpcException.Should().NotBeNull();
+        _grpcSteps.RpcException!.StatusCode.Should().Be(StatusCode.NotFound);
     }
 }

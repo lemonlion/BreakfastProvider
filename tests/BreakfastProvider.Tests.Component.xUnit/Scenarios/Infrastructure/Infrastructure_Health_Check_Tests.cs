@@ -16,17 +16,17 @@ public class Infrastructure_Health_Check_Tests : BaseFixture
         var response = await Client.GetAsync(Endpoints.Health);
 
         // Then the response should indicate healthy with all dependencies
-        Track.That(() => response.StatusCode.Should().Be(HttpStatusCode.OK));
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
 
         var content = await response.Content.ReadAsStringAsync();
         var result = Json.Deserialize<TestHealthCheckResponse>(content)!;
-        Track.That(() => result.Should().NotBeNull());
-        Track.That(() => result.Status.Should().Be(HealthCheckStatuses.Healthy));
-        Track.That(() => result.Results.Should().ContainKey(HealthCheckNames.CowService));
-        Track.That(() => result.Results.Should().ContainKey(HealthCheckNames.GoatService));
-        Track.That(() => result.Results.Should().ContainKey(HealthCheckNames.SupplierService));
-        Track.That(() => result.Results.Should().ContainKey(HealthCheckNames.KitchenService));
-        Track.That(() => result.Results.Should().ContainKey(HealthCheckNames.CosmosDb));
-        Track.That(() => result.Results.Should().ContainKey(HealthCheckNames.Kafka));
+        result.Should().NotBeNull();
+        result.Status.Should().Be(HealthCheckStatuses.Healthy);
+        result.Results.Should().ContainKey(HealthCheckNames.CowService);
+        result.Results.Should().ContainKey(HealthCheckNames.GoatService);
+        result.Results.Should().ContainKey(HealthCheckNames.SupplierService);
+        result.Results.Should().ContainKey(HealthCheckNames.KitchenService);
+        result.Results.Should().ContainKey(HealthCheckNames.CosmosDb);
+        result.Results.Should().ContainKey(HealthCheckNames.Kafka);
     }
 }

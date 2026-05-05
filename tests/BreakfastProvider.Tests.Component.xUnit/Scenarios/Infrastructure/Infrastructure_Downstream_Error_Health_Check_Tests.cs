@@ -28,20 +28,20 @@ public class Infrastructure_Downstream_Error_Health_Check_Tests : BaseFixture
         var response = await Client.GetAsync(Endpoints.Health);
 
         // Then the response should indicate a degraded status
-        Track.That(() => response.StatusCode.Should().Be(HttpStatusCode.OK));
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
 
         var content = await response.Content.ReadAsStringAsync();
         var result = Json.Deserialize<TestHealthCheckResponse>(content)!;
-        Track.That(() => result.Should().NotBeNull());
-        Track.That(() => result.Status.Should().Be(HealthCheckStatuses.Degraded));
+        result.Should().NotBeNull();
+        result.Status.Should().Be(HealthCheckStatuses.Degraded);
 
         // And the kitchen service dependency should report degraded with a status code description
-        Track.That(() => result.Results.Should().ContainKey(HealthCheckNames.KitchenService));
+        result.Results.Should().ContainKey(HealthCheckNames.KitchenService);
 
         var kitchenEntry = result.Results[HealthCheckNames.KitchenService];
         var kitchenServiceHealthStatus = kitchenEntry.Status;
-        Track.That(() => kitchenServiceHealthStatus.Should().Be(HealthCheckStatuses.Degraded));
+        kitchenServiceHealthStatus.Should().Be(HealthCheckStatuses.Degraded);
         var kitchenServiceHealthDescription = kitchenEntry.Description;
-        Track.That(() => kitchenServiceHealthDescription.Should().Contain("503"));
+        kitchenServiceHealthDescription.Should().Contain("503");
     }
 }

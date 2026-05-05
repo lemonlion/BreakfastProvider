@@ -19,25 +19,25 @@ public class Specifications_Open_Api_Tests : BaseFixture
         var swaggerResponse = await Client.GetAsync(Endpoints.Swagger.SwaggerJson);
 
         // Then the response status should be ok
-        Track.That(() => swaggerResponse.StatusCode.Should().Be(HttpStatusCode.OK));
+        swaggerResponse.StatusCode.Should().Be(HttpStatusCode.OK);
 
         // And the response should be valid json
         var swaggerJsonString = await swaggerResponse.Content.ReadAsStringAsync();
         var openApiResponseIsValidJson = Json.TryParse(swaggerJsonString, out var swaggerJson);
-        Track.That(() => openApiResponseIsValidJson.Should().BeTrue());
+        openApiResponseIsValidJson.Should().BeTrue();
 
         // And the response should contain all the endpoints
-        Track.That(() => swaggerJson!.RootElement.GetProperty("paths").GetProperty(Endpoints.Swagger.PancakesPath).Should().NotBeNull());
-        Track.That(() => swaggerJson!.RootElement.GetProperty("paths").GetProperty(Endpoints.Swagger.WafflesPath).Should().NotBeNull());
-        Track.That(() => swaggerJson!.RootElement.GetProperty("paths").GetProperty(Endpoints.Swagger.OrdersPath).Should().NotBeNull());
-        Track.That(() => swaggerJson!.RootElement.GetProperty("paths").GetProperty(Endpoints.Swagger.OrderByIdPath).Should().NotBeNull());
-        Track.That(() => swaggerJson!.RootElement.GetProperty("paths").GetProperty(Endpoints.Swagger.ToppingsPath).Should().NotBeNull());
-        Track.That(() => swaggerJson!.RootElement.GetProperty("paths").GetProperty(Endpoints.Swagger.MenuPath).Should().NotBeNull());
-        Track.That(() => swaggerJson!.RootElement.GetProperty("paths").GetProperty(Endpoints.Swagger.MilkPath).Should().NotBeNull());
-        Track.That(() => swaggerJson!.RootElement.GetProperty("paths").GetProperty(Endpoints.Swagger.EggsPath).Should().NotBeNull());
-        Track.That(() => swaggerJson!.RootElement.GetProperty("paths").GetProperty(Endpoints.Swagger.FlourPath).Should().NotBeNull());
-        Track.That(() => swaggerJson!.RootElement.GetProperty("paths").GetProperty(Endpoints.Swagger.GoatMilkPath).Should().NotBeNull());
-        Track.That(() => swaggerJson!.RootElement.GetProperty("paths").GetProperty(Endpoints.Swagger.AuditLogsPath).Should().NotBeNull());
+        swaggerJson!.RootElement.GetProperty("paths").GetProperty(Endpoints.Swagger.PancakesPath).Should().NotBeNull();
+        swaggerJson!.RootElement.GetProperty("paths").GetProperty(Endpoints.Swagger.WafflesPath).Should().NotBeNull();
+        swaggerJson!.RootElement.GetProperty("paths").GetProperty(Endpoints.Swagger.OrdersPath).Should().NotBeNull();
+        swaggerJson!.RootElement.GetProperty("paths").GetProperty(Endpoints.Swagger.OrderByIdPath).Should().NotBeNull();
+        swaggerJson!.RootElement.GetProperty("paths").GetProperty(Endpoints.Swagger.ToppingsPath).Should().NotBeNull();
+        swaggerJson!.RootElement.GetProperty("paths").GetProperty(Endpoints.Swagger.MenuPath).Should().NotBeNull();
+        swaggerJson!.RootElement.GetProperty("paths").GetProperty(Endpoints.Swagger.MilkPath).Should().NotBeNull();
+        swaggerJson!.RootElement.GetProperty("paths").GetProperty(Endpoints.Swagger.EggsPath).Should().NotBeNull();
+        swaggerJson!.RootElement.GetProperty("paths").GetProperty(Endpoints.Swagger.FlourPath).Should().NotBeNull();
+        swaggerJson!.RootElement.GetProperty("paths").GetProperty(Endpoints.Swagger.GoatMilkPath).Should().NotBeNull();
+        swaggerJson!.RootElement.GetProperty("paths").GetProperty(Endpoints.Swagger.AuditLogsPath).Should().NotBeNull();
 
         // And the openapi spec is written to disk as json
         var path = $"{OpenApiSpecs.SpecificationsFolderPath}{OpenApiSpecs.JsonFileName}";

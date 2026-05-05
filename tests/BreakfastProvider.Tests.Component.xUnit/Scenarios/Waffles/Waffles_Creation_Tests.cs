@@ -42,15 +42,15 @@ public class Waffles_Creation_Tests : BaseFixture
     {
         // Given a valid waffle recipe with all ingredients
         await _milkSteps.Retrieve();
-        Track.That(() => _milkSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
+        _milkSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
         _waffleSteps.Request.Milk = _milkSteps.MilkResponse.Milk;
 
         await _eggsSteps.Retrieve();
-        Track.That(() => _eggsSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
+        _eggsSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
         _waffleSteps.Request.Eggs = _eggsSteps.EggsResponse.Eggs;
 
         await _flourSteps.Retrieve();
-        Track.That(() => _flourSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK));
+        _flourSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
         _waffleSteps.Request.Flour = _flourSteps.FlourResponse.Flour;
 
         _waffleSteps.Request.Butter = IngredientDefaults.UnsaltedButter;
@@ -59,12 +59,12 @@ public class Waffles_Creation_Tests : BaseFixture
         await _waffleSteps.Send();
 
         // Then the response should contain a valid batch with all ingredients
-        Track.That(() => _waffleSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created));
+        _waffleSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
         await _waffleSteps.ParseResponse();
-        Track.That(() => _waffleSteps.Response!.Ingredients.Should().Contain(_milkSteps.MilkResponse.Milk));
-        Track.That(() => _waffleSteps.Response!.Ingredients.Should().Contain(_eggsSteps.EggsResponse.Eggs));
-        Track.That(() => _waffleSteps.Response!.Ingredients.Should().Contain(_flourSteps.FlourResponse.Flour));
-        Track.That(() => _waffleSteps.Response!.Ingredients.Should().Contain(IngredientDefaults.UnsaltedButter));
+        _waffleSteps.Response!.Ingredients.Should().Contain(_milkSteps.MilkResponse.Milk);
+        _waffleSteps.Response!.Ingredients.Should().Contain(_eggsSteps.EggsResponse.Eggs);
+        _waffleSteps.Response!.Ingredients.Should().Contain(_flourSteps.FlourResponse.Flour);
+        _waffleSteps.Response!.Ingredients.Should().Contain(IngredientDefaults.UnsaltedButter);
 
         // And the cow service should have received a milk request
         if (!Settings.RunAgainstExternalServiceUnderTest)
@@ -100,8 +100,8 @@ public class Waffles_Creation_Tests : BaseFixture
         // Then the responses should contain the validation error
         var actualResults = await ValidationHelper.ParseValidationResponses(responses);
         var actual = actualResults.Single();
-        Track.That(() => actual.ErrorMessage.Should().Be(expectedError));
-        Track.That(() => actual.ResponseStatus.Should().Be(expectedStatus));
+        actual.ErrorMessage.Should().Be(expectedError);
+        actual.ResponseStatus.Should().Be(expectedStatus);
     }
 
     [Fact]
@@ -128,8 +128,8 @@ public class Waffles_Creation_Tests : BaseFixture
         await _waffleSteps.Send();
 
         // Then the response should indicate too many toppings
-        Track.That(() => _waffleSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.BadRequest));
+        _waffleSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         var body = await _waffleSteps.ResponseMessage!.Content.ReadAsStringAsync();
-        Track.That(() => body.Should().Contain(WaffleValidationMessages.MaxToppingsExceeded));
+        body.Should().Contain(WaffleValidationMessages.MaxToppingsExceeded);
     }
 }

@@ -38,17 +38,17 @@ public class DailySpecials_Idempotency_Tests : BaseFixture
         _postSteps.AddHeader(CustomHeaders.IdempotencyKey, _idempotencyKey);
 
         await _postSteps.Send();
-        Track.That(() => _postSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created));
+        _postSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
         await _postSteps.ParseResponse();
         _firstConfirmationId = _postSteps.Response!.OrderConfirmationId;
 
         await _postSteps.Send();
-        Track.That(() => _postSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created));
+        _postSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
         await _postSteps.ParseResponse();
         _secondConfirmationId = _postSteps.Response!.OrderConfirmationId;
 
         // Then both responses should return the same confirmation id
-        Track.That(() => _firstConfirmationId.Should().Be(_secondConfirmationId));
+        _firstConfirmationId.Should().Be(_secondConfirmationId);
     }
 
     [Fact]
@@ -67,17 +67,17 @@ public class DailySpecials_Idempotency_Tests : BaseFixture
         // When the order is submitted with two different idempotency keys
         _postSteps.AddHeader(CustomHeaders.IdempotencyKey, Guid.NewGuid().ToString());
         await _postSteps.Send();
-        Track.That(() => _postSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created));
+        _postSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
         await _postSteps.ParseResponse();
         _firstConfirmationId = _postSteps.Response!.OrderConfirmationId;
 
         _postSteps.AddHeader(CustomHeaders.IdempotencyKey, Guid.NewGuid().ToString());
         await _postSteps.Send();
-        Track.That(() => _postSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created));
+        _postSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
         await _postSteps.ParseResponse();
         _secondConfirmationId = _postSteps.Response!.OrderConfirmationId;
 
         // Then the responses should have different confirmation ids
-        Track.That(() => _firstConfirmationId.Should().NotBe(_secondConfirmationId));
+        _firstConfirmationId.Should().NotBe(_secondConfirmationId);
     }
 }

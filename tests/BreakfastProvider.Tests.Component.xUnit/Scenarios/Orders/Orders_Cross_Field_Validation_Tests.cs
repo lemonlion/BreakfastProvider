@@ -46,7 +46,7 @@ public class Orders_Cross_Field_Validation_Tests : BaseFixture
             Flour = _flourSteps.FlourResponse.Flour
         };
         await _pancakeSteps.Send();
-        Track.That(() => _pancakeSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created));
+        _pancakeSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
         await _pancakeSteps.ParseResponse();
     }
 
@@ -79,12 +79,12 @@ public class Orders_Cross_Field_Validation_Tests : BaseFixture
         await _orderSteps.Send();
 
         // Then
-        Track.That(() => _orderSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.BadRequest));
+        _orderSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.BadRequest);
 
         var content = await _orderSteps.ResponseMessage!.Content.ReadAsStringAsync();
         var problemDetails = Json.Deserialize<ValidationProblemDetails>(content);
         var orderValidationErrors = problemDetails?.Errors.Values.SelectMany(v => v).ToList();
-        Track.That(() => orderValidationErrors.Should().Contain(e => e.Contains("cannot contain more than 2 items")));
+        orderValidationErrors.Should().Contain(e => e.Contains("cannot contain more than 2 items"));
     }
 
     [Fact]
@@ -115,6 +115,6 @@ public class Orders_Cross_Field_Validation_Tests : BaseFixture
         await _orderSteps.Send();
 
         // Then
-        Track.That(() => _orderSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created));
+        _orderSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
     }
 }

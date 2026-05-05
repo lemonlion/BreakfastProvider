@@ -17,7 +17,7 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.Muffins
     
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Reqnroll", "3.0.0.0")]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    public partial class MuffinsCreationFeature : object, Xunit.IClassFixture<MuffinsCreationFeature.FixtureData>, Xunit.IAsyncLifetime
+    public partial class AppleCinnamonMuffinsCreationFeature : object, Xunit.IClassFixture<AppleCinnamonMuffinsCreationFeature.FixtureData>, Xunit.IAsyncLifetime
     {
         
         private global::Reqnroll.ITestRunner testRunner;
@@ -26,12 +26,12 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.Muffins
         
         private static string[] featureTags = ((string[])(null));
         
-        private static global::Reqnroll.FeatureInfo featureInfo = new global::Reqnroll.FeatureInfo(new global::System.Globalization.CultureInfo("en-US"), "Features/Muffins", "Muffins Creation", "    /muffins - Creating apple cinnamon muffins with baking profiles and toppings", global::Reqnroll.ProgrammingLanguage.CSharp, featureTags, InitializeCucumberMessages());
+        private static global::Reqnroll.FeatureInfo featureInfo = new global::Reqnroll.FeatureInfo(new global::System.Globalization.CultureInfo("en-US"), "Features/Muffins", "Apple Cinnamon Muffins Creation", "    /muffins - Creating apple cinnamon muffins with baking profiles and toppings", global::Reqnroll.ProgrammingLanguage.CSharp, featureTags, InitializeCucumberMessages());
         
-#line 1 "MuffinsCreation.feature"
+#line 1 "AppleCinnamonMuffinsCreation.feature"
 #line hidden
         
-        public MuffinsCreationFeature(MuffinsCreationFeature.FixtureData fixtureData, Xunit.ITestOutputHelper testOutputHelper)
+        public AppleCinnamonMuffinsCreationFeature(AppleCinnamonMuffinsCreationFeature.FixtureData fixtureData, Xunit.ITestOutputHelper testOutputHelper)
         {
             this._testOutputHelper = testOutputHelper;
         }
@@ -105,7 +105,7 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.Muffins
         
         private static global::Reqnroll.Formatters.RuntimeSupport.FeatureLevelCucumberMessages InitializeCucumberMessages()
         {
-            return new global::Reqnroll.Formatters.RuntimeSupport.FeatureLevelCucumberMessages("Features/Muffins/MuffinsCreation.feature.ndjson", 15);
+            return new global::Reqnroll.Formatters.RuntimeSupport.FeatureLevelCucumberMessages("Features/Muffins/AppleCinnamonMuffinsCreation.feature.ndjson", 15);
         }
         
         async System.Threading.Tasks.ValueTask Xunit.IAsyncLifetime.InitializeAsync()
@@ -134,7 +134,7 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.Muffins
         }
         
         [global::Xunit.FactAttribute(DisplayName="A valid apple cinnamon muffin request should return a fresh batch")]
-        [global::Xunit.TraitAttribute("FeatureTitle", "Muffins Creation")]
+        [global::Xunit.TraitAttribute("FeatureTitle", "Apple Cinnamon Muffins Creation")]
         [global::Xunit.TraitAttribute("Description", "A valid apple cinnamon muffin request should return a fresh batch")]
         [global::Xunit.TraitAttribute("Category", "happy-path")]
         public async global::System.Threading.Tasks.Task AValidAppleCinnamonMuffinRequestShouldReturnAFreshBatch()
@@ -173,7 +173,7 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.Muffins
         }
         
         [global::Xunit.TheoryAttribute(DisplayName="Different muffin recipes should produce the expected batch")]
-        [global::Xunit.TraitAttribute("FeatureTitle", "Muffins Creation")]
+        [global::Xunit.TraitAttribute("FeatureTitle", "Apple Cinnamon Muffins Creation")]
         [global::Xunit.TraitAttribute("Description", "Different muffin recipes should produce the expected batch")]
         [global::Xunit.InlineDataAttribute("Classic", "Plain Flour", "Granny Smith", "Ceylon", "180", "25", "Standard", "Streusel", "Light", "Icing Glaze", "Drizzle", "5", "2", "1", new string[0])]
         [global::Xunit.InlineDataAttribute("Rustic Wholesome", "Whole Wheat", "Honeycrisp", "Cassia", "175", "30", "Cast Iron", "Brown Sugar Crumb", "Heavy", "Maple Drizzle", "Light", "5", "2", "2", new string[0])]
@@ -252,7 +252,7 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.Muffins
         }
         
         [global::Xunit.TheoryAttribute(DisplayName="Different muffin recipes without toppings should produce the expected batch")]
-        [global::Xunit.TraitAttribute("FeatureTitle", "Muffins Creation")]
+        [global::Xunit.TraitAttribute("FeatureTitle", "Apple Cinnamon Muffins Creation")]
         [global::Xunit.TraitAttribute("Description", "Different muffin recipes without toppings should produce the expected batch")]
         [global::Xunit.InlineDataAttribute("Classic Plain", "Plain Flour", "Granny Smith", "Ceylon", "180", "25", "Standard", "5", "0", "4", new string[0])]
         [global::Xunit.InlineDataAttribute("Rustic Wholesome Plain", "Whole Wheat", "Honeycrisp", "Cassia", "175", "30", "Cast Iron", "5", "0", "5", new string[0])]
@@ -319,7 +319,7 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.Muffins
         
         [global::Xunit.TheoryAttribute(DisplayName="Muffins endpoint called with an invalid field should return a bad request respons" +
             "e")]
-        [global::Xunit.TraitAttribute("FeatureTitle", "Muffins Creation")]
+        [global::Xunit.TraitAttribute("FeatureTitle", "Apple Cinnamon Muffins Creation")]
         [global::Xunit.TraitAttribute("Description", "Muffins endpoint called with an invalid field should return a bad request respons" +
             "e")]
         [global::Xunit.InlineDataAttribute("Flour", "", "Flour is required", "\'Flour\' is required.", "Bad Request", "7", new string[0])]
@@ -372,12 +372,12 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.Muffins
             
             async System.Threading.Tasks.ValueTask Xunit.IAsyncLifetime.InitializeAsync()
             {
-                await MuffinsCreationFeature.FeatureSetupAsync();
+                await AppleCinnamonMuffinsCreationFeature.FeatureSetupAsync();
             }
             
             async System.Threading.Tasks.ValueTask System.IAsyncDisposable.DisposeAsync()
             {
-                await MuffinsCreationFeature.FeatureTearDownAsync();
+                await AppleCinnamonMuffinsCreationFeature.FeatureTearDownAsync();
             }
         }
     }

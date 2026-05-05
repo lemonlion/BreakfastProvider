@@ -10,7 +10,7 @@ using TestTrackingDiagrams.xUnit3;
 
 namespace BreakfastProvider.Tests.Component.xUnit.Scenarios.Muffins;
 
-public class Muffins_Creation_Tests : BaseFixture
+public class Apple_Cinnamon_Muffins_Creation_Tests : BaseFixture
 {
     private readonly GetMilkSteps _milkSteps;
     private readonly GetEggsSteps _eggsSteps;
@@ -18,7 +18,7 @@ public class Muffins_Creation_Tests : BaseFixture
     private readonly PostMuffinsSteps _muffinSteps;
     private readonly DownstreamRequestSteps _downstreamSteps;
 
-    public Muffins_Creation_Tests()
+    public Apple_Cinnamon_Muffins_Creation_Tests()
     {
         _milkSteps = Get<GetMilkSteps>();
         _eggsSteps = Get<GetEggsSteps>();

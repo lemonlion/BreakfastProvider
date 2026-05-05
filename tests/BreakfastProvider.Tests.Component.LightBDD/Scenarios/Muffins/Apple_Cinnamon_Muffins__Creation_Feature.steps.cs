@@ -11,7 +11,7 @@ using TestTrackingDiagrams.LightBDD;
 
 namespace BreakfastProvider.Tests.Component.LightBDD.Scenarios.Muffins;
 
-public partial class Muffins__Creation_Feature : BaseFixture
+public partial class Apple_Cinnamon_Muffins__Creation_Feature : BaseFixture
 {
     private readonly GetMilkSteps _milkSteps;
     private readonly GetEggsSteps _eggsSteps;
@@ -21,7 +21,7 @@ public partial class Muffins__Creation_Feature : BaseFixture
 
     private readonly List<HttpResponseMessage> _validationResponses = [];
 
-    public Muffins__Creation_Feature()
+    public Apple_Cinnamon_Muffins__Creation_Feature()
     {
         _milkSteps = Get<GetMilkSteps>();
         _eggsSteps = Get<GetEggsSteps>();

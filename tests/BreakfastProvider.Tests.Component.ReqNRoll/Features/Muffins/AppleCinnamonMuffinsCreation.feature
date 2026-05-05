@@ -1,4 +1,4 @@
-Feature: Muffins Creation
+Feature: Apple Cinnamon Muffins Creation
     /muffins - Creating apple cinnamon muffins with baking profiles and toppings
 
     @happy-path

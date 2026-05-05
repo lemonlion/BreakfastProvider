@@ -8,7 +8,7 @@ using TestTrackingDiagrams.LightBDD;
 namespace BreakfastProvider.Tests.Component.LightBDD.Scenarios.Muffins;
 
 [FeatureDescription($"/{Endpoints.Muffins} - Creating apple cinnamon muffins with baking profiles and toppings")]
-public partial class Muffins__Creation_Feature
+public partial class Apple_Cinnamon_Muffins__Creation_Feature
 {
     [HappyPath]
     [Scenario]

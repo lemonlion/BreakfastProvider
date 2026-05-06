@@ -48,6 +48,7 @@ public class ConfiguredLightBddScopeAttribute : LightBddScope
                 new ReportConfigurationOptions
                 {
                     SpecificationsTitle = "Breakfast Provider Specifications",
+                    TestRunReportTitle = "Breakfast Provider (LightBDD) Test Run Report",
                     WriteCiSummary = true,
                     ExcludedHeaders = [CustomHeaders.ComponentTestRequestId, CustomHeaders.CorrelationId]
                 });

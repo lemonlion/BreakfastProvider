@@ -64,6 +64,7 @@ public class GlobalTestSetup : IAsyncLifetime
             new ReportConfigurationOptions
             {
                 SpecificationsTitle = "Breakfast Provider Specifications",
+                TestRunReportTitle = "Breakfast Provider (xUnit3) Test Run Report",
                 WriteCiSummary = true,
                 ExcludedHeaders = [CustomHeaders.ComponentTestRequestId, CustomHeaders.CorrelationId]
             });

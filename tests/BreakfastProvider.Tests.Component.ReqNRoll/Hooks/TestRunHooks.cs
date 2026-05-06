@@ -51,6 +51,7 @@ public sealed class TestRunHooks
             new ReportConfigurationOptions
             {
                 SpecificationsTitle = "Breakfast Provider Specifications",
+                TestRunReportTitle = "Breakfast Provider (ReqNRoll) Test Run Report",
                 WriteCiSummary = true,
                 ExcludedHeaders = [CustomHeaders.ComponentTestRequestId, CustomHeaders.CorrelationId]
             });

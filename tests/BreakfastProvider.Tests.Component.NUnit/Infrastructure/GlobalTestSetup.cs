@@ -68,6 +68,7 @@ public class GlobalTestSetup : DiagrammedTestRun
             new ReportConfigurationOptions
             {
                 SpecificationsTitle = "Breakfast Provider Specifications",
+                TestRunReportTitle = "Breakfast Provider (NUnit) Test Run Report",
                 WriteCiSummary = true,
                 ExcludedHeaders = [CustomHeaders.ComponentTestRequestId, CustomHeaders.CorrelationId]
             });

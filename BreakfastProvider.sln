@@ -39,6 +39,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BreakfastProvider.Tests.Com
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dependencies.Fakes.NotificationService", "fakes\Dependencies.Fakes.NotificationService\Dependencies.Fakes.NotificationService.csproj", "{9072ADAA-2DDC-4F2C-87AF-9D1592C10B1A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BreakfastProvider.Tests.Component.NUnit", "tests\BreakfastProvider.Tests.Component.NUnit\BreakfastProvider.Tests.Component.NUnit.csproj", "{37E91C01-13AF-4EFB-B4A4-551DE02EC60B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -181,6 +183,18 @@ Global
 		{9072ADAA-2DDC-4F2C-87AF-9D1592C10B1A}.Release|x64.Build.0 = Release|Any CPU
 		{9072ADAA-2DDC-4F2C-87AF-9D1592C10B1A}.Release|x86.ActiveCfg = Release|Any CPU
 		{9072ADAA-2DDC-4F2C-87AF-9D1592C10B1A}.Release|x86.Build.0 = Release|Any CPU
+		{37E91C01-13AF-4EFB-B4A4-551DE02EC60B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{37E91C01-13AF-4EFB-B4A4-551DE02EC60B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{37E91C01-13AF-4EFB-B4A4-551DE02EC60B}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{37E91C01-13AF-4EFB-B4A4-551DE02EC60B}.Debug|x64.Build.0 = Debug|Any CPU
+		{37E91C01-13AF-4EFB-B4A4-551DE02EC60B}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{37E91C01-13AF-4EFB-B4A4-551DE02EC60B}.Debug|x86.Build.0 = Debug|Any CPU
+		{37E91C01-13AF-4EFB-B4A4-551DE02EC60B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{37E91C01-13AF-4EFB-B4A4-551DE02EC60B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{37E91C01-13AF-4EFB-B4A4-551DE02EC60B}.Release|x64.ActiveCfg = Release|Any CPU
+		{37E91C01-13AF-4EFB-B4A4-551DE02EC60B}.Release|x64.Build.0 = Release|Any CPU
+		{37E91C01-13AF-4EFB-B4A4-551DE02EC60B}.Release|x86.ActiveCfg = Release|Any CPU
+		{37E91C01-13AF-4EFB-B4A4-551DE02EC60B}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -198,6 +212,7 @@ Global
 		{B8C9D0E1-8888-9999-AAAA-BBBBCCCCDDDD} = {11111111-1111-1111-1111-111111111111}
 		{8E63B305-11D2-478F-A209-ABE5B913AF96} = {22222222-2222-2222-2222-222222222222}
 		{9072ADAA-2DDC-4F2C-87AF-9D1592C10B1A} = {33333333-3333-3333-3333-333333333333}
+		{37E91C01-13AF-4EFB-B4A4-551DE02EC60B} = {22222222-2222-2222-2222-222222222222}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {88627928-EDD7-4D0C-84AE-EB0D4D473DB9}

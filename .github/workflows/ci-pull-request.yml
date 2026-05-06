@@ -324,6 +324,98 @@ jobs:
     secrets: inherit
 
 
+  # ─── NUnit ──────────────────────────────────────────────────────────────────
+
+  nunit-in-memory:
+    name: NUnit in memory
+    uses: ./.github/workflows/_tests.yml
+    with:
+      test-type: component
+      test-run-type: memory
+      test-run-description: nunit-in-memory
+      csproj-path: ./tests/BreakfastProvider.Tests.Component.NUnit/BreakfastProvider.Tests.Component.NUnit.csproj
+      features-report-path: tests/BreakfastProvider.Tests.Component.NUnit/bin/Debug/net10.0/Reports/TestRunReport.html
+    secrets: inherit
+
+  nunit-in-memory-report:
+    name: NUnit in memory report
+    needs: [nunit-in-memory]
+    uses: ./.github/workflows/_report-tests.yml
+    with:
+      test-type: component
+      test-run-type: memory
+      trx-file: nunit-in-memory-results.trx
+
+  nunit-in-memory-coverage:
+    name: NUnit in memory coverage
+    needs: [nunit-in-memory]
+    uses: ./.github/workflows/_report-coverage.yml
+    with:
+      test-type: component
+      test-run-type: memory
+      coverage-file: nunit-in-memory.coverage.cobertura.xml
+
+
+  nunit-in-docker:
+    name: NUnit in docker
+    uses: ./.github/workflows/_tests.yml
+    with:
+      test-type: component
+      test-run-type: docker
+      test-run-description: nunit-in-docker
+      csproj-path: ./tests/BreakfastProvider.Tests.Component.NUnit/BreakfastProvider.Tests.Component.NUnit.csproj
+      features-report-path: tests/BreakfastProvider.Tests.Component.NUnit/bin/Debug/net10.0/Reports/TestRunReport.html
+    secrets: inherit
+
+  nunit-in-docker-report:
+    name: NUnit in docker report
+    needs: [nunit-in-docker]
+    uses: ./.github/workflows/_report-tests.yml
+    with:
+      test-type: component
+      test-run-type: docker
+      trx-file: nunit-in-docker-results.trx
+
+  nunit-in-docker-coverage:
+    name: NUnit in docker coverage
+    needs: [nunit-in-docker]
+    uses: ./.github/workflows/_report-coverage.yml
+    with:
+      test-type: component
+      test-run-type: docker
+      coverage-file: nunit-in-docker.coverage.cobertura.xml
+
+
+  nunit-external-sut:
+    name: NUnit external SUT
+    uses: ./.github/workflows/_tests.yml
+    with:
+      test-type: component
+      test-run-type: external-sut
+      test-run-description: nunit-external-sut
+      csproj-path: ./tests/BreakfastProvider.Tests.Component.NUnit/BreakfastProvider.Tests.Component.NUnit.csproj
+      features-report-path: tests/BreakfastProvider.Tests.Component.NUnit/bin/Debug/net10.0/Reports/TestRunReport.html
+    secrets: inherit
+
+  nunit-external-sut-report:
+    name: NUnit external SUT report
+    needs: [nunit-external-sut]
+    uses: ./.github/workflows/_report-tests.yml
+    with:
+      test-type: component
+      test-run-type: external-sut
+      trx-file: nunit-external-sut-results.trx
+
+  nunit-external-sut-coverage:
+    name: NUnit external SUT coverage
+    needs: [nunit-external-sut]
+    uses: ./.github/workflows/_report-coverage.yml
+    with:
+      test-type: component
+      test-run-type: external-sut
+      coverage-file: nunit-external-sut.coverage.cobertura.xml
+
+
   # ─── Gate ───────────────────────────────────────────────────────────────────
 
   checks-complete:
@@ -342,6 +434,9 @@ jobs:
       - tunit-in-memory
       - tunit-in-docker
       - tunit-external-sut
+      - nunit-in-memory
+      - nunit-in-docker
+      - nunit-external-sut
     runs-on: ubuntu-24.04
     steps:
       - name: Checks complete

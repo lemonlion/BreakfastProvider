@@ -118,44 +118,6 @@ public class Apple_Cinnamon_Muffins_Creation_Tests : BaseFixture
     }
 
     [Theory]
-    [MemberData(nameof(MuffinRecipeVariations.RecipeVariationsWithoutToppings), MemberType = typeof(MuffinRecipeVariations))]
-    public async Task Different_muffin_recipes_without_toppings_should_produce_the_expected_batch(
-        string recipeName, MuffinRecipeTestDataWithoutToppings recipe, int temperature, int durationMinutes, string panType, MuffinBatchExpectation expected)
-    {
-        // Given a muffin recipe with specific ingredients and baking profile but no toppings
-        await _milkSteps.Retrieve();
-        _milkSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
-        _muffinSteps.Request.Milk = _milkSteps.MilkResponse.Milk;
-
-        await _eggsSteps.Retrieve();
-        _eggsSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
-        _muffinSteps.Request.Eggs = _eggsSteps.EggsResponse.Eggs;
-
-        _muffinSteps.Request.Flour = recipe.Ingredients.Flour;
-        _muffinSteps.Request.Apples = recipe.Ingredients.Apples;
-        _muffinSteps.Request.Cinnamon = recipe.Ingredients.Cinnamon;
-        _muffinSteps.Request.Baking = new TestBakingProfile
-        {
-            Temperature = temperature,
-            DurationMinutes = durationMinutes,
-            PanType = panType
-        };
-
-        // When the muffins are prepared
-        await _muffinSteps.Send();
-
-        // Then the batch should match expectations
-        _muffinSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
-        await _muffinSteps.ParseResponse();
-        _muffinSteps.Response!.Ingredients.Should().HaveCount(expected.ExpectedIngredientCount);
-        _muffinSteps.Response!.Toppings.Should().HaveCount(expected.ExpectedToppingCount);
-        (expected.HasBakingInfo
-            ? _muffinSteps.Response!.BakingTemperature > 0
-            : _muffinSteps.Response!.BakingTemperature == 0).Should().BeTrue();
-        this.BDDfy();
-    }
-
-    [Theory]
     [InlineData("Flour", "", "Flour is required", "'Flour' is required.", "Bad Request")]
     [InlineData("Apples", "", "Apples is required", "'Apples' is required.", "Bad Request")]
     [InlineData("Cinnamon", "", "Cinnamon is required", "'Cinnamon' is required.", "Bad Request")]

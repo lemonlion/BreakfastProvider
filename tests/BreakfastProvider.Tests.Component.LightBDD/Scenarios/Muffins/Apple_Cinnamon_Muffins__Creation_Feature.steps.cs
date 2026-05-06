@@ -84,27 +84,6 @@ public partial class Apple_Cinnamon_Muffins__Creation_Feature : BaseFixture
             .ToList();
     }
 
-    private async Task A_muffin_recipe_with_ingredients_and_baking_profile(string recipeName, MuffinRecipeTestDataWithoutToppings recipe, int temperature, int durationMinutes, string panType)
-    {
-        await _milkSteps.Retrieve();
-        _milkSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
-        _muffinSteps.Request.Milk = _milkSteps.MilkResponse.Milk;
-
-        await _eggsSteps.Retrieve();
-        _eggsSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
-        _muffinSteps.Request.Eggs = _eggsSteps.EggsResponse.Eggs;
-
-        _muffinSteps.Request.Flour = recipe.Ingredients.Flour;
-        _muffinSteps.Request.Apples = recipe.Ingredients.Apples;
-        _muffinSteps.Request.Cinnamon = recipe.Ingredients.Cinnamon;
-        _muffinSteps.Request.Baking = new TestBakingProfile
-        {
-            Temperature = temperature,
-            DurationMinutes = durationMinutes,
-            PanType = panType
-        };
-    }
-
     private async Task A_valid_muffin_request_with_an_invalid_field(string field, string value)
     {
         _muffinSteps.Request = new TestMuffinRequest

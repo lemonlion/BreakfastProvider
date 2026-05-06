@@ -1,7 +1,9 @@
 using System.Diagnostics;
+using System.Net;
 using BreakfastProvider.Api.Configuration;
 using BreakfastProvider.Api.Storage;
 using BreakfastProvider.Api.Telemetry;
+using Microsoft.Azure.Cosmos;
 using Microsoft.Extensions.Options;
 
 namespace BreakfastProvider.Api.Events.Outbox;
@@ -14,6 +16,12 @@ public class OutboxProcessor(
 {
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
+        if (!config.Value.IsEnabled)
+        {
+            logger.LogInformation("OutboxProcessor is disabled via configuration");
+            return;
+        }
+
         var pollingInterval = TimeSpan.FromSeconds(config.Value.PollingIntervalSeconds);
 
         while (!stoppingToken.IsCancellationRequested)
@@ -64,10 +72,41 @@ public class OutboxProcessor(
                 continue;
             }
 
+            // Claim the message with optimistic concurrency — prevents other processors from touching it.
+            if (!await TryClaimMessage(message, cancellationToken))
+                continue;
+
+            await DispatchWithRetries(message, dispatcher, cancellationToken);
+        }
+    }
+
+    private async Task<bool> TryClaimMessage(OutboxMessage message, CancellationToken cancellationToken)
+    {
+        try
+        {
+            message.Status = OutboxMessageStatus.Processing;
+            var updated = await outboxRepository.ReplaceAsync(message, message.Id, message.PartitionKey, message.ETag, cancellationToken);
+            message.ETag = updated.ETag;
+            return true;
+        }
+        catch (CosmosException ex) when (ex.StatusCode == HttpStatusCode.PreconditionFailed)
+        {
+            logger.LogDebug("Outbox message {MessageId} was claimed by another processor, skipping", message.Id);
+            return false;
+        }
+    }
+
+    private async Task DispatchWithRetries(OutboxMessage message, IOutboxDispatcher dispatcher, CancellationToken cancellationToken)
+    {
+        var maxRetries = config.Value.MaxRetryCount;
+
+        while (message.RetryCount < maxRetries)
+        {
             using var dispatchActivity = DiagnosticsConfig.ActivitySource.StartActivity("OutboxProcessor.DispatchMessage");
             dispatchActivity?.SetTag("outbox.message_id", message.Id);
             dispatchActivity?.SetTag("outbox.event_type", message.EventType);
             dispatchActivity?.SetTag("outbox.destination", message.Destination);
+            dispatchActivity?.SetTag("outbox.retry_count", message.RetryCount);
 
             try
             {
@@ -75,22 +114,26 @@ public class OutboxProcessor(
 
                 message.Status = OutboxMessageStatus.Processed;
                 message.ProcessedAt = DateTime.UtcNow;
-                await outboxRepository.UpsertAsync(message, message.PartitionKey, cancellationToken);
+                await outboxRepository.ReplaceAsync(message, message.Id, message.PartitionKey, message.ETag, cancellationToken);
 
                 DiagnosticsConfig.OutboxMessagesDispatched.Add(1,
                     new KeyValuePair<string, object?>("outbox.destination", message.Destination));
 
                 logger.LogInformation("Successfully dispatched outbox message {MessageId} ({EventType}) to {Destination}",
                     message.Id, message.EventType, message.Destination);
+                return;
             }
+            catch (CosmosException) { throw; }
             catch (Exception ex)
             {
                 message.RetryCount++;
                 message.ErrorMessage = ex.Message;
+                dispatchActivity?.SetStatus(ActivityStatusCode.Error, ex.Message);
 
-                if (message.RetryCount >= config.Value.MaxRetryCount)
+                if (message.RetryCount >= maxRetries)
                 {
                     message.Status = OutboxMessageStatus.Failed;
+                    await outboxRepository.ReplaceAsync(message, message.Id, message.PartitionKey, message.ETag, cancellationToken);
 
                     DiagnosticsConfig.OutboxMessagesFailed.Add(1,
                         new KeyValuePair<string, object?>("outbox.destination", message.Destination),
@@ -98,16 +141,15 @@ public class OutboxProcessor(
 
                     logger.LogError(ex, "Outbox message {MessageId} ({EventType}) failed after {RetryCount} retries",
                         message.Id, message.EventType, message.RetryCount);
-                }
-                else
-                {
-                    logger.LogWarning(ex, "Outbox message {MessageId} ({EventType}) dispatch failed, retry {RetryCount}/{MaxRetries}",
-                        message.Id, message.EventType, message.RetryCount, config.Value.MaxRetryCount);
+                    return;
                 }
 
-                dispatchActivity?.SetStatus(ActivityStatusCode.Error, ex.Message);
+                // Save retry progress (message stays "Processing" — still claimed by this processor)
+                var updated = await outboxRepository.ReplaceAsync(message, message.Id, message.PartitionKey, message.ETag, cancellationToken);
+                message.ETag = updated.ETag;
 
-                await outboxRepository.UpsertAsync(message, message.PartitionKey, cancellationToken);
+                logger.LogWarning(ex, "Outbox message {MessageId} ({EventType}) dispatch failed, retry {RetryCount}/{MaxRetries}",
+                    message.Id, message.EventType, message.RetryCount, maxRetries);
             }
         }
     }

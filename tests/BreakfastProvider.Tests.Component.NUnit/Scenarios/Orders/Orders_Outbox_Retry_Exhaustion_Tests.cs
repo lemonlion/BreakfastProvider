@@ -52,7 +52,6 @@ public class Orders_Outbox_Retry_Exhaustion_Tests : BaseFixture
     public async Task Outbox_message_should_transition_to_failed_after_exhausting_retries()
     {
         if (Settings.RunAgainstExternalServiceUnderTest) return;
-        if (Settings.UsesSharedDockerDatabase) return;
 
         // Given a pancake batch has been created
         await _milkSteps.Retrieve();

@@ -78,4 +78,11 @@ public class CosmosRepository<T>(Container container) : ICosmosRepository<T> whe
         var response = await container.UpsertItemAsync(item, new PartitionKey(partitionKey), cancellationToken: cancellationToken);
         return response.Resource;
     }
+
+    public async Task<T> ReplaceAsync(T item, string id, string partitionKey, string? etag = null, CancellationToken cancellationToken = default)
+    {
+        var options = etag != null ? new ItemRequestOptions { IfMatchEtag = etag } : null;
+        var response = await container.ReplaceItemAsync(item, id, new PartitionKey(partitionKey), options, cancellationToken);
+        return response.Resource;
+    }
 }

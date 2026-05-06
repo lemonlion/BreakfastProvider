@@ -10,4 +10,5 @@ public interface ICosmosRepository<T> where T : class
     Task<IReadOnlyList<T>> QueryAsync(Expression<Func<T, int, bool>> predicate, CancellationToken cancellationToken = default);
     Task<(IReadOnlyList<T> Items, int TotalCount)> QueryPagedAsync(Expression<Func<T, bool>> predicate, int offset, int limit, CancellationToken cancellationToken = default);
     Task<T> UpsertAsync(T item, string partitionKey, CancellationToken cancellationToken = default);
+    Task<T> ReplaceAsync(T item, string id, string partitionKey, string? etag = null, CancellationToken cancellationToken = default);
 }

@@ -56,6 +56,8 @@ public class OutboxMessage
     public string Id { get; set; } = Guid.NewGuid().ToString();
     [JsonProperty("partitionKey")]
     public string PartitionKey { get; set; } = string.Empty;
+    [JsonProperty("_etag")]
+    public string? ETag { get; set; }
     public string EventType { get; set; } = string.Empty;
     public string Destination { get; set; } = string.Empty;
     public string Payload { get; set; } = string.Empty;
@@ -69,6 +71,7 @@ public class OutboxMessage
 public static class OutboxMessageStatus
 {
     public const string Pending = "Pending";
+    public const string Processing = "Processing";
     public const string Processed = "Processed";
     public const string Failed = "Failed";
 }

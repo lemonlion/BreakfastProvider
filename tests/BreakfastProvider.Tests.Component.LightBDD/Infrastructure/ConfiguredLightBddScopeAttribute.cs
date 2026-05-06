@@ -1,3 +1,4 @@
+using BreakfastProvider.Tests.Component.Shared.Constants;
 using BreakfastProvider.Tests.Component.Shared.Fakes.Kafka;
 using BreakfastProvider.Tests.Component.Shared.Fakes.PubSub;
 using LightBDD.Core.Configuration;
@@ -47,7 +48,8 @@ public class ConfiguredLightBddScopeAttribute : LightBddScope
                 new ReportConfigurationOptions
                 {
                     SpecificationsTitle = "Breakfast Provider Specifications",
-                    WriteCiSummary = true
+                    WriteCiSummary = true,
+                    ExcludedHeaders = [CustomHeaders.ComponentTestRequestId, CustomHeaders.CorrelationId]
                 });
 
         // To stop the output repeating the step name each step

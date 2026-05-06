@@ -1,3 +1,4 @@
+using BreakfastProvider.Tests.Component.Shared.Constants;
 using BreakfastProvider.Tests.Component.Shared.Fakes.Kafka;
 using BreakfastProvider.Tests.Component.Shared.Fakes.PubSub;
 using BreakfastProvider.Tests.Component.Shared.Infrastructure;
@@ -50,7 +51,8 @@ public sealed class TestRunHooks
             new ReportConfigurationOptions
             {
                 SpecificationsTitle = "Breakfast Provider Specifications",
-                WriteCiSummary = true
+                WriteCiSummary = true,
+                ExcludedHeaders = [CustomHeaders.ComponentTestRequestId, CustomHeaders.CorrelationId]
             });
 
         Support.AppManager.DisposeFactory();

@@ -414,6 +414,98 @@ jobs:
       coverage-file: nunit-external-sut.coverage.cobertura.xml
 
 
+  # ─── BDDfy ──────────────────────────────────────────────────────────────────
+
+  bddfy-in-memory:
+    name: BDDfy in memory
+    uses: ./.github/workflows/_tests.yml
+    with:
+      test-type: component
+      test-run-type: memory
+      test-run-description: bddfy-in-memory
+      csproj-path: ./tests/BreakfastProvider.Tests.Component.BDDfy/BreakfastProvider.Tests.Component.BDDfy.csproj
+      features-report-path: tests/BreakfastProvider.Tests.Component.BDDfy/bin/Debug/net10.0/Reports/TestRunReport.html
+    secrets: inherit
+
+  bddfy-in-memory-report:
+    name: BDDfy in memory report
+    needs: [bddfy-in-memory]
+    uses: ./.github/workflows/_report-tests.yml
+    with:
+      test-type: component
+      test-run-type: memory
+      trx-file: bddfy-in-memory-results.trx
+
+  bddfy-in-memory-coverage:
+    name: BDDfy in memory coverage
+    needs: [bddfy-in-memory]
+    uses: ./.github/workflows/_report-coverage.yml
+    with:
+      test-type: component
+      test-run-type: memory
+      coverage-file: bddfy-in-memory.coverage.cobertura.xml
+
+
+  bddfy-in-docker:
+    name: BDDfy in docker
+    uses: ./.github/workflows/_tests.yml
+    with:
+      test-type: component
+      test-run-type: docker
+      test-run-description: bddfy-in-docker
+      csproj-path: ./tests/BreakfastProvider.Tests.Component.BDDfy/BreakfastProvider.Tests.Component.BDDfy.csproj
+      features-report-path: tests/BreakfastProvider.Tests.Component.BDDfy/bin/Debug/net10.0/Reports/TestRunReport.html
+    secrets: inherit
+
+  bddfy-in-docker-report:
+    name: BDDfy in docker report
+    needs: [bddfy-in-docker]
+    uses: ./.github/workflows/_report-tests.yml
+    with:
+      test-type: component
+      test-run-type: docker
+      trx-file: bddfy-in-docker-results.trx
+
+  bddfy-in-docker-coverage:
+    name: BDDfy in docker coverage
+    needs: [bddfy-in-docker]
+    uses: ./.github/workflows/_report-coverage.yml
+    with:
+      test-type: component
+      test-run-type: docker
+      coverage-file: bddfy-in-docker.coverage.cobertura.xml
+
+
+  bddfy-external-sut:
+    name: BDDfy external SUT
+    uses: ./.github/workflows/_tests.yml
+    with:
+      test-type: component
+      test-run-type: external-sut
+      test-run-description: bddfy-external-sut
+      csproj-path: ./tests/BreakfastProvider.Tests.Component.BDDfy/BreakfastProvider.Tests.Component.BDDfy.csproj
+      features-report-path: tests/BreakfastProvider.Tests.Component.BDDfy/bin/Debug/net10.0/Reports/TestRunReport.html
+    secrets: inherit
+
+  bddfy-external-sut-report:
+    name: BDDfy external SUT report
+    needs: [bddfy-external-sut]
+    uses: ./.github/workflows/_report-tests.yml
+    with:
+      test-type: component
+      test-run-type: external-sut
+      trx-file: bddfy-external-sut-results.trx
+
+  bddfy-external-sut-coverage:
+    name: BDDfy external SUT coverage
+    needs: [bddfy-external-sut]
+    uses: ./.github/workflows/_report-coverage.yml
+    with:
+      test-type: component
+      test-run-type: external-sut
+      coverage-file: bddfy-external-sut.coverage.cobertura.xml
+
+
   # ─── Gate ───────────────────────────────────────────────────────────────────
 
   checks-complete:
@@ -435,6 +527,9 @@ jobs:
       - nunit-in-memory
       - nunit-in-docker
       - nunit-external-sut
+      - bddfy-in-memory
+      - bddfy-in-docker
+      - bddfy-external-sut
     runs-on: ubuntu-24.04
     steps:
       - name: Checks complete
@@ -454,7 +549,7 @@ jobs:
 
   deploy-pages:
     name: Deploy to GitHub Pages
-    needs: [lightbdd-in-memory, reqnroll-in-memory, xunit-in-memory, tunit-in-memory, nunit-in-memory]
+    needs: [lightbdd-in-memory, reqnroll-in-memory, xunit-in-memory, tunit-in-memory, nunit-in-memory, bddfy-in-memory]
     runs-on: ubuntu-24.04
     permissions:
       pages: write
@@ -499,6 +594,12 @@ jobs:
         with:
           name: LightBDD-nunit-in-memory-report
           path: site/reports/nunit
+
+      - name: Download BDDfy report
+        uses: actions/download-artifact@v4
+        with:
+          name: LightBDD-bddfy-in-memory-report
+          path: site/reports/bddfy
 
       - name: Copy API specs
         run: |
@@ -599,15 +700,20 @@ jobs:
             <div class="container">
               <p class="section-title">Test Run Reports</p>
               <div class="card-grid">
+                <a href="reports/reqnroll/TestRunReport.html" class="card">
+                  <div class="card-icon">🥒</div>
+                  <h3>ReqNRoll</h3>
+                  <p>Gherkin-based component test report with feature specifications</p>
+                </a>
                 <a href="reports/lightbdd/TestRunReport.html" class="card">
                   <div class="card-icon">📋</div>
                   <h3>LightBDD</h3>
                   <p>BDD-style component test report with interaction diagrams</p>
                 </a>
-                <a href="reports/reqnroll/TestRunReport.html" class="card">
-                  <div class="card-icon">🥒</div>
-                  <h3>ReqNRoll</h3>
-                  <p>Gherkin-based component test report with feature specifications</p>
+                <a href="reports/bddfy/TestRunReport.html" class="card">
+                  <div class="card-icon">🎭</div>
+                  <h3>BDDfy</h3>
+                  <p>BDDfy fluent component test report with sequence diagrams</p>
                 </a>
                 <a href="reports/xunit/TestRunReport.html" class="card">
                   <div class="card-icon">🧪</div>

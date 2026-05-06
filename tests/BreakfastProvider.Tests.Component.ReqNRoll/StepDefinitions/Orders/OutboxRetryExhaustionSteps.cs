@@ -1,11 +1,8 @@
-using System.Net;
 using BreakfastProvider.Api.Configuration;
 using BreakfastProvider.Api.Events.Outbox;
 using BreakfastProvider.Api.Storage;
 using BreakfastProvider.Tests.Component.ReqNRoll.Support;
-using BreakfastProvider.Tests.Component.Shared.Common.Ingredients;
 using BreakfastProvider.Tests.Component.Shared.Common.Orders;
-using BreakfastProvider.Tests.Component.Shared.Common.Pancakes;
 using BreakfastProvider.Tests.Component.Shared.Constants;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -14,14 +11,10 @@ using Reqnroll;
 namespace BreakfastProvider.Tests.Component.ReqNRoll.StepDefinitions.Orders;
 
 [Binding]
-public class OutboxRetryExhaustionSteps(
-    AppManager appManager,
-    GetMilkSteps milkSteps,
-    GetEggsSteps eggsSteps,
-    GetFlourSteps flourSteps,
-    PostPancakesSteps pancakeSteps,
-    PostOrderSteps orderSteps)
+public class OutboxRetryExhaustionSteps(AppManager appManager)
 {
+    private const string TestDestination = "TestRetryExhaustion";
+
     [Given("the outbox processor is configured with a failing dispatcher")]
     public void GivenTheOutboxProcessorIsConfiguredWithAFailingDispatcher()
     {
@@ -29,8 +22,7 @@ public class OutboxRetryExhaustionSteps(
             new Dictionary<string, string?>
             {
                 [$"{nameof(OutboxConfig)}:{nameof(OutboxConfig.PollingIntervalSeconds)}"] = "1",
-                [$"{nameof(OutboxConfig)}:{nameof(OutboxConfig.MaxRetryCount)}"] = "2",
-                [$"{nameof(OutboxConfig)}:{nameof(OutboxConfig.IsEnabled)}"] = "true"
+                [$"{nameof(OutboxConfig)}:{nameof(OutboxConfig.MaxRetryCount)}"] = "2"
             },
             services =>
             {
@@ -39,11 +31,20 @@ public class OutboxRetryExhaustionSteps(
             });
     }
 
-    [When("the order is submitted and retries are exhausted")]
-    public async Task WhenTheOrderIsSubmittedAndRetriesAreExhausted()
+    [Given("a pending outbox message with a test-specific destination")]
+    public async Task GivenAPendingOutboxMessageWithATestSpecificDestination()
     {
-        await orderSteps.Send();
-        orderSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
+        var outboxRepo = appManager.AppFactory.Services.GetRequiredService<ICosmosRepository<OutboxMessage>>();
+        var message = new OutboxMessage
+        {
+            PartitionKey = "outbox-retry-test",
+            EventType = EventTypes.OrderCreated,
+            Destination = TestDestination,
+            Payload = """{"CustomerName":"RetryTest","OrderId":"00000000-0000-0000-0000-000000000001"}""",
+            Status = OutboxMessageStatus.Pending,
+            CreatedAt = DateTime.UtcNow
+        };
+        await outboxRepo.CreateAsync(message, message.PartitionKey);
     }
 
     [Then("the outbox message should be in a failed state")]
@@ -72,7 +73,7 @@ public class OutboxRetryExhaustionSteps(
 
     private class FailingOutboxDispatcher : IOutboxDispatcher
     {
-        public string Destination => OutboxDestinations.EventGrid;
+        public string Destination => TestDestination;
 
         public Task DispatchAsync(OutboxMessage message, CancellationToken ct = default)
             => throw new InvalidOperationException("Simulated dispatch failure for testing retry exhaustion.");

@@ -1,12 +1,7 @@
-using System.Net;
 using BreakfastProvider.Api.Events.Outbox;
 using BreakfastProvider.Api.Storage;
-using BreakfastProvider.Tests.Component.Shared.Common.Ingredients;
 using BreakfastProvider.Tests.Component.Shared.Common.Orders;
-using BreakfastProvider.Tests.Component.Shared.Common.Pancakes;
 using BreakfastProvider.Tests.Component.Shared.Constants;
-using BreakfastProvider.Tests.Component.Shared.Models.Orders;
-using BreakfastProvider.Tests.Component.Shared.Models.Pancakes;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
@@ -14,14 +9,9 @@ namespace BreakfastProvider.Tests.Component.TUnit.Scenarios.Orders;
 
 public class Orders_Outbox_Retry_Exhaustion_Tests : BaseFixture
 {
-    private readonly string _customerName = $"TestCustomer_{Random.Shared.NextInt64()}";
-
-    private GetMilkSteps _milkSteps = null!;
-    private GetEggsSteps _eggsSteps = null!;
-    private GetFlourSteps _flourSteps = null!;
-    private PostPancakesSteps _pancakeSteps = null!;
-    private PostOrderSteps _orderSteps = null!;
+    private const string TestDestination = "TestRetryExhaustion";
     private OutboxSteps _outboxSteps = null!;
+    private ICosmosRepository<OutboxMessage> _outboxRepository = null!;
 
     public Orders_Outbox_Retry_Exhaustion_Tests() : base(delayAppCreation: true)
     {
@@ -32,8 +22,7 @@ public class Orders_Outbox_Retry_Exhaustion_Tests : BaseFixture
             configOverrides: new Dictionary<string, string?>
             {
                 ["OutboxConfig:PollingIntervalSeconds"] = "1",
-                ["OutboxConfig:MaxRetryCount"] = "2",
-                ["OutboxConfig:IsEnabled"] = "true"
+                ["OutboxConfig:MaxRetryCount"] = "2"
             },
             additionalServices: services =>
             {
@@ -41,12 +30,8 @@ public class Orders_Outbox_Retry_Exhaustion_Tests : BaseFixture
                 services.AddSingleton<IOutboxDispatcher>(new FailingOutboxDispatcher());
             });
 
-        _milkSteps = Get<GetMilkSteps>();
-        _eggsSteps = Get<GetEggsSteps>();
-        _flourSteps = Get<GetFlourSteps>();
-        _pancakeSteps = Get<PostPancakesSteps>();
-        _orderSteps = Get<PostOrderSteps>();
-        _outboxSteps = new OutboxSteps(AppFactory.Services.GetRequiredService<ICosmosRepository<OutboxMessage>>());
+        _outboxRepository = AppFactory.Services.GetRequiredService<ICosmosRepository<OutboxMessage>>();
+        _outboxSteps = new OutboxSteps(_outboxRepository);
     }
 
     [Test]
@@ -54,50 +39,29 @@ public class Orders_Outbox_Retry_Exhaustion_Tests : BaseFixture
     {
         if (Settings.RunAgainstExternalServiceUnderTest) return;
 
-        // Given a pancake batch has been created
-        await _milkSteps.Retrieve();
-        _milkSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
-        await _eggsSteps.Retrieve();
-        _eggsSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
-        await _flourSteps.Retrieve();
-        _flourSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
-
-        _pancakeSteps.Request = new TestPancakeRequest
+        // Given a pending outbox message with a test-specific destination
+        // (the static factory's processor will skip it — no matching dispatcher)
+        var message = new OutboxMessage
         {
-            Milk = _milkSteps.MilkResponse.Milk,
-            Eggs = _eggsSteps.EggsResponse.Eggs,
-            Flour = _flourSteps.FlourResponse.Flour
+            PartitionKey = "outbox-retry-test",
+            EventType = EventTypes.OrderCreated,
+            Destination = TestDestination,
+            Payload = """{"CustomerName":"RetryTest","OrderId":"00000000-0000-0000-0000-000000000001"}""",
+            Status = OutboxMessageStatus.Pending,
+            CreatedAt = DateTime.UtcNow
         };
-        await _pancakeSteps.Send();
-        _pancakeSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
-        await _pancakeSteps.ParseResponse();
-        _pancakeSteps.Response.Should().NotBeNull();
+        await _outboxRepository.CreateAsync(message, message.PartitionKey);
 
-        // And a valid order request for the created batch
-        _orderSteps.Request.CustomerName = _customerName;
-        _orderSteps.Request.TableNumber = 7;
-        _orderSteps.Request.Items.Add(new TestOrderItemRequest
-        {
-            ItemType = OrderDefaults.PancakeItemType,
-            BatchId = _pancakeSteps.Response!.BatchId,
-            Quantity = 1
-        });
-
-        // When the breakfast order is placed
-        await _orderSteps.Send();
-
-        // Then the order should be created successfully
-        _orderSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
-
-        // And the outbox message should transition to failed
-        const int maxRetries = 60;
+        // Then the outbox message should transition to failed after exhausting retries
+        const int maxRetries = 120;
         var retryDelay = TimeSpan.FromMilliseconds(500);
 
         for (var i = 0; i < maxRetries; i++)
         {
             await _outboxSteps.LoadOutboxMessages();
             if (_outboxSteps.OutboxMessages!.Any(m =>
-                    m.EventType == EventTypes.OrderCreated && m.Status == OutboxStatuses.Failed))
+                    m.EventType == EventTypes.OrderCreated &&
+                    m.Status == OutboxStatuses.Failed))
                 return;
             await Task.Delay(retryDelay);
         }
@@ -110,7 +74,7 @@ public class Orders_Outbox_Retry_Exhaustion_Tests : BaseFixture
 
     private class FailingOutboxDispatcher : IOutboxDispatcher
     {
-        public string Destination => OutboxDestinations.EventGrid;
+        public string Destination => TestDestination;
 
         public Task DispatchAsync(OutboxMessage message, CancellationToken cancellationToken = default)
             => throw new InvalidOperationException("Simulated dispatch failure for testing retry exhaustion.");

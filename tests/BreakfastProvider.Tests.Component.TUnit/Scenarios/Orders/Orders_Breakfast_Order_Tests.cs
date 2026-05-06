@@ -1,5 +1,4 @@
 using System.Net;
-using BreakfastProvider.Api.Storage;
 using BreakfastProvider.Tests.Component.Shared.Common.Downstream;
 using BreakfastProvider.Tests.Component.Shared.Common.Ingredients;
 using BreakfastProvider.Tests.Component.Shared.Common.Orders;
@@ -26,24 +25,10 @@ public class Orders_Breakfast_Order_Tests : BaseFixture
     private readonly PostOrderSteps _orderSteps;
     private readonly DownstreamRequestSteps _downstreamSteps;
     private OutboxSteps? _outboxSteps;
-    private OutboxSteps OutboxSteps => _outboxSteps ??= new OutboxSteps(
-        AppFactory.Services.GetRequiredService<ICosmosRepository<OutboxMessage>>());
+    private OutboxSteps OutboxSteps => _outboxSteps ??= Get<OutboxSteps>();
 
-    public Orders_Breakfast_Order_Tests() : base(delayAppCreation: true)
+    public Orders_Breakfast_Order_Tests()
     {
-        if (!Settings.RunAgainstExternalServiceUnderTest)
-        {
-            CreateAppAndClient(
-                configOverrides: new Dictionary<string, string?>
-                {
-                    ["OutboxConfig:IsEnabled"] = "true"
-                });
-        }
-        else
-        {
-            CreateAppAndClient();
-        }
-
         _milkSteps = Get<GetMilkSteps>();
         _eggsSteps = Get<GetEggsSteps>();
         _flourSteps = Get<GetFlourSteps>();

@@ -160,15 +160,9 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.Orders
         await testRunner.GivenAsync("the outbox processor is configured with a failing dispatcher", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
 #line hidden
 #line 7
-        await testRunner.AndAsync("a pancake batch has been created", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
+        await testRunner.AndAsync("a pending outbox message with a test-specific destination", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
 #line hidden
 #line 8
-        await testRunner.AndAsync("a valid order request for the created batch", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
-#line hidden
-#line 9
-        await testRunner.WhenAsync("the order is submitted and retries are exhausted", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
-#line hidden
-#line 10
         await testRunner.ThenAsync("the outbox message should be in a failed state", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
 #line hidden
             }

@@ -1,7 +1,7 @@
 Feature: Outbox Retry Exhaustion
     /orders - Outbox message transitions to failed after exhausting retries
 
-    @IgnoreIfNeedsEventInfrastructure
+    @IgnoreIfNeedsEventInfrastructure @IgnoreUnlessInMemoryDb
     Scenario: An outbox message should transition to failed after exhausting retries
         Given the outbox processor is configured with a failing dispatcher
         And a pancake batch has been created

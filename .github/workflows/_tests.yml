@@ -224,10 +224,14 @@ jobs:
         if: ${{ inputs.test-run-type == 'docker' || inputs.test-run-type == 'external-sut' }}
         run: |
           csproj_dir=$(dirname "${{ inputs.csproj-path }}")
-          jq '.maxParallelThreads = 2' "$csproj_dir/xunit.runner.json" > tmp.json \
-            && mv tmp.json "$csproj_dir/xunit.runner.json"
-          echo "Patched xunit.runner.json for Docker mode:"
-          cat "$csproj_dir/xunit.runner.json"
+          if [ -f "$csproj_dir/xunit.runner.json" ]; then
+            jq '.maxParallelThreads = 2' "$csproj_dir/xunit.runner.json" > tmp.json \
+              && mv tmp.json "$csproj_dir/xunit.runner.json"
+            echo "Patched xunit.runner.json for Docker mode:"
+            cat "$csproj_dir/xunit.runner.json"
+          else
+            echo "No xunit.runner.json found in $csproj_dir — skipping parallelism throttle"
+          fi
 
       - name: Run tests
         run: >

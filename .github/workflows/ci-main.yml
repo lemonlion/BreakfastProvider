@@ -559,44 +559,44 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - name: Checkout source
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           sparse-checkout: |
             docs/openapi.json
             docs/asyncapi.json
 
       - name: Download LightBDD report
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           name: LightBDD-lightbdd-in-memory-report
           path: site/reports/lightbdd
 
       - name: Download ReqNRoll report
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           name: LightBDD-reqnroll-in-memory-report
           path: site/reports/reqnroll
 
       - name: Download xUnit report
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           name: LightBDD-xunit-in-memory-report
           path: site/reports/xunit
 
       - name: Download TUnit report
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           name: LightBDD-tunit-in-memory-report
           path: site/reports/tunit
 
       - name: Download NUnit report
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           name: LightBDD-nunit-in-memory-report
           path: site/reports/nunit
 
       - name: Download BDDfy report
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           name: LightBDD-bddfy-in-memory-report
           path: site/reports/bddfy
@@ -762,4 +762,4 @@ jobs:
 
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5

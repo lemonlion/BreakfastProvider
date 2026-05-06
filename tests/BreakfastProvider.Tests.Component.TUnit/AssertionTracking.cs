@@ -1,3 +1,3 @@
 using TestTrackingDiagrams.Tracking;
 
-[assembly: TrackAssertionsBeta]
+[assembly: TrackAssertions]

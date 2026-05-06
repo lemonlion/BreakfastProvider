@@ -24,7 +24,7 @@ jobs:
         run: sudo rm -fr $GITHUB_WORKSPACE && mkdir $GITHUB_WORKSPACE
 
       - name: Checkout source
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           token: ${{ secrets.PUSH_SPECS_IN_CI_TOKEN != '' && secrets.PUSH_SPECS_IN_CI_TOKEN || github.token }}
           fetch-depth: 2
@@ -37,7 +37,7 @@ jobs:
           echo "Previous Git Commit is: $previousGitCommit"
 
       - name: Setup .NET v10
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@v5
         with:
           dotnet-version: 10.0.x
 

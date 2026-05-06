@@ -31,7 +31,7 @@ jobs:
           echo "${HOME}/.dotnet/tools" >> $GITHUB_PATH
 
       - name: Download code coverage XML artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           name: ${{ inputs.coverage-file }}
 
@@ -80,6 +80,6 @@ jobs:
           retention-days: 1
 
       - name: Delete code coverage XML artifact
-        uses: geekyeggo/delete-artifact@v4
+        uses: geekyeggo/delete-artifact@v5
         with:
           name: ${{ inputs.coverage-file }}

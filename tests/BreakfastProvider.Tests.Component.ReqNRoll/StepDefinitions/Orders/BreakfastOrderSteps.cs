@@ -1,4 +1,5 @@
 using System.Net;
+using BreakfastProvider.Api.Configuration;
 using BreakfastProvider.Tests.Component.ReqNRoll.Support;
 using BreakfastProvider.Tests.Component.Shared.Common.Orders;
 using BreakfastProvider.Tests.Component.Shared.Common.Pancakes;
@@ -19,6 +20,16 @@ public class BreakfastOrderSteps(
     PostOrderSteps orderSteps)
 {
     private readonly string _customerName = $"TestCustomer_{Random.Shared.NextInt64()}";
+
+    [Given("the outbox processor is enabled for this scenario")]
+    public void GivenTheOutboxProcessorIsEnabledForThisScenario()
+    {
+        appManager.CreateAppWithOverrides(
+            new Dictionary<string, string?>
+            {
+                [$"{nameof(OutboxConfig)}:{nameof(OutboxConfig.IsEnabled)}"] = "true"
+            });
+    }
 
     [Given("a valid order request for the created batch")]
     public void GivenAValidOrderRequestForTheCreatedBatch()

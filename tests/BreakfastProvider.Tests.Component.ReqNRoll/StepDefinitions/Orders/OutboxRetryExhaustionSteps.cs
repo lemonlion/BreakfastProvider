@@ -29,7 +29,8 @@ public class OutboxRetryExhaustionSteps(
             new Dictionary<string, string?>
             {
                 [$"{nameof(OutboxConfig)}:{nameof(OutboxConfig.PollingIntervalSeconds)}"] = "1",
-                [$"{nameof(OutboxConfig)}:{nameof(OutboxConfig.MaxRetryCount)}"] = "2"
+                [$"{nameof(OutboxConfig)}:{nameof(OutboxConfig.MaxRetryCount)}"] = "2",
+                [$"{nameof(OutboxConfig)}:{nameof(OutboxConfig.IsEnabled)}"] = "true"
             },
             services =>
             {

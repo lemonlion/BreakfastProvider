@@ -32,7 +32,8 @@ public class Orders_Outbox_Retry_Exhaustion_Tests : BaseFixture
             configOverrides: new Dictionary<string, string?>
             {
                 ["OutboxConfig:PollingIntervalSeconds"] = "1",
-                ["OutboxConfig:MaxRetryCount"] = "2"
+                ["OutboxConfig:MaxRetryCount"] = "2",
+                ["OutboxConfig:IsEnabled"] = "true"
             },
             additionalServices: services =>
             {

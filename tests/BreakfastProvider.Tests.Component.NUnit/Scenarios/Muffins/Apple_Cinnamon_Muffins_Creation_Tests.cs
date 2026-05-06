@@ -77,7 +77,7 @@ public class Apple_Cinnamon_Muffins_Creation_Tests : BaseFixture
     
     [TestCaseSource(typeof(MuffinRecipeVariations), nameof(MuffinRecipeVariations.RecipeVariations))]
     public async Task Different_muffin_recipes_should_produce_the_expected_batch(
-        string recipeName, MuffinRecipeTestData recipe, MuffinBatchExpectation expected)
+        string recipeName, MuffinRecipeTestData recipe, int temperature, int durationMinutes, string panType, MuffinBatchExpectation expected)
     {
         // Given a muffin recipe with specific ingredients and baking profile
         await _milkSteps.Retrieve();
@@ -93,9 +93,9 @@ public class Apple_Cinnamon_Muffins_Creation_Tests : BaseFixture
         _muffinSteps.Request.Cinnamon = recipe.Ingredients.Cinnamon;
         _muffinSteps.Request.Baking = new TestBakingProfile
         {
-            Temperature = recipe.Temperature,
-            DurationMinutes = recipe.DurationMinutes,
-            PanType = recipe.PanType
+            Temperature = temperature,
+            DurationMinutes = durationMinutes,
+            PanType = panType
         };
         _muffinSteps.Request.Toppings = recipe.Toppings?
             .Select(t => new TestMuffinTopping { Name = t.Name, Amount = t.Amount })
@@ -117,7 +117,7 @@ public class Apple_Cinnamon_Muffins_Creation_Tests : BaseFixture
     
     [TestCaseSource(typeof(MuffinRecipeVariations), nameof(MuffinRecipeVariations.RecipeVariationsWithoutToppings))]
     public async Task Different_muffin_recipes_without_toppings_should_produce_the_expected_batch(
-        string recipeName, MuffinRecipeTestDataWithoutToppings recipe, MuffinBatchExpectation expected)
+        string recipeName, MuffinRecipeTestDataWithoutToppings recipe, int temperature, int durationMinutes, string panType, MuffinBatchExpectation expected)
     {
         // Given a muffin recipe with specific ingredients and baking profile but no toppings
         await _milkSteps.Retrieve();
@@ -133,9 +133,9 @@ public class Apple_Cinnamon_Muffins_Creation_Tests : BaseFixture
         _muffinSteps.Request.Cinnamon = recipe.Ingredients.Cinnamon;
         _muffinSteps.Request.Baking = new TestBakingProfile
         {
-            Temperature = recipe.Temperature,
-            DurationMinutes = recipe.DurationMinutes,
-            PanType = recipe.PanType
+            Temperature = temperature,
+            DurationMinutes = durationMinutes,
+            PanType = panType
         };
 
         // When the muffins are prepared

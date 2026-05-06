@@ -4,11 +4,12 @@ namespace BreakfastProvider.Tests.Component.Shared.Constants;
 
 public static class MuffinRecipeVariations
 {
-    public static IEnumerable<object[]> RecipeVariations =>
+    private static readonly MuffinRecipeVariation[] _recipeVariations =
     [
-        [
-            "Classic",
-            new MuffinRecipeTestData
+        new MuffinRecipeVariation
+        {
+            RecipeName = "Classic",
+            Recipe = new MuffinRecipeTestData
             {
                 Ingredients = new IngredientSet
                 {
@@ -16,25 +17,26 @@ public static class MuffinRecipeVariations
                     Apples = "Granny Smith",
                     Cinnamon = "Ceylon"
                 },
-                Temperature = 180,
-                DurationMinutes = 25,
-                PanType = "Standard",
                 Toppings =
                 [
                     new ToppingData { Name = "Streusel", Amount = "Light" },
                     new ToppingData { Name = "Icing Glaze", Amount = "Drizzle" }
                 ]
             },
-            new MuffinBatchExpectation
+            Temperature = 180,
+            DurationMinutes = 25,
+            PanType = "Standard",
+            Expected = new MuffinBatchExpectation
             {
                 ExpectedIngredientCount = 5,
                 ExpectedToppingCount = 2,
                 HasBakingInfo = true
             }
-        ],
-        [
-            "Rustic Wholesome",
-            new MuffinRecipeTestData
+        },
+        new MuffinRecipeVariation
+        {
+            RecipeName = "Rustic Wholesome",
+            Recipe = new MuffinRecipeTestData
             {
                 Ingredients = new IngredientSet
                 {
@@ -42,25 +44,26 @@ public static class MuffinRecipeVariations
                     Apples = "Honeycrisp",
                     Cinnamon = "Cassia"
                 },
-                Temperature = 175,
-                DurationMinutes = 30,
-                PanType = "Cast Iron",
                 Toppings =
                 [
                     new ToppingData { Name = "Brown Sugar Crumb", Amount = "Heavy" },
                     new ToppingData { Name = "Maple Drizzle", Amount = "Light" }
                 ]
             },
-            new MuffinBatchExpectation
+            Temperature = 175,
+            DurationMinutes = 30,
+            PanType = "Cast Iron",
+            Expected = new MuffinBatchExpectation
             {
                 ExpectedIngredientCount = 5,
                 ExpectedToppingCount = 2,
                 HasBakingInfo = true
             }
-        ],
-        [
-            "Spiced Deluxe",
-            new MuffinRecipeTestData
+        },
+        new MuffinRecipeVariation
+        {
+            RecipeName = "Spiced Deluxe",
+            Recipe = new MuffinRecipeTestData
             {
                 Ingredients = new IngredientSet
                 {
@@ -68,88 +71,97 @@ public static class MuffinRecipeVariations
                     Apples = "Pink Lady",
                     Cinnamon = "Saigon"
                 },
-                Temperature = 190,
-                DurationMinutes = 20,
-                PanType = "Silicone",
                 Toppings =
                 [
                     new ToppingData { Name = "Cinnamon Sugar", Amount = "Heavy" },
                     new ToppingData { Name = "Cream Cheese Swirl", Amount = "Thick" }
                 ]
             },
-            new MuffinBatchExpectation
+            Temperature = 190,
+            DurationMinutes = 20,
+            PanType = "Silicone",
+            Expected = new MuffinBatchExpectation
             {
                 ExpectedIngredientCount = 5,
                 ExpectedToppingCount = 2,
                 HasBakingInfo = true
             }
-        ]
+        }
     ];
 
-    public static IEnumerable<object[]> RecipeVariationsWithoutToppings =>
+    private static readonly MuffinRecipeVariationWithoutToppings[] _recipeVariationsWithoutToppings =
     [
-        [
-            "Classic Plain",
-            new MuffinRecipeTestDataWithoutToppings
+        new MuffinRecipeVariationWithoutToppings
+        {
+            RecipeName = "Classic Plain",
+            Recipe = new MuffinRecipeTestDataWithoutToppings
             {
                 Ingredients = new IngredientSet
                 {
                     Flour = "Plain Flour",
                     Apples = "Granny Smith",
                     Cinnamon = "Ceylon"
-                },
-                Temperature = 180,
-                DurationMinutes = 25,
-                PanType = "Standard"
+                }
             },
-            new MuffinBatchExpectation
+            Temperature = 180,
+            DurationMinutes = 25,
+            PanType = "Standard",
+            Expected = new MuffinBatchExpectation
             {
                 ExpectedIngredientCount = 5,
                 ExpectedToppingCount = 0,
                 HasBakingInfo = true
             }
-        ],
-        [
-            "Rustic Wholesome Plain",
-            new MuffinRecipeTestDataWithoutToppings
+        },
+        new MuffinRecipeVariationWithoutToppings
+        {
+            RecipeName = "Rustic Wholesome Plain",
+            Recipe = new MuffinRecipeTestDataWithoutToppings
             {
                 Ingredients = new IngredientSet
                 {
                     Flour = "Whole Wheat",
                     Apples = "Honeycrisp",
                     Cinnamon = "Cassia"
-                },
-                Temperature = 175,
-                DurationMinutes = 30,
-                PanType = "Cast Iron"
+                }
             },
-            new MuffinBatchExpectation
+            Temperature = 175,
+            DurationMinutes = 30,
+            PanType = "Cast Iron",
+            Expected = new MuffinBatchExpectation
             {
                 ExpectedIngredientCount = 5,
                 ExpectedToppingCount = 0,
                 HasBakingInfo = true
             }
-        ],
-        [
-            "Spiced Deluxe Plain",
-            new MuffinRecipeTestDataWithoutToppings
+        },
+        new MuffinRecipeVariationWithoutToppings
+        {
+            RecipeName = "Spiced Deluxe Plain",
+            Recipe = new MuffinRecipeTestDataWithoutToppings
             {
                 Ingredients = new IngredientSet
                 {
                     Flour = "Almond Flour",
                     Apples = "Pink Lady",
                     Cinnamon = "Saigon"
-                },
-                Temperature = 190,
-                DurationMinutes = 20,
-                PanType = "Silicone"
+                }
             },
-            new MuffinBatchExpectation
+            Temperature = 190,
+            DurationMinutes = 20,
+            PanType = "Silicone",
+            Expected = new MuffinBatchExpectation
             {
                 ExpectedIngredientCount = 5,
                 ExpectedToppingCount = 0,
                 HasBakingInfo = true
             }
-        ]
+        }
     ];
+
+    public static IEnumerable<object[]> RecipeVariations =>
+        _recipeVariations.Select(v => new object[] { v.RecipeName, v.Recipe, v.Temperature, v.DurationMinutes, v.PanType, v.Expected });
+
+    public static IEnumerable<object[]> RecipeVariationsWithoutToppings =>
+        _recipeVariationsWithoutToppings.Select(v => new object[] { v.RecipeName, v.Recipe, v.Temperature, v.DurationMinutes, v.PanType, v.Expected });
 }

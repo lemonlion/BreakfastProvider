@@ -60,7 +60,7 @@ public partial class Apple_Cinnamon_Muffins__Creation_Feature : BaseFixture
         ];
     }
 
-    private async Task A_muffin_recipe_with_ingredients_and_baking_profile(string recipeName, MuffinRecipeTestData recipe)
+    private async Task A_muffin_recipe_with_ingredients_and_baking_profile(string recipeName, MuffinRecipeTestData recipe, int temperature, int durationMinutes, string panType)
     {
         await _milkSteps.Retrieve();
         _milkSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -75,16 +75,16 @@ public partial class Apple_Cinnamon_Muffins__Creation_Feature : BaseFixture
         _muffinSteps.Request.Cinnamon = recipe.Ingredients.Cinnamon;
         _muffinSteps.Request.Baking = new TestBakingProfile
         {
-            Temperature = recipe.Temperature,
-            DurationMinutes = recipe.DurationMinutes,
-            PanType = recipe.PanType
+            Temperature = temperature,
+            DurationMinutes = durationMinutes,
+            PanType = panType
         };
         _muffinSteps.Request.Toppings = recipe.Toppings?
             .Select(t => new TestMuffinTopping { Name = t.Name, Amount = t.Amount })
             .ToList();
     }
 
-    private async Task A_muffin_recipe_with_ingredients_and_baking_profile(string recipeName, MuffinRecipeTestDataWithoutToppings recipe)
+    private async Task A_muffin_recipe_with_ingredients_and_baking_profile(string recipeName, MuffinRecipeTestDataWithoutToppings recipe, int temperature, int durationMinutes, string panType)
     {
         await _milkSteps.Retrieve();
         _milkSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -99,9 +99,9 @@ public partial class Apple_Cinnamon_Muffins__Creation_Feature : BaseFixture
         _muffinSteps.Request.Cinnamon = recipe.Ingredients.Cinnamon;
         _muffinSteps.Request.Baking = new TestBakingProfile
         {
-            Temperature = recipe.Temperature,
-            DurationMinutes = recipe.DurationMinutes,
-            PanType = recipe.PanType
+            Temperature = temperature,
+            DurationMinutes = durationMinutes,
+            PanType = panType
         };
     }
 

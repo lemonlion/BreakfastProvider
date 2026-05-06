@@ -24,10 +24,10 @@ public partial class Apple_Cinnamon_Muffins__Creation_Feature
     [Scenario]
     [MemberData(nameof(MuffinRecipeVariations.RecipeVariations), MemberType = typeof(MuffinRecipeVariations))]
     public async Task Different_Muffin_Recipes_Should_Produce_The_Expected_Batch(
-        string recipeName, MuffinRecipeTestData recipe, MuffinBatchExpectation expected)
+        string recipeName, MuffinRecipeTestData recipe, int temperature, int durationMinutes, string panType, MuffinBatchExpectation expected)
     {
         await Runner.RunScenarioAsync(
-            given => A_muffin_recipe_with_ingredients_and_baking_profile(recipeName, recipe),
+            given => A_muffin_recipe_with_ingredients_and_baking_profile(recipeName, recipe, temperature, durationMinutes, panType),
             when => The_muffins_are_prepared(),
             then => The_muffin_batch_should_match_the_expected_outcome(expected));
     }
@@ -35,10 +35,10 @@ public partial class Apple_Cinnamon_Muffins__Creation_Feature
     [Scenario]
     [MemberData(nameof(MuffinRecipeVariations.RecipeVariationsWithoutToppings), MemberType = typeof(MuffinRecipeVariations))]
     public async Task Different_Muffin_Recipes_Without_Toppings_Should_Produce_The_Expected_Batch(
-        string recipeName, MuffinRecipeTestDataWithoutToppings recipe, MuffinBatchExpectation expected)
+        string recipeName, MuffinRecipeTestDataWithoutToppings recipe, int temperature, int durationMinutes, string panType, MuffinBatchExpectation expected)
     {
         await Runner.RunScenarioAsync(
-            given => A_muffin_recipe_with_ingredients_and_baking_profile(recipeName, recipe),
+            given => A_muffin_recipe_with_ingredients_and_baking_profile(recipeName, recipe, temperature, durationMinutes, panType),
             when => The_muffins_are_prepared(),
             then => The_muffin_batch_should_match_the_expected_outcome(expected));
     }

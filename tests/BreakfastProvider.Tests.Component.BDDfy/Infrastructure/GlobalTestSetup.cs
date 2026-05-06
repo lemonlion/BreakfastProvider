@@ -58,6 +58,7 @@ public class GlobalTestSetup : IAsyncLifetime
             SpecificationsTitle = "Breakfast Provider Specifications",
             TestRunReportTitle = "Breakfast Provider (BDDfy) Test Run Report",
             WriteCiSummary = true,
+            DiagnosticMode = true,
             ExcludedHeaders = [CustomHeaders.ComponentTestRequestId, CustomHeaders.CorrelationId]
         });
 

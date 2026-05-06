@@ -1,7 +1,7 @@
 global using AwesomeAssertions;
 global using TestTrackingDiagrams.Tracking;
 global using TestTrackingDiagrams.xUnit3;
-global using CurrentTestInfo = TestTrackingDiagrams.BDDfy.xUnit3.CurrentTestInfo;
+global using CurrentTestInfo = TestTrackingDiagrams.xUnit3.CurrentTestInfo;
 global using Xunit;
 global using BreakfastProvider.Tests.Component.BDDfy.Infrastructure;
 global using BreakfastProvider.Tests.Component.Shared.Infrastructure.Configuration;

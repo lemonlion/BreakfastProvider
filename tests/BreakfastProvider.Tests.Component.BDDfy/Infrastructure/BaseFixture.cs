@@ -356,9 +356,6 @@ public abstract class BaseFixture : IDisposable
         services.AddTestTypedEventStores(ConsumedKafkaMessageStore, ConsumedEventHubMessageStore, CurrentTestInfo.Fetcher);
     }
 
-    private static readonly Func<(string Name, string Id)> TestInfoFetcher =
-        TestTrackingDiagrams.xUnit3.CurrentTestInfo.Fetcher;
-
     private HttpClient CreateTestClient()
     {
         if (Settings.RunAgainstExternalServiceUnderTest)
@@ -366,8 +363,7 @@ public abstract class BaseFixture : IDisposable
             var handler = new TestTrackingMessageHandler(
                 new BDDfyTestTrackingMessageHandlerOptions
                 {
-                    FixedNameForReceivingService = Documentation.ServiceNames.BreakfastProvider,
-                    CurrentTestInfoFetcher = TestInfoFetcher
+                    FixedNameForReceivingService = Documentation.ServiceNames.BreakfastProvider
                 })
             {
                 InnerHandler = new HttpClientHandler()
@@ -385,8 +381,7 @@ public abstract class BaseFixture : IDisposable
             new TestTrackingMessageHandler(
                 new BDDfyTestTrackingMessageHandlerOptions
                 {
-                    FixedNameForReceivingService = Documentation.ServiceNames.BreakfastProvider,
-                    CurrentTestInfoFetcher = TestInfoFetcher
+                    FixedNameForReceivingService = Documentation.ServiceNames.BreakfastProvider
                 }));
 
         if (!Settings.RunWithAnInMemoryDatabase)

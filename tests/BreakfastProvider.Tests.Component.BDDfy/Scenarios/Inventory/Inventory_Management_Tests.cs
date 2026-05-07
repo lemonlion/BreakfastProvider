@@ -14,6 +14,8 @@ public class Inventory_Management_Tests : BaseFixture
     private readonly PutInventorySteps _putSteps;
     private readonly DeleteInventorySteps _deleteSteps;
 
+    private int _createdItemId;
+
     public Inventory_Management_Tests()
     {
         _postSteps = Get<PostInventorySteps>();
@@ -31,73 +33,117 @@ public class Inventory_Management_Tests : BaseFixture
         ReorderLevel = 10m
     };
 
-    private async Task<int> CreateInventoryItem()
-    {
-        _postSteps.Request = CreateValidRequest();
-        await _postSteps.Send();
-        _postSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
-        await _postSteps.ParseResponse();
-        return _postSteps.Response!.Id;
-    }
-
     [Fact]
     [HappyPath]
-    public async Task Adding_a_new_inventory_item_should_return_the_created_item()
+    public void Adding_a_new_inventory_item_should_return_the_created_item()
     {
-        // Given a valid inventory item request
+        this.Given(x => x.A_valid_inventory_item_request_is_prepared())
+            .When(x => x.The_inventory_item_is_submitted())
+            .Then(x => x.The_response_should_contain_the_created_item())
+            .BDDfy();
+    }
+
+    [Fact]
+    public void Retrieving_an_existing_inventory_item_should_return_the_item()
+    {
+        this.Given(x => x.An_inventory_item_exists())
+            .When(x => x.The_inventory_item_is_retrieved_by_id())
+            .Then(x => x.The_get_response_should_contain_the_item())
+            .BDDfy();
+    }
+
+    [Fact]
+    public void Listing_all_inventory_items_should_return_all_items()
+    {
+        this.Given(x => x.An_inventory_item_exists())
+            .When(x => x.All_inventory_items_are_requested())
+            .Then(x => x.The_list_response_should_contain_the_item())
+            .BDDfy();
+    }
+
+    [Fact]
+    public void Updating_an_inventory_item_should_return_the_updated_item()
+    {
+        this.Given(x => x.An_inventory_item_exists())
+            .When(x => x.The_inventory_item_is_updated())
+            .Then(x => x.The_put_response_should_contain_the_updated_values())
+            .BDDfy();
+    }
+
+    [Fact]
+    public void Deleting_an_inventory_item_should_return_no_content()
+    {
+        this.Given(x => x.An_inventory_item_exists())
+            .When(x => x.The_inventory_item_is_deleted())
+            .Then(x => x.The_delete_response_should_indicate_no_content())
+            .BDDfy();
+    }
+
+    [Fact]
+    public void Retrieving_a_non_existent_inventory_item_should_return_not_found()
+    {
+        this.When(x => x.A_non_existent_inventory_item_is_retrieved())
+            .Then(x => x.The_get_response_should_indicate_not_found())
+            .BDDfy();
+    }
+
+    #region Steps
+
+    private async Task A_valid_inventory_item_request_is_prepared()
+    {
         _postSteps.Request = CreateValidRequest();
+        await Task.CompletedTask;
+    }
 
-        // When the inventory item is submitted
+    private async Task The_inventory_item_is_submitted()
+    {
         await _postSteps.Send();
+    }
 
-        // Then the response should contain the created item
+    private async Task The_response_should_contain_the_created_item()
+    {
         _postSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
         await _postSteps.ParseResponse();
-        _postSteps.Response!.Name.Should().Be(_postSteps.Request.Name);
+        _postSteps.Response!.Name.Should().Be(_postSteps.Request!.Name);
         _postSteps.Response!.Category.Should().Be("Dry Goods");
-        this.BDDfy();
     }
 
-    [Fact]
-    public async Task Retrieving_an_existing_inventory_item_should_return_the_item()
+    private async Task An_inventory_item_exists()
     {
-        // Given an inventory item exists
-        var createdItemId = await CreateInventoryItem();
+        _postSteps.Request = CreateValidRequest();
+        await _postSteps.Send();
+        _postSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
+        await _postSteps.ParseResponse();
+        _createdItemId = _postSteps.Response!.Id;
+    }
 
-        // When the inventory item is retrieved by id
-        await _getSteps.RetrieveById(createdItemId);
+    private async Task The_inventory_item_is_retrieved_by_id()
+    {
+        await _getSteps.RetrieveById(_createdItemId);
+    }
 
-        // Then the response should contain the item
+    private async Task The_get_response_should_contain_the_item()
+    {
         _getSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
         await _getSteps.ParseResponse();
-        _getSteps.Response!.Id.Should().Be(createdItemId);
+        _getSteps.Response!.Id.Should().Be(_createdItemId);
         _getSteps.Response!.Name.Should().Be(_postSteps.Response!.Name);
-        this.BDDfy();
     }
 
-    [Fact]
-    public async Task Listing_all_inventory_items_should_return_all_items()
+    private async Task All_inventory_items_are_requested()
     {
-        // Given an inventory item exists
-        var createdItemId = await CreateInventoryItem();
-
-        // When all inventory items are requested
         await _getSteps.RetrieveAll();
+    }
 
-        // Then the list response should contain the item
+    private async Task The_list_response_should_contain_the_item()
+    {
         _getSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
         await _getSteps.ParseListResponse();
-        _getSteps.ListResponse!.Should().Contain(i => i.Id == createdItemId);
-        this.BDDfy();
+        _getSteps.ListResponse!.Should().Contain(i => i.Id == _createdItemId);
     }
 
-    [Fact]
-    public async Task Updating_an_inventory_item_should_return_the_updated_item()
+    private async Task The_inventory_item_is_updated()
     {
-        // Given an inventory item exists
-        var createdItemId = await CreateInventoryItem();
-
-        // When the inventory item is updated
         _putSteps.Request = new TestInventoryItemRequest
         {
             Name = _postSteps.Response!.Name,
@@ -106,37 +152,35 @@ public class Inventory_Management_Tests : BaseFixture
             Unit = "kg",
             ReorderLevel = 20m
         };
-        await _putSteps.Send(createdItemId);
+        await _putSteps.Send(_createdItemId);
+    }
 
-        // Then the response should contain the updated values
+    private async Task The_put_response_should_contain_the_updated_values()
+    {
         _putSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
         await _putSteps.ParseResponse();
         _putSteps.Response!.Category.Should().Be("Updated Category");
-        this.BDDfy();
     }
 
-    [Fact]
-    public async Task Deleting_an_inventory_item_should_return_no_content()
+    private async Task The_inventory_item_is_deleted()
     {
-        // Given an inventory item exists
-        var createdItemId = await CreateInventoryItem();
+        await _deleteSteps.Send(_createdItemId);
+    }
 
-        // When the inventory item is deleted
-        await _deleteSteps.Send(createdItemId);
-
-        // Then the response should indicate no content
+    private void The_delete_response_should_indicate_no_content()
+    {
         _deleteSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.NoContent);
-        this.BDDfy();
     }
 
-    [Fact]
-    public async Task Retrieving_a_non_existent_inventory_item_should_return_not_found()
+    private async Task A_non_existent_inventory_item_is_retrieved()
     {
-        // When a non-existent inventory item is retrieved
         await _getSteps.RetrieveById(99999);
-
-        // Then the response should indicate not found
-        _getSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.NotFound);
-        this.BDDfy();
     }
+
+    private void The_get_response_should_indicate_not_found()
+    {
+        _getSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.NotFound);
+    }
+
+    #endregion
 }

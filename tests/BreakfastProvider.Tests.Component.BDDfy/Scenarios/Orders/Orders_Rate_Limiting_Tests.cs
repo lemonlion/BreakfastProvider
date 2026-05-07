@@ -33,19 +33,35 @@ public class Orders_Rate_Limiting_Tests : BaseFixture
         _orderSteps = Get<PostOrderSteps>();
     }
 
+    private HttpResponseMessage? _firstResponse;
+    private HttpResponseMessage? _secondResponse;
+
     [Fact]
-    public async Task Exceeding_rate_limit_should_return_too_many_requests()
+    public void Exceeding_rate_limit_should_return_too_many_requests()
     {
         if (Settings.RunAgainstExternalServiceUnderTest) return;
 
-        // Given the rate limit is configured to allow one request per window
+        this.Given(x => x.The_rate_limit_is_configured_to_allow_one_request_per_window())
+            .And(x => x.A_pancake_batch_has_been_created())
+            .And(x => x.A_valid_order_request_is_prepared())
+            .When(x => x.The_order_is_submitted_twice_in_rapid_succession())
+            .Then(x => x.The_first_request_should_succeed_and_the_second_should_be_rate_limited())
+            .BDDfy();
+    }
+
+    #region Steps
+
+    private void The_rate_limit_is_configured_to_allow_one_request_per_window()
+    {
         EnsureAppCreated(new Dictionary<string, string?>
         {
             [$"{nameof(RateLimitConfig)}:{nameof(RateLimitConfig.PermitLimit)}"] = "1",
             [$"{nameof(RateLimitConfig)}:{nameof(RateLimitConfig.WindowSeconds)}"] = "60"
         });
+    }
 
-        // And a pancake batch has been created
+    private async Task A_pancake_batch_has_been_created()
+    {
         await _milkSteps.Retrieve();
         await _eggsSteps.Retrieve();
         await _flourSteps.Retrieve();
@@ -59,8 +75,10 @@ public class Orders_Rate_Limiting_Tests : BaseFixture
         await _pancakeSteps.Send();
         _pancakeSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
         await _pancakeSteps.ParseResponse();
+    }
 
-        // And a valid order request
+    private void A_valid_order_request_is_prepared()
+    {
         _orderSteps.Request = new TestOrderRequest
         {
             CustomerName = $"RateLimitTest_{Random.Shared.NextInt64()}",
@@ -75,18 +93,23 @@ public class Orders_Rate_Limiting_Tests : BaseFixture
                 }
             ]
         };
+    }
 
-        // When the order is submitted twice in rapid succession
+    private async Task The_order_is_submitted_twice_in_rapid_succession()
+    {
         await _orderSteps.Send();
-        var firstResponse = _orderSteps.ResponseMessage;
+        _firstResponse = _orderSteps.ResponseMessage;
 
         _orderSteps.Request.CustomerName = $"RateLimitTest2_{Random.Shared.NextInt64()}";
         await _orderSteps.Send();
-        var secondResponse = _orderSteps.ResponseMessage;
-
-        // Then
-        firstResponse!.StatusCode.Should().Be(HttpStatusCode.Created);
-        secondResponse!.StatusCode.Should().Be(HttpStatusCode.TooManyRequests);
-        this.BDDfy();
+        _secondResponse = _orderSteps.ResponseMessage;
     }
+
+    private void The_first_request_should_succeed_and_the_second_should_be_rate_limited()
+    {
+        _firstResponse!.StatusCode.Should().Be(HttpStatusCode.Created);
+        _secondResponse!.StatusCode.Should().Be(HttpStatusCode.TooManyRequests);
+    }
+
+    #endregion
 }

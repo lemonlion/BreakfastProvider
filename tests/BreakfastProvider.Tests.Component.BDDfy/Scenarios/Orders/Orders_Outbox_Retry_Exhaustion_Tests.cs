@@ -37,12 +37,19 @@ public class Orders_Outbox_Retry_Exhaustion_Tests : BaseFixture
     }
 
     [Fact]
-    public async Task Outbox_message_should_transition_to_failed_after_exhausting_retries()
+    public void Outbox_message_should_transition_to_failed_after_exhausting_retries()
     {
         if (Settings.RunAgainstExternalServiceUnderTest) return;
 
-        // Given a pending outbox message with a test-specific destination
-        // (the static factory's processor will skip it — no matching dispatcher)
+        this.Given(x => x.A_pending_outbox_message_with_a_failing_dispatcher())
+            .Then(x => x.The_outbox_message_should_transition_to_failed_after_exhausting_retries())
+            .BDDfy();
+    }
+
+    #region Steps
+
+    private async Task A_pending_outbox_message_with_a_failing_dispatcher()
+    {
         var message = new OutboxMessage
         {
             PartitionKey = "outbox-retry-test",
@@ -53,8 +60,10 @@ public class Orders_Outbox_Retry_Exhaustion_Tests : BaseFixture
             CreatedAt = DateTime.UtcNow
         };
         await _outboxRepository.CreateAsync(message, message.PartitionKey);
+    }
 
-        // Then the outbox message should transition to failed after exhausting retries
+    private async Task The_outbox_message_should_transition_to_failed_after_exhausting_retries()
+    {
         const int maxRetries = 120;
         var retryDelay = TimeSpan.FromMilliseconds(500);
 
@@ -72,8 +81,9 @@ public class Orders_Outbox_Retry_Exhaustion_Tests : BaseFixture
         _outboxSteps.OutboxMessages.Should().Contain(m =>
                 m.EventType == EventTypes.OrderCreated && m.Status == OutboxStatuses.Failed,
             "the outbox message should have transitioned to Failed after exhausting retries");
-        this.BDDfy();
     }
+
+    #endregion
 
     private class FailingOutboxDispatcher : IOutboxDispatcher
     {

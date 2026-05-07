@@ -53,18 +53,48 @@ public class Orders_Cross_Field_Validation_Tests : BaseFixture
     }
 
     [Fact]
-    public async Task Order_exceeding_maximum_items_per_order_should_be_rejected()
+    public void Order_exceeding_maximum_items_per_order_should_be_rejected()
     {
         if (Settings.RunAgainstExternalServiceUnderTest) return;
 
-        // Given
+        this.Given(x => x.The_max_items_per_order_is_configured_to_2())
+            .And(x => x.A_pancake_batch_is_created())
+            .And(x => x.An_order_request_has_3_items())
+            .When(x => x.The_order_is_submitted())
+            .Then(x => x.The_response_should_indicate_too_many_items())
+            .BDDfy();
+    }
+
+    [Fact]
+    public void Order_at_maximum_items_per_order_should_be_accepted()
+    {
+        if (Settings.RunAgainstExternalServiceUnderTest) return;
+
+        this.Given(x => x.The_max_items_per_order_is_configured_to_2())
+            .And(x => x.A_pancake_batch_is_created())
+            .And(x => x.An_order_request_has_2_items())
+            .When(x => x.The_order_is_submitted())
+            .Then(x => x.The_order_should_be_created_successfully())
+            .BDDfy();
+    }
+
+    #region Steps
+
+    private void The_max_items_per_order_is_configured_to_2()
+    {
         EnsureAppCreated(new Dictionary<string, string?>
         {
             [$"{nameof(OrderConfig)}:{nameof(OrderConfig.MaxItemsPerOrder)}"] = "2"
         });
+    }
 
+    private async Task A_pancake_batch_is_created()
+    {
         await CreatePancakeBatch();
+    }
 
+    private void An_order_request_has_3_items()
+    {
         _orderSteps.Request = new TestOrderRequest
         {
             CustomerName = $"CrossFieldTest_{Random.Shared.NextInt64()}",
@@ -76,49 +106,40 @@ public class Orders_Cross_Field_Validation_Tests : BaseFixture
                 new TestOrderItemRequest { ItemType = OrderDefaults.PancakeItemType, BatchId = _pancakeSteps.Response!.BatchId, Quantity = 1 }
             ]
         };
+    }
 
-        // When
+    private void An_order_request_has_2_items()
+    {
+        _orderSteps.Request = new TestOrderRequest
+        {
+            CustomerName = $"CrossFieldTest_{Random.Shared.NextInt64()}",
+            TableNumber = 1,
+            Items =
+            [
+                new TestOrderItemRequest { ItemType = OrderDefaults.PancakeItemType, BatchId = _pancakeSteps.Response!.BatchId, Quantity = 1 },
+                new TestOrderItemRequest { ItemType = OrderDefaults.PancakeItemType, BatchId = _pancakeSteps.Response!.BatchId, Quantity = 1 }
+            ]
+        };
+    }
+
+    private async Task The_order_is_submitted()
+    {
         await _orderSteps.Send();
+    }
 
-        // Then
+    private async Task The_response_should_indicate_too_many_items()
+    {
         _orderSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-
         var content = await _orderSteps.ResponseMessage!.Content.ReadAsStringAsync();
         var problemDetails = Json.Deserialize<ValidationProblemDetails>(content);
         var orderValidationErrors = problemDetails?.Errors.Values.SelectMany(v => v).ToList();
         orderValidationErrors.Should().Contain(e => e.Contains("cannot contain more than 2 items"));
-        this.BDDfy();
     }
 
-    [Fact]
-    public async Task Order_at_maximum_items_per_order_should_be_accepted()
+    private void The_order_should_be_created_successfully()
     {
-        if (Settings.RunAgainstExternalServiceUnderTest) return;
-
-        // Given
-        EnsureAppCreated(new Dictionary<string, string?>
-        {
-            [$"{nameof(OrderConfig)}:{nameof(OrderConfig.MaxItemsPerOrder)}"] = "2"
-        });
-
-        await CreatePancakeBatch();
-
-        _orderSteps.Request = new TestOrderRequest
-        {
-            CustomerName = $"CrossFieldTest_{Random.Shared.NextInt64()}",
-            TableNumber = 1,
-            Items =
-            [
-                new TestOrderItemRequest { ItemType = OrderDefaults.PancakeItemType, BatchId = _pancakeSteps.Response!.BatchId, Quantity = 1 },
-                new TestOrderItemRequest { ItemType = OrderDefaults.PancakeItemType, BatchId = _pancakeSteps.Response!.BatchId, Quantity = 1 }
-            ]
-        };
-
-        // When
-        await _orderSteps.Send();
-
-        // Then
         _orderSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
-        this.BDDfy();
     }
+
+    #endregion
 }

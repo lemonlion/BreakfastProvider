@@ -19,9 +19,18 @@ public class Reporting_EventGrid_Webhook_Tests : BaseFixture
 
     [Fact]
     [HappyPath]
-    public async Task Ingredient_shipments_should_be_recorded_when_delivered_via_eventgrid_webhook()
+    public void Ingredient_shipments_should_be_recorded_when_delivered_via_eventgrid_webhook()
     {
-        // Given an ingredient delivery event has been received via EventGrid webhook
+        this.Given(x => x.An_ingredient_delivery_event_has_been_received_via_eventgrid_webhook())
+            .When(x => x.The_ingredient_shipments_are_queried_via_graphql())
+            .Then(x => x.The_response_should_contain_the_ingredient_shipment())
+            .BDDfy();
+    }
+
+    #region Steps
+
+    private async Task An_ingredient_delivery_event_has_been_received_via_eventgrid_webhook()
+    {
         var eventGridPayload = new[]
         {
             new
@@ -48,17 +57,22 @@ public class Reporting_EventGrid_Webhook_Tests : BaseFixture
         request.Headers.Add(CustomHeaders.ComponentTestRequestId, RequestId);
         var webhookResponse = await Client.SendAsync(request);
         webhookResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+    }
 
-        // When the ingredient shipments are queried via GraphQL
+    private async Task The_ingredient_shipments_are_queried_via_graphql()
+    {
         await _graphQlSteps.QueryIngredientShipments();
+    }
 
-        // Then the response should contain the ingredient shipment
+    private async Task The_response_should_contain_the_ingredient_shipment()
+    {
         _graphQlSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
         await _graphQlSteps.ParseIngredientShipmentsResponse();
         _graphQlSteps.IngredientShipments.Should().Contain(s =>
             s.DeliveryId == _deliveryId &&
             s.IngredientName == "Milk" &&
             s.Quantity == 50.0m);
-        this.BDDfy();
     }
+
+    #endregion
 }

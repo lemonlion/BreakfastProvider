@@ -27,9 +27,18 @@ public class Reporting_Equipment_Alerts_Tests : BaseFixture
 
     [Fact]
     [HappyPath]
-    public async Task Equipment_alerts_should_contain_data_ingested_via_event_hub_consumer()
+    public void Equipment_alerts_should_contain_data_ingested_via_event_hub_consumer()
     {
-        // Given a pancake batch has been created
+        this.Given(x => x.A_pancake_batch_has_been_created())
+            .When(x => x.The_equipment_alerts_are_queried_via_graphql())
+            .Then(x => x.The_response_should_contain_the_equipment_alert_record())
+            .BDDfy();
+    }
+
+    #region Steps
+
+    private async Task A_pancake_batch_has_been_created()
+    {
         await _milkSteps.Retrieve();
         _milkSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
         await _eggsSteps.Retrieve();
@@ -48,11 +57,15 @@ public class Reporting_Equipment_Alerts_Tests : BaseFixture
         await _pancakeSteps.ParseResponse();
         _pancakeSteps.Response.Should().NotBeNull();
         _pancakeSteps.Response!.BatchId.Should().NotBeEmpty();
+    }
 
-        // When the equipment alerts are queried via GraphQL
+    private async Task The_equipment_alerts_are_queried_via_graphql()
+    {
         await _graphQlSteps.QueryEquipmentAlerts(waitForBatchId: _pancakeSteps.Response?.BatchId);
+    }
 
-        // Then the response should contain the equipment alert record
+    private async Task The_response_should_contain_the_equipment_alert_record()
+    {
         _graphQlSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
         await _graphQlSteps.ParseEquipmentAlertsResponse();
         var batchId = _pancakeSteps.Response!.BatchId;
@@ -60,6 +73,7 @@ public class Reporting_Equipment_Alerts_Tests : BaseFixture
             a.BatchId == batchId &&
             a.EquipmentName == "Griddle" &&
             a.AlertType == "UsageCycleCompleted");
-        this.BDDfy();
     }
+
+    #endregion
 }

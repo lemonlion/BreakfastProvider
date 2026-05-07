@@ -16,20 +16,34 @@ public class DailySpecials_Not_Found_Tests : BaseFixture
     }
 
     [Fact]
-    public async Task Ordering_non_existent_daily_special_should_return_not_found()
+    public void Ordering_non_existent_daily_special_should_return_not_found()
     {
-        // Given a daily special order request for a non-existent special
+        this.Given(x => x.A_daily_special_order_request_for_a_non_existent_special())
+            .When(x => x.The_daily_special_order_is_submitted())
+            .Then(x => x.The_response_should_indicate_not_found())
+            .BDDfy();
+    }
+
+    #region Steps
+
+    private void A_daily_special_order_request_for_a_non_existent_special()
+    {
         _postSteps.Request = new TestDailySpecialOrderRequest
         {
             SpecialId = Guid.NewGuid(),
             Quantity = 1
         };
-
-        // When the daily special order is submitted
-        await _postSteps.Send();
-
-        // Then the response should indicate not found
-        _postSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.NotFound);
-        this.BDDfy();
     }
+
+    private async Task The_daily_special_order_is_submitted()
+    {
+        await _postSteps.Send();
+    }
+
+    private void The_response_should_indicate_not_found()
+    {
+        _postSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.NotFound);
+    }
+
+    #endregion
 }

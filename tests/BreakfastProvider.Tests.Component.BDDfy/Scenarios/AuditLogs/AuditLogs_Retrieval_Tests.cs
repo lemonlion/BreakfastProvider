@@ -37,9 +37,20 @@ public class AuditLogs_Retrieval_Tests : BaseFixture
 
     [Fact]
     [HappyPath]
-    public async Task Creating_an_order_should_produce_a_retrievable_audit_log_entry()
+    public void Creating_an_order_should_produce_a_retrievable_audit_log_entry()
     {
-        // Given a pancake batch has been created
+        this.Given(x => x.A_pancake_batch_has_been_created())
+            .And(x => x.An_order_has_been_created_for_the_batch())
+            .When(x => x.The_audit_logs_are_retrieved())
+            .Then(x => x.The_audit_log_response_should_contain_the_order_creation_entry())
+            .And(x => x.The_downstream_services_should_have_received_requests())
+            .BDDfy();
+    }
+
+    #region Steps
+
+    private async Task A_pancake_batch_has_been_created()
+    {
         await _milkSteps.Retrieve();
         await _eggsSteps.Retrieve();
         await _flourSteps.Retrieve();
@@ -55,8 +66,10 @@ public class AuditLogs_Retrieval_Tests : BaseFixture
         await _pancakeSteps.ParseResponse();
         _pancakeSteps.Response.Should().NotBeNull();
         _pancakeSteps.Response!.BatchId.Should().NotBeEmpty();
+    }
 
-        // And an order has been created for the batch
+    private async Task An_order_has_been_created_for_the_batch()
+    {
         _orderSteps.Request = new TestOrderRequest
         {
             CustomerName = _customerName,
@@ -76,24 +89,31 @@ public class AuditLogs_Retrieval_Tests : BaseFixture
         await _orderSteps.ParseResponse();
         _orderSteps.Response.Should().NotBeNull();
         _orderSteps.Response!.OrderId.Should().NotBeEmpty();
+    }
 
-        // When the audit logs are retrieved
+    private async Task The_audit_logs_are_retrieved()
+    {
         await _auditSteps.Retrieve();
+    }
 
-        // Then the audit log response should contain the order creation entry
+    private async Task The_audit_log_response_should_contain_the_order_creation_entry()
+    {
         _auditSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
         await _auditSteps.ParseResponse();
         _auditSteps.Response!.Should().Contain(a =>
             a.Action == AuditLogDefaults.CreatedAction
             && a.EntityType == AuditLogDefaults.OrderEntityType
             && a.Details.Contains(_customerName));
+    }
 
-        // And the downstream services should have received requests (if not post-deployment)
+    private void The_downstream_services_should_have_received_requests()
+    {
         if (!Settings.RunAgainstExternalServiceUnderTest)
         {
             _downstreamSteps.AssertCowServiceReceivedMilkRequest();
             _downstreamSteps.AssertKitchenServiceReceivedPreparationRequest();
         }
-        this.BDDfy();
     }
+
+    #endregion
 }

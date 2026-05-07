@@ -14,7 +14,6 @@ using TestStack.BDDfy;
 using TestTrackingDiagrams.BDDfy.xUnit3;
 namespace BreakfastProvider.Tests.Component.BDDfy.Scenarios.Waffles;
 
-#pragma warning disable CS1998
 public class Waffles_Creation_Tests : BaseFixture
 {
     private readonly GetMilkSteps _milkSteps;
@@ -39,9 +38,63 @@ public class Waffles_Creation_Tests : BaseFixture
 
     [Fact]
     [HappyPath]
-    public async Task Valid_waffle_request_with_all_ingredients_should_return_a_fresh_batch()
+    public void Valid_waffle_request_with_all_ingredients_should_return_a_fresh_batch()
     {
-        // Given a valid waffle recipe with all ingredients
+        this.Given(x => x.All_ingredients_are_retrieved_for_waffles())
+            .When(x => x.The_waffles_are_prepared())
+            .Then(x => x.The_response_should_contain_a_valid_batch_with_all_ingredients())
+            .And(x => x.The_cow_service_should_have_received_a_milk_request())
+            .BDDfy();
+    }
+
+    [Theory]
+    [InlineData("Milk", "", "Milk is required", "'Milk' is required.", "Bad Request")]
+    [InlineData("Flour", "", "Flour is required", "'Flour' is required.", "Bad Request")]
+    [InlineData("Eggs", "", "Eggs is required", "'Eggs' is required.", "Bad Request")]
+    [InlineData("Butter", "", "Butter is required", "'Butter' is required.", "Bad Request")]
+    [InlineData("Milk", "<script>alert</script>", "XSS in milk", "Milk contains potentially dangerous content.", "Bad Request")]
+    [InlineData("Butter", "<img onerror=x>", "XSS in butter", "Butter contains potentially dangerous content.", "Bad Request")]
+    public async Task Waffle_request_with_invalid_ingredient_should_return_bad_request(
+        string field, string value, string reason, string expectedError, string expectedStatus)
+    {
+        var validBase = new TestWaffleRequest
+        {
+            Milk = CowServiceDefaults.FreshMilk,
+            Flour = IngredientDefaults.PlainFlour,
+            Eggs = IngredientDefaults.FreeRangeEggs,
+            Butter = IngredientDefaults.UnsaltedButter
+        };
+
+        var input = new InvalidFieldFromRequest(field, value, reason);
+        var requests = ValidationHelper.CreateValidationRequests(validBase, new List<InvalidFieldFromRequest> { input });
+
+        var responses = await ValidationHelper.SendValidationRequests(
+            Client, RequestId, Endpoints.Waffles, requests, new List<InvalidFieldFromRequest> { input });
+
+        var actualResults = await ValidationHelper.ParseValidationResponses(responses);
+        var actual = actualResults.Single();
+        actual.ErrorMessage.Should().Be(expectedError);
+        actual.ResponseStatus.Should().Be(expectedStatus);
+        this.BDDfy();
+    }
+
+    [Fact]
+    public void Waffle_request_with_more_toppings_than_allowed_should_return_bad_request()
+    {
+        if (Settings.RunAgainstExternalServiceUnderTest)
+            return;
+
+        this.Given(x => x.All_ingredients_are_retrieved_for_waffles())
+            .And(x => x.The_request_has_more_toppings_than_the_configured_limit())
+            .When(x => x.The_waffles_are_prepared())
+            .Then(x => x.The_response_should_indicate_too_many_toppings())
+            .BDDfy();
+    }
+
+    #region Steps
+
+    private async Task All_ingredients_are_retrieved_for_waffles()
+    {
         await _milkSteps.Retrieve();
         _milkSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
         _waffleSteps.Request.Milk = _milkSteps.MilkResponse.Milk;
@@ -55,84 +108,42 @@ public class Waffles_Creation_Tests : BaseFixture
         _waffleSteps.Request.Flour = _flourSteps.FlourResponse.Flour;
 
         _waffleSteps.Request.Butter = IngredientDefaults.UnsaltedButter;
+    }
 
-        // When the waffles are prepared
+    private async Task The_waffles_are_prepared()
+    {
         await _waffleSteps.Send();
+    }
 
-        // Then the response should contain a valid batch with all ingredients
+    private async Task The_response_should_contain_a_valid_batch_with_all_ingredients()
+    {
         _waffleSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
         await _waffleSteps.ParseResponse();
         _waffleSteps.Response!.Ingredients.Should().Contain(_milkSteps.MilkResponse.Milk);
         _waffleSteps.Response!.Ingredients.Should().Contain(_eggsSteps.EggsResponse.Eggs);
         _waffleSteps.Response!.Ingredients.Should().Contain(_flourSteps.FlourResponse.Flour);
         _waffleSteps.Response!.Ingredients.Should().Contain(IngredientDefaults.UnsaltedButter);
+    }
 
-        // And the cow service should have received a milk request
+    private void The_cow_service_should_have_received_a_milk_request()
+    {
         if (!Settings.RunAgainstExternalServiceUnderTest)
             _downstreamSteps.AssertCowServiceReceivedMilkRequest();
-        this.BDDfy();
     }
 
-    [Theory]
-    [InlineData("Milk", "", "Milk is required", "'Milk' is required.", "Bad Request")]
-    [InlineData("Flour", "", "Flour is required", "'Flour' is required.", "Bad Request")]
-    [InlineData("Eggs", "", "Eggs is required", "'Eggs' is required.", "Bad Request")]
-    [InlineData("Butter", "", "Butter is required", "'Butter' is required.", "Bad Request")]
-    [InlineData("Milk", "<script>alert</script>", "XSS in milk", "Milk contains potentially dangerous content.", "Bad Request")]
-    [InlineData("Butter", "<img onerror=x>", "XSS in butter", "Butter contains potentially dangerous content.", "Bad Request")]
-    public async Task Waffle_request_with_invalid_ingredient_should_return_bad_request(
-        string field, string value, string reason, string expectedError, string expectedStatus)
+    private void The_request_has_more_toppings_than_the_configured_limit()
     {
-        // Given valid waffle requests with an invalid field
-        var validBase = new TestWaffleRequest
-        {
-            Milk = CowServiceDefaults.FreshMilk,
-            Flour = IngredientDefaults.PlainFlour,
-            Eggs = IngredientDefaults.FreeRangeEggs,
-            Butter = IngredientDefaults.UnsaltedButter
-        };
-
-        var input = new InvalidFieldFromRequest(field, value, reason);
-        var requests = ValidationHelper.CreateValidationRequests(validBase, new List<InvalidFieldFromRequest> { input });
-
-        // When the invalid waffle requests are submitted
-        var responses = await ValidationHelper.SendValidationRequests(
-            Client, RequestId, Endpoints.Waffles, requests, new List<InvalidFieldFromRequest> { input });
-
-        // Then the responses should contain the validation error
-        var actualResults = await ValidationHelper.ParseValidationResponses(responses);
-        var actual = actualResults.Single();
-        actual.ErrorMessage.Should().Be(expectedError);
-        actual.ResponseStatus.Should().Be(expectedStatus);
-    }
-
-    [Fact]
-    public async Task Waffle_request_with_more_toppings_than_allowed_should_return_bad_request()
-    {
-        if (Settings.RunAgainstExternalServiceUnderTest)
-            return;
-
-        // Given a valid waffle recipe with all ingredients
-        await _milkSteps.Retrieve();
-        _waffleSteps.Request.Milk = _milkSteps.MilkResponse.Milk;
-        await _eggsSteps.Retrieve();
-        _waffleSteps.Request.Eggs = _eggsSteps.EggsResponse.Eggs;
-        await _flourSteps.Retrieve();
-        _waffleSteps.Request.Flour = _flourSteps.FlourResponse.Flour;
-        _waffleSteps.Request.Butter = IngredientDefaults.UnsaltedButter;
-
-        // And the request has more toppings than the configured limit
         _waffleSteps.Request.Toppings = Enumerable.Range(0, MaxToppings + 1)
             .Select(i => $"Topping_{i}")
             .ToList();
+    }
 
-        // When the waffles are prepared
-        await _waffleSteps.Send();
-
-        // Then the response should indicate too many toppings
+    private async Task The_response_should_indicate_too_many_toppings()
+    {
         _waffleSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         var body = await _waffleSteps.ResponseMessage!.Content.ReadAsStringAsync();
         body.Should().Contain(WaffleValidationMessages.MaxToppingsExceeded);
-        this.BDDfy();
     }
+
+    #endregion
 }

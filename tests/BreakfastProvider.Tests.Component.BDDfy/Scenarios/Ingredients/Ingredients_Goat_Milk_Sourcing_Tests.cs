@@ -20,19 +20,33 @@ public class Ingredients_Goat_Milk_Sourcing_Tests : BaseFixture
 
     [Fact]
     [HappyPath]
-    public async Task Goat_milk_endpoint_should_return_fresh_goat_milk_from_goat_service()
+    public void Goat_milk_endpoint_should_return_fresh_goat_milk_from_goat_service()
     {
-        // When goat milk is requested
-        await _goatMilkSteps.Retrieve();
+        this.When(x => x.Goat_milk_is_requested())
+            .Then(x => x.The_response_should_contain_fresh_goat_milk())
+            .And(x => x.The_goat_service_should_have_received_a_goat_milk_request())
+            .BDDfy();
+    }
 
-        // Then the goat milk response should contain fresh goat milk
+    #region Steps
+
+    private async Task Goat_milk_is_requested()
+    {
+        await _goatMilkSteps.Retrieve();
+    }
+
+    private void The_response_should_contain_fresh_goat_milk()
+    {
         _goatMilkSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
         _goatMilkSteps.GoatMilkResponse.Should().NotBeNull();
         _goatMilkSteps.GoatMilkResponse.GoatMilk.Should().Be(GoatServiceDefaults.FreshGoatMilk);
+    }
 
-        // And the goat service should have received a goat milk request
+    private void The_goat_service_should_have_received_a_goat_milk_request()
+    {
         if (!Settings.RunAgainstExternalServiceUnderTest)
             _downstreamSteps.AssertGoatServiceReceivedGoatMilkRequest();
-        this.BDDfy();
     }
+
+    #endregion
 }

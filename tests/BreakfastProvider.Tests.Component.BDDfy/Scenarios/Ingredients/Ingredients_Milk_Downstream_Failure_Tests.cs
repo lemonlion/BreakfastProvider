@@ -16,59 +16,69 @@ public class Ingredients_Milk_Downstream_Failure_Tests : BaseFixture
     }
 
     [Fact]
-    public async Task Requesting_milk_when_cow_service_unavailable_should_return_bad_gateway()
+    public void Requesting_milk_when_cow_service_unavailable_should_return_bad_gateway()
     {
         if (Settings.RunAgainstExternalServiceUnderTest)
             return;
 
-        // Given the cow service will return service unavailable
+        this.Given(x => x.The_cow_service_will_return_service_unavailable())
+            .When(x => x.Milk_is_requested())
+            .Then(x => x.The_milk_response_should_indicate_a_bad_gateway_with_unavailable_message())
+            .BDDfy();
+    }
+
+    [Fact]
+    public void Requesting_milk_when_cow_service_times_out_should_return_bad_gateway()
+    {
+        if (Settings.RunAgainstExternalServiceUnderTest)
+            return;
+
+        this.Given(x => x.The_cow_service_will_return_a_timeout())
+            .When(x => x.Milk_is_requested())
+            .Then(x => x.The_milk_response_should_indicate_a_bad_gateway_with_unavailable_message())
+            .BDDfy();
+    }
+
+    [Fact]
+    public void Requesting_milk_when_cow_service_returns_invalid_response_should_return_bad_gateway()
+    {
+        if (Settings.RunAgainstExternalServiceUnderTest)
+            return;
+
+        this.Given(x => x.The_cow_service_will_return_an_invalid_response())
+            .When(x => x.Milk_is_requested())
+            .Then(x => x.The_milk_response_should_indicate_a_bad_gateway_with_unavailable_message())
+            .BDDfy();
+    }
+
+    #region Steps
+
+    private void The_cow_service_will_return_service_unavailable()
+    {
         _milkSteps.AddHeader(FakeScenarioHeaders.CowService, FakeScenarios.ServiceUnavailable);
-
-        // When milk is requested
-        await _milkSteps.Retrieve();
-
-        // Then the milk response should indicate a bad gateway
-        _milkSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.BadGateway);
-        var milkErrorResponseBody = await _milkSteps.ResponseMessage!.Content.ReadAsStringAsync();
-        milkErrorResponseBody.Should().Contain(DownstreamErrorMessages.CowServiceUnavailableTitle);
-        this.BDDfy();
     }
 
-    [Fact]
-    public async Task Requesting_milk_when_cow_service_times_out_should_return_bad_gateway()
+    private void The_cow_service_will_return_a_timeout()
     {
-        if (Settings.RunAgainstExternalServiceUnderTest)
-            return;
-
-        // Given the cow service will return a timeout
         _milkSteps.AddHeader(FakeScenarioHeaders.CowService, FakeScenarios.Timeout);
-
-        // When milk is requested
-        await _milkSteps.Retrieve();
-
-        // Then the milk response should indicate a bad gateway
-        _milkSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.BadGateway);
-        var milkErrorResponseBody = await _milkSteps.ResponseMessage!.Content.ReadAsStringAsync();
-        milkErrorResponseBody.Should().Contain(DownstreamErrorMessages.CowServiceUnavailableTitle);
-        this.BDDfy();
     }
 
-    [Fact]
-    public async Task Requesting_milk_when_cow_service_returns_invalid_response_should_return_bad_gateway()
+    private void The_cow_service_will_return_an_invalid_response()
     {
-        if (Settings.RunAgainstExternalServiceUnderTest)
-            return;
-
-        // Given the cow service will return an invalid response
         _milkSteps.AddHeader(FakeScenarioHeaders.CowService, FakeScenarios.InvalidResponse);
+    }
 
-        // When milk is requested
+    private async Task Milk_is_requested()
+    {
         await _milkSteps.Retrieve();
+    }
 
-        // Then the milk response should indicate a bad gateway
+    private async Task The_milk_response_should_indicate_a_bad_gateway_with_unavailable_message()
+    {
         _milkSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.BadGateway);
         var milkErrorResponseBody = await _milkSteps.ResponseMessage!.Content.ReadAsStringAsync();
         milkErrorResponseBody.Should().Contain(DownstreamErrorMessages.CowServiceUnavailableTitle);
-        this.BDDfy();
     }
+
+    #endregion
 }

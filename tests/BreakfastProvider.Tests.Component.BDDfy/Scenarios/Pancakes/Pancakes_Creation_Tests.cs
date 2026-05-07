@@ -38,35 +38,13 @@ public class Pancakes_Creation_Tests : BaseFixture
 
     [Fact]
     [HappyPath]
-    public async Task Valid_pancake_request_with_all_ingredients_should_return_a_fresh_batch()
+    public void Valid_pancake_request_with_all_ingredients_should_return_a_fresh_batch()
     {
-        // Given a valid pancake recipe with all ingredients
-        await _milkSteps.Retrieve();
-        _milkSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
-        _pancakeSteps.Request.Milk = _milkSteps.MilkResponse.Milk;
-
-        await _eggsSteps.Retrieve();
-        _eggsSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
-        _pancakeSteps.Request.Eggs = _eggsSteps.EggsResponse.Eggs;
-
-        await _flourSteps.Retrieve();
-        _flourSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
-        _pancakeSteps.Request.Flour = _flourSteps.FlourResponse.Flour;
-
-        // When the pancakes are prepared
-        await _pancakeSteps.Send();
-
-        // Then the response should contain a valid batch with all ingredients
-        _pancakeSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
-        await _pancakeSteps.ParseResponse();
-        _pancakeSteps.Response!.Ingredients.Should().Contain(_milkSteps.MilkResponse.Milk);
-        _pancakeSteps.Response!.Ingredients.Should().Contain(_eggsSteps.EggsResponse.Eggs);
-        _pancakeSteps.Response!.Ingredients.Should().Contain(_flourSteps.FlourResponse.Flour);
-
-        // And the cow service should have received a milk request
-        if (!Settings.RunAgainstExternalServiceUnderTest)
-            _downstreamSteps.AssertCowServiceReceivedMilkRequest();
-        this.BDDfy();
+        this.Given(x => x.All_ingredients_are_retrieved_for_pancakes())
+            .When(x => x.The_pancakes_are_prepared())
+            .Then(x => x.The_response_should_contain_a_valid_batch_with_all_ingredients())
+            .And(x => x.The_cow_service_should_have_received_a_milk_request())
+            .BDDfy();
     }
 
     [Theory]
@@ -79,7 +57,6 @@ public class Pancakes_Creation_Tests : BaseFixture
     public async Task Pancake_request_with_invalid_ingredient_should_return_bad_request(
         string field, string value, string reason, string expectedError, string expectedStatus)
     {
-        // Given valid pancake requests with an invalid field
         var validBase = new TestPancakeRequest
         {
             Milk = CowServiceDefaults.FreshMilk,
@@ -90,44 +67,79 @@ public class Pancakes_Creation_Tests : BaseFixture
         var input = new InvalidFieldFromRequest(field, value, reason);
         var requests = ValidationHelper.CreateValidationRequests(validBase, new List<InvalidFieldFromRequest> { input });
 
-        // When the invalid pancake requests are submitted
         var responses = await ValidationHelper.SendValidationRequests(
             Client, RequestId, Endpoints.Pancakes, requests, new List<InvalidFieldFromRequest> { input });
 
-        // Then the responses should contain the validation error
         var actualResults = await ValidationHelper.ParseValidationResponses(responses);
         var actual = actualResults.Single();
         actual.ErrorMessage.Should().Be(expectedError);
         actual.ResponseStatus.Should().Be(expectedStatus);
+        this.BDDfy();
     }
 
     [Fact(Skip = null)]
-    public async Task Pancake_request_with_more_toppings_than_allowed_should_return_bad_request()
+    public void Pancake_request_with_more_toppings_than_allowed_should_return_bad_request()
     {
         if (Settings.RunAgainstExternalServiceUnderTest)
             return;
 
-        // Given the max toppings per item is configured
-        // And a valid pancake recipe with all ingredients
-        await _milkSteps.Retrieve();
-        _pancakeSteps.Request.Milk = _milkSteps.MilkResponse.Milk;
-        await _eggsSteps.Retrieve();
-        _pancakeSteps.Request.Eggs = _eggsSteps.EggsResponse.Eggs;
-        await _flourSteps.Retrieve();
-        _pancakeSteps.Request.Flour = _flourSteps.FlourResponse.Flour;
+        this.Given(x => x.All_ingredients_are_retrieved_for_pancakes())
+            .And(x => x.The_request_has_more_toppings_than_the_configured_limit())
+            .When(x => x.The_pancakes_are_prepared())
+            .Then(x => x.The_response_should_indicate_too_many_toppings())
+            .BDDfy();
+    }
 
-        // And the request has more toppings than the configured limit
+    #region Steps
+
+    private async Task All_ingredients_are_retrieved_for_pancakes()
+    {
+        await _milkSteps.Retrieve();
+        _milkSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
+        _pancakeSteps.Request.Milk = _milkSteps.MilkResponse.Milk;
+
+        await _eggsSteps.Retrieve();
+        _eggsSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
+        _pancakeSteps.Request.Eggs = _eggsSteps.EggsResponse.Eggs;
+
+        await _flourSteps.Retrieve();
+        _flourSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
+        _pancakeSteps.Request.Flour = _flourSteps.FlourResponse.Flour;
+    }
+
+    private async Task The_pancakes_are_prepared()
+    {
+        await _pancakeSteps.Send();
+    }
+
+    private async Task The_response_should_contain_a_valid_batch_with_all_ingredients()
+    {
+        _pancakeSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
+        await _pancakeSteps.ParseResponse();
+        _pancakeSteps.Response!.Ingredients.Should().Contain(_milkSteps.MilkResponse.Milk);
+        _pancakeSteps.Response!.Ingredients.Should().Contain(_eggsSteps.EggsResponse.Eggs);
+        _pancakeSteps.Response!.Ingredients.Should().Contain(_flourSteps.FlourResponse.Flour);
+    }
+
+    private void The_cow_service_should_have_received_a_milk_request()
+    {
+        if (!Settings.RunAgainstExternalServiceUnderTest)
+            _downstreamSteps.AssertCowServiceReceivedMilkRequest();
+    }
+
+    private void The_request_has_more_toppings_than_the_configured_limit()
+    {
         _pancakeSteps.Request.Toppings = Enumerable.Range(0, MaxToppings + 1)
             .Select(i => $"Topping_{i}")
             .ToList();
+    }
 
-        // When the pancakes are prepared
-        await _pancakeSteps.Send();
-
-        // Then the response should indicate too many toppings
+    private async Task The_response_should_indicate_too_many_toppings()
+    {
         _pancakeSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         var body = await _pancakeSteps.ResponseMessage!.Content.ReadAsStringAsync();
         body.Should().Contain(PancakeValidationMessages.MaxToppingsExceeded);
-        this.BDDfy();
     }
+
+    #endregion
 }

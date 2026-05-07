@@ -32,11 +32,23 @@ public class Orders_Kitchen_Service_Failure_Tests : BaseFixture
     }
 
     [Fact]
-    public async Task Creating_an_order_when_kitchen_service_returns_error_should_still_create_the_order()
+    public void Creating_an_order_when_kitchen_service_returns_error_should_still_create_the_order()
     {
         if (Settings.RunAgainstExternalServiceUnderTest) return;
 
-        // Given a pancake batch has been created
+        this.Given(x => x.A_pancake_batch_has_been_created())
+            .And(x => x.A_valid_order_request_for_the_created_batch())
+            .And(x => x.The_kitchen_service_will_return_an_error())
+            .When(x => x.The_breakfast_order_is_placed())
+            .Then(x => x.The_order_should_still_be_created_successfully())
+            .And(x => x.The_order_should_be_retrievable_by_its_id())
+            .BDDfy();
+    }
+
+    #region Steps
+
+    private async Task A_pancake_batch_has_been_created()
+    {
         await _milkSteps.Retrieve();
         _milkSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
         await _eggsSteps.Retrieve();
@@ -54,8 +66,10 @@ public class Orders_Kitchen_Service_Failure_Tests : BaseFixture
         _pancakeSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
         await _pancakeSteps.ParseResponse();
         _pancakeSteps.Response.Should().NotBeNull();
+    }
 
-        // And a valid order request for the created batch
+    private void A_valid_order_request_for_the_created_batch()
+    {
         _orderSteps.Request.CustomerName = _customerName;
         _orderSteps.Request.TableNumber = 7;
         _orderSteps.Request.Items.Add(new TestOrderItemRequest
@@ -64,21 +78,30 @@ public class Orders_Kitchen_Service_Failure_Tests : BaseFixture
             BatchId = _pancakeSteps.Response!.BatchId,
             Quantity = 1
         });
+    }
 
-        // And the kitchen service will return an error
+    private void The_kitchen_service_will_return_an_error()
+    {
         _orderSteps.AddHeader(FakeScenarioHeaders.KitchenService, FakeScenarios.KitchenBusy);
+    }
 
-        // When the breakfast order is placed
+    private async Task The_breakfast_order_is_placed()
+    {
         await _orderSteps.Send();
+    }
 
-        // Then the order should still be created successfully
+    private async Task The_order_should_still_be_created_successfully()
+    {
         _orderSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
         await _orderSteps.ParseResponse();
         _orderSteps.Response!.CustomerName.Should().Be(_customerName);
+    }
 
-        // And the order should be retrievable by its id
+    private async Task The_order_should_be_retrievable_by_its_id()
+    {
         await _getOrderSteps.Retrieve(_orderSteps.Response!.OrderId);
         _getOrderSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
-        this.BDDfy();
     }
+
+    #endregion
 }

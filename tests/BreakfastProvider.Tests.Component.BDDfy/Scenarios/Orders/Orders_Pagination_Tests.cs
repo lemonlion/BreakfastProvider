@@ -76,71 +76,97 @@ public class Orders_Pagination_Tests : BaseFixture
 
     [Fact]
     [HappyPath]
-    public async Task Listing_orders_should_return_a_paginated_response()
+    public void Listing_orders_should_return_a_paginated_response()
     {
-        // Given
+        this.Given(x => x.Multiple_orders_have_been_created())
+            .When(x => x.The_orders_are_listed())
+            .Then(x => x.The_response_should_contain_a_paginated_list_of_orders())
+            .BDDfy();
+    }
+
+    [Fact]
+    public void Listing_orders_with_small_page_size_should_limit_results()
+    {
+        this.Given(x => x.Multiple_orders_have_been_created())
+            .When(x => x.The_orders_are_listed_with_page_size_1())
+            .Then(x => x.The_response_should_contain_only_one_item_per_page())
+            .BDDfy();
+    }
+
+    [Fact]
+    public void Requesting_second_page_should_return_different_orders()
+    {
+        this.Given(x => x.Multiple_orders_have_been_created())
+            .When(x => x.The_second_page_is_requested_with_page_size_1())
+            .Then(x => x.The_response_should_be_for_page_2())
+            .BDDfy();
+    }
+
+    [Fact]
+    public void Listing_orders_when_none_exist_should_return_an_empty_page()
+    {
+        if (Settings.RunAgainstExternalServiceUnderTest) return;
+        if (!Settings.RunWithAnInMemoryDatabase) return;
+
+        this.When(x => x.The_orders_are_listed())
+            .Then(x => x.The_response_should_be_an_empty_page())
+            .BDDfy();
+    }
+
+    #region Steps
+
+    private async Task Multiple_orders_have_been_created()
+    {
         await CreateMultipleOrders();
+    }
 
-        // When
+    private async Task The_orders_are_listed()
+    {
         await _listSteps.Retrieve();
+    }
 
-        // Then
+    private async Task The_orders_are_listed_with_page_size_1()
+    {
+        await _listSteps.Retrieve(page: 1, pageSize: 1);
+    }
+
+    private async Task The_second_page_is_requested_with_page_size_1()
+    {
+        await _listSteps.Retrieve(page: 2, pageSize: 1);
+    }
+
+    private async Task The_response_should_contain_a_paginated_list_of_orders()
+    {
         _listSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
         await _listSteps.ParseResponse();
         _listSteps.Response!.Items.Should().HaveCountGreaterThanOrEqualTo(_createdOrderCount);
         _listSteps.Response!.Page.Should().Be(1);
         _listSteps.Response!.TotalCount.Should().BeGreaterThanOrEqualTo(_createdOrderCount);
-        this.BDDfy();
     }
 
-    [Fact]
-    public async Task Listing_orders_with_small_page_size_should_limit_results()
+    private async Task The_response_should_contain_only_one_item_per_page()
     {
-        // Given
-        await CreateMultipleOrders();
-
-        // When
-        await _listSteps.Retrieve(page: 1, pageSize: 1);
-
-        // Then
         _listSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
         await _listSteps.ParseResponse();
         _listSteps.Response!.Items.Should().HaveCount(1);
         _listSteps.Response!.TotalPages.Should().BeGreaterThanOrEqualTo(_createdOrderCount);
-        this.BDDfy();
     }
 
-    [Fact]
-    public async Task Requesting_second_page_should_return_different_orders()
+    private async Task The_response_should_be_for_page_2()
     {
-        // Given
-        await CreateMultipleOrders();
-
-        // When
-        await _listSteps.Retrieve(page: 2, pageSize: 1);
-
-        // Then
         _listSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
         await _listSteps.ParseResponse();
         _listSteps.Response!.Items.Should().HaveCount(1);
         _listSteps.Response!.Page.Should().Be(2);
-        this.BDDfy();
     }
 
-    [Fact]
-    public async Task Listing_orders_when_none_exist_should_return_an_empty_page()
+    private async Task The_response_should_be_an_empty_page()
     {
-        if (Settings.RunAgainstExternalServiceUnderTest) return;
-        if (!Settings.RunWithAnInMemoryDatabase) return;
-
-        // When
-        await _listSteps.Retrieve();
-
-        // Then
         _listSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
         await _listSteps.ParseResponse();
         _listSteps.Response!.Items.Should().BeEmpty();
         _listSteps.Response!.TotalCount.Should().Be(0);
-        this.BDDfy();
     }
+
+    #endregion
 }

@@ -30,52 +30,97 @@ public class DailySpecials_Ordering_Tests : BaseFixture
 
     [Fact]
     [HappyPath]
-    public async Task Valid_daily_special_order_should_return_a_confirmation()
+    public void Valid_daily_special_order_should_return_a_confirmation()
     {
-        // Given the cinnamon swirl order count is reset
-        await _resetSteps.Reset(DailySpecialDefaults.CinnamonSwirlId);
+        this.Given(x => x.The_cinnamon_swirl_order_count_is_reset())
+            .And(x => x.A_valid_daily_special_order_request_for_cinnamon_swirl())
+            .When(x => x.The_daily_special_order_is_submitted())
+            .Then(x => x.The_daily_special_order_response_should_contain_a_valid_confirmation())
+            .BDDfy();
+    }
 
-        // And a valid daily special order request for cinnamon swirl
+    [Fact]
+    public void Daily_specials_endpoint_should_return_all_available_specials()
+    {
+        this.When(x => x.The_available_daily_specials_are_requested())
+            .Then(x => x.The_daily_specials_response_should_contain_all_expected_specials())
+            .BDDfy();
+    }
+
+    [Fact]
+    public void Ordering_daily_special_beyond_threshold_should_return_conflict()
+    {
+        if (Settings.RunAgainstExternalServiceUnderTest)
+            return;
+
+        this.Given(x => x.The_matcha_waffles_order_count_is_reset())
+            .And(x => x.The_matcha_waffles_special_has_been_ordered_up_to_the_configured_limit())
+            .When(x => x.Another_order_is_placed_for_the_matcha_waffles_special())
+            .Then(x => x.The_response_should_indicate_the_daily_special_is_sold_out())
+            .BDDfy();
+    }
+
+    [Fact]
+    public void Remaining_quantity_should_decrease_after_each_order()
+    {
+        if (Settings.RunAgainstExternalServiceUnderTest)
+            return;
+
+        this.Given(x => x.The_lemon_ricotta_order_count_is_reset())
+            .And(x => x.A_daily_special_order_for_lemon_ricotta_of_quantity_one_is_placed())
+            .When(x => x.The_available_daily_specials_are_requested())
+            .Then(x => x.The_lemon_ricotta_special_should_have_one_fewer_remaining())
+            .BDDfy();
+    }
+
+    #region Steps
+
+    private async Task The_cinnamon_swirl_order_count_is_reset()
+    {
+        await _resetSteps.Reset(DailySpecialDefaults.CinnamonSwirlId);
+    }
+
+    private void A_valid_daily_special_order_request_for_cinnamon_swirl()
+    {
         _postSteps.Request = new TestDailySpecialOrderRequest
         {
             SpecialId = DailySpecialDefaults.CinnamonSwirlId,
             Quantity = 1
         };
+    }
 
-        // When the daily special order is submitted
+    private async Task The_daily_special_order_is_submitted()
+    {
         await _postSteps.Send();
+    }
 
-        // Then the daily special order response should contain a valid confirmation
+    private async Task The_daily_special_order_response_should_contain_a_valid_confirmation()
+    {
         _postSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
         await _postSteps.ParseResponse();
         _postSteps.Response!.SpecialId.Should().Be(DailySpecialDefaults.CinnamonSwirlId);
         _postSteps.Response!.OrderConfirmationId.Should().NotBeEmpty();
-        this.BDDfy();
     }
 
-    [Fact]
-    public async Task Daily_specials_endpoint_should_return_all_available_specials()
+    private async Task The_available_daily_specials_are_requested()
     {
-        // When the available daily specials are requested
         await _getSteps.Retrieve();
+    }
 
-        // Then the daily specials response should contain all expected specials
+    private async Task The_daily_specials_response_should_contain_all_expected_specials()
+    {
         _getSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
         await _getSteps.ParseResponse();
         _getSteps.Response.Should().HaveCount(DailySpecialDefaults.ExpectedSpecialsCount);
-        this.BDDfy();
     }
 
-    [Fact]
-    public async Task Ordering_daily_special_beyond_threshold_should_return_conflict()
+    private async Task The_matcha_waffles_order_count_is_reset()
     {
-        if (Settings.RunAgainstExternalServiceUnderTest)
-            return;
-
-        // Given the matcha waffles order count is reset
         await _resetSteps.Reset(DailySpecialDefaults.MatchaWafflesId);
+    }
 
-        // And the matcha waffles special has been ordered up to the configured limit
+    private async Task The_matcha_waffles_special_has_been_ordered_up_to_the_configured_limit()
+    {
         _postSteps.Request = new TestDailySpecialOrderRequest
         {
             SpecialId = DailySpecialDefaults.MatchaWafflesId,
@@ -83,30 +128,30 @@ public class DailySpecials_Ordering_Tests : BaseFixture
         };
         await _postSteps.Send();
         _postSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
+    }
 
-        // When another order is placed for the matcha waffles special
+    private async Task Another_order_is_placed_for_the_matcha_waffles_special()
+    {
         _postSteps.Request = new TestDailySpecialOrderRequest
         {
             SpecialId = DailySpecialDefaults.MatchaWafflesId,
             Quantity = 1
         };
         await _postSteps.Send();
-
-        // Then the response should indicate the daily special is sold out
-        _postSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Conflict);
-        this.BDDfy();
     }
 
-    [Fact]
-    public async Task Remaining_quantity_should_decrease_after_each_order()
+    private void The_response_should_indicate_the_daily_special_is_sold_out()
     {
-        if (Settings.RunAgainstExternalServiceUnderTest)
-            return;
+        _postSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Conflict);
+    }
 
-        // Given the lemon ricotta order count is reset
+    private async Task The_lemon_ricotta_order_count_is_reset()
+    {
         await _resetSteps.Reset(DailySpecialDefaults.LemonRicottaId);
+    }
 
-        // And a daily special order for lemon ricotta of quantity one is placed
+    private async Task A_daily_special_order_for_lemon_ricotta_of_quantity_one_is_placed()
+    {
         _postSteps.Request = new TestDailySpecialOrderRequest
         {
             SpecialId = DailySpecialDefaults.LemonRicottaId,
@@ -114,15 +159,15 @@ public class DailySpecials_Ordering_Tests : BaseFixture
         };
         await _postSteps.Send();
         _postSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
+    }
 
-        // When the available daily specials are requested
-        await _getSteps.Retrieve();
-
-        // Then the lemon ricotta special should have one fewer remaining
+    private async Task The_lemon_ricotta_special_should_have_one_fewer_remaining()
+    {
         await _getSteps.ParseResponse();
         var lemonRicottaSpecial = _getSteps.Response!.Single(s => s.SpecialId == DailySpecialDefaults.LemonRicottaId);
         var lemonRicottaRemainingQuantity = lemonRicottaSpecial.RemainingQuantity;
         lemonRicottaRemainingQuantity.Should().Be(MaxOrdersPerSpecial - 1);
-        this.BDDfy();
     }
+
+    #endregion
 }

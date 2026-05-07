@@ -42,9 +42,21 @@ public class Orders_Complete_Lifecycle_Tests : BaseFixture
 
     [Fact]
     [HappyPath]
-    public async Task Order_should_progress_through_all_status_transitions_to_completion()
+    public void Order_should_progress_through_all_status_transitions_to_completion()
     {
-        // Given a pancake batch has been created
+        this.Given(x => x.A_pancake_batch_has_been_created())
+            .And(x => x.A_breakfast_order_has_been_placed_for_the_batch())
+            .When(x => x.The_order_is_progressed_through_the_complete_lifecycle())
+            .Then(x => x.The_completed_order_should_be_retrievable_with_all_details())
+            .And(x => x.An_audit_log_entry_should_exist_for_the_order())
+            .And(x => x.The_downstream_services_should_have_received_requests())
+            .BDDfy();
+    }
+
+    #region Steps
+
+    private async Task A_pancake_batch_has_been_created()
+    {
         await _milkSteps.Retrieve();
         _milkSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
         await _eggsSteps.Retrieve();
@@ -63,8 +75,10 @@ public class Orders_Complete_Lifecycle_Tests : BaseFixture
         await _pancakeSteps.ParseResponse();
         _pancakeSteps.Response.Should().NotBeNull();
         _pancakeSteps.Response!.BatchId.Should().NotBeEmpty();
+    }
 
-        // And a breakfast order has been placed for the batch
+    private async Task A_breakfast_order_has_been_placed_for_the_batch()
+    {
         _orderSteps.Request = new TestOrderRequest
         {
             CustomerName = _customerName,
@@ -85,16 +99,20 @@ public class Orders_Complete_Lifecycle_Tests : BaseFixture
         _orderSteps.Response.Should().NotBeNull();
         _orderId = _orderSteps.Response!.OrderId;
         _orderId.Should().NotBeEmpty();
+    }
 
-        // When the order is progressed through the complete lifecycle
+    private async Task The_order_is_progressed_through_the_complete_lifecycle()
+    {
         await _patchSteps.Send(_orderId, OrderStatuses.Preparing);
         _patchSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
         await _patchSteps.Send(_orderId, OrderStatuses.Ready);
         _patchSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
         await _patchSteps.Send(_orderId, OrderStatuses.Completed);
         _patchSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
+    }
 
-        // Then the completed order should be retrievable with all details
+    private async Task The_completed_order_should_be_retrievable_with_all_details()
+    {
         await _retrievalSteps.Retrieve(_orderId);
         _retrievalSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
         await _retrievalSteps.ParseResponse();
@@ -102,14 +120,12 @@ public class Orders_Complete_Lifecycle_Tests : BaseFixture
         _retrievalSteps.Response!.CustomerName.Should().Be(_customerName);
         _retrievalSteps.Response!.Items.Should().HaveCount(1);
         _retrievalSteps.Response!.TableNumber.Should().Be(4);
-
-        // And the order timestamps should be recent
         _retrievalSteps.Response!.CreatedAt.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromMinutes(2));
-
-        // And the order id should be a valid guid format
         _retrievalSteps.Response!.OrderId.ToString().Should().MatchRegex(@"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$");
+    }
 
-        // And an audit log entry should exist for the order
+    private async Task An_audit_log_entry_should_exist_for_the_order()
+    {
         var auditLogRequest = new HttpRequestMessage(HttpMethod.Get, $"{Endpoints.AuditLogs}?entityId={_orderId}");
         auditLogRequest.Headers.Add(CustomHeaders.ComponentTestRequestId, RequestId);
         var auditLogResponse = await Client.SendAsync(auditLogRequest);
@@ -117,14 +133,16 @@ public class Orders_Complete_Lifecycle_Tests : BaseFixture
         var auditContent = await auditLogResponse.Content.ReadAsStringAsync();
         var auditLogs = Json.Deserialize<List<TestAuditLogResponse>>(auditContent)!;
         auditLogs.Should().Contain(l => l.EntityId == _orderId && l.Action == AuditLogDefaults.CreatedAction);
-
-        // And the cow service should have received a milk request
-        if (!Settings.RunAgainstExternalServiceUnderTest)
-            _downstreamSteps.AssertCowServiceReceivedMilkRequest();
-
-        // And the kitchen service should have received a preparation request
-        if (!Settings.RunAgainstExternalServiceUnderTest)
-            _downstreamSteps.AssertKitchenServiceReceivedPreparationRequest();
-        this.BDDfy();
     }
+
+    private void The_downstream_services_should_have_received_requests()
+    {
+        if (!Settings.RunAgainstExternalServiceUnderTest)
+        {
+            _downstreamSteps.AssertCowServiceReceivedMilkRequest();
+            _downstreamSteps.AssertKitchenServiceReceivedPreparationRequest();
+        }
+    }
+
+    #endregion
 }

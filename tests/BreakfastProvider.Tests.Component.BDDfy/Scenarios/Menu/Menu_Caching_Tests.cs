@@ -19,26 +19,43 @@ public class Menu_Caching_Tests : BaseFixture
     }
 
     [Fact]
-    public async Task Menu_should_return_cached_results_on_subsequent_requests()
+    public void Menu_should_return_cached_results_on_subsequent_requests()
     {
         if (Settings.RunAgainstExternalServiceUnderTest)
             return;
 
-        // Given the menu has been requested and cached
+        this.Given(x => x.The_menu_has_been_requested_and_cached())
+            .And(x => x.The_supplier_service_is_then_made_unavailable())
+            .When(x => x.The_menu_is_requested_again())
+            .Then(x => x.The_menu_response_should_still_return_available_items())
+            .BDDfy();
+    }
+
+    #region Steps
+
+    private async Task The_menu_has_been_requested_and_cached()
+    {
         await Client.DeleteAsync(Endpoints.MenuCache);
         await _menuSteps.Retrieve();
         _menuSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
+    }
 
-        // And the supplier service is then made unavailable
+    private void The_supplier_service_is_then_made_unavailable()
+    {
         _secondMenuSteps.AddHeader(FakeScenarioHeaders.SupplierService, FakeScenarios.ServiceUnavailable);
+    }
 
-        // When the menu is requested again
+    private async Task The_menu_is_requested_again()
+    {
         await _secondMenuSteps.Retrieve();
+    }
 
-        // Then the menu response should still return available items
+    private async Task The_menu_response_should_still_return_available_items()
+    {
         _secondMenuSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
         await _secondMenuSteps.ParseResponse();
         _secondMenuSteps.Response!.Should().Contain(m => m.IsAvailable);
-        this.BDDfy();
     }
+
+    #endregion
 }

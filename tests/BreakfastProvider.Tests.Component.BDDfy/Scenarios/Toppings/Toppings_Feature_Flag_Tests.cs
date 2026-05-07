@@ -7,7 +7,6 @@ using TestStack.BDDfy;
 using TestTrackingDiagrams.BDDfy.xUnit3;
 namespace BreakfastProvider.Tests.Component.BDDfy.Scenarios.Toppings;
 
-#pragma warning disable CS1998
 public class Toppings_Feature_Flag_Tests : BaseFixture
 {
     private GetToppingsSteps _toppingsSteps = null!;
@@ -16,53 +15,68 @@ public class Toppings_Feature_Flag_Tests : BaseFixture
     {
     }
 
-    private void EnsureAppCreated(Dictionary<string, string?> overrides)
-    {
-        CreateAppAndClient(overrides);
-        _toppingsSteps = Get<GetToppingsSteps>();
-    }
-
     [Fact]
-    public async Task Toppings_should_exclude_raspberries_when_feature_flag_is_disabled()
+    public void Toppings_should_exclude_raspberries_when_feature_flag_is_disabled()
     {
         if (Settings.RunAgainstExternalServiceUnderTest)
             return;
 
-        // Given the raspberry topping feature flag is disabled
-        EnsureAppCreated(new Dictionary<string, string?>
+        this.Given(x => x.The_raspberry_topping_feature_flag_is_disabled())
+            .When(x => x.Toppings_are_requested())
+            .Then(x => x.The_toppings_response_should_not_include_raspberries())
+            .BDDfy();
+    }
+
+    [Fact]
+    public void Toppings_should_include_raspberries_when_feature_flag_is_enabled()
+    {
+        if (Settings.RunAgainstExternalServiceUnderTest)
+            return;
+
+        this.Given(x => x.The_raspberry_topping_feature_flag_is_enabled())
+            .When(x => x.Toppings_are_requested())
+            .Then(x => x.The_toppings_response_should_include_raspberries())
+            .BDDfy();
+    }
+
+    #region Steps
+
+    private void The_raspberry_topping_feature_flag_is_disabled()
+    {
+        CreateAppAndClient(new Dictionary<string, string?>
         {
             [$"{nameof(FeatureSwitchesConfig)}:{nameof(FeatureSwitchesConfig.IsRaspberryToppingEnabled)}"] = "false"
         });
-
-        // When toppings are requested
-        await _toppingsSteps.Retrieve();
-
-        // Then the toppings response should not include raspberries
-        _toppingsSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
-        await _toppingsSteps.ParseResponse();
-        _toppingsSteps.Response!.Should().NotContain(t => t.Name == ToppingDefaults.Raspberries);
-        this.BDDfy();
+        _toppingsSteps = Get<GetToppingsSteps>();
     }
 
-    [Fact]
-    public async Task Toppings_should_include_raspberries_when_feature_flag_is_enabled()
+    private void The_raspberry_topping_feature_flag_is_enabled()
     {
-        if (Settings.RunAgainstExternalServiceUnderTest)
-            return;
-
-        // Given the raspberry topping feature flag is enabled
-        EnsureAppCreated(new Dictionary<string, string?>
+        CreateAppAndClient(new Dictionary<string, string?>
         {
             [$"{nameof(FeatureSwitchesConfig)}:{nameof(FeatureSwitchesConfig.IsRaspberryToppingEnabled)}"] = "true"
         });
+        _toppingsSteps = Get<GetToppingsSteps>();
+    }
 
-        // When toppings are requested
+    private async Task Toppings_are_requested()
+    {
         await _toppingsSteps.Retrieve();
+    }
 
-        // Then the toppings response should include raspberries
+    private async Task The_toppings_response_should_not_include_raspberries()
+    {
+        _toppingsSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
+        await _toppingsSteps.ParseResponse();
+        _toppingsSteps.Response!.Should().NotContain(t => t.Name == ToppingDefaults.Raspberries);
+    }
+
+    private async Task The_toppings_response_should_include_raspberries()
+    {
         _toppingsSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
         await _toppingsSteps.ParseResponse();
         _toppingsSteps.Response!.Should().Contain(t => t.Name == ToppingDefaults.Raspberries);
-        this.BDDfy();
     }
+
+    #endregion
 }

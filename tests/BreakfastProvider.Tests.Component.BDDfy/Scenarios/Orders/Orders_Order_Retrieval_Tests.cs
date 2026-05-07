@@ -36,9 +36,29 @@ public class Orders_Order_Retrieval_Tests : BaseFixture
 
     [Fact]
     [HappyPath]
-    public async Task Previously_created_order_should_be_retrievable_by_id()
+    public void Previously_created_order_should_be_retrievable_by_id()
     {
-        // Given a pancake batch has been created
+        this.Given(x => x.A_pancake_batch_has_been_created())
+            .And(x => x.An_order_has_been_created_for_the_batch())
+            .When(x => x.The_order_is_retrieved_by_id())
+            .Then(x => x.The_retrieved_order_should_match_the_created_order())
+            .And(x => x.The_downstream_services_should_have_received_requests())
+            .BDDfy();
+    }
+
+    [Fact]
+    public void Retrieving_a_non_existent_order_should_return_not_found()
+    {
+        this.Given(x => x.A_non_existent_order_id())
+            .When(x => x.The_non_existent_order_is_retrieved())
+            .Then(x => x.The_response_should_be_not_found())
+            .BDDfy();
+    }
+
+    #region Steps
+
+    private async Task A_pancake_batch_has_been_created()
+    {
         await _milkSteps.Retrieve();
         await _eggsSteps.Retrieve();
         await _flourSteps.Retrieve();
@@ -54,8 +74,10 @@ public class Orders_Order_Retrieval_Tests : BaseFixture
         await _pancakeSteps.ParseResponse();
         _pancakeSteps.Response.Should().NotBeNull();
         _pancakeSteps.Response!.BatchId.Should().NotBeEmpty();
+    }
 
-        // And an order has been created for the batch
+    private async Task An_order_has_been_created_for_the_batch()
+    {
         _orderSteps.Request = new TestOrderRequest
         {
             CustomerName = _customerName,
@@ -75,38 +97,47 @@ public class Orders_Order_Retrieval_Tests : BaseFixture
         await _orderSteps.ParseResponse();
         _orderSteps.Response.Should().NotBeNull();
         _orderSteps.Response!.OrderId.Should().NotBeEmpty();
+    }
 
-        // When the order is retrieved by id
+    private async Task The_order_is_retrieved_by_id()
+    {
         await _retrievalSteps.Retrieve(_orderSteps.Response!.OrderId);
+    }
 
-        // Then the retrieved order should match the created order
+    private async Task The_retrieved_order_should_match_the_created_order()
+    {
         _retrievalSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
         await _retrievalSteps.ParseResponse();
         _retrievalSteps.Response!.OrderId.Should().Be(_orderSteps.Response!.OrderId);
         _retrievalSteps.Response!.CustomerName.Should().Be(_customerName);
         _retrievalSteps.Response!.Items.Should().HaveCount(1);
-
-        // And the cow service should have received a milk request
-        if (!Settings.RunAgainstExternalServiceUnderTest)
-            _downstreamSteps.AssertCowServiceReceivedMilkRequest();
-
-        // And the kitchen service should have received a preparation request
-        if (!Settings.RunAgainstExternalServiceUnderTest)
-            _downstreamSteps.AssertKitchenServiceReceivedPreparationRequest();
-        this.BDDfy();
     }
 
-    [Fact]
-    public async Task Retrieving_a_non_existent_order_should_return_not_found()
+    private void The_downstream_services_should_have_received_requests()
     {
-        // Given a non-existent order id
-        var nonExistentOrderId = Guid.NewGuid();
-
-        // When the order is retrieved by id
-        await _retrievalSteps.Retrieve(nonExistentOrderId);
-
-        // Then the response should be not found
-        _retrievalSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.NotFound);
-        this.BDDfy();
+        if (!Settings.RunAgainstExternalServiceUnderTest)
+        {
+            _downstreamSteps.AssertCowServiceReceivedMilkRequest();
+            _downstreamSteps.AssertKitchenServiceReceivedPreparationRequest();
+        }
     }
+
+    private Guid _nonExistentOrderId;
+
+    private void A_non_existent_order_id()
+    {
+        _nonExistentOrderId = Guid.NewGuid();
+    }
+
+    private async Task The_non_existent_order_is_retrieved()
+    {
+        await _retrievalSteps.Retrieve(_nonExistentOrderId);
+    }
+
+    private void The_response_should_be_not_found()
+    {
+        _retrievalSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.NotFound);
+    }
+
+    #endregion
 }

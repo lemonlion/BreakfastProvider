@@ -23,20 +23,44 @@ public class DailySpecials_Idempotency_Tests : BaseFixture
     }
 
     [Fact]
-    public async Task Same_order_with_same_idempotency_key_should_return_same_confirmation()
+    public void Same_order_with_same_idempotency_key_should_return_same_confirmation()
     {
-        // Given the cinnamon swirl order count is reset
-        await _resetSteps.Reset(DailySpecialDefaults.CinnamonSwirlId);
+        this.Given(x => x.The_cinnamon_swirl_order_count_is_reset())
+            .And(x => x.An_order_request_with_an_idempotency_key())
+            .When(x => x.The_order_is_submitted_twice_with_the_same_idempotency_key())
+            .Then(x => x.Both_responses_should_return_the_same_confirmation_id())
+            .BDDfy();
+    }
 
-        // And an order request with an idempotency key
+    [Fact]
+    public void Same_order_with_different_idempotency_keys_should_return_different_confirmations()
+    {
+        this.Given(x => x.The_cinnamon_swirl_order_count_is_reset())
+            .And(x => x.An_order_request_for_the_same_special())
+            .When(x => x.The_order_is_submitted_with_two_different_idempotency_keys())
+            .Then(x => x.The_responses_should_have_different_confirmation_ids())
+            .BDDfy();
+    }
+
+    #region Steps
+
+    private async Task The_cinnamon_swirl_order_count_is_reset()
+    {
+        await _resetSteps.Reset(DailySpecialDefaults.CinnamonSwirlId);
+    }
+
+    private void An_order_request_with_an_idempotency_key()
+    {
         _idempotencyKey = Guid.NewGuid().ToString();
         _postSteps.Request = new TestDailySpecialOrderRequest
         {
             SpecialId = DailySpecialDefaults.CinnamonSwirlId,
             Quantity = 1
         };
+    }
 
-        // When the order is submitted twice with the same idempotency key
+    private async Task The_order_is_submitted_twice_with_the_same_idempotency_key()
+    {
         _postSteps.AddHeader(CustomHeaders.IdempotencyKey, _idempotencyKey);
 
         await _postSteps.Send();
@@ -48,26 +72,24 @@ public class DailySpecials_Idempotency_Tests : BaseFixture
         _postSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
         await _postSteps.ParseResponse();
         _secondConfirmationId = _postSteps.Response!.OrderConfirmationId;
-
-        // Then both responses should return the same confirmation id
-        _firstConfirmationId.Should().Be(_secondConfirmationId);
-        this.BDDfy();
     }
 
-    [Fact]
-    public async Task Same_order_with_different_idempotency_keys_should_return_different_confirmations()
+    private void Both_responses_should_return_the_same_confirmation_id()
     {
-        // Given the cinnamon swirl order count is reset
-        await _resetSteps.Reset(DailySpecialDefaults.CinnamonSwirlId);
+        _firstConfirmationId.Should().Be(_secondConfirmationId);
+    }
 
-        // And an order request for the same special
+    private void An_order_request_for_the_same_special()
+    {
         _postSteps.Request = new TestDailySpecialOrderRequest
         {
             SpecialId = DailySpecialDefaults.CinnamonSwirlId,
             Quantity = 1
         };
+    }
 
-        // When the order is submitted with two different idempotency keys
+    private async Task The_order_is_submitted_with_two_different_idempotency_keys()
+    {
         _postSteps.AddHeader(CustomHeaders.IdempotencyKey, Guid.NewGuid().ToString());
         await _postSteps.Send();
         _postSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
@@ -79,9 +101,12 @@ public class DailySpecials_Idempotency_Tests : BaseFixture
         _postSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
         await _postSteps.ParseResponse();
         _secondConfirmationId = _postSteps.Response!.OrderConfirmationId;
-
-        // Then the responses should have different confirmation ids
-        _firstConfirmationId.Should().NotBe(_secondConfirmationId);
-        this.BDDfy();
     }
+
+    private void The_responses_should_have_different_confirmation_ids()
+    {
+        _firstConfirmationId.Should().NotBe(_secondConfirmationId);
+    }
+
+    #endregion
 }

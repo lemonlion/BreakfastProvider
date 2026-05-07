@@ -11,24 +11,35 @@ namespace BreakfastProvider.Tests.Component.BDDfy.Scenarios.Specifications;
 
 public class Specifications_Async_Api_Tests : BaseFixture
 {
+    private HttpResponseMessage? _asyncApiResponse;
+    private string? _asyncApiJsonString;
+    private JsonDocument? _asyncApiJson;
+
     [Fact]
     [HappyPath]
     [Trait("Produces", "asyncapi.json")]
-    public async Task The_AsyncApi_endpoint_should_return_a_valid_specification()
+    public void The_AsyncApi_endpoint_should_return_a_valid_specification()
     {
-        // When the asyncapi endpoint is called (with retries)
-        HttpResponseMessage? asyncApiResponse = null;
-        string? asyncApiJsonString = null;
-        JsonDocument? asyncApiJson = null;
+        this.When(x => x.The_asyncapi_endpoint_is_called())
+            .Then(x => x.The_response_status_should_be_ok())
+            .And(x => x.The_response_should_be_valid_json())
+            .And(x => x.The_asyncapi_spec_should_contain_expected_top_level_properties())
+            .And(x => x.The_asyncapi_spec_is_written_to_disk_as_json())
+            .BDDfy();
+    }
 
+    #region Steps
+
+    private async Task The_asyncapi_endpoint_is_called()
+    {
         const int maxRetries = 5;
         for (var attempt = 1; attempt <= maxRetries; attempt++)
         {
             try
             {
-                asyncApiResponse = await Client.GetAsync(Endpoints.AsyncApi.AsyncApiSpec);
-                asyncApiJsonString = await asyncApiResponse.Content.ReadAsStringAsync();
-                if (Json.TryParse(asyncApiJsonString, out asyncApiJson))
+                _asyncApiResponse = await Client.GetAsync(Endpoints.AsyncApi.AsyncApiSpec);
+                _asyncApiJsonString = await _asyncApiResponse.Content.ReadAsStringAsync();
+                if (Json.TryParse(_asyncApiJsonString, out _asyncApiJson))
                     break;
             }
             catch (HttpRequestException) when (attempt < maxRetries)
@@ -38,31 +49,39 @@ public class Specifications_Async_Api_Tests : BaseFixture
             if (attempt < maxRetries)
                 await Task.Delay(500 * attempt);
         }
+    }
 
-        // Then the response status should be ok
-        asyncApiResponse!.StatusCode.Should().Be(HttpStatusCode.OK);
+    private void The_response_status_should_be_ok()
+    {
+        _asyncApiResponse!.StatusCode.Should().Be(HttpStatusCode.OK);
+    }
 
-        // And the response should be valid json
-        var asyncApiResponseIsValidJson = asyncApiJson is not null;
+    private void The_response_should_be_valid_json()
+    {
+        var asyncApiResponseIsValidJson = _asyncApiJson is not null;
         asyncApiResponseIsValidJson.Should().BeTrue(
-            $"response body (first 500 chars): {asyncApiJsonString?[..Math.Min(asyncApiJsonString.Length, 500)]}");
+            $"response body (first 500 chars): {_asyncApiJsonString?[..Math.Min(_asyncApiJsonString.Length, 500)]}");
+    }
 
-        // And the asyncapi spec should contain expected top-level properties
-        asyncApiJson!.RootElement.GetProperty("asyncapi").Should().NotBeNull();
-        asyncApiJson!.RootElement.GetProperty("info").Should().NotBeNull();
-        asyncApiJson!.RootElement.GetProperty("defaultContentType").Should().NotBeNull();
-        asyncApiJson!.RootElement.GetProperty("channels").Should().NotBeNull();
-        asyncApiJson!.RootElement.GetProperty("operations").Should().NotBeNull();
-        asyncApiJson!.RootElement.GetProperty("components").Should().NotBeNull();
+    private void The_asyncapi_spec_should_contain_expected_top_level_properties()
+    {
+        _asyncApiJson!.RootElement.GetProperty("asyncapi").Should().NotBeNull();
+        _asyncApiJson!.RootElement.GetProperty("info").Should().NotBeNull();
+        _asyncApiJson!.RootElement.GetProperty("defaultContentType").Should().NotBeNull();
+        _asyncApiJson!.RootElement.GetProperty("channels").Should().NotBeNull();
+        _asyncApiJson!.RootElement.GetProperty("operations").Should().NotBeNull();
+        _asyncApiJson!.RootElement.GetProperty("components").Should().NotBeNull();
+    }
 
-        // And the asyncapi spec is written to disk as json
+    private async Task The_asyncapi_spec_is_written_to_disk_as_json()
+    {
         var path = $"{AsyncApiSpecs.SpecificationsFolderPath}{AsyncApiSpecs.JsonFileName}";
         const int writeRetries = 3;
         for (var attempt = 1; attempt <= writeRetries; attempt++)
         {
             try
             {
-                await File.WriteAllTextAsync(path, asyncApiJsonString, Encoding.UTF8);
+                await File.WriteAllTextAsync(path, _asyncApiJsonString, Encoding.UTF8);
                 return;
             }
             catch (IOException) when (attempt < writeRetries)
@@ -70,6 +89,7 @@ public class Specifications_Async_Api_Tests : BaseFixture
                 await Task.Delay(500 * attempt);
             }
         }
-        this.BDDfy();
     }
+
+    #endregion
 }

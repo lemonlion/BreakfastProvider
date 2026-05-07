@@ -15,7 +15,6 @@ public class DailySpecials_Validation_Tests : BaseFixture
     public async Task Daily_special_order_with_invalid_field_should_return_bad_request(
         string field, string? value, string reason, string expectedError, string expectedStatus)
     {
-        // Given valid daily special order requests with an invalid field
         var validBase = new TestDailySpecialOrderRequest
         {
             SpecialId = DailySpecialDefaults.CinnamonSwirlId,
@@ -25,11 +24,9 @@ public class DailySpecials_Validation_Tests : BaseFixture
         var input = new InvalidFieldFromRequest(field, value, reason);
         var requests = ValidationHelper.CreateValidationRequests(validBase, new List<InvalidFieldFromRequest> { input });
 
-        // When the invalid daily special order requests are submitted
         var responses = await ValidationHelper.SendValidationRequests(
             Client, RequestId, Endpoints.DailySpecialsOrders, requests, new List<InvalidFieldFromRequest> { input });
 
-        // Then the responses should contain the validation error for the invalid field
         var actualResults = await ValidationHelper.ParseValidationResponses(responses);
         var actual = actualResults.Single();
         actual.ErrorMessage.Should().Be(expectedError);

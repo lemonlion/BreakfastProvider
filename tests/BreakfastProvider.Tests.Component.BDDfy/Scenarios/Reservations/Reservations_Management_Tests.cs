@@ -14,6 +14,9 @@ public class Reservations_Management_Tests : BaseFixture
     private readonly GetReservationSteps _getSteps;
     private readonly CancelReservationSteps _cancelSteps;
 
+    private int _createdReservationId;
+    private HttpResponseMessage? _deleteResponse;
+
     public Reservations_Management_Tests()
     {
         _postSteps = Get<PostReservationSteps>();
@@ -30,96 +33,135 @@ public class Reservations_Management_Tests : BaseFixture
         ContactPhone = "07700900000"
     };
 
-    private async Task<int> CreateReservation()
+    [Fact]
+    [HappyPath]
+    public void Creating_a_reservation_should_return_the_confirmed_reservation()
     {
-        _postSteps.Request = CreateValidRequest();
-        await _postSteps.Send();
-        _postSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
-        await _postSteps.ParseResponse();
-        return _postSteps.Response!.Id;
+        this.Given(x => x.A_valid_reservation_request_is_prepared())
+            .When(x => x.The_reservation_is_submitted())
+            .Then(x => x.The_response_should_contain_the_confirmed_booking())
+            .BDDfy();
     }
 
     [Fact]
-    [HappyPath]
-    public async Task Creating_a_reservation_should_return_the_confirmed_reservation()
+    public void Retrieving_an_existing_reservation_should_return_the_reservation()
     {
-        // Given a valid reservation request
+        this.Given(x => x.A_reservation_exists())
+            .When(x => x.The_reservation_is_retrieved_by_id())
+            .Then(x => x.The_get_response_should_contain_the_reservation())
+            .BDDfy();
+    }
+
+    [Fact]
+    public void Cancelling_a_reservation_should_return_the_cancelled_reservation()
+    {
+        this.Given(x => x.A_reservation_exists())
+            .When(x => x.The_reservation_is_cancelled())
+            .Then(x => x.The_cancellation_response_should_indicate_cancelled())
+            .BDDfy();
+    }
+
+    [Fact]
+    public void Cancelling_an_already_cancelled_reservation_should_return_a_conflict_response()
+    {
+        this.Given(x => x.A_cancelled_reservation_exists())
+            .When(x => x.The_reservation_is_cancelled())
+            .Then(x => x.The_cancellation_response_should_indicate_conflict())
+            .BDDfy();
+    }
+
+    [Fact]
+    public void Deleting_a_reservation_should_return_no_content()
+    {
+        this.Given(x => x.A_reservation_exists())
+            .When(x => x.The_reservation_is_deleted())
+            .Then(x => x.The_delete_response_should_indicate_no_content())
+            .BDDfy();
+    }
+
+    #region Steps
+
+    private async Task A_valid_reservation_request_is_prepared()
+    {
         _postSteps.Request = CreateValidRequest();
+        await Task.CompletedTask;
+    }
 
-        // When the reservation is submitted
+    private async Task The_reservation_is_submitted()
+    {
         await _postSteps.Send();
+    }
 
-        // Then the response should contain the confirmed booking
+    private async Task The_response_should_contain_the_confirmed_booking()
+    {
         _postSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
         await _postSteps.ParseResponse();
         _postSteps.Response!.Status.Should().Be("Confirmed");
-        _postSteps.Response!.CustomerName.Should().Be(_postSteps.Request.CustomerName);
-        this.BDDfy();
+        _postSteps.Response!.CustomerName.Should().Be(_postSteps.Request!.CustomerName);
     }
 
-    [Fact]
-    public async Task Retrieving_an_existing_reservation_should_return_the_reservation()
+    private async Task A_reservation_exists()
     {
-        // Given a reservation exists
-        var createdReservationId = await CreateReservation();
+        _postSteps.Request = CreateValidRequest();
+        await _postSteps.Send();
+        _postSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
+        await _postSteps.ParseResponse();
+        _createdReservationId = _postSteps.Response!.Id;
+    }
 
-        // When the reservation is retrieved by id
-        await _getSteps.RetrieveById(createdReservationId);
+    private async Task The_reservation_is_retrieved_by_id()
+    {
+        await _getSteps.RetrieveById(_createdReservationId);
+    }
 
-        // Then the response should contain the reservation
+    private async Task The_get_response_should_contain_the_reservation()
+    {
         _getSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
         await _getSteps.ParseResponse();
-        _getSteps.Response!.Id.Should().Be(createdReservationId);
+        _getSteps.Response!.Id.Should().Be(_createdReservationId);
         _getSteps.Response!.CustomerName.Should().Be(_postSteps.Response!.CustomerName);
         _getSteps.Response!.Status.Should().Be("Confirmed");
-        this.BDDfy();
     }
 
-    [Fact]
-    public async Task Cancelling_a_reservation_should_return_the_cancelled_reservation()
+    private async Task The_reservation_is_cancelled()
     {
-        // Given a reservation exists
-        var createdReservationId = await CreateReservation();
+        await _cancelSteps.Send(_createdReservationId);
+    }
 
-        // When the reservation is cancelled
-        await _cancelSteps.Send(createdReservationId);
-
-        // Then the cancellation response should indicate the reservation is cancelled
+    private async Task The_cancellation_response_should_indicate_cancelled()
+    {
         _cancelSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
         await _cancelSteps.ParseResponse();
         _cancelSteps.Response!.Status.Should().Be("Cancelled");
-        this.BDDfy();
     }
 
-    [Fact]
-    public async Task Cancelling_an_already_cancelled_reservation_should_return_a_conflict_response()
+    private async Task A_cancelled_reservation_exists()
     {
-        // Given a cancelled reservation exists
-        var createdReservationId = await CreateReservation();
-        await _cancelSteps.Send(createdReservationId);
+        _postSteps.Request = CreateValidRequest();
+        await _postSteps.Send();
+        _postSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
+        await _postSteps.ParseResponse();
+        _createdReservationId = _postSteps.Response!.Id;
+        await _cancelSteps.Send(_createdReservationId);
         _cancelSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
-
-        // When the reservation is cancelled again
-        await _cancelSteps.Send(createdReservationId);
-
-        // Then the cancellation response should indicate a conflict
-        _cancelSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Conflict);
-        this.BDDfy();
     }
 
-    [Fact]
-    public async Task Deleting_a_reservation_should_return_no_content()
+    private void The_cancellation_response_should_indicate_conflict()
     {
-        // Given a reservation exists
-        var createdReservationId = await CreateReservation();
-
-        // When the reservation is deleted
-        var request = new HttpRequestMessage(HttpMethod.Delete, $"reservations/{createdReservationId}");
-        request.Headers.Add(CustomHeaders.ComponentTestRequestId, RequestId);
-        var deleteResponse = await Client.SendAsync(request);
-
-        // Then the response should indicate no content
-        deleteResponse.StatusCode.Should().Be(HttpStatusCode.NoContent);
-        this.BDDfy();
+        _cancelSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Conflict);
     }
+
+    private async Task The_reservation_is_deleted()
+    {
+        var request = new HttpRequestMessage(HttpMethod.Delete, $"reservations/{_createdReservationId}");
+        request.Headers.Add(CustomHeaders.ComponentTestRequestId, RequestId);
+        _deleteResponse = await Client.SendAsync(request);
+    }
+
+    private void The_delete_response_should_indicate_no_content()
+    {
+        _deleteResponse!.StatusCode.Should().Be(HttpStatusCode.NoContent);
+    }
+
+    #endregion
 }

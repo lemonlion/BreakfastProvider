@@ -10,14 +10,40 @@ namespace BreakfastProvider.Tests.Component.BDDfy.Scenarios.Infrastructure;
 
 public class Infrastructure_Degraded_Health_Check_Tests : BaseFixture
 {
+    private HttpResponseMessage? _response;
+    private TestHealthCheckResponse? _result;
+
     public Infrastructure_Degraded_Health_Check_Tests() : base(delayAppCreation: true) { }
 
     [Fact]
-    public async Task Health_check_should_report_degraded_when_cow_service_is_unavailable()
+    public void Health_check_should_report_degraded_when_cow_service_is_unavailable()
     {
         if (Settings.RunAgainstExternalServiceUnderTest) return;
 
-        // Given the cow service is configured to be unreachable
+        this.Given(x => x.The_cow_service_is_configured_to_be_unreachable())
+            .When(x => x.The_health_check_endpoint_is_called())
+            .Then(x => x.The_response_should_indicate_degraded_status())
+            .And(x => x.The_cow_service_dependency_should_report_degraded())
+            .BDDfy();
+    }
+
+    [Fact]
+    public void Health_check_should_report_degraded_when_multiple_downstream_services_are_unavailable()
+    {
+        if (Settings.RunAgainstExternalServiceUnderTest) return;
+
+        this.Given(x => x.The_cow_service_and_supplier_service_are_configured_to_be_unreachable())
+            .When(x => x.The_health_check_endpoint_is_called())
+            .Then(x => x.The_response_should_indicate_degraded_status())
+            .And(x => x.The_cow_service_dependency_should_report_degraded())
+            .And(x => x.The_supplier_service_dependency_should_report_degraded())
+            .BDDfy();
+    }
+
+    #region Steps
+
+    private void The_cow_service_is_configured_to_be_unreachable()
+    {
         CreateAppAndClient(additionalServices: services =>
         {
             services.ReplaceHealthCheckWithDegraded(HealthCheckNames.CowService,
@@ -28,30 +54,10 @@ public class Infrastructure_Degraded_Health_Check_Tests : BaseFixture
             if (!Settings.RunWithAnInMemoryKafkaBroker)
                 services.ReplaceKafkaHealthCheckWithNoOp();
         });
-
-        // When the health check endpoint is called
-        var response = await Client.GetAsync(Endpoints.Health);
-
-        // Then the response should indicate a degraded status
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
-
-        var content = await response.Content.ReadAsStringAsync();
-        var result = Json.Deserialize<TestHealthCheckResponse>(content)!;
-        result.Should().NotBeNull();
-        result.Status.Should().Be(HealthCheckStatuses.Degraded);
-
-        // And the cow service dependency should report degraded
-        result.Results.Should().ContainKey(HealthCheckNames.CowService);
-        result.Results[HealthCheckNames.CowService].Status.Should().Be(HealthCheckStatuses.Degraded);
-        this.BDDfy();
     }
 
-    [Fact]
-    public async Task Health_check_should_report_degraded_when_multiple_downstream_services_are_unavailable()
+    private void The_cow_service_and_supplier_service_are_configured_to_be_unreachable()
     {
-        if (Settings.RunAgainstExternalServiceUnderTest) return;
-
-        // Given the cow service and supplier service are configured to be unreachable
         CreateAppAndClient(additionalServices: services =>
         {
             services.ReplaceHealthCheckWithDegraded(HealthCheckNames.CowService,
@@ -64,23 +70,33 @@ public class Infrastructure_Degraded_Health_Check_Tests : BaseFixture
             if (!Settings.RunWithAnInMemoryKafkaBroker)
                 services.ReplaceKafkaHealthCheckWithNoOp();
         });
-
-        // When the health check endpoint is called
-        var response = await Client.GetAsync(Endpoints.Health);
-
-        // Then the response should indicate a degraded status
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
-
-        var content = await response.Content.ReadAsStringAsync();
-        var result = Json.Deserialize<TestHealthCheckResponse>(content)!;
-        result.Should().NotBeNull();
-        result.Status.Should().Be(HealthCheckStatuses.Degraded);
-
-        // And both dependencies should report degraded
-        result.Results.Should().ContainKey(HealthCheckNames.CowService);
-        result.Results[HealthCheckNames.CowService].Status.Should().Be(HealthCheckStatuses.Degraded);
-        result.Results.Should().ContainKey(HealthCheckNames.SupplierService);
-        result.Results[HealthCheckNames.SupplierService].Status.Should().Be(HealthCheckStatuses.Degraded);
-        this.BDDfy();
     }
+
+    private async Task The_health_check_endpoint_is_called()
+    {
+        _response = await Client.GetAsync(Endpoints.Health);
+        var content = await _response.Content.ReadAsStringAsync();
+        _result = Json.Deserialize<TestHealthCheckResponse>(content)!;
+    }
+
+    private void The_response_should_indicate_degraded_status()
+    {
+        _response!.StatusCode.Should().Be(HttpStatusCode.OK);
+        _result.Should().NotBeNull();
+        _result!.Status.Should().Be(HealthCheckStatuses.Degraded);
+    }
+
+    private void The_cow_service_dependency_should_report_degraded()
+    {
+        _result!.Results.Should().ContainKey(HealthCheckNames.CowService);
+        _result.Results[HealthCheckNames.CowService].Status.Should().Be(HealthCheckStatuses.Degraded);
+    }
+
+    private void The_supplier_service_dependency_should_report_degraded()
+    {
+        _result!.Results.Should().ContainKey(HealthCheckNames.SupplierService);
+        _result.Results[HealthCheckNames.SupplierService].Status.Should().Be(HealthCheckStatuses.Degraded);
+    }
+
+    #endregion
 }

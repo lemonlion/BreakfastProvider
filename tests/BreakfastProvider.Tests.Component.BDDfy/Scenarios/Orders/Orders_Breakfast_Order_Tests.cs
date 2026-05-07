@@ -38,7 +38,42 @@ public class Orders_Breakfast_Order_Tests : BaseFixture
         _downstreamSteps = Get<DownstreamRequestSteps>();
     }
 
-    private async Task CreatePancakeBatch()
+    [Fact]
+    [HappyPath]
+    public void Valid_order_should_be_created_and_an_event_published()
+    {
+        this.Given(x => x.A_pancake_batch_is_created_and_order_request_is_ready())
+            .When(x => x.The_order_is_submitted())
+            .Then(x => x.The_order_should_be_created_successfully())
+            .And(x => x.An_order_created_event_should_have_been_published())
+            .And(x => x.The_kitchen_service_should_have_received_a_preparation_request())
+            .BDDfy();
+    }
+
+    [Fact]
+    public void Creating_an_order_should_produce_an_audit_log_entry_and_events()
+    {
+        this.Given(x => x.A_pancake_batch_is_created_and_order_request_is_ready())
+            .When(x => x.The_order_is_submitted())
+            .Then(x => x.The_order_should_be_created_successfully())
+            .And(x => x.An_order_created_event_should_have_been_published())
+            .And(x => x.A_recipe_log_should_have_been_published_to_kafka())
+            .BDDfy();
+    }
+
+    [Fact]
+    public void Creating_an_order_should_write_an_outbox_message_that_gets_processed()
+    {
+        this.Given(x => x.A_pancake_batch_is_created_and_order_request_is_ready())
+            .When(x => x.The_order_is_submitted())
+            .Then(x => x.The_order_should_be_created_successfully())
+            .And(x => x.An_outbox_message_should_have_been_written_and_processed())
+            .BDDfy();
+    }
+
+    #region Steps
+
+    private async Task A_pancake_batch_is_created_and_order_request_is_ready()
     {
         await _milkSteps.Retrieve();
         _milkSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -68,164 +103,104 @@ public class Orders_Breakfast_Order_Tests : BaseFixture
             BatchId = _pancakeSteps.Response!.BatchId,
             Quantity = 1
         });
-    }
 
-    private void SetupValidOrderRequest()
-    {
         _orderSteps.Request.CustomerName = _customerName;
         _orderSteps.Request.TableNumber = 7;
     }
 
-    [Fact]
-    [HappyPath]
-    public async Task Valid_order_should_be_created_and_an_event_published()
+    private async Task The_order_is_submitted()
     {
-        // Given
-        await CreatePancakeBatch();
-        SetupValidOrderRequest();
-
-        // When
         await _orderSteps.Send();
+    }
 
-        // Then
+    private async Task The_order_should_be_created_successfully()
+    {
         _orderSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
         await _orderSteps.ParseResponse();
         _orderSteps.Response!.CustomerName.Should().Be(_customerName);
         _orderSteps.Response!.Items.Should().HaveCount(1);
+    }
 
-        // And an order created event should have been published
-        if (!Settings.RunAgainstExternalServiceUnderTest)
+    private async Task An_order_created_event_should_have_been_published()
+    {
+        if (Settings.RunAgainstExternalServiceUnderTest) return;
+
+        var eventStore = AppFactory.Services.GetService<IPublishedEventStore>();
+        if (eventStore != null)
         {
-            var eventStore = AppFactory.Services.GetService<IPublishedEventStore>();
-            if (eventStore != null)
+            const int maxRetries = 100;
+            var retryDelay = TimeSpan.FromMilliseconds(300);
+
+            IReadOnlyList<TestOrderCreatedEvent> orderCreatedEvents = [];
+            for (var i = 0; i < maxRetries; i++)
             {
-                const int maxRetries = 100;
-                var retryDelay = TimeSpan.FromMilliseconds(300);
-
-                IReadOnlyList<TestOrderCreatedEvent> orderCreatedEvents = [];
-                for (var i = 0; i < maxRetries; i++)
-                {
-                    orderCreatedEvents = await eventStore.GetPublishedEventsAsync<TestOrderCreatedEvent>();
-                    if (orderCreatedEvents.Any(e => e.CustomerName == _customerName))
-                        break;
-                    await Task.Delay(retryDelay);
-                }
-
-                orderCreatedEvents.Should().Contain(e => e.CustomerName == _customerName);
+                orderCreatedEvents = await eventStore.GetPublishedEventsAsync<TestOrderCreatedEvent>();
+                if (orderCreatedEvents.Any(e => e.CustomerName == _customerName))
+                    break;
+                await Task.Delay(retryDelay);
             }
 
-            // And the kitchen service should have received a preparation request
+            orderCreatedEvents.Should().Contain(e => e.CustomerName == _customerName);
+        }
+    }
+
+    private void The_kitchen_service_should_have_received_a_preparation_request()
+    {
+        if (!Settings.RunAgainstExternalServiceUnderTest)
             _downstreamSteps.AssertKitchenServiceReceivedPreparationRequest();
-        }
-        this.BDDfy();
     }
 
-    [Fact]
-    public async Task Creating_an_order_should_produce_an_audit_log_entry_and_events()
+    private async Task A_recipe_log_should_have_been_published_to_kafka()
     {
-        // Given
-        await CreatePancakeBatch();
-        SetupValidOrderRequest();
+        if (Settings.RunAgainstExternalServiceUnderTest) return;
 
-        // When
-        await _orderSteps.Send();
-
-        // Then
-        _orderSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
-        await _orderSteps.ParseResponse();
-        _orderSteps.Response!.CustomerName.Should().Be(_customerName);
-        _orderSteps.Response!.Items.Should().HaveCount(1);
-
-        // And an order created event should have been published
-        if (!Settings.RunAgainstExternalServiceUnderTest)
+        var kafkaStore = AppFactory.Services.GetService<IKafkaMessageStore>();
+        if (kafkaStore != null)
         {
-            var eventStore = AppFactory.Services.GetService<IPublishedEventStore>();
-            if (eventStore != null)
-            {
-                const int maxRetries = 100;
-                var retryDelay = TimeSpan.FromMilliseconds(300);
-
-                IReadOnlyList<TestOrderCreatedEvent> orderCreatedEvents = [];
-                for (var i = 0; i < maxRetries; i++)
-                {
-                    orderCreatedEvents = await eventStore.GetPublishedEventsAsync<TestOrderCreatedEvent>();
-                    if (orderCreatedEvents.Any(e => e.CustomerName == _customerName))
-                        break;
-                    await Task.Delay(retryDelay);
-                }
-
-                orderCreatedEvents.Should().Contain(e => e.CustomerName == _customerName);
-            }
-        }
-
-        // And a recipe log should have been published to Kafka
-        if (!Settings.RunAgainstExternalServiceUnderTest)
-        {
-            var kafkaStore = AppFactory.Services.GetService<IKafkaMessageStore>();
-            if (kafkaStore != null)
-            {
-                const int maxRetries = 50;
-                var retryDelay = TimeSpan.FromMilliseconds(200);
-
-                IReadOnlyList<(string Key, TestRecipeLogEvent Message)> recipeLogMessages = [];
-                for (var i = 0; i < maxRetries; i++)
-                {
-                    recipeLogMessages = kafkaStore.GetMessages<TestRecipeLogEvent>();
-                    if (recipeLogMessages.Any(m => m.Message.RecipeType == OrderDefaults.PancakeItemType))
-                        break;
-                    await Task.Delay(retryDelay);
-                }
-
-                recipeLogMessages.Should().Contain(m => m.Message.RecipeType == OrderDefaults.PancakeItemType,
-                    "a RecipeLogEvent should have been published for the pancake recipe");
-            }
-        }
-        this.BDDfy();
-    }
-
-    [Fact]
-    public async Task Creating_an_order_should_write_an_outbox_message_that_gets_processed()
-    {
-        // Given
-        await CreatePancakeBatch();
-        SetupValidOrderRequest();
-
-        // When
-        await _orderSteps.Send();
-
-        // Then
-        _orderSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
-        await _orderSteps.ParseResponse();
-        _orderSteps.Response!.CustomerName.Should().Be(_customerName);
-        _orderSteps.Response!.Items.Should().HaveCount(1);
-
-        if (!Settings.RunAgainstExternalServiceUnderTest)
-        {
-            // And an outbox message should have been written for the order created event
             const int maxRetries = 50;
             var retryDelay = TimeSpan.FromMilliseconds(200);
 
+            IReadOnlyList<(string Key, TestRecipeLogEvent Message)> recipeLogMessages = [];
             for (var i = 0; i < maxRetries; i++)
             {
-                await OutboxSteps.LoadOutboxMessages();
-                if (OutboxSteps.OutboxMessages!.Any(m => m.EventType == EventTypes.OrderCreated))
+                recipeLogMessages = kafkaStore.GetMessages<TestRecipeLogEvent>();
+                if (recipeLogMessages.Any(m => m.Message.RecipeType == OrderDefaults.PancakeItemType))
                     break;
                 await Task.Delay(retryDelay);
             }
 
-            OutboxSteps.AssertOutboxContainsMessageForEventType(EventTypes.OrderCreated);
-
-            // And the outbox message should have been processed
-            for (var i = 0; i < maxRetries; i++)
-            {
-                await OutboxSteps.LoadOutboxMessages();
-                if (OutboxSteps.OutboxMessages!.Any(m => m.EventType == EventTypes.OrderCreated && m.Status == OutboxStatuses.Processed))
-                    break;
-                await Task.Delay(retryDelay);
-            }
-
-            OutboxSteps.AssertOutboxMessageWasProcessed(EventTypes.OrderCreated);
+            recipeLogMessages.Should().Contain(m => m.Message.RecipeType == OrderDefaults.PancakeItemType,
+                "a RecipeLogEvent should have been published for the pancake recipe");
         }
-        this.BDDfy();
     }
+
+    private async Task An_outbox_message_should_have_been_written_and_processed()
+    {
+        if (Settings.RunAgainstExternalServiceUnderTest) return;
+
+        const int maxRetries = 50;
+        var retryDelay = TimeSpan.FromMilliseconds(200);
+
+        for (var i = 0; i < maxRetries; i++)
+        {
+            await OutboxSteps.LoadOutboxMessages();
+            if (OutboxSteps.OutboxMessages!.Any(m => m.EventType == EventTypes.OrderCreated))
+                break;
+            await Task.Delay(retryDelay);
+        }
+
+        OutboxSteps.AssertOutboxContainsMessageForEventType(EventTypes.OrderCreated);
+
+        for (var i = 0; i < maxRetries; i++)
+        {
+            await OutboxSteps.LoadOutboxMessages();
+            if (OutboxSteps.OutboxMessages!.Any(m => m.EventType == EventTypes.OrderCreated && m.Status == OutboxStatuses.Processed))
+                break;
+            await Task.Delay(retryDelay);
+        }
+
+        OutboxSteps.AssertOutboxMessageWasProcessed(EventTypes.OrderCreated);
+    }
+
+    #endregion
 }

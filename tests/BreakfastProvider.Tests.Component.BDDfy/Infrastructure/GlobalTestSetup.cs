@@ -4,7 +4,6 @@ using BreakfastProvider.Tests.Component.Shared.Fakes.PubSub;
 using BreakfastProvider.Tests.Component.Shared.Infrastructure.Configuration;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
-using TestStack.BDDfy.Configuration;
 using TestTrackingDiagrams;
 using TestTrackingDiagrams.BDDfy.xUnit3;
 
@@ -31,7 +30,6 @@ public class GlobalTestSetup : IAsyncLifetime
         if (!Settings.RunWithAnInMemoryDatabase)
             ThreadPool.SetMinThreads(100, 100);
 
-        Configurator.Processors.Add(() => new ScenarioResultFixupProcessor());
         BDDfyDiagramsConfigurator.Configure();
         BDDfyScenarioCollector.StartRunTime = DateTime.UtcNow;
 

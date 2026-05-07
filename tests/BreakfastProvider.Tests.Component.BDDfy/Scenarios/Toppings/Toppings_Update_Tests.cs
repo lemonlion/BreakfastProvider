@@ -9,12 +9,13 @@ using TestStack.BDDfy;
 using TestTrackingDiagrams.BDDfy.xUnit3;
 namespace BreakfastProvider.Tests.Component.BDDfy.Scenarios.Toppings;
 
-#pragma warning disable CS1998
 public class Toppings_Update_Tests : BaseFixture
 {
     private readonly PutToppingSteps _putSteps;
 
     private static readonly Guid KnownBlueberryToppingId = ToppingDefaults.KnownBlueberryToppingId;
+
+    private Guid _toppingId;
 
     public Toppings_Update_Tests()
     {
@@ -23,45 +24,21 @@ public class Toppings_Update_Tests : BaseFixture
 
     [Fact]
     [HappyPath]
-    public async Task Updating_an_existing_topping_should_return_the_updated_topping()
+    public void Updating_an_existing_topping_should_return_the_updated_topping()
     {
-        // Given a known topping exists and a valid update request
-        var toppingId = KnownBlueberryToppingId;
-        _putSteps.Request = new TestUpdateToppingRequest
-        {
-            Name = ToppingDefaults.Strawberries,
-            Category = ToppingDefaults.FruitCategory
-        };
-
-        // When the topping is updated
-        await _putSteps.Send(toppingId);
-
-        // Then the update response should contain the updated topping
-        _putSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
-        await _putSteps.ParseResponse();
-        _putSteps.Response!.ToppingId.Should().Be(KnownBlueberryToppingId);
-        _putSteps.Response!.Name.Should().Be(ToppingDefaults.Strawberries);
-        _putSteps.Response!.Category.Should().Be(ToppingDefaults.FruitCategory);
-        this.BDDfy();
+        this.Given(x => x.A_known_topping_exists_and_a_valid_update_request())
+            .When(x => x.The_topping_is_updated())
+            .Then(x => x.The_update_response_should_contain_the_updated_topping())
+            .BDDfy();
     }
 
     [Fact]
-    public async Task Updating_a_non_existent_topping_should_return_not_found()
+    public void Updating_a_non_existent_topping_should_return_not_found()
     {
-        // Given a topping id that does not exist
-        var toppingId = Guid.NewGuid();
-        _putSteps.Request = new TestUpdateToppingRequest
-        {
-            Name = ToppingDefaults.Strawberries,
-            Category = ToppingDefaults.FruitCategory
-        };
-
-        // When the topping is updated
-        await _putSteps.Send(toppingId);
-
-        // Then the update response should indicate not found
-        _putSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.NotFound);
-        this.BDDfy();
+        this.Given(x => x.A_topping_id_that_does_not_exist_and_a_valid_update_request())
+            .When(x => x.The_topping_is_updated())
+            .Then(x => x.The_update_response_should_indicate_not_found())
+            .BDDfy();
     }
 
     [Theory]
@@ -74,7 +51,6 @@ public class Toppings_Update_Tests : BaseFixture
     public async Task Update_topping_with_invalid_or_dangerous_input_should_return_bad_request(
         string field, string value, string reason, string expectedError, string expectedStatus)
     {
-        // Given a known topping exists and an invalid update request
         var toppingId = KnownBlueberryToppingId;
         var validBase = new TestUpdateToppingRequest
         {
@@ -85,14 +61,56 @@ public class Toppings_Update_Tests : BaseFixture
         var input = new InvalidFieldFromRequest(field, value, reason);
         var requests = ValidationHelper.CreateValidationRequests(validBase, new List<InvalidFieldFromRequest> { input });
 
-        // When the invalid update topping requests are submitted
         var responses = await ValidationHelper.SendPutValidationRequests(
             Client, RequestId, $"{Endpoints.Toppings}/{toppingId}", requests, new List<InvalidFieldFromRequest> { input });
 
-        // Then the responses should contain the validation error
         var actualResults = await ValidationHelper.ParseValidationResponses(responses);
         var actual = actualResults.Single();
         actual.ErrorMessage.Should().Be(expectedError);
         actual.ResponseStatus.Should().Be(expectedStatus);
+        this.BDDfy();
     }
+
+    #region Steps
+
+    private void A_known_topping_exists_and_a_valid_update_request()
+    {
+        _toppingId = KnownBlueberryToppingId;
+        _putSteps.Request = new TestUpdateToppingRequest
+        {
+            Name = ToppingDefaults.Strawberries,
+            Category = ToppingDefaults.FruitCategory
+        };
+    }
+
+    private void A_topping_id_that_does_not_exist_and_a_valid_update_request()
+    {
+        _toppingId = Guid.NewGuid();
+        _putSteps.Request = new TestUpdateToppingRequest
+        {
+            Name = ToppingDefaults.Strawberries,
+            Category = ToppingDefaults.FruitCategory
+        };
+    }
+
+    private async Task The_topping_is_updated()
+    {
+        await _putSteps.Send(_toppingId);
+    }
+
+    private async Task The_update_response_should_contain_the_updated_topping()
+    {
+        _putSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
+        await _putSteps.ParseResponse();
+        _putSteps.Response!.ToppingId.Should().Be(KnownBlueberryToppingId);
+        _putSteps.Response!.Name.Should().Be(ToppingDefaults.Strawberries);
+        _putSteps.Response!.Category.Should().Be(ToppingDefaults.FruitCategory);
+    }
+
+    private void The_update_response_should_indicate_not_found()
+    {
+        _putSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.NotFound);
+    }
+
+    #endregion
 }

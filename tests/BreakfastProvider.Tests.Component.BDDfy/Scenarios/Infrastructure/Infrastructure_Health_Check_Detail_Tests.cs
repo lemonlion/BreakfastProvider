@@ -9,28 +9,40 @@ namespace BreakfastProvider.Tests.Component.BDDfy.Scenarios.Infrastructure;
 
 public class Infrastructure_Health_Check_Detail_Tests : BaseFixture
 {
+    private TestHealthCheckResponse? _result;
+
     [Fact]
-    public async Task Health_check_response_should_include_description_and_data_for_each_entry()
+    public void Health_check_response_should_include_description_and_data_for_each_entry()
     {
-        // When the health check endpoint is called
+        this.When(x => x.The_health_check_endpoint_is_called())
+            .Then(x => x.Each_entry_should_have_a_status())
+            .And(x => x.Each_downstream_entry_should_have_a_description())
+            .And(x => x.Each_entry_should_have_a_data_object())
+            .BDDfy();
+    }
+
+    #region Steps
+
+    private async Task The_health_check_endpoint_is_called()
+    {
         var response = await Client.GetAsync(Endpoints.Health);
-
-        // Then the response should contain detailed entries
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-
         var content = await response.Content.ReadAsStringAsync();
-        var result = Json.Deserialize<TestHealthCheckResponse>(content)!;
-        result.Should().NotBeNull();
+        _result = Json.Deserialize<TestHealthCheckResponse>(content)!;
+        _result.Should().NotBeNull();
+    }
 
-        // Each entry should have a status
-        foreach (var entry in result.Results)
+    private void Each_entry_should_have_a_status()
+    {
+        foreach (var entry in _result!.Results)
         {
-            var healthCheckEntryStatus = entry.Value.Status;
-            healthCheckEntryStatus.Should().NotBeNullOrEmpty(
+            entry.Value.Status.Should().NotBeNullOrEmpty(
                 $"health check entry '{entry.Key}' should have a status");
         }
+    }
 
-        // Each downstream entry should have a description
+    private void Each_downstream_entry_should_have_a_description()
+    {
         string[] downstreamChecks =
         [
             HealthCheckNames.CowService,
@@ -41,19 +53,20 @@ public class Infrastructure_Health_Check_Detail_Tests : BaseFixture
 
         foreach (var checkName in downstreamChecks)
         {
-            result.Results.Should().ContainKey(checkName);
-            var healthCheckDescription = result.Results[checkName].Description;
-            healthCheckDescription.Should().NotBeNullOrEmpty(
+            _result!.Results.Should().ContainKey(checkName);
+            _result.Results[checkName].Description.Should().NotBeNullOrEmpty(
                 $"health check entry '{checkName}' should have a description");
         }
+    }
 
-        // Each entry should have a data object
-        foreach (var entry in result.Results)
+    private void Each_entry_should_have_a_data_object()
+    {
+        foreach (var entry in _result!.Results)
         {
-            var healthCheckEntryData = entry.Value.Data;
-            healthCheckEntryData.Should().NotBeNull(
+            entry.Value.Data.Should().NotBeNull(
                 $"health check entry '{entry.Key}' should have a data object");
         }
-        this.BDDfy();
     }
+
+    #endregion
 }

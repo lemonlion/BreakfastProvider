@@ -33,7 +33,47 @@ public class AuditLogs_Filtering_Tests : BaseFixture
         _orderSteps = Get<PostOrderSteps>();
     }
 
-    private async Task CreateOrderToGenerateAuditLog()
+    [Fact]
+    public void Audit_logs_should_be_filterable_by_entity_type()
+    {
+        this.Given(x => x.An_order_has_been_created_to_generate_an_audit_log())
+            .When(x => x.Audit_logs_are_requested_filtered_by_entity_type())
+            .Then(x => x.The_audit_log_response_should_be_OK())
+            .And(x => x.The_audit_logs_should_only_contain_order_entries())
+            .BDDfy();
+    }
+
+    [Fact]
+    public void Audit_logs_should_be_filterable_by_entity_id()
+    {
+        this.Given(x => x.An_order_has_been_created_to_generate_an_audit_log())
+            .When(x => x.Audit_logs_are_requested_filtered_by_entity_id())
+            .Then(x => x.The_audit_log_response_should_be_OK())
+            .And(x => x.The_audit_logs_should_contain_the_specific_order_entry())
+            .BDDfy();
+    }
+
+    [Fact]
+    public void Filtering_audit_logs_by_a_non_existent_entity_type_should_return_an_empty_collection()
+    {
+        this.When(x => x.Audit_logs_are_requested_filtered_by_a_non_existent_entity_type())
+            .Then(x => x.The_audit_log_response_should_be_OK())
+            .And(x => x.The_audit_logs_should_be_empty())
+            .BDDfy();
+    }
+
+    [Fact]
+    public void Audit_logs_should_be_returned_in_descending_timestamp_order()
+    {
+        this.Given(x => x.An_order_has_been_created_to_generate_an_audit_log())
+            .When(x => x.Audit_logs_are_requested_filtered_by_entity_type())
+            .Then(x => x.The_audit_logs_should_be_ordered_by_timestamp_descending())
+            .BDDfy();
+    }
+
+    #region Steps
+
+    private async Task An_order_has_been_created_to_generate_an_audit_log()
     {
         await _milkSteps.Retrieve();
         await _eggsSteps.Retrieve();
@@ -58,76 +98,50 @@ public class AuditLogs_Filtering_Tests : BaseFixture
         _orderId = _orderSteps.Response!.OrderId;
     }
 
-    [Fact]
-    public async Task Audit_logs_should_be_filterable_by_entity_type()
+    private async Task Audit_logs_are_requested_filtered_by_entity_type()
     {
-        // Given an order has been created to generate an audit log
-        await CreateOrderToGenerateAuditLog();
-
-        // When audit logs are requested filtered by entity type
         var request = new HttpRequestMessage(HttpMethod.Get, $"{Endpoints.AuditLogs}?entityType={AuditLogDefaults.OrderEntityType}");
         request.Headers.Add(CustomHeaders.ComponentTestRequestId, RequestId);
         _auditLogResponse = await Client.SendAsync(request);
         var content = await _auditLogResponse.Content.ReadAsStringAsync();
         _auditLogs = Json.Deserialize<List<TestAuditLogResponse>>(content)!;
-
-        // Then the audit log response should only contain order entries
-        _auditLogResponse!.StatusCode.Should().Be(HttpStatusCode.OK);
-        _auditLogs!.Should().OnlyContain(l => l.EntityType == AuditLogDefaults.OrderEntityType);
-        this.BDDfy();
     }
 
-    [Fact]
-    public async Task Audit_logs_should_be_filterable_by_entity_id()
+    private async Task Audit_logs_are_requested_filtered_by_entity_id()
     {
-        // Given an order has been created to generate an audit log
-        await CreateOrderToGenerateAuditLog();
-
-        // When audit logs are requested filtered by entity ID
         var request = new HttpRequestMessage(HttpMethod.Get, $"{Endpoints.AuditLogs}?entityId={_orderId}");
         request.Headers.Add(CustomHeaders.ComponentTestRequestId, RequestId);
         _auditLogResponse = await Client.SendAsync(request);
         var content = await _auditLogResponse.Content.ReadAsStringAsync();
         _auditLogs = Json.Deserialize<List<TestAuditLogResponse>>(content)!;
-
-        // Then the audit log response should contain the specific order entry
-        _auditLogResponse!.StatusCode.Should().Be(HttpStatusCode.OK);
-        _auditLogs!.Should().Contain(l => l.EntityId == _orderId);
-        this.BDDfy();
     }
 
-    [Fact]
-    public async Task Filtering_audit_logs_by_a_non_existent_entity_type_should_return_an_empty_collection()
+    private async Task Audit_logs_are_requested_filtered_by_a_non_existent_entity_type()
     {
-        // When audit logs are requested filtered by a non-existent entity type
         var request = new HttpRequestMessage(HttpMethod.Get, $"{Endpoints.AuditLogs}?entityType=NonExistent_{Random.Shared.NextInt64()}");
-        request.Headers.Add(CustomHeaders.ComponentTestRequestId, RequestId);
-        _auditLogResponse = await Client.SendAsync(request);
-
-        // Then the audit log response should be an empty collection
-        _auditLogResponse!.StatusCode.Should().Be(HttpStatusCode.OK);
-        var content = await _auditLogResponse!.Content.ReadAsStringAsync();
-        var auditLogs = Json.Deserialize<List<TestAuditLogResponse>>(content)!;
-        auditLogs.Should().BeEmpty();
-        this.BDDfy();
-    }
-
-    [Fact]
-    public async Task Audit_logs_should_be_returned_in_descending_timestamp_order()
-    {
-        // Given an order has been created to generate an audit log
-        await CreateOrderToGenerateAuditLog();
-
-        // When audit logs are requested filtered by entity type
-        var request = new HttpRequestMessage(HttpMethod.Get, $"{Endpoints.AuditLogs}?entityType={AuditLogDefaults.OrderEntityType}");
         request.Headers.Add(CustomHeaders.ComponentTestRequestId, RequestId);
         _auditLogResponse = await Client.SendAsync(request);
         var content = await _auditLogResponse.Content.ReadAsStringAsync();
         _auditLogs = Json.Deserialize<List<TestAuditLogResponse>>(content)!;
+    }
 
-        // Then the audit logs should be ordered by timestamp descending
+    private void The_audit_log_response_should_be_OK()
+        => _auditLogResponse!.StatusCode.Should().Be(HttpStatusCode.OK);
+
+    private void The_audit_logs_should_only_contain_order_entries()
+        => _auditLogs!.Should().OnlyContain(l => l.EntityType == AuditLogDefaults.OrderEntityType);
+
+    private void The_audit_logs_should_contain_the_specific_order_entry()
+        => _auditLogs!.Should().Contain(l => l.EntityId == _orderId);
+
+    private void The_audit_logs_should_be_empty()
+        => _auditLogs!.Should().BeEmpty();
+
+    private void The_audit_logs_should_be_ordered_by_timestamp_descending()
+    {
         _auditLogs.Should().NotBeNullOrEmpty();
         _auditLogs!.Should().BeInDescendingOrder(l => l.Timestamp);
-        this.BDDfy();
     }
+
+    #endregion
 }

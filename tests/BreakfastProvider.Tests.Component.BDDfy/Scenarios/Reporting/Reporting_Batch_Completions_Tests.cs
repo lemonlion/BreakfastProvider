@@ -27,9 +27,18 @@ public class Reporting_Batch_Completions_Tests : BaseFixture
 
     [Fact]
     [HappyPath]
-    public async Task Batch_completions_should_contain_data_ingested_via_pubsub_consumer()
+    public void Batch_completions_should_contain_data_ingested_via_pubsub_consumer()
     {
-        // Given a pancake batch has been created
+        this.Given(x => x.A_pancake_batch_has_been_created())
+            .When(x => x.The_batch_completions_are_queried_via_graphql())
+            .Then(x => x.The_response_should_contain_the_batch_completion_record())
+            .BDDfy();
+    }
+
+    #region Steps
+
+    private async Task A_pancake_batch_has_been_created()
+    {
         await _milkSteps.Retrieve();
         _milkSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
         await _eggsSteps.Retrieve();
@@ -48,11 +57,15 @@ public class Reporting_Batch_Completions_Tests : BaseFixture
         await _pancakeSteps.ParseResponse();
         _pancakeSteps.Response.Should().NotBeNull();
         _pancakeSteps.Response!.BatchId.Should().NotBeEmpty();
+    }
 
-        // When the batch completions are queried via GraphQL
+    private async Task The_batch_completions_are_queried_via_graphql()
+    {
         await _graphQlSteps.QueryBatchCompletions(waitForBatchId: _pancakeSteps.Response?.BatchId);
+    }
 
-        // Then the response should contain the batch completion record
+    private async Task The_response_should_contain_the_batch_completion_record()
+    {
         _graphQlSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
         await _graphQlSteps.ParseBatchCompletionsResponse();
         var batchId = _pancakeSteps.Response!.BatchId;
@@ -60,6 +73,7 @@ public class Reporting_Batch_Completions_Tests : BaseFixture
             r.BatchId == batchId &&
             r.RecipeType == "Pancakes" &&
             r.Ingredients.Contains("Milk"));
-        this.BDDfy();
     }
+
+    #endregion
 }

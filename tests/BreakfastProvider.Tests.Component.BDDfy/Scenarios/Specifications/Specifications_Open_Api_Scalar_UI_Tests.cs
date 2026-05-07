@@ -8,22 +8,42 @@ namespace BreakfastProvider.Tests.Component.BDDfy.Scenarios.Specifications;
 
 public class Specifications_Open_Api_Scalar_UI_Tests : BaseFixture
 {
+    private HttpResponseMessage? _scalarResponse;
+    private string? _scalarUiResponseBody;
+
     [Fact]
     [HappyPath]
-    public async Task The_Scalar_UI_endpoint_should_return_a_valid_page()
+    public void The_Scalar_UI_endpoint_should_return_a_valid_page()
     {
-        // When the scalar ui endpoint is called
-        var scalarResponse = await Client.GetAsync(Endpoints.Swagger.ScalarUI);
-
-        // Then the response status should be ok
-        scalarResponse.StatusCode.Should().Be(HttpStatusCode.OK);
-
-        // And the response should be valid html
-        var scalarUiResponseBody = await scalarResponse.Content.ReadAsStringAsync();
-        scalarUiResponseBody.Should().Contain("<html");
-
-        // And the response should refer to scalar
-        scalarUiResponseBody.Should().Contain("scalar");
-        this.BDDfy();
+        this.When(x => x.The_scalar_ui_endpoint_is_called())
+            .Then(x => x.The_response_status_should_be_ok())
+            .And(x => x.The_response_should_be_valid_html())
+            .And(x => x.The_response_should_refer_to_scalar())
+            .BDDfy();
     }
+
+    #region Steps
+
+    private async Task The_scalar_ui_endpoint_is_called()
+    {
+        _scalarResponse = await Client.GetAsync(Endpoints.Swagger.ScalarUI);
+        _scalarUiResponseBody = await _scalarResponse.Content.ReadAsStringAsync();
+    }
+
+    private void The_response_status_should_be_ok()
+    {
+        _scalarResponse!.StatusCode.Should().Be(HttpStatusCode.OK);
+    }
+
+    private void The_response_should_be_valid_html()
+    {
+        _scalarUiResponseBody.Should().Contain("<html");
+    }
+
+    private void The_response_should_refer_to_scalar()
+    {
+        _scalarUiResponseBody.Should().Contain("scalar");
+    }
+
+    #endregion
 }

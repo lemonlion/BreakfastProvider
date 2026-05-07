@@ -23,6 +23,8 @@ public class Grpc_Stream_Order_Updates_Tests : BaseFixture
     private readonly PostOrderSteps _orderSteps;
     private readonly GrpcBreakfastSteps _grpcSteps;
 
+    private string _createdOrderId = null!;
+
     public Grpc_Stream_Order_Updates_Tests()
     {
         _milkSteps = Get<GetMilkSteps>();
@@ -39,9 +41,26 @@ public class Grpc_Stream_Order_Updates_Tests : BaseFixture
 
     [Fact]
     [HappyPath]
-    public async Task Streaming_order_updates_should_return_the_current_status()
+    public void Streaming_order_updates_should_return_the_current_status()
     {
-        // Given a pancake batch has been created
+        this.Given(x => x.A_pancake_batch_and_order_have_been_created())
+            .When(x => x.Order_updates_are_streamed_via_grpc())
+            .Then(x => x.The_streamed_response_should_contain_the_order_status())
+            .BDDfy();
+    }
+
+    [Fact]
+    public void Streaming_updates_for_non_existent_order_should_return_not_found()
+    {
+        this.When(x => x.Order_updates_for_a_non_existent_order_are_streamed_via_grpc())
+            .Then(x => x.The_grpc_stream_should_return_a_not_found_error())
+            .BDDfy();
+    }
+
+    #region Steps
+
+    private async Task A_pancake_batch_and_order_have_been_created()
+    {
         await _milkSteps.Retrieve();
         await _eggsSteps.Retrieve();
         await _flourSteps.Retrieve();
@@ -56,7 +75,6 @@ public class Grpc_Stream_Order_Updates_Tests : BaseFixture
         _pancakeSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
         await _pancakeSteps.ParseResponse();
 
-        // And an order has been created for the batch
         _orderSteps.Request = new TestOrderRequest
         {
             CustomerName = _customerName,
@@ -74,28 +92,32 @@ public class Grpc_Stream_Order_Updates_Tests : BaseFixture
         await _orderSteps.Send();
         _orderSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
         await _orderSteps.ParseResponse();
-        var createdOrderId = _orderSteps.Response!.OrderId;
+        _createdOrderId = _orderSteps.Response!.OrderId.ToString();
+    }
 
-        // When order updates are streamed via gRPC
-        await _grpcSteps.StreamOrderUpdates(createdOrderId.ToString());
+    private async Task Order_updates_are_streamed_via_grpc()
+    {
+        await _grpcSteps.StreamOrderUpdates(_createdOrderId);
+    }
 
-        // Then the streamed response should contain the order status
+    private void The_streamed_response_should_contain_the_order_status()
+    {
         _grpcSteps.StreamedReplies.Should().HaveCount(1);
-        _grpcSteps.StreamedReplies[0].OrderId.Should().Be(createdOrderId.ToString());
+        _grpcSteps.StreamedReplies[0].OrderId.Should().Be(_createdOrderId);
         _grpcSteps.StreamedReplies[0].CustomerName.Should().Be(_customerName);
         _grpcSteps.StreamedReplies[0].Status.Should().Be(OrderStatuses.Created);
-        this.BDDfy();
     }
 
-    [Fact]
-    public async Task Streaming_updates_for_non_existent_order_should_return_not_found()
+    private async Task Order_updates_for_a_non_existent_order_are_streamed_via_grpc()
     {
-        // When order updates for a non-existent order are streamed via gRPC
         await _grpcSteps.StreamOrderUpdates(Guid.NewGuid().ToString());
+    }
 
-        // Then the gRPC stream should return a not-found error
+    private void The_grpc_stream_should_return_a_not_found_error()
+    {
         _grpcSteps.RpcException.Should().NotBeNull();
         _grpcSteps.RpcException!.StatusCode.Should().Be(StatusCode.NotFound);
-        this.BDDfy();
     }
+
+    #endregion
 }

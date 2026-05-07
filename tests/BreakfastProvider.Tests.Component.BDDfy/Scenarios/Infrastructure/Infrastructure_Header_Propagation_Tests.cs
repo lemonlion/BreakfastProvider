@@ -8,6 +8,7 @@ namespace BreakfastProvider.Tests.Component.BDDfy.Scenarios.Infrastructure;
 public class Infrastructure_Header_Propagation_Tests : BaseFixture
 {
     private readonly DownstreamRequestSteps _downstreamSteps;
+    private string _correlationId = null!;
 
     public Infrastructure_Header_Propagation_Tests() : base(delayAppCreation: true)
     {
@@ -17,45 +18,67 @@ public class Infrastructure_Header_Propagation_Tests : BaseFixture
 
     [Fact]
     [HappyPath]
-    public async Task Request_with_correlation_id_should_forward_it_to_cow_service()
+    public void Request_with_correlation_id_should_forward_it_to_cow_service()
     {
         if (Settings.RunAgainstExternalServiceUnderTest) return;
 
-        // Given a request with a known correlation id
-        var correlationId = Guid.NewGuid().ToString();
-
-        // When milk is requested from the milk endpoint
-        var request = new HttpRequestMessage(HttpMethod.Get, Endpoints.Milk);
-        request.Headers.Add(CustomHeaders.CorrelationId, correlationId);
-        request.Headers.Add(CustomHeaders.ComponentTestRequestId, RequestId);
-        await Client.SendAsync(request);
-
-        // Then the cow service should have received the correlation id
-        _downstreamSteps.AssertDownstreamReceivedCorrelationId(ServiceNames.CowService, correlationId);
-        this.BDDfy();
+        this.Given(x => x.A_request_with_a_known_correlation_id())
+            .When(x => x.Milk_is_requested_from_the_milk_endpoint())
+            .Then(x => x.The_cow_service_should_have_received_the_correlation_id())
+            .BDDfy();
     }
 
     [Fact]
-    public async Task Request_with_correlation_id_should_forward_it_to_supplier_service()
+    public void Request_with_correlation_id_should_forward_it_to_supplier_service()
     {
         if (Settings.RunAgainstExternalServiceUnderTest) return;
 
-        // Given a request with a known correlation id
-        var correlationId = Guid.NewGuid().ToString();
+        this.Given(x => x.A_request_with_a_known_correlation_id())
+            .And(x => x.The_menu_cache_is_cleared())
+            .When(x => x.The_menu_is_requested())
+            .Then(x => x.The_supplier_service_should_have_received_the_correlation_id())
+            .BDDfy();
+    }
 
-        // And the menu cache is cleared
+    #region Steps
+
+    private void A_request_with_a_known_correlation_id()
+    {
+        _correlationId = Guid.NewGuid().ToString();
+    }
+
+    private async Task Milk_is_requested_from_the_milk_endpoint()
+    {
+        var request = new HttpRequestMessage(HttpMethod.Get, Endpoints.Milk);
+        request.Headers.Add(CustomHeaders.CorrelationId, _correlationId);
+        request.Headers.Add(CustomHeaders.ComponentTestRequestId, RequestId);
+        await Client.SendAsync(request);
+    }
+
+    private async Task The_menu_cache_is_cleared()
+    {
         var clearRequest = new HttpRequestMessage(HttpMethod.Delete, Endpoints.MenuCache);
         clearRequest.Headers.Add(CustomHeaders.ComponentTestRequestId, RequestId);
         await Client.SendAsync(clearRequest);
+    }
 
-        // When the menu is requested
+    private async Task The_menu_is_requested()
+    {
         var request = new HttpRequestMessage(HttpMethod.Get, Endpoints.Menu);
-        request.Headers.Add(CustomHeaders.CorrelationId, correlationId);
+        request.Headers.Add(CustomHeaders.CorrelationId, _correlationId);
         request.Headers.Add(CustomHeaders.ComponentTestRequestId, RequestId);
         await Client.SendAsync(request);
-
-        // Then the supplier service should have received the correlation id
-        _downstreamSteps.AssertDownstreamReceivedCorrelationId(ServiceNames.SupplierService, correlationId);
-        this.BDDfy();
     }
+
+    private void The_cow_service_should_have_received_the_correlation_id()
+    {
+        _downstreamSteps.AssertDownstreamReceivedCorrelationId(ServiceNames.CowService, _correlationId);
+    }
+
+    private void The_supplier_service_should_have_received_the_correlation_id()
+    {
+        _downstreamSteps.AssertDownstreamReceivedCorrelationId(ServiceNames.SupplierService, _correlationId);
+    }
+
+    #endregion
 }

@@ -83,13 +83,9 @@ public class Orders_Status_Transition_Tests : BaseFixture
     [InlineData("Ready", "Completed")]
     public async Task Valid_status_transition_should_update_the_order(string fromStatus, string toStatus)
     {
-        // Given an order exists with the given status
         await CreateOrderWithStatus(fromStatus);
-
-        // When the order status is updated
         await _patchSteps.Send(_orderId, toStatus);
 
-        // Then the order status should be updated successfully
         _patchSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
         await _patchSteps.ParseResponse();
         _patchSteps.Response!.Status.Should().Be(toStatus);
@@ -106,13 +102,10 @@ public class Orders_Status_Transition_Tests : BaseFixture
     [InlineData("Cancelled", "Ready")]
     public async Task Invalid_status_transition_should_return_conflict(string fromStatus, string toStatus)
     {
-        // Given an order exists with the given status
         await CreateOrderWithStatus(fromStatus);
-
-        // When the order status is updated
         await _patchSteps.Send(_orderId, toStatus);
 
-        // Then the response should indicate an invalid state transition
         _patchSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Conflict);
+        this.BDDfy();
     }
 }

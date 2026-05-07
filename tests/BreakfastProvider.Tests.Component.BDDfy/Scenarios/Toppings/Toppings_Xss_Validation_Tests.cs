@@ -7,7 +7,6 @@ using TestStack.BDDfy;
 using TestTrackingDiagrams.BDDfy.xUnit3;
 namespace BreakfastProvider.Tests.Component.BDDfy.Scenarios.Toppings;
 
-#pragma warning disable CS1998
 public class Toppings_Xss_Validation_Tests : BaseFixture
 {
     [Theory]
@@ -20,7 +19,6 @@ public class Toppings_Xss_Validation_Tests : BaseFixture
     public async Task Topping_request_with_invalid_or_dangerous_input_should_return_bad_request(
         string field, string value, string reason, string expectedError, string expectedStatus)
     {
-        // Given valid topping requests with an invalid field
         var validBase = new TestToppingRequest
         {
             Name = ToppingDefaults.Strawberries,
@@ -30,14 +28,13 @@ public class Toppings_Xss_Validation_Tests : BaseFixture
         var input = new InvalidFieldFromRequest(field, value, reason);
         var requests = ValidationHelper.CreateValidationRequests(validBase, new List<InvalidFieldFromRequest> { input });
 
-        // When the invalid topping requests are submitted
         var responses = await ValidationHelper.SendValidationRequests(
             Client, RequestId, Endpoints.Toppings, requests, new List<InvalidFieldFromRequest> { input });
 
-        // Then the responses should contain the validation error
         var actualResults = await ValidationHelper.ParseValidationResponses(responses);
         var actual = actualResults.Single();
         actual.ErrorMessage.Should().Be(expectedError);
         actual.ResponseStatus.Should().Be(expectedStatus);
+        this.BDDfy();
     }
 }

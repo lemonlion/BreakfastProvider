@@ -34,9 +34,27 @@ public class Reporting_Order_Summaries_Tests : BaseFixture
 
     [Fact]
     [HappyPath]
-    public async Task Order_summaries_should_contain_ingested_order_data()
+    public void Order_summaries_should_contain_ingested_order_data()
     {
-        // Given a pancake batch has been created
+        this.Given(x => x.A_pancake_batch_has_been_created())
+            .And(x => x.A_breakfast_order_has_been_placed_for_the_batch())
+            .When(x => x.The_order_summaries_are_queried_via_graphql())
+            .Then(x => x.The_response_should_contain_the_ingested_order_summary())
+            .BDDfy();
+    }
+
+    [Fact]
+    public void Order_summaries_should_return_an_empty_list_when_no_orders_exist()
+    {
+        this.When(x => x.The_order_summaries_are_queried_via_graphql())
+            .Then(x => x.The_response_should_not_contain_the_test_order())
+            .BDDfy();
+    }
+
+    #region Steps
+
+    private async Task A_pancake_batch_has_been_created()
+    {
         await _milkSteps.Retrieve();
         _milkSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
         await _eggsSteps.Retrieve();
@@ -55,8 +73,10 @@ public class Reporting_Order_Summaries_Tests : BaseFixture
         await _pancakeSteps.ParseResponse();
         _pancakeSteps.Response.Should().NotBeNull();
         _pancakeSteps.Response!.BatchId.Should().NotBeEmpty();
+    }
 
-        // And a breakfast order has been placed for the batch
+    private async Task A_breakfast_order_has_been_placed_for_the_batch()
+    {
         _orderSteps.Request = new TestOrderRequest
         {
             CustomerName = _customerName,
@@ -77,11 +97,15 @@ public class Reporting_Order_Summaries_Tests : BaseFixture
         _orderSteps.Response.Should().NotBeNull();
         _orderId = _orderSteps.Response!.OrderId;
         _orderId.Should().NotBeEmpty();
+    }
 
-        // When the order summaries are queried via GraphQL
+    private async Task The_order_summaries_are_queried_via_graphql()
+    {
         await _graphQlSteps.QueryOrderSummaries();
+    }
 
-        // Then the response should contain the ingested order summary
+    private async Task The_response_should_contain_the_ingested_order_summary()
+    {
         _graphQlSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
         await _graphQlSteps.ParseOrderSummariesResponse();
         _graphQlSteps.OrderSummaries.Should().Contain(o =>
@@ -89,19 +113,14 @@ public class Reporting_Order_Summaries_Tests : BaseFixture
             o.CustomerName == _customerName &&
             o.ItemCount == 1 &&
             o.TableNumber == 7);
-        this.BDDfy();
     }
 
-    [Fact]
-    public async Task Order_summaries_should_return_an_empty_list_when_no_orders_exist()
+    private async Task The_response_should_not_contain_the_test_order()
     {
-        // When the order summaries are queried via GraphQL
-        await _graphQlSteps.QueryOrderSummaries();
-
-        // Then the response should be successful and not contain the test order
         _graphQlSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
         await _graphQlSteps.ParseOrderSummariesResponse();
         _graphQlSteps.OrderSummaries.Should().NotContain(o => o.OrderId == _orderId);
-        this.BDDfy();
     }
+
+    #endregion
 }

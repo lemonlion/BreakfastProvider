@@ -21,24 +21,41 @@ public class Menu_Availability_Tests : BaseFixture
 
     [Fact]
     [HappyPath]
-    public async Task Menu_endpoint_should_return_all_menu_items_with_availability()
+    public void Menu_endpoint_should_return_all_menu_items_with_availability()
     {
-        // When the menu is requested
-        await _menuSteps.Retrieve();
+        this.When(x => x.The_menu_is_requested())
+            .Then(x => x.The_menu_response_should_contain_all_menu_items())
+            .And(x => x.The_menu_items_should_be_in_alphabetical_order())
+            .And(x => x.The_supplier_service_should_have_received_an_availability_request())
+            .BDDfy();
+    }
 
-        // Then the menu response should contain all menu items
+    #region Steps
+
+    private async Task The_menu_is_requested()
+    {
+        await _menuSteps.Retrieve();
+    }
+
+    private async Task The_menu_response_should_contain_all_menu_items()
+    {
         _menuSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
         await _menuSteps.ParseResponse();
         _menuSteps.Response!.Should().Contain(m => m.Name == MenuDefaults.ClassicPancakes);
         _menuSteps.Response!.Should().Contain(m => m.Name == MenuDefaults.BelgianWaffles);
         _menuSteps.Response!.Should().Contain(m => m.Name == MenuDefaults.GoatMilkPancakes);
+    }
 
-        // And the menu items should be in alphabetical order
+    private void The_menu_items_should_be_in_alphabetical_order()
+    {
         _menuSteps.Response!.Should().BeInAscendingOrder(m => m.Name);
+    }
 
-        // And the supplier service should have received an availability request
+    private void The_supplier_service_should_have_received_an_availability_request()
+    {
         if (!Settings.RunAgainstExternalServiceUnderTest)
             _downstreamSteps.AssertSupplierServiceReceivedAvailabilityRequest();
-        this.BDDfy();
     }
+
+    #endregion
 }

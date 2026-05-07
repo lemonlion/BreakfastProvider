@@ -16,67 +16,88 @@ namespace BreakfastProvider.Tests.Component.BDDfy.Scenarios.Infrastructure;
 public class Infrastructure_Telemetry_Tests : BaseFixture
 {
     private readonly InMemoryLoggerProvider _logProvider = new();
+    private GetMilkSteps _milkSteps = null!;
+    private GetEggsSteps _eggsSteps = null!;
+    private GetFlourSteps _flourSteps = null!;
+    private PostPancakesSteps _pancakeSteps = null!;
+    private PostOrderSteps _orderSteps = null!;
+    private string _customerName = null!;
 
     public Infrastructure_Telemetry_Tests() : base(delayAppCreation: true) { }
 
     [Fact]
     [HappyPath]
-    public async Task Creating_an_order_should_emit_a_structured_log_entry()
+    public void Creating_an_order_should_emit_a_structured_log_entry()
     {
         if (Settings.RunAgainstExternalServiceUnderTest) return;
 
-        // Given the application is configured with an in-memory log capture
+        this.Given(x => x.The_application_is_configured_with_in_memory_log_capture())
+            .And(x => x.A_pancake_batch_has_been_created())
+            .When(x => x.The_order_is_submitted())
+            .Then(x => x.A_structured_log_entry_should_have_been_captured_for_order_creation())
+            .BDDfy();
+    }
+
+    #region Steps
+
+    private void The_application_is_configured_with_in_memory_log_capture()
+    {
         CreateAppAndClient(additionalServices: services =>
         {
             services.AddSingleton<ILoggerFactory>(new LoggerFactory([_logProvider]));
         });
 
-        var milkSteps = Get<GetMilkSteps>();
-        var eggsSteps = Get<GetEggsSteps>();
-        var flourSteps = Get<GetFlourSteps>();
-        var pancakeSteps = Get<PostPancakesSteps>();
-        var orderSteps = Get<PostOrderSteps>();
+        _milkSteps = Get<GetMilkSteps>();
+        _eggsSteps = Get<GetEggsSteps>();
+        _flourSteps = Get<GetFlourSteps>();
+        _pancakeSteps = Get<PostPancakesSteps>();
+        _orderSteps = Get<PostOrderSteps>();
+    }
 
-        // And a pancake batch has been created
-        await milkSteps.Retrieve();
-        await eggsSteps.Retrieve();
-        await flourSteps.Retrieve();
+    private async Task A_pancake_batch_has_been_created()
+    {
+        await _milkSteps.Retrieve();
+        await _eggsSteps.Retrieve();
+        await _flourSteps.Retrieve();
 
-        pancakeSteps.Request = new TestPancakeRequest
+        _pancakeSteps.Request = new TestPancakeRequest
         {
-            Milk = milkSteps.MilkResponse.Milk,
-            Eggs = eggsSteps.EggsResponse.Eggs,
-            Flour = flourSteps.FlourResponse.Flour
+            Milk = _milkSteps.MilkResponse.Milk,
+            Eggs = _eggsSteps.EggsResponse.Eggs,
+            Flour = _flourSteps.FlourResponse.Flour
         };
-        await pancakeSteps.Send();
-        pancakeSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
-        await pancakeSteps.ParseResponse();
+        await _pancakeSteps.Send();
+        _pancakeSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
+        await _pancakeSteps.ParseResponse();
+    }
 
-        // And a valid order request
-        var customerName = $"TelemetryTest_{Random.Shared.NextInt64()}";
-        orderSteps.Request = new TestOrderRequest
+    private async Task The_order_is_submitted()
+    {
+        _customerName = $"TelemetryTest_{Random.Shared.NextInt64()}";
+        _orderSteps.Request = new TestOrderRequest
         {
-            CustomerName = customerName,
+            CustomerName = _customerName,
             TableNumber = 5,
             Items =
             [
                 new TestOrderItemRequest
                 {
                     ItemType = OrderDefaults.PancakeItemType,
-                    BatchId = pancakeSteps.Response!.BatchId,
+                    BatchId = _pancakeSteps.Response!.BatchId,
                     Quantity = 1
                 }
             ]
         };
-
-        // When the order is submitted
-        await orderSteps.Send();
-        orderSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
-
-        // Then a structured log entry should have been captured for order creation
-        _logProvider.Entries.Should().Contain(e => e.Message.Contains("created for customer"));
-        _logProvider.Entries.Should().Contain(e => e.Message.Contains(customerName));
-        _logProvider.Entries.Should().Contain(e => e.Message.Contains("1 items"));
-        this.BDDfy();
+        await _orderSteps.Send();
+        _orderSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
     }
+
+    private void A_structured_log_entry_should_have_been_captured_for_order_creation()
+    {
+        _logProvider.Entries.Should().Contain(e => e.Message.Contains("created for customer"));
+        _logProvider.Entries.Should().Contain(e => e.Message.Contains(_customerName));
+        _logProvider.Entries.Should().Contain(e => e.Message.Contains("1 items"));
+    }
+
+    #endregion
 }

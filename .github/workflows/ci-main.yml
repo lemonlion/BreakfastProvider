@@ -607,6 +607,11 @@ jobs:
           cp docs/openapi.json site/api/openapi.json
           cp docs/asyncapi.json site/api/asyncapi.json
 
+          # Vendor UI assets locally to avoid third-party requests at view time
+          curl -sL "https://cdn.jsdelivr.net/npm/@scalar/api-reference" -o site/api/scalar.js
+          curl -sL "https://unpkg.com/@asyncapi/react-component@latest/browser/standalone/index.js" -o site/api/asyncapi-standalone.js
+          curl -sL "https://unpkg.com/@asyncapi/react-component@latest/styles/default.min.css" -o site/api/asyncapi.css
+
           cat > site/api/openapi.html << 'OPENAPI_EOF'
           <!DOCTYPE html>
           <html lang="en">
@@ -614,11 +619,10 @@ jobs:
             <meta charset="utf-8">
             <meta name="viewport" content="width=device-width, initial-scale=1">
             <title>Breakfast Provider — OpenAPI</title>
-            <link rel="icon" type="image/svg+xml" href="https://raw.githubusercontent.com/lemonlion/TestTrackingDiagrams/main/icon.svg">
           </head>
           <body>
             <script id="api-reference" data-url="./openapi.json"></script>
-            <script src="https://cdn.jsdelivr.net/npm/@scalar/api-reference"></script>
+            <script src="./scalar.js"></script>
           </body>
           </html>
           OPENAPI_EOF
@@ -630,12 +634,11 @@ jobs:
             <meta charset="utf-8">
             <meta name="viewport" content="width=device-width, initial-scale=1">
             <title>Breakfast Provider — AsyncAPI</title>
-            <link rel="icon" type="image/svg+xml" href="https://raw.githubusercontent.com/lemonlion/TestTrackingDiagrams/main/icon.svg">
-            <link rel="stylesheet" href="https://unpkg.com/@asyncapi/react-component@latest/styles/default.min.css">
+            <link rel="stylesheet" href="./asyncapi.css">
           </head>
           <body>
             <div id="asyncapi"></div>
-            <script src="https://unpkg.com/@asyncapi/react-component@latest/browser/standalone/index.js"></script>
+            <script src="./asyncapi-standalone.js"></script>
             <script>
               AsyncApiStandalone.render({
                 schema: { url: './asyncapi.json' },

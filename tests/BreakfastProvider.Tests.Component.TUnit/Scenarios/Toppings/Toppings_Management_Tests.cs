@@ -26,14 +26,14 @@ public class Toppings_Management_Tests : BaseFixture
         await _getSteps.Retrieve();
 
         // Then the toppings response should contain the default toppings
-        _getSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
+        await _getSteps.ResponseMessage!.StatusCode.Should().BeEqualTo(HttpStatusCode.OK);
         await _getSteps.ParseResponse();
-        _getSteps.Response.Should().HaveCount(ToppingDefaults.ExpectedToppingCount);
-        _getSteps.Response!.Should().Contain(t => t.Name == ToppingDefaults.Raspberries);
-        _getSteps.Response!.Should().Contain(t => t.Name == ToppingDefaults.Blueberries);
-        _getSteps.Response!.Should().Contain(t => t.Name == ToppingDefaults.MapleSyrup);
-        _getSteps.Response!.Should().Contain(t => t.Name == ToppingDefaults.WhippedCream);
-        _getSteps.Response!.Should().Contain(t => t.Name == ToppingDefaults.ChocolateChips);
+        await _getSteps.Response.Should().HaveCount(ToppingDefaults.ExpectedToppingCount);
+        await _getSteps.Response!.Should().Contain(t => t.Name == ToppingDefaults.Raspberries);
+        await _getSteps.Response!.Should().Contain(t => t.Name == ToppingDefaults.Blueberries);
+        await _getSteps.Response!.Should().Contain(t => t.Name == ToppingDefaults.MapleSyrup);
+        await _getSteps.Response!.Should().Contain(t => t.Name == ToppingDefaults.WhippedCream);
+        await _getSteps.Response!.Should().Contain(t => t.Name == ToppingDefaults.ChocolateChips);
     }
 
     [Test]
@@ -50,9 +50,9 @@ public class Toppings_Management_Tests : BaseFixture
         await _postSteps.Send();
 
         // Then the topping response should contain the created topping
-        _postSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
+        await _postSteps.ResponseMessage!.StatusCode.Should().BeEqualTo(HttpStatusCode.Created);
         await _postSteps.ParseResponse();
-        _postSteps.Response!.Name.Should().Be(ToppingDefaults.Strawberries);
-        _postSteps.Response!.Category.Should().Be(ToppingDefaults.FruitCategory);
+        await _postSteps.Response!.Name.Should().BeEqualTo(ToppingDefaults.Strawberries);
+        await _postSteps.Response!.Category.Should().BeEqualTo(ToppingDefaults.FruitCategory);
     }
 }

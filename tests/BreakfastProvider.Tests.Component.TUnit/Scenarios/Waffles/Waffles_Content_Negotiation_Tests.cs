@@ -24,6 +24,6 @@ public class Waffles_Content_Negotiation_Tests : BaseFixture
         var response = await Client.SendAsync(request);
 
         // Then the response should indicate unsupported media type
-        response.StatusCode.Should().Be(HttpStatusCode.UnsupportedMediaType);
+        await response.StatusCode.Should().BeEqualTo(HttpStatusCode.UnsupportedMediaType);
     }
 }

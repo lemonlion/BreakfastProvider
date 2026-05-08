@@ -28,7 +28,7 @@ public class Toppings_Deletion_Tests : BaseFixture
         await _deleteSteps.Send(toppingId);
 
         // Then the delete response should indicate success
-        _deleteSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.NoContent);
+        await _deleteSteps.ResponseMessage!.StatusCode.Should().BeEqualTo(HttpStatusCode.NoContent);
     }
 
     [Test]
@@ -41,6 +41,6 @@ public class Toppings_Deletion_Tests : BaseFixture
         await _deleteSteps.Send(toppingId);
 
         // Then the delete response should indicate not found
-        _deleteSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.NotFound);
+        await _deleteSteps.ResponseMessage!.StatusCode.Should().BeEqualTo(HttpStatusCode.NotFound);
     }
 }

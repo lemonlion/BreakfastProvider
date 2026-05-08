@@ -71,8 +71,8 @@ public class AuditLogs_Filtering_Tests : BaseFixture
         _auditLogs = Json.Deserialize<List<TestAuditLogResponse>>(content)!;
 
         // Then the audit log response should only contain order entries
-        _auditLogResponse!.StatusCode.Should().Be(HttpStatusCode.OK);
-        _auditLogs!.Should().OnlyContain(l => l.EntityType == AuditLogDefaults.OrderEntityType);
+        await _auditLogResponse!.StatusCode.Should().BeEqualTo(HttpStatusCode.OK);
+        await _auditLogs!.Should().All(l => l.EntityType == AuditLogDefaults.OrderEntityType);
     }
 
     [Test]
@@ -89,8 +89,8 @@ public class AuditLogs_Filtering_Tests : BaseFixture
         _auditLogs = Json.Deserialize<List<TestAuditLogResponse>>(content)!;
 
         // Then the audit log response should contain the specific order entry
-        _auditLogResponse!.StatusCode.Should().Be(HttpStatusCode.OK);
-        _auditLogs!.Should().Contain(l => l.EntityId == _orderId);
+        await _auditLogResponse!.StatusCode.Should().BeEqualTo(HttpStatusCode.OK);
+        await _auditLogs!.Should().Contain(l => l.EntityId == _orderId);
     }
 
     [Test]
@@ -102,10 +102,10 @@ public class AuditLogs_Filtering_Tests : BaseFixture
         _auditLogResponse = await Client.SendAsync(request);
 
         // Then the audit log response should be an empty collection
-        _auditLogResponse!.StatusCode.Should().Be(HttpStatusCode.OK);
+        await _auditLogResponse!.StatusCode.Should().BeEqualTo(HttpStatusCode.OK);
         var content = await _auditLogResponse!.Content.ReadAsStringAsync();
         var auditLogs = Json.Deserialize<List<TestAuditLogResponse>>(content)!;
-        auditLogs.Should().BeEmpty();
+        await auditLogs.Should().BeEmpty();
     }
 
     [Test]
@@ -122,7 +122,7 @@ public class AuditLogs_Filtering_Tests : BaseFixture
         _auditLogs = Json.Deserialize<List<TestAuditLogResponse>>(content)!;
 
         // Then the audit logs should be ordered by timestamp descending
-        _auditLogs.Should().NotBeNullOrEmpty();
-        _auditLogs!.Should().BeInDescendingOrder(l => l.Timestamp);
+        await _auditLogs.Should().NotBeNull();
+        await _auditLogs!.Select(l => l.Timestamp).Should().BeInDescendingOrder();
     }
 }

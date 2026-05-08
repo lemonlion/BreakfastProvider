@@ -36,10 +36,10 @@ public class CustomerPreferences_Management_Tests : BaseFixture
         await _putSteps.Send(customerId);
 
         // Then the response should contain the saved preferences
-        _putSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
+        await _putSteps.ResponseMessage!.StatusCode.Should().BeEqualTo(HttpStatusCode.OK);
         await _putSteps.ParseResponse();
-        _putSteps.Response!.PreferredMilkType.Should().Be("Oat");
-        _putSteps.Response!.FavouriteItem.Should().Be("Blueberry Pancakes");
+        await _putSteps.Response!.PreferredMilkType.Should().BeEqualTo("Oat");
+        await _putSteps.Response!.FavouriteItem.Should().BeEqualTo("Blueberry Pancakes");
     }
 
     [Test]
@@ -56,18 +56,18 @@ public class CustomerPreferences_Management_Tests : BaseFixture
             FavouriteItem = "Blueberry Pancakes"
         };
         await _putSteps.Send(customerId);
-        _putSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
+        await _putSteps.ResponseMessage!.StatusCode.Should().BeEqualTo(HttpStatusCode.OK);
         await _putSteps.ParseResponse();
 
         // When the customer preferences are retrieved
         await _getSteps.RetrieveById(customerId);
 
         // Then the response should contain the preferences
-        _getSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
+        await _getSteps.ResponseMessage!.StatusCode.Should().BeEqualTo(HttpStatusCode.OK);
         await _getSteps.ParseResponse();
-        _getSteps.Response!.CustomerId.Should().Be(customerId);
-        _getSteps.Response!.PreferredMilkType.Should().Be("Oat");
-        _getSteps.Response!.LikesExtraToppings.Should().BeTrue();
+        await _getSteps.Response!.CustomerId.Should().BeEqualTo(customerId);
+        await _getSteps.Response!.PreferredMilkType.Should().BeEqualTo("Oat");
+        await _getSteps.Response!.LikesExtraToppings.Should().BeTrue();
     }
 
     [Test]
@@ -84,7 +84,7 @@ public class CustomerPreferences_Management_Tests : BaseFixture
             FavouriteItem = "Blueberry Pancakes"
         };
         await _putSteps.Send(customerId);
-        _putSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
+        await _putSteps.ResponseMessage!.StatusCode.Should().BeEqualTo(HttpStatusCode.OK);
         await _putSteps.ParseResponse();
 
         // When the customer preferences are updated
@@ -99,10 +99,10 @@ public class CustomerPreferences_Management_Tests : BaseFixture
         await _putSteps.Send(customerId);
 
         // Then the response should contain the updated values
-        _putSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
+        await _putSteps.ResponseMessage!.StatusCode.Should().BeEqualTo(HttpStatusCode.OK);
         await _putSteps.ParseResponse();
-        _putSteps.Response!.PreferredMilkType.Should().Be("Almond");
-        _putSteps.Response!.FavouriteItem.Should().Be("Belgian Waffles");
+        await _putSteps.Response!.PreferredMilkType.Should().BeEqualTo("Almond");
+        await _putSteps.Response!.FavouriteItem.Should().BeEqualTo("Belgian Waffles");
     }
 
     [Test]
@@ -112,7 +112,7 @@ public class CustomerPreferences_Management_Tests : BaseFixture
         await _getSteps.RetrieveById(Guid.NewGuid().ToString("N"));
 
         // Then the response should indicate not found
-        _getSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.NotFound);
+        await _getSteps.ResponseMessage!.StatusCode.Should().BeEqualTo(HttpStatusCode.NotFound);
     }
 
     [Test]
@@ -133,6 +133,6 @@ public class CustomerPreferences_Management_Tests : BaseFixture
         await _putSteps.Send(customerId);
 
         // Then the response should indicate bad request
-        _putSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        await _putSteps.ResponseMessage!.StatusCode.Should().BeEqualTo(HttpStatusCode.BadRequest);
     }
 }

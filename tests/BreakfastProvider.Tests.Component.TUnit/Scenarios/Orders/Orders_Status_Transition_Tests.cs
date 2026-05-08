@@ -60,7 +60,7 @@ public class Orders_Status_Transition_Tests : BaseFixture
         foreach (var intermediateStatus in path)
         {
             await _patchSteps.Send(_orderId, intermediateStatus);
-            _patchSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
+            await _patchSteps.ResponseMessage!.StatusCode.Should().BeEqualTo(HttpStatusCode.OK);
         }
     }
 
@@ -88,9 +88,9 @@ public class Orders_Status_Transition_Tests : BaseFixture
         await _patchSteps.Send(_orderId, toStatus);
 
         // Then the order status should be updated successfully
-        _patchSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
+        await _patchSteps.ResponseMessage!.StatusCode.Should().BeEqualTo(HttpStatusCode.OK);
         await _patchSteps.ParseResponse();
-        _patchSteps.Response!.Status.Should().Be(toStatus);
+        await _patchSteps.Response!.Status.Should().BeEqualTo(toStatus);
     }
 
     [Test]
@@ -110,6 +110,6 @@ public class Orders_Status_Transition_Tests : BaseFixture
         await _patchSteps.Send(_orderId, toStatus);
 
         // Then the response should indicate an invalid state transition
-        _patchSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Conflict);
+        await _patchSteps.ResponseMessage!.StatusCode.Should().BeEqualTo(HttpStatusCode.Conflict);
     }
 }

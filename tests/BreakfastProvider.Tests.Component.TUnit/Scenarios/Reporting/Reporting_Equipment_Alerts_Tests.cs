@@ -30,11 +30,11 @@ public class Reporting_Equipment_Alerts_Tests : BaseFixture
     {
         // Given a pancake batch has been created
         await _milkSteps.Retrieve();
-        _milkSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
+        await _milkSteps.ResponseMessage!.StatusCode.Should().BeEqualTo(HttpStatusCode.OK);
         await _eggsSteps.Retrieve();
-        _eggsSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
+        await _eggsSteps.ResponseMessage!.StatusCode.Should().BeEqualTo(HttpStatusCode.OK);
         await _flourSteps.Retrieve();
-        _flourSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
+        await _flourSteps.ResponseMessage!.StatusCode.Should().BeEqualTo(HttpStatusCode.OK);
 
         _pancakeSteps.Request = new TestPancakeRequest
         {
@@ -43,19 +43,19 @@ public class Reporting_Equipment_Alerts_Tests : BaseFixture
             Flour = _flourSteps.FlourResponse.Flour
         };
         await _pancakeSteps.Send();
-        _pancakeSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
+        await _pancakeSteps.ResponseMessage!.StatusCode.Should().BeEqualTo(HttpStatusCode.Created);
         await _pancakeSteps.ParseResponse();
-        _pancakeSteps.Response.Should().NotBeNull();
-        _pancakeSteps.Response!.BatchId.Should().NotBeEmpty();
+        await _pancakeSteps.Response.Should().NotBeNull();
+        await _pancakeSteps.Response!.BatchId.Should().NotBeEqualTo(Guid.Empty);
 
         // When the equipment alerts are queried via GraphQL
         await _graphQlSteps.QueryEquipmentAlerts(waitForBatchId: _pancakeSteps.Response?.BatchId);
 
         // Then the response should contain the equipment alert record
-        _graphQlSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
+        await _graphQlSteps.ResponseMessage!.StatusCode.Should().BeEqualTo(HttpStatusCode.OK);
         await _graphQlSteps.ParseEquipmentAlertsResponse();
         var batchId = _pancakeSteps.Response!.BatchId;
-        _graphQlSteps.EquipmentAlerts.Should().Contain(a =>
+        await _graphQlSteps.EquipmentAlerts.Should().Contain(a =>
             a.BatchId == batchId &&
             a.EquipmentName == "Griddle" &&
             a.AlertType == "UsageCycleCompleted");

@@ -39,20 +39,19 @@ public class Specifications_Async_Api_Tests : BaseFixture
         }
 
         // Then the response status should be ok
-        asyncApiResponse!.StatusCode.Should().Be(HttpStatusCode.OK);
+        await asyncApiResponse!.StatusCode.Should().BeEqualTo(HttpStatusCode.OK);
 
         // And the response should be valid json
         var asyncApiResponseIsValidJson = asyncApiJson is not null;
-        asyncApiResponseIsValidJson.Should().BeTrue(
-            $"response body (first 500 chars): {asyncApiJsonString?[..Math.Min(asyncApiJsonString.Length, 500)]}");
+        await asyncApiResponseIsValidJson.Should().BeTrue();
 
         // And the asyncapi spec should contain expected top-level properties
-        asyncApiJson!.RootElement.GetProperty("asyncapi").Should().NotBeNull();
-        asyncApiJson!.RootElement.GetProperty("info").Should().NotBeNull();
-        asyncApiJson!.RootElement.GetProperty("defaultContentType").Should().NotBeNull();
-        asyncApiJson!.RootElement.GetProperty("channels").Should().NotBeNull();
-        asyncApiJson!.RootElement.GetProperty("operations").Should().NotBeNull();
-        asyncApiJson!.RootElement.GetProperty("components").Should().NotBeNull();
+        await asyncApiJson!.RootElement.GetProperty("asyncapi").Should().NotBeNull();
+        await asyncApiJson!.RootElement.GetProperty("info").Should().NotBeNull();
+        await asyncApiJson!.RootElement.GetProperty("defaultContentType").Should().NotBeNull();
+        await asyncApiJson!.RootElement.GetProperty("channels").Should().NotBeNull();
+        await asyncApiJson!.RootElement.GetProperty("operations").Should().NotBeNull();
+        await asyncApiJson!.RootElement.GetProperty("components").Should().NotBeNull();
 
         // And the asyncapi spec is written to disk as json
         var path = $"{AsyncApiSpecs.SpecificationsFolderPath}{AsyncApiSpecs.JsonFileName}";

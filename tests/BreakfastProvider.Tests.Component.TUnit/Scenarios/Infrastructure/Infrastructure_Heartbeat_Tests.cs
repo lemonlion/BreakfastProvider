@@ -16,12 +16,12 @@ public class Infrastructure_Heartbeat_Tests : BaseFixture
         var response = await Client.GetAsync($"/{Endpoints.Heartbeat}");
 
         // Then the response should indicate the service is running
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        await response.StatusCode.Should().BeEqualTo(HttpStatusCode.OK);
 
         var content = await response.Content.ReadAsStringAsync();
         var result = Json.Deserialize<TestHeartbeatResponse>(content);
-        result.Should().NotBeNull();
-        result!.Status.Should().Be(Documentation.HeartbeatStatus);
+        await result.Should().NotBeNull();
+        await result!.Status.Should().BeEqualTo(Documentation.HeartbeatStatus);
     }
 
     private record TestHeartbeatResponse(string Status);

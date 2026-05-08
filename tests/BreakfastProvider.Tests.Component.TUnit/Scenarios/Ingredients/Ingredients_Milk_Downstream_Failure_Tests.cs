@@ -26,9 +26,9 @@ public class Ingredients_Milk_Downstream_Failure_Tests : BaseFixture
         await _milkSteps.Retrieve();
 
         // Then the milk response should indicate a bad gateway
-        _milkSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.BadGateway);
+        await _milkSteps.ResponseMessage!.StatusCode.Should().BeEqualTo(HttpStatusCode.BadGateway);
         var milkErrorResponseBody = await _milkSteps.ResponseMessage!.Content.ReadAsStringAsync();
-        milkErrorResponseBody.Should().Contain(DownstreamErrorMessages.CowServiceUnavailableTitle);
+        await milkErrorResponseBody.Should().Contain(DownstreamErrorMessages.CowServiceUnavailableTitle);
     }
 
     [Test]
@@ -44,9 +44,9 @@ public class Ingredients_Milk_Downstream_Failure_Tests : BaseFixture
         await _milkSteps.Retrieve();
 
         // Then the milk response should indicate a bad gateway
-        _milkSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.BadGateway);
+        await _milkSteps.ResponseMessage!.StatusCode.Should().BeEqualTo(HttpStatusCode.BadGateway);
         var milkErrorResponseBody = await _milkSteps.ResponseMessage!.Content.ReadAsStringAsync();
-        milkErrorResponseBody.Should().Contain(DownstreamErrorMessages.CowServiceUnavailableTitle);
+        await milkErrorResponseBody.Should().Contain(DownstreamErrorMessages.CowServiceUnavailableTitle);
     }
 
     [Test]
@@ -62,8 +62,8 @@ public class Ingredients_Milk_Downstream_Failure_Tests : BaseFixture
         await _milkSteps.Retrieve();
 
         // Then the milk response should indicate a bad gateway
-        _milkSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.BadGateway);
+        await _milkSteps.ResponseMessage!.StatusCode.Should().BeEqualTo(HttpStatusCode.BadGateway);
         var milkErrorResponseBody = await _milkSteps.ResponseMessage!.Content.ReadAsStringAsync();
-        milkErrorResponseBody.Should().Contain(DownstreamErrorMessages.CowServiceUnavailableTitle);
+        await milkErrorResponseBody.Should().Contain(DownstreamErrorMessages.CowServiceUnavailableTitle);
     }
 }

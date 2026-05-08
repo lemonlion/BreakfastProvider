@@ -34,7 +34,7 @@ public class Inventory_Management_Tests : BaseFixture
     {
         _postSteps.Request = CreateValidRequest();
         await _postSteps.Send();
-        _postSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
+        await _postSteps.ResponseMessage!.StatusCode.Should().BeEqualTo(HttpStatusCode.Created);
         await _postSteps.ParseResponse();
         return _postSteps.Response!.Id;
     }
@@ -50,10 +50,10 @@ public class Inventory_Management_Tests : BaseFixture
         await _postSteps.Send();
 
         // Then the response should contain the created item
-        _postSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
+        await _postSteps.ResponseMessage!.StatusCode.Should().BeEqualTo(HttpStatusCode.Created);
         await _postSteps.ParseResponse();
-        _postSteps.Response!.Name.Should().Be(_postSteps.Request.Name);
-        _postSteps.Response!.Category.Should().Be("Dry Goods");
+        await _postSteps.Response!.Name.Should().BeEqualTo(_postSteps.Request.Name);
+        await _postSteps.Response!.Category.Should().BeEqualTo("Dry Goods");
     }
 
     [Test]
@@ -66,10 +66,10 @@ public class Inventory_Management_Tests : BaseFixture
         await _getSteps.RetrieveById(createdItemId);
 
         // Then the response should contain the item
-        _getSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
+        await _getSteps.ResponseMessage!.StatusCode.Should().BeEqualTo(HttpStatusCode.OK);
         await _getSteps.ParseResponse();
-        _getSteps.Response!.Id.Should().Be(createdItemId);
-        _getSteps.Response!.Name.Should().Be(_postSteps.Response!.Name);
+        await _getSteps.Response!.Id.Should().BeEqualTo(createdItemId);
+        await _getSteps.Response!.Name.Should().BeEqualTo(_postSteps.Response!.Name);
     }
 
     [Test]
@@ -82,9 +82,9 @@ public class Inventory_Management_Tests : BaseFixture
         await _getSteps.RetrieveAll();
 
         // Then the list response should contain the item
-        _getSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
+        await _getSteps.ResponseMessage!.StatusCode.Should().BeEqualTo(HttpStatusCode.OK);
         await _getSteps.ParseListResponse();
-        _getSteps.ListResponse!.Should().Contain(i => i.Id == createdItemId);
+        await _getSteps.ListResponse!.Should().Contain(i => i.Id == createdItemId);
     }
 
     [Test]
@@ -105,9 +105,9 @@ public class Inventory_Management_Tests : BaseFixture
         await _putSteps.Send(createdItemId);
 
         // Then the response should contain the updated values
-        _putSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
+        await _putSteps.ResponseMessage!.StatusCode.Should().BeEqualTo(HttpStatusCode.OK);
         await _putSteps.ParseResponse();
-        _putSteps.Response!.Category.Should().Be("Updated Category");
+        await _putSteps.Response!.Category.Should().BeEqualTo("Updated Category");
     }
 
     [Test]
@@ -120,7 +120,7 @@ public class Inventory_Management_Tests : BaseFixture
         await _deleteSteps.Send(createdItemId);
 
         // Then the response should indicate no content
-        _deleteSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.NoContent);
+        await _deleteSteps.ResponseMessage!.StatusCode.Should().BeEqualTo(HttpStatusCode.NoContent);
     }
 
     [Test]
@@ -130,6 +130,6 @@ public class Inventory_Management_Tests : BaseFixture
         await _getSteps.RetrieveById(99999);
 
         // Then the response should indicate not found
-        _getSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.NotFound);
+        await _getSteps.ResponseMessage!.StatusCode.Should().BeEqualTo(HttpStatusCode.NotFound);
     }
 }

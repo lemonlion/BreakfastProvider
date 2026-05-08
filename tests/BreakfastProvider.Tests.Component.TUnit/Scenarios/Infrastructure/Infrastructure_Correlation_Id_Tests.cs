@@ -20,9 +20,9 @@ public class Infrastructure_Correlation_Id_Tests : BaseFixture
 
         // Then the response should contain the same correlation id
         var responseContainsCorrelationIdHeader = response.Headers.TryGetValues(CustomHeaders.CorrelationId, out var values);
-        responseContainsCorrelationIdHeader.Should().BeTrue();
+        await responseContainsCorrelationIdHeader.Should().BeTrue();
         var firstCorrelationIdHeaderValue = values!.First();
-        firstCorrelationIdHeaderValue.Should().Be(knownCorrelationId);
+        await firstCorrelationIdHeaderValue.Should().BeEqualTo(knownCorrelationId);
     }
 
     [Test]
@@ -35,8 +35,8 @@ public class Infrastructure_Correlation_Id_Tests : BaseFixture
 
         // Then the response should contain a generated correlation id
         var responseContainsCorrelationIdHeader = response.Headers.TryGetValues(CustomHeaders.CorrelationId, out var values);
-        responseContainsCorrelationIdHeader.Should().BeTrue();
+        await responseContainsCorrelationIdHeader.Should().BeTrue();
         var firstCorrelationIdHeaderValue = values!.First();
-        firstCorrelationIdHeaderValue.Should().NotBeNullOrEmpty();
+        await firstCorrelationIdHeaderValue.Should().NotBeNull();
     }
 }

@@ -67,7 +67,7 @@ public class Orders_Outbox_Retry_Exhaustion_Tests : BaseFixture
         }
 
         await _outboxSteps.LoadOutboxMessages();
-        _outboxSteps.OutboxMessages.Should().Contain(m =>
+        await _outboxSteps.OutboxMessages.Should().Contain(m =>
                 m.EventType == EventTypes.OrderCreated && m.Status == OutboxStatuses.Failed,
             "the outbox message should have transitioned to Failed after exhausting retries");
     }

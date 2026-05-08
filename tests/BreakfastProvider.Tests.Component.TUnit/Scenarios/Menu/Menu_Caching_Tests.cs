@@ -25,7 +25,7 @@ public class Menu_Caching_Tests : BaseFixture
         // Given the menu has been requested and cached
         await Client.DeleteAsync(Endpoints.MenuCache);
         await _menuSteps.Retrieve();
-        _menuSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
+        await _menuSteps.ResponseMessage!.StatusCode.Should().BeEqualTo(HttpStatusCode.OK);
 
         // And the supplier service is then made unavailable
         _secondMenuSteps.AddHeader(FakeScenarioHeaders.SupplierService, FakeScenarios.ServiceUnavailable);
@@ -34,8 +34,8 @@ public class Menu_Caching_Tests : BaseFixture
         await _secondMenuSteps.Retrieve();
 
         // Then the menu response should still return available items
-        _secondMenuSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
+        await _secondMenuSteps.ResponseMessage!.StatusCode.Should().BeEqualTo(HttpStatusCode.OK);
         await _secondMenuSteps.ParseResponse();
-        _secondMenuSteps.Response!.Should().Contain(m => m.IsAvailable);
+        await _secondMenuSteps.Response!.Should().Contain(m => m.IsAvailable);
     }
 }

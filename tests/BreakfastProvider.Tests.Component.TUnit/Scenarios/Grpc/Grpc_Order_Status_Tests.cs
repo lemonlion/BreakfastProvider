@@ -52,7 +52,7 @@ public class Grpc_Order_Status_Tests : BaseFixture
             Flour = _flourSteps.FlourResponse.Flour
         };
         await _pancakeSteps.Send();
-        _pancakeSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
+        await _pancakeSteps.ResponseMessage!.StatusCode.Should().BeEqualTo(HttpStatusCode.Created);
         await _pancakeSteps.ParseResponse();
 
         // And an order has been created for the batch
@@ -71,7 +71,7 @@ public class Grpc_Order_Status_Tests : BaseFixture
             ]
         };
         await _orderSteps.Send();
-        _orderSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
+        await _orderSteps.ResponseMessage!.StatusCode.Should().BeEqualTo(HttpStatusCode.Created);
         await _orderSteps.ParseResponse();
         var createdOrderId = _orderSteps.Response!.OrderId;
 
@@ -79,9 +79,9 @@ public class Grpc_Order_Status_Tests : BaseFixture
         await _grpcSteps.GetOrderStatus(createdOrderId.ToString());
 
         // Then the gRPC response should contain the order details
-        _grpcSteps.OrderStatusReply!.OrderId.Should().Be(createdOrderId.ToString());
-        _grpcSteps.OrderStatusReply!.CustomerName.Should().Be(_customerName);
-        _grpcSteps.OrderStatusReply!.Status.Should().Be(OrderStatuses.Created);
+        await _grpcSteps.OrderStatusReply!.OrderId.Should().BeEqualTo(createdOrderId.ToString());
+        await _grpcSteps.OrderStatusReply!.CustomerName.Should().BeEqualTo(_customerName);
+        await _grpcSteps.OrderStatusReply!.Status.Should().BeEqualTo(OrderStatuses.Created);
     }
 
     [Test]
@@ -91,7 +91,7 @@ public class Grpc_Order_Status_Tests : BaseFixture
         await _grpcSteps.GetOrderStatus(Guid.NewGuid().ToString());
 
         // Then the gRPC response should be a not-found error
-        _grpcSteps.RpcException.Should().NotBeNull();
-        _grpcSteps.RpcException!.StatusCode.Should().Be(StatusCode.NotFound);
+        await _grpcSteps.RpcException.Should().NotBeNull();
+        await _grpcSteps.RpcException!.StatusCode.Should().BeEqualTo(StatusCode.NotFound);
     }
 }

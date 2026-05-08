@@ -55,7 +55,7 @@ public class Orders_Rate_Limiting_Tests : BaseFixture
             Flour = _flourSteps.FlourResponse.Flour
         };
         await _pancakeSteps.Send();
-        _pancakeSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
+        await _pancakeSteps.ResponseMessage!.StatusCode.Should().BeEqualTo(HttpStatusCode.Created);
         await _pancakeSteps.ParseResponse();
 
         // And a valid order request
@@ -83,7 +83,7 @@ public class Orders_Rate_Limiting_Tests : BaseFixture
         var secondResponse = _orderSteps.ResponseMessage;
 
         // Then
-        firstResponse!.StatusCode.Should().Be(HttpStatusCode.Created);
-        secondResponse!.StatusCode.Should().Be(HttpStatusCode.TooManyRequests);
+        await firstResponse!.StatusCode.Should().BeEqualTo(HttpStatusCode.Created);
+        await secondResponse!.StatusCode.Should().BeEqualTo(HttpStatusCode.TooManyRequests);
     }
 }

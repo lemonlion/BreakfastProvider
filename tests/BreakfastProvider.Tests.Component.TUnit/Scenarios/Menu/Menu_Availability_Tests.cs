@@ -26,14 +26,14 @@ public class Menu_Availability_Tests : BaseFixture
         await _menuSteps.Retrieve();
 
         // Then the menu response should contain all menu items
-        _menuSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
+        await _menuSteps.ResponseMessage!.StatusCode.Should().BeEqualTo(HttpStatusCode.OK);
         await _menuSteps.ParseResponse();
-        _menuSteps.Response!.Should().Contain(m => m.Name == MenuDefaults.ClassicPancakes);
-        _menuSteps.Response!.Should().Contain(m => m.Name == MenuDefaults.BelgianWaffles);
-        _menuSteps.Response!.Should().Contain(m => m.Name == MenuDefaults.GoatMilkPancakes);
+        await _menuSteps.Response!.Should().Contain(m => m.Name == MenuDefaults.ClassicPancakes);
+        await _menuSteps.Response!.Should().Contain(m => m.Name == MenuDefaults.BelgianWaffles);
+        await _menuSteps.Response!.Should().Contain(m => m.Name == MenuDefaults.GoatMilkPancakes);
 
         // And the menu items should be in alphabetical order
-        _menuSteps.Response!.Should().BeInAscendingOrder(m => m.Name);
+        await _menuSteps.Response!.Select(m => m.Name).Should().BeInOrder();
 
         // And the supplier service should have received an availability request
         if (!Settings.RunAgainstExternalServiceUnderTest)

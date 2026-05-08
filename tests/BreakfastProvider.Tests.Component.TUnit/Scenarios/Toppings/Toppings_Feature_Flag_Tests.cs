@@ -36,9 +36,9 @@ public class Toppings_Feature_Flag_Tests : BaseFixture
         await _toppingsSteps.Retrieve();
 
         // Then the toppings response should not include raspberries
-        _toppingsSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
+        await _toppingsSteps.ResponseMessage!.StatusCode.Should().BeEqualTo(HttpStatusCode.OK);
         await _toppingsSteps.ParseResponse();
-        _toppingsSteps.Response!.Should().NotContain(t => t.Name == ToppingDefaults.Raspberries);
+        await _toppingsSteps.Response!.Should().All(t => t.Name != ToppingDefaults.Raspberries);
     }
 
     [Test]
@@ -57,8 +57,8 @@ public class Toppings_Feature_Flag_Tests : BaseFixture
         await _toppingsSteps.Retrieve();
 
         // Then the toppings response should include raspberries
-        _toppingsSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
+        await _toppingsSteps.ResponseMessage!.StatusCode.Should().BeEqualTo(HttpStatusCode.OK);
         await _toppingsSteps.ParseResponse();
-        _toppingsSteps.Response!.Should().Contain(t => t.Name == ToppingDefaults.Raspberries);
+        await _toppingsSteps.Response!.Should().Contain(t => t.Name == ToppingDefaults.Raspberries);
     }
 }

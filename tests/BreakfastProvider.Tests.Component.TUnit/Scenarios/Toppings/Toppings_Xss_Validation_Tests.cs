@@ -35,7 +35,7 @@ public class Toppings_Xss_Validation_Tests : BaseFixture
         // Then the responses should contain the validation error
         var actualResults = await ValidationHelper.ParseValidationResponses(responses);
         var actual = actualResults.Single();
-        actual.ErrorMessage.Should().Be(expectedError);
-        actual.ResponseStatus.Should().Be(expectedStatus);
+        await actual.ErrorMessage.Should().BeEqualTo(expectedError);
+        await actual.ResponseStatus.Should().BeEqualTo(expectedStatus);
     }
 }

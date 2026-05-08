@@ -14,18 +14,17 @@ public class Infrastructure_Health_Check_Detail_Tests : BaseFixture
         var response = await Client.GetAsync(Endpoints.Health);
 
         // Then the response should contain detailed entries
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        await response.StatusCode.Should().BeEqualTo(HttpStatusCode.OK);
 
         var content = await response.Content.ReadAsStringAsync();
         var result = Json.Deserialize<TestHealthCheckResponse>(content)!;
-        result.Should().NotBeNull();
+        await result.Should().NotBeNull();
 
         // Each entry should have a status
         foreach (var entry in result.Results)
         {
             var healthCheckEntryStatus = entry.Value.Status;
-            healthCheckEntryStatus.Should().NotBeNullOrEmpty(
-                $"health check entry '{entry.Key}' should have a status");
+            await healthCheckEntryStatus.Should().NotBeNull();
         }
 
         // Each downstream entry should have a description
@@ -39,18 +38,16 @@ public class Infrastructure_Health_Check_Detail_Tests : BaseFixture
 
         foreach (var checkName in downstreamChecks)
         {
-            result.Results.Should().ContainKey(checkName);
+            await result.Results.Should().ContainKey(checkName);
             var healthCheckDescription = result.Results[checkName].Description;
-            healthCheckDescription.Should().NotBeNullOrEmpty(
-                $"health check entry '{checkName}' should have a description");
+            await healthCheckDescription.Should().NotBeNull();
         }
 
         // Each entry should have a data object
         foreach (var entry in result.Results)
         {
             var healthCheckEntryData = entry.Value.Data;
-            healthCheckEntryData.Should().NotBeNull(
-                $"health check entry '{entry.Key}' should have a data object");
+            await healthCheckEntryData.Should().NotBeNull();
         }
     }
 }

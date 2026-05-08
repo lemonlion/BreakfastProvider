@@ -33,7 +33,7 @@ public class Reservations_Management_Tests : BaseFixture
     {
         _postSteps.Request = CreateValidRequest();
         await _postSteps.Send();
-        _postSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
+        await _postSteps.ResponseMessage!.StatusCode.Should().BeEqualTo(HttpStatusCode.Created);
         await _postSteps.ParseResponse();
         return _postSteps.Response!.Id;
     }
@@ -49,10 +49,10 @@ public class Reservations_Management_Tests : BaseFixture
         await _postSteps.Send();
 
         // Then the response should contain the confirmed booking
-        _postSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
+        await _postSteps.ResponseMessage!.StatusCode.Should().BeEqualTo(HttpStatusCode.Created);
         await _postSteps.ParseResponse();
-        _postSteps.Response!.Status.Should().Be("Confirmed");
-        _postSteps.Response!.CustomerName.Should().Be(_postSteps.Request.CustomerName);
+        await _postSteps.Response!.Status.Should().BeEqualTo("Confirmed");
+        await _postSteps.Response!.CustomerName.Should().BeEqualTo(_postSteps.Request.CustomerName);
     }
 
     [Test]
@@ -65,11 +65,11 @@ public class Reservations_Management_Tests : BaseFixture
         await _getSteps.RetrieveById(createdReservationId);
 
         // Then the response should contain the reservation
-        _getSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
+        await _getSteps.ResponseMessage!.StatusCode.Should().BeEqualTo(HttpStatusCode.OK);
         await _getSteps.ParseResponse();
-        _getSteps.Response!.Id.Should().Be(createdReservationId);
-        _getSteps.Response!.CustomerName.Should().Be(_postSteps.Response!.CustomerName);
-        _getSteps.Response!.Status.Should().Be("Confirmed");
+        await _getSteps.Response!.Id.Should().BeEqualTo(createdReservationId);
+        await _getSteps.Response!.CustomerName.Should().BeEqualTo(_postSteps.Response!.CustomerName);
+        await _getSteps.Response!.Status.Should().BeEqualTo("Confirmed");
     }
 
     [Test]
@@ -82,9 +82,9 @@ public class Reservations_Management_Tests : BaseFixture
         await _cancelSteps.Send(createdReservationId);
 
         // Then the cancellation response should indicate the reservation is cancelled
-        _cancelSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
+        await _cancelSteps.ResponseMessage!.StatusCode.Should().BeEqualTo(HttpStatusCode.OK);
         await _cancelSteps.ParseResponse();
-        _cancelSteps.Response!.Status.Should().Be("Cancelled");
+        await _cancelSteps.Response!.Status.Should().BeEqualTo("Cancelled");
     }
 
     [Test]
@@ -93,13 +93,13 @@ public class Reservations_Management_Tests : BaseFixture
         // Given a cancelled reservation exists
         var createdReservationId = await CreateReservation();
         await _cancelSteps.Send(createdReservationId);
-        _cancelSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
+        await _cancelSteps.ResponseMessage!.StatusCode.Should().BeEqualTo(HttpStatusCode.OK);
 
         // When the reservation is cancelled again
         await _cancelSteps.Send(createdReservationId);
 
         // Then the cancellation response should indicate a conflict
-        _cancelSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Conflict);
+        await _cancelSteps.ResponseMessage!.StatusCode.Should().BeEqualTo(HttpStatusCode.Conflict);
     }
 
     [Test]
@@ -114,6 +114,6 @@ public class Reservations_Management_Tests : BaseFixture
         var deleteResponse = await Client.SendAsync(request);
 
         // Then the response should indicate no content
-        deleteResponse.StatusCode.Should().Be(HttpStatusCode.NoContent);
+        await deleteResponse.StatusCode.Should().BeEqualTo(HttpStatusCode.NoContent);
     }
 }

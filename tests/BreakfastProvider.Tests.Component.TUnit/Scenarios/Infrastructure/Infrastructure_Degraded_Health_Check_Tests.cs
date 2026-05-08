@@ -31,16 +31,16 @@ public class Infrastructure_Degraded_Health_Check_Tests : BaseFixture
         var response = await Client.GetAsync(Endpoints.Health);
 
         // Then the response should indicate a degraded status
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        await response.StatusCode.Should().BeEqualTo(HttpStatusCode.OK);
 
         var content = await response.Content.ReadAsStringAsync();
         var result = Json.Deserialize<TestHealthCheckResponse>(content)!;
-        result.Should().NotBeNull();
-        result.Status.Should().Be(HealthCheckStatuses.Degraded);
+        await result.Should().NotBeNull();
+        await result.Status.Should().BeEqualTo(HealthCheckStatuses.Degraded);
 
         // And the cow service dependency should report degraded
-        result.Results.Should().ContainKey(HealthCheckNames.CowService);
-        result.Results[HealthCheckNames.CowService].Status.Should().Be(HealthCheckStatuses.Degraded);
+        await result.Results.Should().ContainKey(HealthCheckNames.CowService);
+        await result.Results[HealthCheckNames.CowService].Status.Should().BeEqualTo(HealthCheckStatuses.Degraded);
     }
 
     [Test]
@@ -66,17 +66,17 @@ public class Infrastructure_Degraded_Health_Check_Tests : BaseFixture
         var response = await Client.GetAsync(Endpoints.Health);
 
         // Then the response should indicate a degraded status
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        await response.StatusCode.Should().BeEqualTo(HttpStatusCode.OK);
 
         var content = await response.Content.ReadAsStringAsync();
         var result = Json.Deserialize<TestHealthCheckResponse>(content)!;
-        result.Should().NotBeNull();
-        result.Status.Should().Be(HealthCheckStatuses.Degraded);
+        await result.Should().NotBeNull();
+        await result.Status.Should().BeEqualTo(HealthCheckStatuses.Degraded);
 
         // And both dependencies should report degraded
-        result.Results.Should().ContainKey(HealthCheckNames.CowService);
-        result.Results[HealthCheckNames.CowService].Status.Should().Be(HealthCheckStatuses.Degraded);
-        result.Results.Should().ContainKey(HealthCheckNames.SupplierService);
-        result.Results[HealthCheckNames.SupplierService].Status.Should().Be(HealthCheckStatuses.Degraded);
+        await result.Results.Should().ContainKey(HealthCheckNames.CowService);
+        await result.Results[HealthCheckNames.CowService].Status.Should().BeEqualTo(HealthCheckStatuses.Degraded);
+        await result.Results.Should().ContainKey(HealthCheckNames.SupplierService);
+        await result.Results[HealthCheckNames.SupplierService].Status.Should().BeEqualTo(HealthCheckStatuses.Degraded);
     }
 }

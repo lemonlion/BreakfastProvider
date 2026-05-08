@@ -28,8 +28,8 @@ public class Menu_Downstream_Failure_Tests : BaseFixture
         await _menuSteps.Retrieve();
 
         // Then the menu response should mark all items as unavailable
-        _menuSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
+        await _menuSteps.ResponseMessage!.StatusCode.Should().BeEqualTo(HttpStatusCode.OK);
         await _menuSteps.ParseResponse();
-        _menuSteps.Response!.Should().OnlyContain(m => m.IsAvailable == false);
+        await _menuSteps.Response!.Should().All(m => m.IsAvailable == false);
     }
 }

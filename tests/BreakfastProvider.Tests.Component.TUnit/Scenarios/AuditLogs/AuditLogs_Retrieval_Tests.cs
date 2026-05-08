@@ -50,10 +50,10 @@ public class AuditLogs_Retrieval_Tests : BaseFixture
             Flour = _flourSteps.FlourResponse.Flour
         };
         await _pancakeSteps.Send();
-        _pancakeSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
+        await _pancakeSteps.ResponseMessage!.StatusCode.Should().BeEqualTo(HttpStatusCode.Created);
         await _pancakeSteps.ParseResponse();
-        _pancakeSteps.Response.Should().NotBeNull();
-        _pancakeSteps.Response!.BatchId.Should().NotBeEmpty();
+        await _pancakeSteps.Response.Should().NotBeNull();
+        await _pancakeSteps.Response!.BatchId.Should().NotBeEqualTo(Guid.Empty);
 
         // And an order has been created for the batch
         _orderSteps.Request = new TestOrderRequest
@@ -71,18 +71,18 @@ public class AuditLogs_Retrieval_Tests : BaseFixture
             ]
         };
         await _orderSteps.Send();
-        _orderSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
+        await _orderSteps.ResponseMessage!.StatusCode.Should().BeEqualTo(HttpStatusCode.Created);
         await _orderSteps.ParseResponse();
-        _orderSteps.Response.Should().NotBeNull();
-        _orderSteps.Response!.OrderId.Should().NotBeEmpty();
+        await _orderSteps.Response.Should().NotBeNull();
+        await _orderSteps.Response!.OrderId.Should().NotBeEqualTo(Guid.Empty);
 
         // When the audit logs are retrieved
         await _auditSteps.Retrieve();
 
         // Then the audit log response should contain the order creation entry
-        _auditSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
+        await _auditSteps.ResponseMessage!.StatusCode.Should().BeEqualTo(HttpStatusCode.OK);
         await _auditSteps.ParseResponse();
-        _auditSteps.Response!.Should().Contain(a =>
+        await _auditSteps.Response!.Should().Contain(a =>
             a.Action == AuditLogDefaults.CreatedAction
             && a.EntityType == AuditLogDefaults.OrderEntityType
             && a.Details.Contains(_customerName));

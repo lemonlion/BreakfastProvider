@@ -40,13 +40,13 @@ public class Orders_Breakfast_Order_Tests : BaseFixture
     private async Task CreatePancakeBatch()
     {
         await _milkSteps.Retrieve();
-        _milkSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
+        await _milkSteps.ResponseMessage!.StatusCode.Should().BeEqualTo(HttpStatusCode.OK);
 
         await _eggsSteps.Retrieve();
-        _eggsSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
+        await _eggsSteps.ResponseMessage!.StatusCode.Should().BeEqualTo(HttpStatusCode.OK);
 
         await _flourSteps.Retrieve();
-        _flourSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
+        await _flourSteps.ResponseMessage!.StatusCode.Should().BeEqualTo(HttpStatusCode.OK);
 
         _pancakeSteps.Request = new TestPancakeRequest
         {
@@ -56,10 +56,10 @@ public class Orders_Breakfast_Order_Tests : BaseFixture
         };
         await _pancakeSteps.Send();
 
-        _pancakeSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
+        await _pancakeSteps.ResponseMessage!.StatusCode.Should().BeEqualTo(HttpStatusCode.Created);
         await _pancakeSteps.ParseResponse();
-        _pancakeSteps.Response.Should().NotBeNull();
-        _pancakeSteps.Response!.BatchId.Should().NotBeEmpty();
+        await _pancakeSteps.Response.Should().NotBeNull();
+        await _pancakeSteps.Response!.BatchId.Should().NotBeEqualTo(Guid.Empty);
 
         _orderSteps.Request.Items.Add(new TestOrderItemRequest
         {
@@ -87,10 +87,10 @@ public class Orders_Breakfast_Order_Tests : BaseFixture
         await _orderSteps.Send();
 
         // Then
-        _orderSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
+        await _orderSteps.ResponseMessage!.StatusCode.Should().BeEqualTo(HttpStatusCode.Created);
         await _orderSteps.ParseResponse();
-        _orderSteps.Response!.CustomerName.Should().Be(_customerName);
-        _orderSteps.Response!.Items.Should().HaveCount(1);
+        await _orderSteps.Response!.CustomerName.Should().BeEqualTo(_customerName);
+        await _orderSteps.Response!.Items.Should().HaveCount(1);
 
         // And an order created event should have been published
         if (!Settings.RunAgainstExternalServiceUnderTest)
@@ -110,7 +110,7 @@ public class Orders_Breakfast_Order_Tests : BaseFixture
                     await Task.Delay(retryDelay);
                 }
 
-                orderCreatedEvents.Should().Contain(e => e.CustomerName == _customerName);
+                await orderCreatedEvents.Should().Contain(e => e.CustomerName == _customerName);
             }
 
             // And the kitchen service should have received a preparation request
@@ -129,10 +129,10 @@ public class Orders_Breakfast_Order_Tests : BaseFixture
         await _orderSteps.Send();
 
         // Then
-        _orderSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
+        await _orderSteps.ResponseMessage!.StatusCode.Should().BeEqualTo(HttpStatusCode.Created);
         await _orderSteps.ParseResponse();
-        _orderSteps.Response!.CustomerName.Should().Be(_customerName);
-        _orderSteps.Response!.Items.Should().HaveCount(1);
+        await _orderSteps.Response!.CustomerName.Should().BeEqualTo(_customerName);
+        await _orderSteps.Response!.Items.Should().HaveCount(1);
 
         // And an order created event should have been published
         if (!Settings.RunAgainstExternalServiceUnderTest)
@@ -152,7 +152,7 @@ public class Orders_Breakfast_Order_Tests : BaseFixture
                     await Task.Delay(retryDelay);
                 }
 
-                orderCreatedEvents.Should().Contain(e => e.CustomerName == _customerName);
+                await orderCreatedEvents.Should().Contain(e => e.CustomerName == _customerName);
             }
         }
 
@@ -174,7 +174,7 @@ public class Orders_Breakfast_Order_Tests : BaseFixture
                     await Task.Delay(retryDelay);
                 }
 
-                recipeLogMessages.Should().Contain(m => m.Message.RecipeType == OrderDefaults.PancakeItemType,
+                await recipeLogMessages.Should().Contain(m => m.Message.RecipeType == OrderDefaults.PancakeItemType,
                     "a RecipeLogEvent should have been published for the pancake recipe");
             }
         }
@@ -191,10 +191,10 @@ public class Orders_Breakfast_Order_Tests : BaseFixture
         await _orderSteps.Send();
 
         // Then
-        _orderSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
+        await _orderSteps.ResponseMessage!.StatusCode.Should().BeEqualTo(HttpStatusCode.Created);
         await _orderSteps.ParseResponse();
-        _orderSteps.Response!.CustomerName.Should().Be(_customerName);
-        _orderSteps.Response!.Items.Should().HaveCount(1);
+        await _orderSteps.Response!.CustomerName.Should().BeEqualTo(_customerName);
+        await _orderSteps.Response!.Items.Should().HaveCount(1);
 
         if (!Settings.RunAgainstExternalServiceUnderTest)
         {

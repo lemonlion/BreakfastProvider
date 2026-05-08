@@ -30,7 +30,7 @@ public class DailySpecials_Validation_Tests : BaseFixture
         // Then the responses should contain the validation error for the invalid field
         var actualResults = await ValidationHelper.ParseValidationResponses(responses);
         var actual = actualResults.Single();
-        actual.ErrorMessage.Should().Be(expectedError);
-        actual.ResponseStatus.Should().Be(expectedStatus);
+        await actual.ErrorMessage.Should().BeEqualTo(expectedError);
+        await actual.ResponseStatus.Should().BeEqualTo(expectedStatus);
     }
 }

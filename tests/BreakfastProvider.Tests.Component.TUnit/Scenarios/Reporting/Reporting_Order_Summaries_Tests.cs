@@ -37,11 +37,11 @@ public class Reporting_Order_Summaries_Tests : BaseFixture
     {
         // Given a pancake batch has been created
         await _milkSteps.Retrieve();
-        _milkSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
+        await _milkSteps.ResponseMessage!.StatusCode.Should().BeEqualTo(HttpStatusCode.OK);
         await _eggsSteps.Retrieve();
-        _eggsSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
+        await _eggsSteps.ResponseMessage!.StatusCode.Should().BeEqualTo(HttpStatusCode.OK);
         await _flourSteps.Retrieve();
-        _flourSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
+        await _flourSteps.ResponseMessage!.StatusCode.Should().BeEqualTo(HttpStatusCode.OK);
 
         _pancakeSteps.Request = new TestPancakeRequest
         {
@@ -50,10 +50,10 @@ public class Reporting_Order_Summaries_Tests : BaseFixture
             Flour = _flourSteps.FlourResponse.Flour
         };
         await _pancakeSteps.Send();
-        _pancakeSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
+        await _pancakeSteps.ResponseMessage!.StatusCode.Should().BeEqualTo(HttpStatusCode.Created);
         await _pancakeSteps.ParseResponse();
-        _pancakeSteps.Response.Should().NotBeNull();
-        _pancakeSteps.Response!.BatchId.Should().NotBeEmpty();
+        await _pancakeSteps.Response.Should().NotBeNull();
+        await _pancakeSteps.Response!.BatchId.Should().NotBeEqualTo(Guid.Empty);
 
         // And a breakfast order has been placed for the batch
         _orderSteps.Request = new TestOrderRequest
@@ -71,19 +71,19 @@ public class Reporting_Order_Summaries_Tests : BaseFixture
             ]
         };
         await _orderSteps.Send();
-        _orderSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
+        await _orderSteps.ResponseMessage!.StatusCode.Should().BeEqualTo(HttpStatusCode.Created);
         await _orderSteps.ParseResponse();
-        _orderSteps.Response.Should().NotBeNull();
+        await _orderSteps.Response.Should().NotBeNull();
         _orderId = _orderSteps.Response!.OrderId;
-        _orderId.Should().NotBeEmpty();
+        await _orderId.Should().NotBeEqualTo(Guid.Empty);
 
         // When the order summaries are queried via GraphQL
         await _graphQlSteps.QueryOrderSummaries();
 
         // Then the response should contain the ingested order summary
-        _graphQlSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
+        await _graphQlSteps.ResponseMessage!.StatusCode.Should().BeEqualTo(HttpStatusCode.OK);
         await _graphQlSteps.ParseOrderSummariesResponse();
-        _graphQlSteps.OrderSummaries.Should().Contain(o =>
+        await _graphQlSteps.OrderSummaries.Should().Contain(o =>
             o.OrderId == _orderId &&
             o.CustomerName == _customerName &&
             o.ItemCount == 1 &&
@@ -97,8 +97,8 @@ public class Reporting_Order_Summaries_Tests : BaseFixture
         await _graphQlSteps.QueryOrderSummaries();
 
         // Then the response should be successful and not contain the test order
-        _graphQlSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
+        await _graphQlSteps.ResponseMessage!.StatusCode.Should().BeEqualTo(HttpStatusCode.OK);
         await _graphQlSteps.ParseOrderSummariesResponse();
-        _graphQlSteps.OrderSummaries.Should().NotContain(o => o.OrderId == _orderId);
+        await _graphQlSteps.OrderSummaries.Should().All(o => o.OrderId != _orderId);
     }
 }

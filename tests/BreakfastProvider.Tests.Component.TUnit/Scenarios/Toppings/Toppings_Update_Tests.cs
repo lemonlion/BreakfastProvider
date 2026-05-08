@@ -36,11 +36,11 @@ public class Toppings_Update_Tests : BaseFixture
         await _putSteps.Send(toppingId);
 
         // Then the update response should contain the updated topping
-        _putSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
+        await _putSteps.ResponseMessage!.StatusCode.Should().BeEqualTo(HttpStatusCode.OK);
         await _putSteps.ParseResponse();
-        _putSteps.Response!.ToppingId.Should().Be(KnownBlueberryToppingId);
-        _putSteps.Response!.Name.Should().Be(ToppingDefaults.Strawberries);
-        _putSteps.Response!.Category.Should().Be(ToppingDefaults.FruitCategory);
+        await _putSteps.Response!.ToppingId.Should().BeEqualTo(KnownBlueberryToppingId);
+        await _putSteps.Response!.Name.Should().BeEqualTo(ToppingDefaults.Strawberries);
+        await _putSteps.Response!.Category.Should().BeEqualTo(ToppingDefaults.FruitCategory);
     }
 
     [Test]
@@ -58,7 +58,7 @@ public class Toppings_Update_Tests : BaseFixture
         await _putSteps.Send(toppingId);
 
         // Then the update response should indicate not found
-        _putSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.NotFound);
+        await _putSteps.ResponseMessage!.StatusCode.Should().BeEqualTo(HttpStatusCode.NotFound);
     }
 
     [Test]
@@ -89,7 +89,7 @@ public class Toppings_Update_Tests : BaseFixture
         // Then the responses should contain the validation error
         var actualResults = await ValidationHelper.ParseValidationResponses(responses);
         var actual = actualResults.Single();
-        actual.ErrorMessage.Should().Be(expectedError);
-        actual.ResponseStatus.Should().Be(expectedStatus);
+        await actual.ErrorMessage.Should().BeEqualTo(expectedError);
+        await actual.ResponseStatus.Should().BeEqualTo(expectedStatus);
     }
 }

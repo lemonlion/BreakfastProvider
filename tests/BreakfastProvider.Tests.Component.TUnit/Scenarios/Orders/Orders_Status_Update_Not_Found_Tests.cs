@@ -23,6 +23,6 @@ public class Orders_Status_Update_Not_Found_Tests : BaseFixture
         await _patchSteps.Send(nonExistentOrderId, OrderStatuses.Preparing);
 
         // Then the response should indicate not found
-        _patchSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.NotFound);
+        await _patchSteps.ResponseMessage!.StatusCode.Should().BeEqualTo(HttpStatusCode.NotFound);
     }
 }

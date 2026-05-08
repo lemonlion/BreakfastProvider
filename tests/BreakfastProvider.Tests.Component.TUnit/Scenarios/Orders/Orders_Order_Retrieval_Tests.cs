@@ -49,10 +49,10 @@ public class Orders_Order_Retrieval_Tests : BaseFixture
             Flour = _flourSteps.FlourResponse.Flour
         };
         await _pancakeSteps.Send();
-        _pancakeSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
+        await _pancakeSteps.ResponseMessage!.StatusCode.Should().BeEqualTo(HttpStatusCode.Created);
         await _pancakeSteps.ParseResponse();
-        _pancakeSteps.Response.Should().NotBeNull();
-        _pancakeSteps.Response!.BatchId.Should().NotBeEmpty();
+        await _pancakeSteps.Response.Should().NotBeNull();
+        await _pancakeSteps.Response!.BatchId.Should().NotBeEqualTo(Guid.Empty);
 
         // And an order has been created for the batch
         _orderSteps.Request = new TestOrderRequest
@@ -70,20 +70,20 @@ public class Orders_Order_Retrieval_Tests : BaseFixture
             ]
         };
         await _orderSteps.Send();
-        _orderSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
+        await _orderSteps.ResponseMessage!.StatusCode.Should().BeEqualTo(HttpStatusCode.Created);
         await _orderSteps.ParseResponse();
-        _orderSteps.Response.Should().NotBeNull();
-        _orderSteps.Response!.OrderId.Should().NotBeEmpty();
+        await _orderSteps.Response.Should().NotBeNull();
+        await _orderSteps.Response!.OrderId.Should().NotBeEqualTo(Guid.Empty);
 
         // When the order is retrieved by id
         await _retrievalSteps.Retrieve(_orderSteps.Response!.OrderId);
 
         // Then the retrieved order should match the created order
-        _retrievalSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
+        await _retrievalSteps.ResponseMessage!.StatusCode.Should().BeEqualTo(HttpStatusCode.OK);
         await _retrievalSteps.ParseResponse();
-        _retrievalSteps.Response!.OrderId.Should().Be(_orderSteps.Response!.OrderId);
-        _retrievalSteps.Response!.CustomerName.Should().Be(_customerName);
-        _retrievalSteps.Response!.Items.Should().HaveCount(1);
+        await _retrievalSteps.Response!.OrderId.Should().BeEqualTo(_orderSteps.Response!.OrderId);
+        await _retrievalSteps.Response!.CustomerName.Should().BeEqualTo(_customerName);
+        await _retrievalSteps.Response!.Items.Should().HaveCount(1);
 
         // And the cow service should have received a milk request
         if (!Settings.RunAgainstExternalServiceUnderTest)
@@ -104,6 +104,6 @@ public class Orders_Order_Retrieval_Tests : BaseFixture
         await _retrievalSteps.Retrieve(nonExistentOrderId);
 
         // Then the response should be not found
-        _retrievalSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.NotFound);
+        await _retrievalSteps.ResponseMessage!.StatusCode.Should().BeEqualTo(HttpStatusCode.NotFound);
     }
 }

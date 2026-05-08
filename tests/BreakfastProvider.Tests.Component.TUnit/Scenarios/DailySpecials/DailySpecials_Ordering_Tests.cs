@@ -45,10 +45,10 @@ public class DailySpecials_Ordering_Tests : BaseFixture
         await _postSteps.Send();
 
         // Then the daily special order response should contain a valid confirmation
-        _postSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
+        await _postSteps.ResponseMessage!.StatusCode.Should().BeEqualTo(HttpStatusCode.Created);
         await _postSteps.ParseResponse();
-        _postSteps.Response!.SpecialId.Should().Be(DailySpecialDefaults.CinnamonSwirlId);
-        _postSteps.Response!.OrderConfirmationId.Should().NotBeEmpty();
+        await _postSteps.Response!.SpecialId.Should().BeEqualTo(DailySpecialDefaults.CinnamonSwirlId);
+        await _postSteps.Response!.OrderConfirmationId.Should().NotBeEqualTo(Guid.Empty);
     }
 
     [Test]
@@ -58,9 +58,9 @@ public class DailySpecials_Ordering_Tests : BaseFixture
         await _getSteps.Retrieve();
 
         // Then the daily specials response should contain all expected specials
-        _getSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
+        await _getSteps.ResponseMessage!.StatusCode.Should().BeEqualTo(HttpStatusCode.OK);
         await _getSteps.ParseResponse();
-        _getSteps.Response.Should().HaveCount(DailySpecialDefaults.ExpectedSpecialsCount);
+        await _getSteps.Response.Should().HaveCount(DailySpecialDefaults.ExpectedSpecialsCount);
     }
 
     [Test]
@@ -79,7 +79,7 @@ public class DailySpecials_Ordering_Tests : BaseFixture
             Quantity = MaxOrdersPerSpecial
         };
         await _postSteps.Send();
-        _postSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
+        await _postSteps.ResponseMessage!.StatusCode.Should().BeEqualTo(HttpStatusCode.Created);
 
         // When another order is placed for the matcha waffles special
         _postSteps.Request = new TestDailySpecialOrderRequest
@@ -90,7 +90,7 @@ public class DailySpecials_Ordering_Tests : BaseFixture
         await _postSteps.Send();
 
         // Then the response should indicate the daily special is sold out
-        _postSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Conflict);
+        await _postSteps.ResponseMessage!.StatusCode.Should().BeEqualTo(HttpStatusCode.Conflict);
     }
 
     [Test]
@@ -109,7 +109,7 @@ public class DailySpecials_Ordering_Tests : BaseFixture
             Quantity = 1
         };
         await _postSteps.Send();
-        _postSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
+        await _postSteps.ResponseMessage!.StatusCode.Should().BeEqualTo(HttpStatusCode.Created);
 
         // When the available daily specials are requested
         await _getSteps.Retrieve();
@@ -118,6 +118,6 @@ public class DailySpecials_Ordering_Tests : BaseFixture
         await _getSteps.ParseResponse();
         var lemonRicottaSpecial = _getSteps.Response!.Single(s => s.SpecialId == DailySpecialDefaults.LemonRicottaId);
         var lemonRicottaRemainingQuantity = lemonRicottaSpecial.RemainingQuantity;
-        lemonRicottaRemainingQuantity.Should().Be(MaxOrdersPerSpecial - 1);
+        await lemonRicottaRemainingQuantity.Should().BeEqualTo(MaxOrdersPerSpecial - 1);
     }
 }

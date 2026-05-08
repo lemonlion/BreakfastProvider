@@ -31,7 +31,7 @@ public class Staff_Management_Tests : BaseFixture
     {
         _postSteps.Request = CreateValidRequest();
         await _postSteps.Send();
-        _postSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
+        await _postSteps.ResponseMessage!.StatusCode.Should().BeEqualTo(HttpStatusCode.Created);
         await _postSteps.ParseResponse();
         return _postSteps.Response!.Id;
     }
@@ -47,10 +47,10 @@ public class Staff_Management_Tests : BaseFixture
         await _postSteps.Send();
 
         // Then the response should contain the created member
-        _postSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
+        await _postSteps.ResponseMessage!.StatusCode.Should().BeEqualTo(HttpStatusCode.Created);
         await _postSteps.ParseResponse();
-        _postSteps.Response!.Name.Should().Be(_postSteps.Request.Name);
-        _postSteps.Response!.Role.Should().Be("Chef");
+        await _postSteps.Response!.Name.Should().BeEqualTo(_postSteps.Request.Name);
+        await _postSteps.Response!.Role.Should().BeEqualTo("Chef");
     }
 
     [Test]
@@ -63,11 +63,11 @@ public class Staff_Management_Tests : BaseFixture
         await _getSteps.RetrieveById(createdMemberId);
 
         // Then the response should contain the member
-        _getSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
+        await _getSteps.ResponseMessage!.StatusCode.Should().BeEqualTo(HttpStatusCode.OK);
         await _getSteps.ParseResponse();
-        _getSteps.Response!.Id.Should().Be(createdMemberId);
-        _getSteps.Response!.Name.Should().Be(_postSteps.Response!.Name);
-        _getSteps.Response!.Role.Should().Be("Chef");
+        await _getSteps.Response!.Id.Should().BeEqualTo(createdMemberId);
+        await _getSteps.Response!.Name.Should().BeEqualTo(_postSteps.Response!.Name);
+        await _getSteps.Response!.Role.Should().BeEqualTo("Chef");
     }
 
     [Test]
@@ -82,7 +82,7 @@ public class Staff_Management_Tests : BaseFixture
         var deleteResponse = await Client.SendAsync(request);
 
         // Then the response should indicate no content
-        deleteResponse.StatusCode.Should().Be(HttpStatusCode.NoContent);
+        await deleteResponse.StatusCode.Should().BeEqualTo(HttpStatusCode.NoContent);
     }
 
     [Test]
@@ -100,6 +100,6 @@ public class Staff_Management_Tests : BaseFixture
         await _postSteps.Send();
 
         // Then the response should indicate bad request
-        _postSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        await _postSteps.ResponseMessage!.StatusCode.Should().BeEqualTo(HttpStatusCode.BadRequest);
     }
 }

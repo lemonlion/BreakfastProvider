@@ -35,11 +35,11 @@ public class Reporting_Recipe_Reports_Tests : BaseFixture
     {
         // Given a pancake batch has been created
         await _milkSteps.Retrieve();
-        _milkSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
+        await _milkSteps.ResponseMessage!.StatusCode.Should().BeEqualTo(HttpStatusCode.OK);
         await _eggsSteps.Retrieve();
-        _eggsSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
+        await _eggsSteps.ResponseMessage!.StatusCode.Should().BeEqualTo(HttpStatusCode.OK);
         await _flourSteps.Retrieve();
-        _flourSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
+        await _flourSteps.ResponseMessage!.StatusCode.Should().BeEqualTo(HttpStatusCode.OK);
 
         _pancakeSteps.Request = new TestPancakeRequest
         {
@@ -48,19 +48,19 @@ public class Reporting_Recipe_Reports_Tests : BaseFixture
             Flour = _flourSteps.FlourResponse.Flour
         };
         await _pancakeSteps.Send();
-        _pancakeSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
+        await _pancakeSteps.ResponseMessage!.StatusCode.Should().BeEqualTo(HttpStatusCode.Created);
         await _pancakeSteps.ParseResponse();
-        _pancakeSteps.Response.Should().NotBeNull();
-        _pancakeSteps.Response!.BatchId.Should().NotBeEmpty();
+        await _pancakeSteps.Response.Should().NotBeNull();
+        await _pancakeSteps.Response!.BatchId.Should().NotBeEqualTo(Guid.Empty);
 
         // When the recipe reports are queried via GraphQL
         await _graphQlSteps.QueryRecipeReports(waitForOrderId: _pancakeSteps.Response?.BatchId);
 
         // Then the response should contain the ingested recipe reports
-        _graphQlSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
+        await _graphQlSteps.ResponseMessage!.StatusCode.Should().BeEqualTo(HttpStatusCode.OK);
         await _graphQlSteps.ParseRecipeReportsResponse();
         var batchId = _pancakeSteps.Response!.BatchId;
-        _graphQlSteps.RecipeReports.Should().Contain(r =>
+        await _graphQlSteps.RecipeReports.Should().Contain(r =>
             r.OrderId == batchId &&
             r.RecipeType == "Pancakes" &&
             r.Ingredients.Contains("Milk"));
@@ -90,11 +90,11 @@ public class Reporting_Recipe_Reports_Tests : BaseFixture
         await _graphQlSteps.QueryIngredientUsage();
 
         // Then the ingredient usage should reflect aggregated counts
-        _graphQlSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
+        await _graphQlSteps.ResponseMessage!.StatusCode.Should().BeEqualTo(HttpStatusCode.OK);
         await _graphQlSteps.ParseIngredientUsageResponse();
-        _graphQlSteps.IngredientUsage.Should().Contain(i =>
+        await _graphQlSteps.IngredientUsage.Should().Contain(i =>
             i.Ingredient == "Milk" && i.Count >= 2);
-        _graphQlSteps.IngredientUsage.Should().Contain(i =>
+        await _graphQlSteps.IngredientUsage.Should().Contain(i =>
             i.Ingredient == "Butter" && i.Count >= 1);
     }
 
@@ -124,12 +124,12 @@ public class Reporting_Recipe_Reports_Tests : BaseFixture
         await _graphQlSteps.QueryPopularRecipes();
 
         // Then the popular recipes should be ordered by count descending
-        _graphQlSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
+        await _graphQlSteps.ResponseMessage!.StatusCode.Should().BeEqualTo(HttpStatusCode.OK);
         await _graphQlSteps.ParsePopularRecipesResponse();
         var pancakes = _graphQlSteps.PopularRecipes!.FirstOrDefault(r => r.RecipeType == "Pancakes");
-        pancakes.Should().NotBeNull();
-        pancakes!.Count.Should().BeGreaterThanOrEqualTo(2);
-        _graphQlSteps.PopularRecipes.Should().Contain(r =>
+        await pancakes.Should().NotBeNull();
+        await pancakes!.Count.Should().BeGreaterThanOrEqualTo(2);
+        await _graphQlSteps.PopularRecipes.Should().Contain(r =>
             r.RecipeType == "Waffles" && r.Count >= 1);
     }
 }

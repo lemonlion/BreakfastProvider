@@ -45,11 +45,11 @@ public class Orders_Complete_Lifecycle_Tests : BaseFixture
     {
         // Given a pancake batch has been created
         await _milkSteps.Retrieve();
-        _milkSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
+        await _milkSteps.ResponseMessage!.StatusCode.Should().BeEqualTo(HttpStatusCode.OK);
         await _eggsSteps.Retrieve();
-        _eggsSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
+        await _eggsSteps.ResponseMessage!.StatusCode.Should().BeEqualTo(HttpStatusCode.OK);
         await _flourSteps.Retrieve();
-        _flourSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
+        await _flourSteps.ResponseMessage!.StatusCode.Should().BeEqualTo(HttpStatusCode.OK);
 
         _pancakeSteps.Request = new TestPancakeRequest
         {
@@ -58,10 +58,10 @@ public class Orders_Complete_Lifecycle_Tests : BaseFixture
             Flour = _flourSteps.FlourResponse.Flour
         };
         await _pancakeSteps.Send();
-        _pancakeSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
+        await _pancakeSteps.ResponseMessage!.StatusCode.Should().BeEqualTo(HttpStatusCode.Created);
         await _pancakeSteps.ParseResponse();
-        _pancakeSteps.Response.Should().NotBeNull();
-        _pancakeSteps.Response!.BatchId.Should().NotBeEmpty();
+        await _pancakeSteps.Response.Should().NotBeNull();
+        await _pancakeSteps.Response!.BatchId.Should().NotBeEqualTo(Guid.Empty);
 
         // And a breakfast order has been placed for the batch
         _orderSteps.Request = new TestOrderRequest
@@ -79,43 +79,43 @@ public class Orders_Complete_Lifecycle_Tests : BaseFixture
             ]
         };
         await _orderSteps.Send();
-        _orderSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
+        await _orderSteps.ResponseMessage!.StatusCode.Should().BeEqualTo(HttpStatusCode.Created);
         await _orderSteps.ParseResponse();
-        _orderSteps.Response.Should().NotBeNull();
+        await _orderSteps.Response.Should().NotBeNull();
         _orderId = _orderSteps.Response!.OrderId;
-        _orderId.Should().NotBeEmpty();
+        await _orderId.Should().NotBeEqualTo(Guid.Empty);
 
         // When the order is progressed through the complete lifecycle
         await _patchSteps.Send(_orderId, OrderStatuses.Preparing);
-        _patchSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
+        await _patchSteps.ResponseMessage!.StatusCode.Should().BeEqualTo(HttpStatusCode.OK);
         await _patchSteps.Send(_orderId, OrderStatuses.Ready);
-        _patchSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
+        await _patchSteps.ResponseMessage!.StatusCode.Should().BeEqualTo(HttpStatusCode.OK);
         await _patchSteps.Send(_orderId, OrderStatuses.Completed);
-        _patchSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
+        await _patchSteps.ResponseMessage!.StatusCode.Should().BeEqualTo(HttpStatusCode.OK);
 
         // Then the completed order should be retrievable with all details
         await _retrievalSteps.Retrieve(_orderId);
-        _retrievalSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
+        await _retrievalSteps.ResponseMessage!.StatusCode.Should().BeEqualTo(HttpStatusCode.OK);
         await _retrievalSteps.ParseResponse();
-        _retrievalSteps.Response!.Status.Should().Be(OrderStatuses.Completed);
-        _retrievalSteps.Response!.CustomerName.Should().Be(_customerName);
-        _retrievalSteps.Response!.Items.Should().HaveCount(1);
-        _retrievalSteps.Response!.TableNumber.Should().Be(4);
+        await _retrievalSteps.Response!.Status.Should().BeEqualTo(OrderStatuses.Completed);
+        await _retrievalSteps.Response!.CustomerName.Should().BeEqualTo(_customerName);
+        await _retrievalSteps.Response!.Items.Should().HaveCount(1);
+        await _retrievalSteps.Response!.TableNumber.Should().BeEqualTo(4);
 
         // And the order timestamps should be recent
-        _retrievalSteps.Response!.CreatedAt.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromMinutes(2));
+        await (_retrievalSteps.Response!.CreatedAt > DateTime.UtcNow.AddMinutes(-2) && _retrievalSteps.Response!.CreatedAt < DateTime.UtcNow.AddMinutes(2)).Should().BeTrue();
 
         // And the order id should be a valid guid format
-        _retrievalSteps.Response!.OrderId.ToString().Should().MatchRegex(@"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$");
+        await System.Text.RegularExpressions.Regex.IsMatch(_retrievalSteps.Response!.OrderId.ToString(), @"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$").Should().BeTrue();
 
         // And an audit log entry should exist for the order
         var auditLogRequest = new HttpRequestMessage(HttpMethod.Get, $"{Endpoints.AuditLogs}?entityId={_orderId}");
         auditLogRequest.Headers.Add(CustomHeaders.ComponentTestRequestId, RequestId);
         var auditLogResponse = await Client.SendAsync(auditLogRequest);
-        auditLogResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+        await auditLogResponse.StatusCode.Should().BeEqualTo(HttpStatusCode.OK);
         var auditContent = await auditLogResponse.Content.ReadAsStringAsync();
         var auditLogs = Json.Deserialize<List<TestAuditLogResponse>>(auditContent)!;
-        auditLogs.Should().Contain(l => l.EntityId == _orderId && l.Action == AuditLogDefaults.CreatedAction);
+        await auditLogs.Should().Contain(l => l.EntityId == _orderId && l.Action == AuditLogDefaults.CreatedAction);
 
         // And the cow service should have received a milk request
         if (!Settings.RunAgainstExternalServiceUnderTest)

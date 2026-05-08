@@ -431,3 +431,4 @@ docker/*.crt
 docker/*.pem
 docker/*.cer
 ttd_decompiled.txt
+build-out.txt

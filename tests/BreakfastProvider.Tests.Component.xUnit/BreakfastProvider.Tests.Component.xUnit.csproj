@@ -38,6 +38,7 @@
     <PackageReference Include="Spanner.InMemoryEmulator" Version="1.0.20" />
     <PackageReference Include="TestTrackingDiagrams.xUnit3" Version="2.31.0" />
     <PackageReference Include="TestTrackingDiagrams.AssertionTracking" Version="2.31.0" />
+    <PackageReference Include="TestTrackingDiagrams.StepTracking" Version="2.31.0" />
     <PackageReference Include="xunit.v3" Version="3.2.2" />
     <PackageReference Include="coverlet.collector" Version="6.0.4">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

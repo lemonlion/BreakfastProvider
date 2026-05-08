@@ -7,6 +7,7 @@ using BreakfastProvider.Tests.Component.Shared.Common.Pancakes;
 using BreakfastProvider.Tests.Component.Shared.Constants;
 using BreakfastProvider.Tests.Component.Shared.Models.Orders;
 using BreakfastProvider.Tests.Component.Shared.Models.Pancakes;
+using TestTrackingDiagrams.Tracking;
 using TestTrackingDiagrams.TUnit;
 
 namespace BreakfastProvider.Tests.Component.TUnit.Scenarios.AuditLogs;
@@ -38,7 +39,16 @@ public class AuditLogs_Retrieval_Tests : BaseFixture
     [HappyPath]
     public async Task Creating_an_order_should_produce_a_retrievable_audit_log_entry()
     {
-        // Given a pancake batch has been created
+        await A_pancake_batch_has_been_created();
+        await An_order_has_been_created_for_the_batch();
+        await The_audit_logs_are_retrieved();
+        await The_response_contains_the_order_creation_entry();
+        The_downstream_services_received_requests();
+    }
+
+    [GivenStep] // Completely optional - you only need to add this if you want explicit steps in your reports
+    private async Task A_pancake_batch_has_been_created()
+    {
         await _milkSteps.Retrieve();
         await _eggsSteps.Retrieve();
         await _flourSteps.Retrieve();
@@ -54,8 +64,11 @@ public class AuditLogs_Retrieval_Tests : BaseFixture
         await _pancakeSteps.ParseResponse();
         await _pancakeSteps.Response.Should().NotBeNull();
         await _pancakeSteps.Response!.BatchId.Should().NotBeEqualTo(Guid.Empty);
+    }
 
-        // And an order has been created for the batch
+    [GivenStep] // Completely optional - you only need to add this if you want explicit steps in your reports
+    private async Task An_order_has_been_created_for_the_batch()
+    {
         _orderSteps.Request = new TestOrderRequest
         {
             CustomerName = _customerName,
@@ -75,19 +88,28 @@ public class AuditLogs_Retrieval_Tests : BaseFixture
         await _orderSteps.ParseResponse();
         await _orderSteps.Response.Should().NotBeNull();
         await _orderSteps.Response!.OrderId.Should().NotBeEqualTo(Guid.Empty);
+    }
 
-        // When the audit logs are retrieved
+    [WhenStep] // Completely optional - you only need to add this if you want explicit steps in your reports
+    private async Task The_audit_logs_are_retrieved()
+    {
         await _auditSteps.Retrieve();
+    }
 
-        // Then the audit log response should contain the order creation entry
+    [ThenStep] // Completely optional - you only need to add this if you want explicit steps in your reports
+    private async Task The_response_contains_the_order_creation_entry()
+    {
         await _auditSteps.ResponseMessage!.StatusCode.Should().BeEqualTo(HttpStatusCode.OK);
         await _auditSteps.ParseResponse();
         await _auditSteps.Response!.Should().Contain(a =>
             a.Action == AuditLogDefaults.CreatedAction
             && a.EntityType == AuditLogDefaults.OrderEntityType
             && a.Details.Contains(_customerName));
+    }
 
-        // And the downstream services should have received requests (if not post-deployment)
+    [ThenStep] // Completely optional - you only need to add this if you want explicit steps in your reports
+    private void The_downstream_services_received_requests()
+    {
         if (!Settings.RunAgainstExternalServiceUnderTest)
         {
             _downstreamSteps.AssertCowServiceReceivedMilkRequest();

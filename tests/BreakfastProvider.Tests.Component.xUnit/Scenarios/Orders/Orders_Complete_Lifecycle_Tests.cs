@@ -115,7 +115,7 @@ public class Orders_Complete_Lifecycle_Tests : BaseFixture
         auditLogResponse.StatusCode.Should().Be(HttpStatusCode.OK);
         var auditContent = await auditLogResponse.Content.ReadAsStringAsync();
         var auditLogs = Json.Deserialize<List<TestAuditLogResponse>>(auditContent)!;
-        auditLogs.Should().Contain(l => l.EntityId == _orderId && l.Action == AuditLogDefaults.CreatedAction);
+         => l.EntityId == _orderId && l.Action == AuditLogDefaults.CreatedAction);
 
         // And the cow service should have received a milk request
         if (!Settings.RunAgainstExternalServiceUnderTest)

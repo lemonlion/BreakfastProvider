@@ -601,11 +601,50 @@ jobs:
           name: LightBDD-bddfy-in-memory-report
           path: site/reports/bddfy
 
-      - name: Copy API specs
+      - name: Copy API specs and generate UI pages
         run: |
           mkdir -p site/api
           cp docs/openapi.json site/api/openapi.json
           cp docs/asyncapi.json site/api/asyncapi.json
+
+          cat > site/api/openapi.html << 'OPENAPI_EOF'
+          <!DOCTYPE html>
+          <html lang="en">
+          <head>
+            <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1">
+            <title>Breakfast Provider — OpenAPI</title>
+            <link rel="icon" type="image/svg+xml" href="https://raw.githubusercontent.com/lemonlion/TestTrackingDiagrams/main/icon.svg">
+          </head>
+          <body>
+            <script id="api-reference" data-url="./openapi.json"></script>
+            <script src="https://cdn.jsdelivr.net/npm/@scalar/api-reference"></script>
+          </body>
+          </html>
+          OPENAPI_EOF
+
+          cat > site/api/asyncapi.html << 'ASYNCAPI_EOF'
+          <!DOCTYPE html>
+          <html lang="en">
+          <head>
+            <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1">
+            <title>Breakfast Provider — AsyncAPI</title>
+            <link rel="icon" type="image/svg+xml" href="https://raw.githubusercontent.com/lemonlion/TestTrackingDiagrams/main/icon.svg">
+            <link rel="stylesheet" href="https://unpkg.com/@asyncapi/react-component@latest/styles/default.min.css">
+          </head>
+          <body>
+            <div id="asyncapi"></div>
+            <script src="https://unpkg.com/@asyncapi/react-component@latest/browser/standalone/index.js"></script>
+            <script>
+              AsyncApiStandalone.render({
+                schema: { url: './asyncapi.json' },
+                config: { show: { sidebar: true } }
+              }, document.getElementById('asyncapi'));
+            </script>
+          </body>
+          </html>
+          ASYNCAPI_EOF
 
       - name: Generate landing page
         run: |
@@ -736,15 +775,15 @@ jobs:
 
               <p class="section-title">API Specifications</p>
               <div class="card-grid">
-                <a href="api/openapi.json" class="card">
+                <a href="api/openapi.html" class="card">
                   <div class="card-icon">🔌</div>
                   <h3>OpenAPI</h3>
-                  <p>REST API specification (OpenAPI 3.x JSON)</p>
+                  <p>Interactive REST API documentation (Scalar UI)</p>
                 </a>
-                <a href="api/asyncapi.json" class="card">
+                <a href="api/asyncapi.html" class="card">
                   <div class="card-icon">⚡</div>
                   <h3>AsyncAPI</h3>
-                  <p>Event-driven API specification (AsyncAPI JSON)</p>
+                  <p>Interactive event-driven API documentation</p>
                 </a>
               </div>
 

@@ -2,11 +2,11 @@
 
 Provides breakfast preparation capabilities including pancake/waffle creation, order management, topping customisation, ingredient sourcing from downstream dairy and supplier services, menu management, and recipe logging.
 
-**See the output [here](https://lemonlion.github.io/BreakfastProvider/lightbdd/TestRunReport.html)**
+**See the output [here](https://lemonlion.github.io/BreakfastProvider/)**
 
 ## Purpose [↑](#top)<a name="purpose"></a>
 
-This project is a **deliberately opinionated reference implementation** of a component testing design philosophy. It exists to demonstrate how a modern .NET service can be built and tested, serving as a template for teams adopting outside-in component testing, running all dependencies both in memory and in docker/external (depending on a config switch) and using [TestTrackingDiagrams](https://lemonlion.github.io/TestTrackingDiagrams) to autogenerate test reports that have [interactive sequence diagrams](https://lemonlion.github.io/BreakfastProvider/lightbdd/TestRunReport.html) of your tests.
+This project is a **deliberately opinionated reference implementation** of a component testing design philosophy. It exists to demonstrate how a modern .NET service can be built and tested, serving as a template for teams adopting outside-in component testing, running all dependencies both in memory and in docker/external (depending on a config switch) and using [TestTrackingDiagrams](https://lemonlion.github.io/TestTrackingDiagrams) to autogenerate test reports that have [interactive sequence diagrams](https://lemonlion.github.io/BreakfastProvider/) of your tests.
 
 ## Table Of Contents<a name="table-of-contents"></a>
 

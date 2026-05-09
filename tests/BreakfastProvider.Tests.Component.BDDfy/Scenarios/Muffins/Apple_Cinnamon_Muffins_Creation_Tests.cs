@@ -71,9 +71,10 @@ public class Apple_Cinnamon_Muffins_Creation_Tests : BaseFixture
         await _muffinSteps.ParseResponse();
         _muffinSteps.Response!.Ingredients.Should().HaveCount(expected.ExpectedIngredientCount);
         _muffinSteps.Response!.Toppings.Should().HaveCount(expected.ExpectedToppingCount);
-        (expected.HasBakingInfo
+        var bakingTemperatureMatchesExpectation = expected.HasBakingInfo
             ? _muffinSteps.Response!.BakingTemperature > 0
-            : _muffinSteps.Response!.BakingTemperature == 0).Should().BeTrue();
+            : _muffinSteps.Response!.BakingTemperature == 0;
+        bakingTemperatureMatchesExpectation.Should().BeTrue();
         this.BDDfy();
     }
 

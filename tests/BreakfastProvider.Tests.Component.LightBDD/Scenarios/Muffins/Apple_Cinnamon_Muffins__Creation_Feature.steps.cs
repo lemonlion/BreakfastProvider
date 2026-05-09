@@ -141,9 +141,10 @@ public partial class Apple_Cinnamon_Muffins__Creation_Feature : BaseFixture
         await _muffinSteps.ParseResponse();
         _muffinSteps.Response!.Ingredients.Should().HaveCount(expected.ExpectedIngredientCount);
         _muffinSteps.Response!.Toppings.Should().HaveCount(expected.ExpectedToppingCount);
-        (expected.HasBakingInfo
+        var bakingTemperatureMatchesExpectation = expected.HasBakingInfo
             ? _muffinSteps.Response!.BakingTemperature > 0
-            : _muffinSteps.Response!.BakingTemperature == 0).Should().BeTrue();
+            : _muffinSteps.Response!.BakingTemperature == 0;
+        bakingTemperatureMatchesExpectation.Should().BeTrue();
     }
 
     private async Task The_muffin_response_should_contain_the_validation_error(string expectedError, string expectedStatus)

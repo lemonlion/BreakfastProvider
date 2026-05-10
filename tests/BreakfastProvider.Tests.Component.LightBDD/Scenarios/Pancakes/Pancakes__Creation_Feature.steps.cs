@@ -8,11 +8,10 @@ using BreakfastProvider.Tests.Component.Shared.Constants;
 using BreakfastProvider.Tests.Component.Shared.Models.Pancakes;
 using BreakfastProvider.Tests.Component.Shared.Models.Validation;
 using LightBDD.Framework;
-using LightBDD.Framework.Parameters;
 using Microsoft.Extensions.DependencyInjection;
-using TestTrackingDiagrams.LightBDD;
 using Microsoft.Extensions.Options;
 using BreakfastProvider.Tests.Component.LightBDD.Util;
+using TestTrackingDiagrams.TabularAttributes;
 
 
 namespace BreakfastProvider.Tests.Component.LightBDD.Scenarios.Pancakes;
@@ -111,7 +110,7 @@ public partial class Pancakes__Creation_Feature : BaseFixture
     private async Task Retrieved_flour_is_set_on_the_body()
         => _pancakeSteps.Request.Flour = _flourSteps.FlourResponse.Flour;
 
-    private async Task Valid_pancake_requests_with_an_invalid_field(InputTable<InvalidFieldFromRequest> inputs)
+    private async Task Valid_pancake_requests_with_an_invalid_field(TabularInputs<InvalidFieldFromRequest> inputs)
     {
         var validBase = new TestPancakeRequest
         {
@@ -145,8 +144,7 @@ public partial class Pancakes__Creation_Feature : BaseFixture
 
     private async Task The_invalid_pancake_requests_are_submitted()
         => _validationResponses.AddRange(
-            await ValidationHelper.SendValidationRequests(Client, RequestId, Endpoints.Pancakes, _validationRequests, _validationInputs,
-                onTestDelimiter: TrackingDiagramOverride.InsertTestDelimiter));
+            await ValidationHelper.SendValidationRequests(Client, RequestId, Endpoints.Pancakes, _validationRequests, _validationInputs));
 
     #endregion
 
@@ -178,10 +176,11 @@ public partial class Pancakes__Creation_Feature : BaseFixture
         => _pancakeSteps.Response!.Ingredients.Should().Contain(_flourSteps.FlourResponse.Flour);
 
     private async Task The_responses_should_each_contain_the_validation_error_for_the_invalid_field(
-        VerifiableDataTable<VerifiableErrorResult> expectedOutputs)
+        TabularOutputs<VerifiableErrorResult> expectedOutputs)
     {
         var actualResults = await ValidationHelper.ParseValidationResponses(_validationResponses);
-        expectedOutputs.SetActual(actualResults);
+        foreach (var result in actualResults)
+            expectedOutputs.RecordActualResult(result);
     }
 
     private async Task<CompositeStep> The_pancakes_response_should_indicate_too_many_toppings()

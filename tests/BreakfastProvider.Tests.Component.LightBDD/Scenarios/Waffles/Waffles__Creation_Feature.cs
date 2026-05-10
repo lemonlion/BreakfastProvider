@@ -2,8 +2,7 @@ using BreakfastProvider.Tests.Component.Shared.Constants;
 using BreakfastProvider.Tests.Component.Shared.Models.Validation;
 using LightBDD.Framework;
 using LightBDD.Framework.Scenarios;
-using LightBDD.TabularAttributes;
-using LightBDD.TabularAttributes.Attributes;
+using TestTrackingDiagrams.TabularAttributes;
 using LightBDD.XUnit3;
 using TestTrackingDiagrams.LightBDD;
 
@@ -33,12 +32,13 @@ public partial class Waffles__Creation_Feature
     [Inputs("Butter", "",                      "Butter is required")][Outputs("'Butter' is required.",                                "Bad Request"    )]
     [Inputs("Milk",   "<script>alert</script>", "XSS in milk"      )][Outputs("Milk contains potentially dangerous content.",         "Bad Request"    )]
     [Inputs("Butter", "<img onerror=x>",        "XSS in butter"    )][Outputs("Butter contains potentially dangerous content.",      "Bad Request"    )]
-    public async Task Waffles_Endpoint_Is_Called_With_Invalid_Ingredients_Should_Return_A_Bad_Request_Response()
+    public async Task Waffles_Endpoint_Is_Called_With_Invalid_Ingredients_Should_Return_A_Bad_Request_Response(
+        TabularInputs<InvalidFieldFromRequest> inputs, TabularOutputs<VerifiableErrorResult> outputs)
     {
         await Runner.RunScenarioAsync(
-            given => Valid_waffle_requests_with_an_invalid_field(TableFrom.Inputs<InvalidFieldFromRequest>()),
+            given => Valid_waffle_requests_with_an_invalid_field(inputs),
             when => The_invalid_waffle_requests_are_submitted(),
-            then => The_responses_should_each_contain_the_validation_error_for_the_invalid_field(VerifiableTableFrom.Outputs<VerifiableErrorResult>()));
+            then => The_responses_should_each_contain_the_validation_error_for_the_invalid_field(outputs));
     }
 
     [Scenario]

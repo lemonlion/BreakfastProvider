@@ -2,8 +2,7 @@ using BreakfastProvider.Tests.Component.Shared.Common.Validation;
 using BreakfastProvider.Tests.Component.Shared.Constants;
 using BreakfastProvider.Tests.Component.Shared.Models.DailySpecials;
 using BreakfastProvider.Tests.Component.Shared.Models.Validation;
-using LightBDD.Framework.Parameters;
-using TestTrackingDiagrams.LightBDD;
+using TestTrackingDiagrams.TabularAttributes;
 
 namespace BreakfastProvider.Tests.Component.LightBDD.Scenarios.DailySpecials;
 
@@ -16,7 +15,7 @@ public partial class DailySpecials__Validation_Feature : BaseFixture
 
     #region Given
 
-    private async Task Valid_daily_special_order_requests_with_an_invalid_field(InputTable<InvalidFieldFromRequest> inputs)
+    private async Task Valid_daily_special_order_requests_with_an_invalid_field(TabularInputs<InvalidFieldFromRequest> inputs)
     {
         var validBase = new TestDailySpecialOrderRequest
         {
@@ -34,18 +33,18 @@ public partial class DailySpecials__Validation_Feature : BaseFixture
 
     private async Task The_invalid_daily_special_order_requests_are_submitted()
         => _validationResponses.AddRange(
-            await ValidationHelper.SendValidationRequests(Client, RequestId, Endpoints.DailySpecialsOrders, _validationRequests, _validationInputs,
-                onTestDelimiter: TrackingDiagramOverride.InsertTestDelimiter));
+            await ValidationHelper.SendValidationRequests(Client, RequestId, Endpoints.DailySpecialsOrders, _validationRequests, _validationInputs));
 
     #endregion
 
     #region Then
 
     private async Task The_responses_should_each_contain_the_validation_error_for_the_invalid_field(
-        VerifiableDataTable<VerifiableErrorResult> expectedOutputs)
+        TabularOutputs<VerifiableErrorResult> expectedOutputs)
     {
         var actualResults = await ValidationHelper.ParseValidationResponses(_validationResponses);
-        expectedOutputs.SetActual(actualResults);
+        foreach (var result in actualResults)
+            expectedOutputs.RecordActualResult(result);
     }
 
     #endregion

@@ -8,11 +8,10 @@ using BreakfastProvider.Tests.Component.Shared.Constants;
 using BreakfastProvider.Tests.Component.Shared.Models.Validation;
 using BreakfastProvider.Tests.Component.Shared.Models.Waffles;
 using LightBDD.Framework;
-using LightBDD.Framework.Parameters;
 using Microsoft.Extensions.DependencyInjection;
-using TestTrackingDiagrams.LightBDD;
 using Microsoft.Extensions.Options;
 using BreakfastProvider.Tests.Component.LightBDD.Util;
+using TestTrackingDiagrams.TabularAttributes;
 
 
 namespace BreakfastProvider.Tests.Component.LightBDD.Scenarios.Waffles;
@@ -115,7 +114,7 @@ public partial class Waffles__Creation_Feature : BaseFixture
     private async Task The_body_specifies_butter()
         => _waffleSteps.Request.Butter = IngredientDefaults.UnsaltedButter;
 
-    private async Task Valid_waffle_requests_with_an_invalid_field(InputTable<InvalidFieldFromRequest> inputs)
+    private async Task Valid_waffle_requests_with_an_invalid_field(TabularInputs<InvalidFieldFromRequest> inputs)
     {
         var validBase = new TestWaffleRequest
         {
@@ -150,8 +149,7 @@ public partial class Waffles__Creation_Feature : BaseFixture
 
     private async Task The_invalid_waffle_requests_are_submitted()
         => _validationResponses.AddRange(
-            await ValidationHelper.SendValidationRequests(Client, RequestId, Endpoints.Waffles, _validationRequests, _validationInputs,
-                onTestDelimiter: TrackingDiagramOverride.InsertTestDelimiter));
+            await ValidationHelper.SendValidationRequests(Client, RequestId, Endpoints.Waffles, _validationRequests, _validationInputs));
 
     #endregion
 
@@ -187,10 +185,11 @@ public partial class Waffles__Creation_Feature : BaseFixture
         => _waffleSteps.Response!.Ingredients.Should().Contain(IngredientDefaults.UnsaltedButter);
 
     private async Task The_responses_should_each_contain_the_validation_error_for_the_invalid_field(
-        VerifiableDataTable<VerifiableErrorResult> expectedOutputs)
+        TabularOutputs<VerifiableErrorResult> expectedOutputs)
     {
         var actualResults = await ValidationHelper.ParseValidationResponses(_validationResponses);
-        expectedOutputs.SetActual(actualResults);
+        foreach (var result in actualResults)
+            expectedOutputs.RecordActualResult(result);
     }
 
     private async Task<CompositeStep> The_waffles_response_should_indicate_too_many_toppings()

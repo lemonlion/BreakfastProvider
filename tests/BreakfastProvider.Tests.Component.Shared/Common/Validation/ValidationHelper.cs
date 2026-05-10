@@ -21,40 +21,32 @@ public static class ValidationHelper
 
     public static async Task<List<HttpResponseMessage>> SendValidationRequests<T>(
         HttpClient client, string requestId, string endpoint, List<T> requests,
-        IReadOnlyList<InvalidFieldFromRequest>? invalidFields = null,
-        Action<string>? onTestDelimiter = null)
+        IReadOnlyList<InvalidFieldFromRequest>? invalidFields = null)
     {
-        return await SendValidationRequests(HttpMethod.Post, client, requestId, endpoint, requests, invalidFields, onTestDelimiter);
+        return await SendValidationRequests(HttpMethod.Post, client, requestId, endpoint, requests, invalidFields);
     }
 
     public static async Task<List<HttpResponseMessage>> SendPatchValidationRequests<T>(
         HttpClient client, string requestId, string endpoint, List<T> requests,
-        IReadOnlyList<InvalidFieldFromRequest>? invalidFields = null,
-        Action<string>? onTestDelimiter = null)
+        IReadOnlyList<InvalidFieldFromRequest>? invalidFields = null)
     {
-        return await SendValidationRequests(HttpMethod.Patch, client, requestId, endpoint, requests, invalidFields, onTestDelimiter);
+        return await SendValidationRequests(HttpMethod.Patch, client, requestId, endpoint, requests, invalidFields);
     }
 
     public static async Task<List<HttpResponseMessage>> SendPutValidationRequests<T>(
         HttpClient client, string requestId, string endpoint, List<T> requests,
-        IReadOnlyList<InvalidFieldFromRequest>? invalidFields = null,
-        Action<string>? onTestDelimiter = null)
+        IReadOnlyList<InvalidFieldFromRequest>? invalidFields = null)
     {
-        return await SendValidationRequests(HttpMethod.Put, client, requestId, endpoint, requests, invalidFields, onTestDelimiter);
+        return await SendValidationRequests(HttpMethod.Put, client, requestId, endpoint, requests, invalidFields);
     }
 
     private static async Task<List<HttpResponseMessage>> SendValidationRequests<T>(
         HttpMethod method, HttpClient client, string requestId, string endpoint, List<T> requests,
-        IReadOnlyList<InvalidFieldFromRequest>? invalidFields = null,
-        Action<string>? onTestDelimiter = null)
+        IReadOnlyList<InvalidFieldFromRequest>? invalidFields = null)
     {
         var responses = new List<HttpResponseMessage>();
         for (var i = 0; i < requests.Count; i++)
         {
-            if (invalidFields is not null)
-                onTestDelimiter?.Invoke(
-                    $"The Field '{invalidFields[i].Field}' Set To {invalidFields[i].Value}");
-
             var request = new HttpRequestMessage(method, endpoint)
             {
                 Content = System.Net.Http.Json.JsonContent.Create(requests[i])

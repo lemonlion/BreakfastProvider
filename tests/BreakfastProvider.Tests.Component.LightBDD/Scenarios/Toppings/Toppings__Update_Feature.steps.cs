@@ -5,9 +5,8 @@ using BreakfastProvider.Tests.Component.Shared.Constants;
 using BreakfastProvider.Tests.Component.Shared.Models.Toppings;
 using BreakfastProvider.Tests.Component.Shared.Models.Validation;
 using LightBDD.Framework;
-using LightBDD.Framework.Parameters;
 using BreakfastProvider.Tests.Component.LightBDD.Util;
-using TestTrackingDiagrams.LightBDD;
+using TestTrackingDiagrams.TabularAttributes;
 
 
 namespace BreakfastProvider.Tests.Component.LightBDD.Scenarios.Toppings;
@@ -51,7 +50,7 @@ public partial class Toppings__Update_Feature : BaseFixture
         };
     }
 
-    private async Task Valid_update_topping_requests_with_an_invalid_field(InputTable<InvalidFieldFromRequest> inputs)
+    private async Task Valid_update_topping_requests_with_an_invalid_field(TabularInputs<InvalidFieldFromRequest> inputs)
     {
         var validBase = new TestUpdateToppingRequest
         {
@@ -73,8 +72,7 @@ public partial class Toppings__Update_Feature : BaseFixture
     private async Task The_invalid_update_topping_requests_are_submitted()
         => _validationResponses.AddRange(
             await ValidationHelper.SendPutValidationRequests(
-                Client, RequestId, $"{Endpoints.Toppings}/{_toppingId}", _validationRequests, _validationInputs,
-                onTestDelimiter: TrackingDiagramOverride.InsertTestDelimiter));
+                Client, RequestId, $"{Endpoints.Toppings}/{_toppingId}", _validationRequests, _validationInputs));
 
     #endregion
 
@@ -109,10 +107,11 @@ public partial class Toppings__Update_Feature : BaseFixture
         => _putSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.NotFound);
 
     private async Task The_update_responses_should_each_contain_the_validation_error_for_the_invalid_field(
-        VerifiableDataTable<VerifiableErrorResult> expectedOutputs)
+        TabularOutputs<VerifiableErrorResult> expectedOutputs)
     {
         var actualResults = await ValidationHelper.ParseValidationResponses(_validationResponses);
-        expectedOutputs.SetActual(actualResults);
+        foreach (var result in actualResults)
+            expectedOutputs.RecordActualResult(result);
     }
 
     #endregion

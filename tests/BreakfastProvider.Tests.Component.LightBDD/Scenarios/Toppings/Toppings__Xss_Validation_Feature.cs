@@ -2,8 +2,7 @@ using BreakfastProvider.Tests.Component.Shared.Constants;
 using BreakfastProvider.Tests.Component.Shared.Models.Validation;
 using LightBDD.Framework;
 using LightBDD.Framework.Scenarios;
-using LightBDD.TabularAttributes;
-using LightBDD.TabularAttributes.Attributes;
+using TestTrackingDiagrams.TabularAttributes;
 using LightBDD.XUnit3;
 
 namespace BreakfastProvider.Tests.Component.LightBDD.Scenarios.Toppings;
@@ -21,12 +20,13 @@ public partial class Toppings__Xss_Validation_Feature
     [Inputs("Category", "javascript:alert(1)",                    "Javascript protocol"         )][Outputs("Category contains potentially dangerous content.",  "Bad Request"    )]
     [Inputs("Name",     "",                                       "Name is required"            )][Outputs("'Name' is required.",                              "Bad Request"    )]
     [Inputs("Category", "",                                       "Category is required"        )][Outputs("'Category' is required.",                          "Bad Request"    )]
-    public async Task Toppings_Endpoint_Is_Called_With_Invalid_Or_Dangerous_Input()
+    public async Task Toppings_Endpoint_Is_Called_With_Invalid_Or_Dangerous_Input(
+        TabularInputs<InvalidFieldFromRequest> inputs, TabularOutputs<VerifiableErrorResult> outputs)
     {
         await Runner.RunScenarioAsync(
-            given => Valid_topping_requests_with_an_invalid_field(TableFrom.Inputs<InvalidFieldFromRequest>()),
+            given => Valid_topping_requests_with_an_invalid_field(inputs),
             when => The_invalid_topping_requests_are_submitted(),
-            then => The_responses_should_each_contain_the_validation_error_for_the_invalid_field(VerifiableTableFrom.Outputs<VerifiableErrorResult>()));
+            then => The_responses_should_each_contain_the_validation_error_for_the_invalid_field(outputs));
     }
 
     #endregion

@@ -2,8 +2,7 @@ using BreakfastProvider.Tests.Component.Shared.Common.Validation;
 using BreakfastProvider.Tests.Component.Shared.Constants;
 using BreakfastProvider.Tests.Component.Shared.Models.Orders;
 using BreakfastProvider.Tests.Component.Shared.Models.Validation;
-using LightBDD.Framework.Parameters;
-using TestTrackingDiagrams.LightBDD;
+using TestTrackingDiagrams.TabularAttributes;
 
 namespace BreakfastProvider.Tests.Component.LightBDD.Scenarios.Orders;
 
@@ -20,7 +19,7 @@ public partial class Orders__Validation_Feature : BaseFixture
 
     #region Given
 
-    private async Task Valid_order_requests_with_an_invalid_field(InputTable<InvalidFieldFromRequest> inputs)
+    private async Task Valid_order_requests_with_an_invalid_field(TabularInputs<InvalidFieldFromRequest> inputs)
     {
         var validBase = new TestOrderRequest
         {
@@ -41,7 +40,7 @@ public partial class Orders__Validation_Feature : BaseFixture
         _orderValidationRequests.AddRange(ValidationHelper.CreateValidationRequests(validBase, inputs));
     }
 
-    private async Task Valid_status_update_requests_with_an_invalid_field(InputTable<InvalidFieldFromRequest> inputs)
+    private async Task Valid_status_update_requests_with_an_invalid_field(TabularInputs<InvalidFieldFromRequest> inputs)
     {
         var validBase = new TestUpdateOrderStatusRequest
         {
@@ -58,31 +57,31 @@ public partial class Orders__Validation_Feature : BaseFixture
 
     private async Task The_invalid_order_requests_are_submitted()
         => _orderValidationResponses.AddRange(
-            await ValidationHelper.SendValidationRequests(Client, RequestId, Endpoints.Orders, _orderValidationRequests, _orderValidationInputs,
-                onTestDelimiter: TrackingDiagramOverride.InsertTestDelimiter));
+            await ValidationHelper.SendValidationRequests(Client, RequestId, Endpoints.Orders, _orderValidationRequests, _orderValidationInputs));
 
     private async Task The_invalid_status_update_requests_are_submitted()
         => _statusValidationResponses.AddRange(
             await ValidationHelper.SendPatchValidationRequests(Client, RequestId,
-                $"{Endpoints.Orders}/{Guid.NewGuid()}/status", _statusValidationRequests, _statusValidationInputs,
-                onTestDelimiter: TrackingDiagramOverride.InsertTestDelimiter));
+                $"{Endpoints.Orders}/{Guid.NewGuid()}/status", _statusValidationRequests, _statusValidationInputs));
 
     #endregion
 
     #region Then
 
     private async Task The_responses_should_each_contain_the_validation_error_for_the_invalid_field(
-        VerifiableDataTable<VerifiableErrorResult> expectedOutputs)
+        TabularOutputs<VerifiableErrorResult> expectedOutputs)
     {
         var actualResults = await ValidationHelper.ParseValidationResponses(_orderValidationResponses);
-        expectedOutputs.SetActual(actualResults);
+        foreach (var result in actualResults)
+            expectedOutputs.RecordActualResult(result);
     }
 
     private async Task The_status_update_responses_should_each_contain_the_validation_error_for_the_invalid_field(
-        VerifiableDataTable<VerifiableErrorResult> expectedOutputs)
+        TabularOutputs<VerifiableErrorResult> expectedOutputs)
     {
         var actualResults = await ValidationHelper.ParseValidationResponses(_statusValidationResponses);
-        expectedOutputs.SetActual(actualResults);
+        foreach (var result in actualResults)
+            expectedOutputs.RecordActualResult(result);
     }
 
     #endregion

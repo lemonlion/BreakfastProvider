@@ -2,8 +2,7 @@ using BreakfastProvider.Tests.Component.Shared.Constants;
 using BreakfastProvider.Tests.Component.Shared.Models.Validation;
 using LightBDD.Framework;
 using LightBDD.Framework.Scenarios;
-using LightBDD.TabularAttributes;
-using LightBDD.TabularAttributes.Attributes;
+using TestTrackingDiagrams.TabularAttributes;
 using LightBDD.XUnit3;
 
 namespace BreakfastProvider.Tests.Component.LightBDD.Scenarios.Orders;
@@ -20,12 +19,13 @@ public partial class Orders__Validation_Feature
     [Inputs("Items[0].ItemType", "",      "Item type is required"               )][Outputs("'Item Type' is required.",                "Bad Request"    )]
     [Inputs("Items[0].BatchId",  null,    "Batch ID is required"                )][Outputs("'Batch Id' is required.",                 "Bad Request"    )]
     [Inputs("Items[0].Quantity", 0,       "Quantity must be greater than zero"  )][Outputs("Quantity must be greater than zero.",     "Bad Request"    )]
-    public async Task Orders_Endpoint_Is_Called_With_Invalid_Fields_Should_Return_A_Bad_Request_Response()
+    public async Task Orders_Endpoint_Is_Called_With_Invalid_Fields_Should_Return_A_Bad_Request_Response(
+        TabularInputs<InvalidFieldFromRequest> inputs, TabularOutputs<VerifiableErrorResult> outputs)
     {
         await Runner.RunScenarioAsync(
-            given => Valid_order_requests_with_an_invalid_field(TableFrom.Inputs<InvalidFieldFromRequest>()),
+            given => Valid_order_requests_with_an_invalid_field(inputs),
             when => The_invalid_order_requests_are_submitted(),
-            then => The_responses_should_each_contain_the_validation_error_for_the_invalid_field(VerifiableTableFrom.Outputs<VerifiableErrorResult>()));
+            then => The_responses_should_each_contain_the_validation_error_for_the_invalid_field(outputs));
     }
 
     #endregion
@@ -35,12 +35,13 @@ public partial class Orders__Validation_Feature
     [Scenario]
     [HeadIn("Field",  "Value", "Reason"              )][HeadOut("Error Message",          "Response Status")]
     [Inputs("Status", "",      "Status is required"   )][Outputs("'Status' is required.", "Bad Request"    )]
-    public async Task Order_Status_Update_Endpoint_Is_Called_With_Invalid_Fields_Should_Return_A_Bad_Request_Response()
+    public async Task Order_Status_Update_Endpoint_Is_Called_With_Invalid_Fields_Should_Return_A_Bad_Request_Response(
+        TabularInputs<InvalidFieldFromRequest> inputs, TabularOutputs<VerifiableErrorResult> outputs)
     {
         await Runner.RunScenarioAsync(
-            given => Valid_status_update_requests_with_an_invalid_field(TableFrom.Inputs<InvalidFieldFromRequest>()),
+            given => Valid_status_update_requests_with_an_invalid_field(inputs),
             when => The_invalid_status_update_requests_are_submitted(),
-            then => The_status_update_responses_should_each_contain_the_validation_error_for_the_invalid_field(VerifiableTableFrom.Outputs<VerifiableErrorResult>()));
+            then => The_status_update_responses_should_each_contain_the_validation_error_for_the_invalid_field(outputs));
     }
 
     #endregion

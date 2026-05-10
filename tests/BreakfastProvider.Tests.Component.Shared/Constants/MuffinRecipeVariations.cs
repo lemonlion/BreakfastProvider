@@ -1,4 +1,4 @@
-using BreakfastProvider.Tests.Component.Shared.Models.Muffins;
+using BreakfastProvider.Tests.Component.Shared.Models.AppleCinnamonMuffins;
 
 namespace BreakfastProvider.Tests.Component.Shared.Constants;
 

@@ -1,11 +1,11 @@
 using BreakfastProvider.Tests.Component.Shared.Constants;
-using BreakfastProvider.Tests.Component.Shared.Models.Muffins;
+using BreakfastProvider.Tests.Component.Shared.Models.AppleCinnamonMuffins;
 using LightBDD.Framework;
 using LightBDD.Framework.Scenarios;
 using LightBDD.XUnit3;
 using TestTrackingDiagrams.LightBDD;
 
-namespace BreakfastProvider.Tests.Component.LightBDD.Scenarios.Muffins;
+namespace BreakfastProvider.Tests.Component.LightBDD.Scenarios.AppleCinnamonMuffins;
 
 [FeatureDescription($"/{Endpoints.Muffins} - Creating apple cinnamon muffins with baking profiles and toppings")]
 public partial class Apple_Cinnamon_Muffins__Creation_Feature

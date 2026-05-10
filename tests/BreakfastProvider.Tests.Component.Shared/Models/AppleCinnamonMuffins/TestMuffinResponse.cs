@@ -1,4 +1,4 @@
-namespace BreakfastProvider.Tests.Component.Shared.Models.Muffins;
+namespace BreakfastProvider.Tests.Component.Shared.Models.AppleCinnamonMuffins;
 
 public class TestMuffinResponse
 {

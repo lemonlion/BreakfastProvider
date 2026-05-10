@@ -1,14 +1,14 @@
 using System.Net;
 using BreakfastProvider.Tests.Component.Shared.Common.Downstream;
 using BreakfastProvider.Tests.Component.Shared.Common.Ingredients;
-using BreakfastProvider.Tests.Component.Shared.Common.Muffins;
+using BreakfastProvider.Tests.Component.Shared.Common.AppleCinnamonMuffins;
 using BreakfastProvider.Tests.Component.Shared.Common.Validation;
 using BreakfastProvider.Tests.Component.Shared.Constants;
-using BreakfastProvider.Tests.Component.Shared.Models.Muffins;
+using BreakfastProvider.Tests.Component.Shared.Models.AppleCinnamonMuffins;
 using BreakfastProvider.Tests.Component.Shared.Models.Validation;
 using TestTrackingDiagrams.xUnit3;
 
-namespace BreakfastProvider.Tests.Component.xUnit.Scenarios.Muffins;
+namespace BreakfastProvider.Tests.Component.xUnit.Scenarios.AppleCinnamonMuffins;
 
 public class Apple_Cinnamon_Muffins_Creation_Tests : BaseFixture
 {

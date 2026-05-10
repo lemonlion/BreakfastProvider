@@ -11,7 +11,7 @@
 #region Designer generated code
 #pragma warning disable
 using Reqnroll;
-namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.Muffins
+namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.AppleCinnamonMuffins
 {
     
     
@@ -26,7 +26,7 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.Muffins
         
         private static string[] featureTags = ((string[])(null));
         
-        private static global::Reqnroll.FeatureInfo featureInfo = new global::Reqnroll.FeatureInfo(new global::System.Globalization.CultureInfo("en-US"), "Features/Muffins", "Apple Cinnamon Muffins Creation", "    /muffins - Creating apple cinnamon muffins with baking profiles and toppings", global::Reqnroll.ProgrammingLanguage.CSharp, featureTags, InitializeCucumberMessages());
+        private static global::Reqnroll.FeatureInfo featureInfo = new global::Reqnroll.FeatureInfo(new global::System.Globalization.CultureInfo("en-US"), "Features/AppleCinnamonMuffins", "Apple Cinnamon Muffins Creation", "    /muffins - Creating apple cinnamon muffins with baking profiles and toppings", global::Reqnroll.ProgrammingLanguage.CSharp, featureTags, InitializeCucumberMessages());
         
 #line 1 "AppleCinnamonMuffinsCreation.feature"
 #line hidden
@@ -105,7 +105,7 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.Muffins
         
         private static global::Reqnroll.Formatters.RuntimeSupport.FeatureLevelCucumberMessages InitializeCucumberMessages()
         {
-            return new global::Reqnroll.Formatters.RuntimeSupport.FeatureLevelCucumberMessages("Features/Muffins/AppleCinnamonMuffinsCreation.feature.ndjson", 12);
+            return new global::Reqnroll.Formatters.RuntimeSupport.FeatureLevelCucumberMessages("Features/AppleCinnamonMuffins/AppleCinnamonMuffinsCreation.feature.ndjson", 12);
         }
         
         async System.Threading.Tasks.ValueTask Xunit.IAsyncLifetime.InitializeAsync()

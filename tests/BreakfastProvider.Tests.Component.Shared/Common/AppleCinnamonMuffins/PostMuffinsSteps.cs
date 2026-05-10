@@ -1,9 +1,9 @@
 using System.Net.Http.Json;
 using BreakfastProvider.Tests.Component.Shared.Constants;
-using BreakfastProvider.Tests.Component.Shared.Models.Muffins;
+using BreakfastProvider.Tests.Component.Shared.Models.AppleCinnamonMuffins;
 using BreakfastProvider.Tests.Component.Shared.Util;
 
-namespace BreakfastProvider.Tests.Component.Shared.Common.Muffins;
+namespace BreakfastProvider.Tests.Component.Shared.Common.AppleCinnamonMuffins;
 
 public class PostMuffinsSteps(RequestContext context)
 {

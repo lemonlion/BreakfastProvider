@@ -21,6 +21,10 @@ public class Waffles_Creation_Tests : BaseFixture
     private readonly GetFlourSteps _flourSteps;
     private readonly PostWafflesSteps _waffleSteps;
     private readonly DownstreamRequestSteps _downstreamSteps;
+    private InvalidFieldFromRequest _input = null!;
+    private string _expectedError = null!;
+    private string _expectedStatus = null!;
+    private VerifiableErrorResult? _actual;
 
     public Waffles_Creation_Tests()
     {
@@ -54,28 +58,17 @@ public class Waffles_Creation_Tests : BaseFixture
     [InlineData("Butter", "", "Butter is required", "'Butter' is required.", "Bad Request")]
     [InlineData("Milk", "<script>alert</script>", "XSS in milk", "Milk contains potentially dangerous content.", "Bad Request")]
     [InlineData("Butter", "<img onerror=x>", "XSS in butter", "Butter contains potentially dangerous content.", "Bad Request")]
-    public async Task Waffle_request_with_invalid_ingredient_should_return_bad_request(
+    public void Waffle_request_with_invalid_ingredient_should_return_bad_request(
         string field, string value, string reason, string expectedError, string expectedStatus)
     {
-        var validBase = new TestWaffleRequest
-        {
-            Milk = CowServiceDefaults.FreshMilk,
-            Flour = IngredientDefaults.PlainFlour,
-            Eggs = IngredientDefaults.FreeRangeEggs,
-            Butter = IngredientDefaults.UnsaltedButter
-        };
+        _input = new InvalidFieldFromRequest(field, value, reason);
+        _expectedError = expectedError;
+        _expectedStatus = expectedStatus;
 
-        var input = new InvalidFieldFromRequest(field, value, reason);
-        var requests = ValidationHelper.CreateValidationRequests(validBase, new List<InvalidFieldFromRequest> { input });
-
-        var responses = await ValidationHelper.SendValidationRequests(
-            Client, RequestId, Endpoints.Waffles, requests, new List<InvalidFieldFromRequest> { input });
-
-        var actualResults = await ValidationHelper.ParseValidationResponses(responses);
-        var actual = actualResults.Single();
-        actual.ErrorMessage.Should().Be(expectedError);
-        actual.ResponseStatus.Should().Be(expectedStatus);
-        this.BDDfy();
+        this.Given(x => x.A_valid_waffle_request_with_an_invalid_field())
+            .When(x => x.The_waffle_validation_request_is_sent())
+            .Then(x => x.The_response_should_contain_the_expected_validation_error())
+            .BDDfy();
     }
 
     [Fact]
@@ -143,6 +136,35 @@ public class Waffles_Creation_Tests : BaseFixture
         _waffleSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         var body = await _waffleSteps.ResponseMessage!.Content.ReadAsStringAsync();
         body.Should().Contain(WaffleValidationMessages.MaxToppingsExceeded);
+    }
+
+    private Task A_valid_waffle_request_with_an_invalid_field()
+    {
+        return Task.CompletedTask;
+    }
+
+    private async Task The_waffle_validation_request_is_sent()
+    {
+        var validBase = new TestWaffleRequest
+        {
+            Milk = CowServiceDefaults.FreshMilk,
+            Flour = IngredientDefaults.PlainFlour,
+            Eggs = IngredientDefaults.FreeRangeEggs,
+            Butter = IngredientDefaults.UnsaltedButter
+        };
+
+        var requests = ValidationHelper.CreateValidationRequests(validBase, [_input]);
+        var responses = await ValidationHelper.SendValidationRequests(
+            Client, RequestId, Endpoints.Waffles, requests, [_input]);
+        var actualResults = await ValidationHelper.ParseValidationResponses(responses);
+        _actual = actualResults.Single();
+    }
+
+    private Task The_response_should_contain_the_expected_validation_error()
+    {
+        _actual!.ErrorMessage.Should().Be(_expectedError);
+        _actual!.ResponseStatus.Should().Be(_expectedStatus);
+        return Task.CompletedTask;
     }
 
     #endregion

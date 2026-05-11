@@ -16,6 +16,10 @@ public class Toppings_Update_Tests : BaseFixture
     private static readonly Guid KnownBlueberryToppingId = ToppingDefaults.KnownBlueberryToppingId;
 
     private Guid _toppingId;
+    private InvalidFieldFromRequest _input = null!;
+    private string _expectedError = null!;
+    private string _expectedStatus = null!;
+    private VerifiableErrorResult? _actual;
 
     public Toppings_Update_Tests()
     {
@@ -48,27 +52,17 @@ public class Toppings_Update_Tests : BaseFixture
     [InlineData("Category", "javascript:alert(1)", "Javascript protocol", "Category contains potentially dangerous content.", "Bad Request")]
     [InlineData("Name", "", "Name is required", "'Name' is required.", "Bad Request")]
     [InlineData("Category", "", "Category is required", "'Category' is required.", "Bad Request")]
-    public async Task Update_topping_with_invalid_or_dangerous_input_should_return_bad_request(
+    public void Update_topping_with_invalid_or_dangerous_input_should_return_bad_request(
         string field, string value, string reason, string expectedError, string expectedStatus)
     {
-        var toppingId = KnownBlueberryToppingId;
-        var validBase = new TestUpdateToppingRequest
-        {
-            Name = ToppingDefaults.Strawberries,
-            Category = ToppingDefaults.FruitCategory
-        };
+        _input = new InvalidFieldFromRequest(field, value, reason);
+        _expectedError = expectedError;
+        _expectedStatus = expectedStatus;
 
-        var input = new InvalidFieldFromRequest(field, value, reason);
-        var requests = ValidationHelper.CreateValidationRequests(validBase, new List<InvalidFieldFromRequest> { input });
-
-        var responses = await ValidationHelper.SendPutValidationRequests(
-            Client, RequestId, $"{Endpoints.Toppings}/{toppingId}", requests, new List<InvalidFieldFromRequest> { input });
-
-        var actualResults = await ValidationHelper.ParseValidationResponses(responses);
-        var actual = actualResults.Single();
-        actual.ErrorMessage.Should().Be(expectedError);
-        actual.ResponseStatus.Should().Be(expectedStatus);
-        this.BDDfy();
+        this.Given(x => x.A_valid_update_topping_request_with_an_invalid_field())
+            .When(x => x.The_update_topping_request_is_sent())
+            .Then(x => x.The_response_should_contain_the_expected_validation_error())
+            .BDDfy();
     }
 
     #region Steps
@@ -110,6 +104,33 @@ public class Toppings_Update_Tests : BaseFixture
     private void The_update_response_should_indicate_not_found()
     {
         _putSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.NotFound);
+    }
+
+    private Task A_valid_update_topping_request_with_an_invalid_field()
+    {
+        return Task.CompletedTask;
+    }
+
+    private async Task The_update_topping_request_is_sent()
+    {
+        var validBase = new TestUpdateToppingRequest
+        {
+            Name = ToppingDefaults.Strawberries,
+            Category = ToppingDefaults.FruitCategory
+        };
+
+        var requests = ValidationHelper.CreateValidationRequests(validBase, [_input]);
+        var responses = await ValidationHelper.SendPutValidationRequests(
+            Client, RequestId, $"{Endpoints.Toppings}/{KnownBlueberryToppingId}", requests, [_input]);
+        var actualResults = await ValidationHelper.ParseValidationResponses(responses);
+        _actual = actualResults.Single();
+    }
+
+    private Task The_response_should_contain_the_expected_validation_error()
+    {
+        _actual!.ErrorMessage.Should().Be(_expectedError);
+        _actual!.ResponseStatus.Should().Be(_expectedStatus);
+        return Task.CompletedTask;
     }
 
     #endregion

@@ -18,6 +18,15 @@ public class Apple_Cinnamon_Muffins_Creation_Tests : BaseFixture
     private readonly GetFlourSteps _flourSteps;
     private readonly PostMuffinsSteps _muffinSteps;
     private readonly DownstreamRequestSteps _downstreamSteps;
+    private MuffinRecipeTestData _recipe = null!;
+    private int _temperature;
+    private int _durationMinutes;
+    private string _panType = null!;
+    private MuffinBatchExpectation _expected = null!;
+    private InvalidFieldFromRequest _input = null!;
+    private string _expectedError = null!;
+    private string _expectedStatus = null!;
+    private VerifiableErrorResult? _actual;
 
     public Apple_Cinnamon_Muffins_Creation_Tests()
     {
@@ -41,41 +50,19 @@ public class Apple_Cinnamon_Muffins_Creation_Tests : BaseFixture
 
     [Theory]
     [MemberData(nameof(MuffinRecipeVariations.RecipeVariations), MemberType = typeof(MuffinRecipeVariations))]
-    public async Task Different_muffin_recipes_should_produce_the_expected_batch(
+    public void Different_muffin_recipes_should_produce_the_expected_batch(
         string recipeName, MuffinRecipeTestData recipe, int temperature, int durationMinutes, string panType, MuffinBatchExpectation expected)
     {
-        await _milkSteps.Retrieve();
-        _milkSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
-        _muffinSteps.Request.Milk = _milkSteps.MilkResponse.Milk;
+        _recipe = recipe;
+        _temperature = temperature;
+        _durationMinutes = durationMinutes;
+        _panType = panType;
+        _expected = expected;
 
-        await _eggsSteps.Retrieve();
-        _eggsSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
-        _muffinSteps.Request.Eggs = _eggsSteps.EggsResponse.Eggs;
-
-        _muffinSteps.Request.Flour = recipe.Ingredients.Flour;
-        _muffinSteps.Request.Apples = recipe.Ingredients.Apples;
-        _muffinSteps.Request.Cinnamon = recipe.Ingredients.Cinnamon;
-        _muffinSteps.Request.Baking = new TestBakingProfile
-        {
-            Temperature = temperature,
-            DurationMinutes = durationMinutes,
-            PanType = panType
-        };
-        _muffinSteps.Request.Toppings = recipe.Toppings?
-            .Select(t => new TestMuffinTopping { Name = t.Name, Amount = t.Amount })
-            .ToList();
-
-        await _muffinSteps.Send();
-
-        _muffinSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
-        await _muffinSteps.ParseResponse();
-        _muffinSteps.Response!.Ingredients.Should().HaveCount(expected.ExpectedIngredientCount);
-        _muffinSteps.Response!.Toppings.Should().HaveCount(expected.ExpectedToppingCount);
-        var bakingTemperatureMatchesExpectation = expected.HasBakingInfo
-            ? _muffinSteps.Response!.BakingTemperature > 0
-            : _muffinSteps.Response!.BakingTemperature == 0;
-        bakingTemperatureMatchesExpectation.Should().BeTrue();
-        this.BDDfy();
+        this.Given(x => x.All_ingredients_are_retrieved_for_the_muffin_recipe())
+            .When(x => x.The_muffins_are_prepared())
+            .Then(x => x.The_response_should_match_the_expected_batch())
+            .BDDfy();
     }
 
     [Theory]
@@ -85,36 +72,17 @@ public class Apple_Cinnamon_Muffins_Creation_Tests : BaseFixture
     [InlineData("Milk", "", "Milk is required", "'Milk' is required.", "Bad Request")]
     [InlineData("Eggs", "", "Eggs is required", "'Eggs' is required.", "Bad Request")]
     [InlineData("Cinnamon", "<script>alert('xss')</script>", "XSS in cinnamon", "Cinnamon contains potentially dangerous content.", "Bad Request")]
-    public async Task Muffin_request_with_invalid_field_should_return_bad_request(
+    public void Muffin_request_with_invalid_field_should_return_bad_request(
         string field, string value, string reason, string expectedError, string expectedStatus)
     {
-        var validBase = new TestMuffinRequest
-        {
-            Milk = CowServiceDefaults.FreshMilk,
-            Flour = IngredientDefaults.PlainFlour,
-            Eggs = IngredientDefaults.FreeRangeEggs,
-            Apples = MuffinDefaults.GrannySmithApples,
-            Cinnamon = MuffinDefaults.CeylonCinnamon,
-            Baking = new TestBakingProfile
-            {
-                Temperature = MuffinDefaults.DefaultTemperature,
-                DurationMinutes = MuffinDefaults.DefaultDuration,
-                PanType = MuffinDefaults.DefaultPanType
-            },
-            Toppings = [new TestMuffinTopping { Name = "Streusel", Amount = "Light" }]
-        };
+        _input = new InvalidFieldFromRequest(field, value, reason);
+        _expectedError = expectedError;
+        _expectedStatus = expectedStatus;
 
-        var input = new InvalidFieldFromRequest(field, value, reason);
-        var requests = ValidationHelper.CreateValidationRequests(validBase, [input]);
-
-        var responses = await ValidationHelper.SendValidationRequests(
-            Client, RequestId, Endpoints.Muffins, requests, [input]);
-
-        var actualResults = await ValidationHelper.ParseValidationResponses(responses);
-        var actual = actualResults.Single();
-        actual.ErrorMessage.Should().Contain(expectedError);
-        actual.ResponseStatus.Should().Be(expectedStatus);
-        this.BDDfy();
+        this.Given(x => x.A_valid_muffin_request_with_an_invalid_field())
+            .When(x => x.The_muffin_validation_request_is_sent())
+            .Then(x => x.The_response_should_contain_the_expected_validation_error())
+            .BDDfy();
     }
 
     #region Steps
@@ -167,6 +135,79 @@ public class Apple_Cinnamon_Muffins_Creation_Tests : BaseFixture
     {
         if (!Settings.RunAgainstExternalServiceUnderTest)
             _downstreamSteps.AssertCowServiceReceivedMilkRequest();
+    }
+
+    private async Task All_ingredients_are_retrieved_for_the_muffin_recipe()
+    {
+        await _milkSteps.Retrieve();
+        _milkSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
+        _muffinSteps.Request.Milk = _milkSteps.MilkResponse.Milk;
+
+        await _eggsSteps.Retrieve();
+        _eggsSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
+        _muffinSteps.Request.Eggs = _eggsSteps.EggsResponse.Eggs;
+
+        _muffinSteps.Request.Flour = _recipe.Ingredients.Flour;
+        _muffinSteps.Request.Apples = _recipe.Ingredients.Apples;
+        _muffinSteps.Request.Cinnamon = _recipe.Ingredients.Cinnamon;
+        _muffinSteps.Request.Baking = new TestBakingProfile
+        {
+            Temperature = _temperature,
+            DurationMinutes = _durationMinutes,
+            PanType = _panType
+        };
+        _muffinSteps.Request.Toppings = _recipe.Toppings?
+            .Select(t => new TestMuffinTopping { Name = t.Name, Amount = t.Amount })
+            .ToList();
+    }
+
+    private async Task The_response_should_match_the_expected_batch()
+    {
+        _muffinSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Created);
+        await _muffinSteps.ParseResponse();
+        _muffinSteps.Response!.Ingredients.Should().HaveCount(_expected.ExpectedIngredientCount);
+        _muffinSteps.Response!.Toppings.Should().HaveCount(_expected.ExpectedToppingCount);
+        var bakingTemperatureMatchesExpectation = _expected.HasBakingInfo
+            ? _muffinSteps.Response!.BakingTemperature > 0
+            : _muffinSteps.Response!.BakingTemperature == 0;
+        bakingTemperatureMatchesExpectation.Should().BeTrue();
+    }
+
+    private Task A_valid_muffin_request_with_an_invalid_field()
+    {
+        return Task.CompletedTask;
+    }
+
+    private async Task The_muffin_validation_request_is_sent()
+    {
+        var validBase = new TestMuffinRequest
+        {
+            Milk = CowServiceDefaults.FreshMilk,
+            Flour = IngredientDefaults.PlainFlour,
+            Eggs = IngredientDefaults.FreeRangeEggs,
+            Apples = MuffinDefaults.GrannySmithApples,
+            Cinnamon = MuffinDefaults.CeylonCinnamon,
+            Baking = new TestBakingProfile
+            {
+                Temperature = MuffinDefaults.DefaultTemperature,
+                DurationMinutes = MuffinDefaults.DefaultDuration,
+                PanType = MuffinDefaults.DefaultPanType
+            },
+            Toppings = [new TestMuffinTopping { Name = "Streusel", Amount = "Light" }]
+        };
+
+        var requests = ValidationHelper.CreateValidationRequests(validBase, [_input]);
+        var responses = await ValidationHelper.SendValidationRequests(
+            Client, RequestId, Endpoints.Muffins, requests, [_input]);
+        var actualResults = await ValidationHelper.ParseValidationResponses(responses);
+        _actual = actualResults.Single();
+    }
+
+    private Task The_response_should_contain_the_expected_validation_error()
+    {
+        _actual!.ErrorMessage.Should().Contain(_expectedError);
+        _actual!.ResponseStatus.Should().Be(_expectedStatus);
+        return Task.CompletedTask;
     }
 
     #endregion

@@ -1,29 +1,33 @@
 Feature: Order Status Transition
     /orders - Order status transitions following the order lifecycle
 
-    Scenario Outline: A valid status transition should update the order
-        Given an order exists with status "<FromStatus>"
-        When the order status is updated to "<ToStatus>"
-        Then the order status should be updated successfully to "<ToStatus>"
+    Rule: Valid status transitions are accepted
 
-        Examples:
-            | FromStatus | ToStatus   |
-            | Created    | Preparing  |
-            | Created    | Cancelled  |
-            | Preparing  | Ready      |
-            | Ready      | Completed  |
+        Scenario Outline: A valid status transition should update the order
+            Given an order exists with status "<FromStatus>"
+            When the order status is updated to "<ToStatus>"
+            Then the order status should be updated successfully to "<ToStatus>"
 
-    Scenario Outline: An invalid status transition should return a conflict response
-        Given an order exists with status "<FromStatus>"
-        When the order status is updated to "<ToStatus>"
-        Then the response should indicate an invalid state transition
+            Examples:
+                | FromStatus | ToStatus   |
+                | Created    | Preparing  |
+                | Created    | Cancelled  |
+                | Preparing  | Ready      |
+                | Ready      | Completed  |
 
-        Examples:
-            | FromStatus | ToStatus   |
-            | Created    | Ready      |
-            | Created    | Completed  |
-            | Preparing  | Cancelled  |
-            | Ready      | Preparing  |
-            | Completed  | Preparing  |
-            | Cancelled  | Preparing  |
-            | Cancelled  | Ready      |
+    Rule: Invalid status transitions are rejected
+
+        Scenario Outline: An invalid status transition should return a conflict response
+            Given an order exists with status "<FromStatus>"
+            When the order status is updated to "<ToStatus>"
+            Then the response should indicate an invalid state transition
+
+            Examples:
+                | FromStatus | ToStatus   |
+                | Created    | Ready      |
+                | Created    | Completed  |
+                | Preparing  | Cancelled  |
+                | Ready      | Preparing  |
+                | Completed  | Preparing  |
+                | Cancelled  | Preparing  |
+                | Cancelled  | Ready      |

@@ -220,10 +220,15 @@ jobs:
         run: |
           docker compose -f docker/docker-compose-database.yml -f docker/docker-compose-storage.yml -f docker/docker-compose-fakes.yml -f docker/docker-compose-messaging.yml -f docker/docker-compose-eventhub.yml ${{ inputs.test-run-type == 'external-sut' && '-f docker/docker-compose-sut.yml' || '' }} down
 
+      - name: Determine reports directory
+        id: reports-dir
+        if: ${{ !cancelled() }}
+        run: echo "path=$(dirname "${{ inputs.features-report-path }}")" >> $GITHUB_OUTPUT
+
       - name: Upload report artifact
         uses: actions/upload-artifact@v5
         if: ${{ !cancelled() }}
         with:
           name: LightBDD-${{ inputs.test-run-description }}-report
-          path: ${{ inputs.features-report-path }}
+          path: ${{ steps.reports-dir.outputs.path }}
           retention-days: 1

@@ -85,7 +85,7 @@ public partial class Specifications__Open_Api_Feature : BaseFixture
             try
             {
                 await File.WriteAllTextAsync(path, content, Encoding.UTF8);
-                await StepExecution.AttachFile(m => m.CreateFromFile(path, "openapi.json"));
+                await StepExecution.Current.AttachFile(m => m.CreateFromFile(path, "openapi.json"));
                 return;
             }
             catch (IOException) when (attempt < maxRetries)

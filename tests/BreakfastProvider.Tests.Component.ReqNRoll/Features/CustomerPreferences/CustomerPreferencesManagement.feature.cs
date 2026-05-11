@@ -145,9 +145,9 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.CustomerPreference
             string pickleIndex = "0";
             global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("Saving customer preferences should return the saved preferences", null, tagsOfScenario, argumentsOfScenario, featureTags, pickleIndex);
             string[] tagsOfRule = ((string[])(null));
-            global::Reqnroll.RuleInfo ruleInfo = null;
-#line 5
-    this.ScenarioInitialize(scenarioInfo, ruleInfo);
+            global::Reqnroll.RuleInfo ruleInfo = new global::Reqnroll.RuleInfo("Customer preferences support CRUD operations", null, tagsOfRule);
+#line 7
+        this.ScenarioInitialize(scenarioInfo, ruleInfo);
 #line hidden
             if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
             {
@@ -156,14 +156,14 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.CustomerPreference
             else
             {
                 await this.ScenarioStartAsync();
-#line 6
-        await testRunner.GivenAsync("a valid customer preference request", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
-#line hidden
-#line 7
-        await testRunner.WhenAsync("the customer preferences are saved", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
-#line hidden
 #line 8
-        await testRunner.ThenAsync("the preference response should contain the saved preferences", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
+            await testRunner.GivenAsync("a valid customer preference request", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
+#line hidden
+#line 9
+            await testRunner.WhenAsync("the customer preferences are saved", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
+#line hidden
+#line 10
+            await testRunner.ThenAsync("the preference response should contain the saved preferences", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
 #line hidden
             }
             await this.ScenarioCleanupAsync();
@@ -179,9 +179,9 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.CustomerPreference
             string pickleIndex = "1";
             global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("Retrieving existing customer preferences should return the preferences", null, tagsOfScenario, argumentsOfScenario, featureTags, pickleIndex);
             string[] tagsOfRule = ((string[])(null));
-            global::Reqnroll.RuleInfo ruleInfo = null;
-#line 10
-    this.ScenarioInitialize(scenarioInfo, ruleInfo);
+            global::Reqnroll.RuleInfo ruleInfo = new global::Reqnroll.RuleInfo("Customer preferences support CRUD operations", null, tagsOfRule);
+#line 12
+        this.ScenarioInitialize(scenarioInfo, ruleInfo);
 #line hidden
             if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
             {
@@ -190,14 +190,14 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.CustomerPreference
             else
             {
                 await this.ScenarioStartAsync();
-#line 11
-        await testRunner.GivenAsync("customer preferences exist", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
-#line hidden
-#line 12
-        await testRunner.WhenAsync("the customer preferences are retrieved", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
-#line hidden
 #line 13
-        await testRunner.ThenAsync("the preference get response should contain the preferences", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
+            await testRunner.GivenAsync("customer preferences exist", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
+#line hidden
+#line 14
+            await testRunner.WhenAsync("the customer preferences are retrieved", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
+#line hidden
+#line 15
+            await testRunner.ThenAsync("the preference get response should contain the preferences", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
 #line hidden
             }
             await this.ScenarioCleanupAsync();
@@ -213,9 +213,9 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.CustomerPreference
             string pickleIndex = "2";
             global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("Updating customer preferences should return the updated preferences", null, tagsOfScenario, argumentsOfScenario, featureTags, pickleIndex);
             string[] tagsOfRule = ((string[])(null));
-            global::Reqnroll.RuleInfo ruleInfo = null;
-#line 15
-    this.ScenarioInitialize(scenarioInfo, ruleInfo);
+            global::Reqnroll.RuleInfo ruleInfo = new global::Reqnroll.RuleInfo("Customer preferences support CRUD operations", null, tagsOfRule);
+#line 17
+        this.ScenarioInitialize(scenarioInfo, ruleInfo);
 #line hidden
             if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
             {
@@ -224,14 +224,14 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.CustomerPreference
             else
             {
                 await this.ScenarioStartAsync();
-#line 16
-        await testRunner.GivenAsync("customer preferences exist", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
-#line hidden
-#line 17
-        await testRunner.WhenAsync("the customer preferences are updated", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
-#line hidden
 #line 18
-        await testRunner.ThenAsync("the preference update response should contain the updated values", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
+            await testRunner.GivenAsync("customer preferences exist", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
+#line hidden
+#line 19
+            await testRunner.WhenAsync("the customer preferences are updated", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
+#line hidden
+#line 20
+            await testRunner.ThenAsync("the preference update response should contain the updated values", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
 #line hidden
             }
             await this.ScenarioCleanupAsync();
@@ -247,9 +247,9 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.CustomerPreference
             string pickleIndex = "3";
             global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("Retrieving non-existent customer preferences should return not found", null, tagsOfScenario, argumentsOfScenario, featureTags, pickleIndex);
             string[] tagsOfRule = ((string[])(null));
-            global::Reqnroll.RuleInfo ruleInfo = null;
-#line 20
-    this.ScenarioInitialize(scenarioInfo, ruleInfo);
+            global::Reqnroll.RuleInfo ruleInfo = new global::Reqnroll.RuleInfo("Non-existent preferences cannot be retrieved", null, tagsOfRule);
+#line 24
+        this.ScenarioInitialize(scenarioInfo, ruleInfo);
 #line hidden
             if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
             {
@@ -258,11 +258,11 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.CustomerPreference
             else
             {
                 await this.ScenarioStartAsync();
-#line 21
-        await testRunner.WhenAsync("non-existent customer preferences are retrieved", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
+#line 25
+            await testRunner.WhenAsync("non-existent customer preferences are retrieved", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
 #line hidden
-#line 22
-        await testRunner.ThenAsync("the preference get response should indicate not found", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
+#line 26
+            await testRunner.ThenAsync("the preference get response should indicate not found", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
 #line hidden
             }
             await this.ScenarioCleanupAsync();
@@ -278,9 +278,9 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.CustomerPreference
             string pickleIndex = "4";
             global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("Saving customer preferences with missing customer name should return bad request", null, tagsOfScenario, argumentsOfScenario, featureTags, pickleIndex);
             string[] tagsOfRule = ((string[])(null));
-            global::Reqnroll.RuleInfo ruleInfo = null;
-#line 24
-    this.ScenarioInitialize(scenarioInfo, ruleInfo);
+            global::Reqnroll.RuleInfo ruleInfo = new global::Reqnroll.RuleInfo("Preference requests must pass validation", null, tagsOfRule);
+#line 30
+        this.ScenarioInitialize(scenarioInfo, ruleInfo);
 #line hidden
             if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
             {
@@ -289,14 +289,14 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.CustomerPreference
             else
             {
                 await this.ScenarioStartAsync();
-#line 25
-        await testRunner.GivenAsync("a customer preference request with missing customer name", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
+#line 31
+            await testRunner.GivenAsync("a customer preference request with missing customer name", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
 #line hidden
-#line 26
-        await testRunner.WhenAsync("the customer preferences are saved", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
+#line 32
+            await testRunner.WhenAsync("the customer preferences are saved", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
 #line hidden
-#line 27
-        await testRunner.ThenAsync("the preference response should indicate bad request", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
+#line 33
+            await testRunner.ThenAsync("the preference response should indicate bad request", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
 #line hidden
             }
             await this.ScenarioCleanupAsync();

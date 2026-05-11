@@ -146,9 +146,9 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.Reservations
             string pickleIndex = "0";
             global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("Creating a reservation should return the confirmed reservation", null, tagsOfScenario, argumentsOfScenario, featureTags, pickleIndex);
             string[] tagsOfRule = ((string[])(null));
-            global::Reqnroll.RuleInfo ruleInfo = null;
-#line 5
-    this.ScenarioInitialize(scenarioInfo, ruleInfo);
+            global::Reqnroll.RuleInfo ruleInfo = new global::Reqnroll.RuleInfo("Reservations can be created and retrieved", null, tagsOfRule);
+#line 7
+        this.ScenarioInitialize(scenarioInfo, ruleInfo);
 #line hidden
             if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
             {
@@ -157,14 +157,14 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.Reservations
             else
             {
                 await this.ScenarioStartAsync();
-#line 6
-        await testRunner.GivenAsync("a valid reservation request", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
-#line hidden
-#line 7
-        await testRunner.WhenAsync("the reservation is submitted", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
-#line hidden
 #line 8
-        await testRunner.ThenAsync("the reservation response should contain the confirmed booking", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
+            await testRunner.GivenAsync("a valid reservation request", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
+#line hidden
+#line 9
+            await testRunner.WhenAsync("the reservation is submitted", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
+#line hidden
+#line 10
+            await testRunner.ThenAsync("the reservation response should contain the confirmed booking", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
 #line hidden
             }
             await this.ScenarioCleanupAsync();
@@ -180,9 +180,9 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.Reservations
             string pickleIndex = "1";
             global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("Retrieving an existing reservation should return the reservation", null, tagsOfScenario, argumentsOfScenario, featureTags, pickleIndex);
             string[] tagsOfRule = ((string[])(null));
-            global::Reqnroll.RuleInfo ruleInfo = null;
-#line 10
-    this.ScenarioInitialize(scenarioInfo, ruleInfo);
+            global::Reqnroll.RuleInfo ruleInfo = new global::Reqnroll.RuleInfo("Reservations can be created and retrieved", null, tagsOfRule);
+#line 12
+        this.ScenarioInitialize(scenarioInfo, ruleInfo);
 #line hidden
             if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
             {
@@ -191,14 +191,14 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.Reservations
             else
             {
                 await this.ScenarioStartAsync();
-#line 11
-        await testRunner.GivenAsync("a reservation exists", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
-#line hidden
-#line 12
-        await testRunner.WhenAsync("the reservation is retrieved by id", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
-#line hidden
 #line 13
-        await testRunner.ThenAsync("the reservation get response should contain the reservation", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
+            await testRunner.GivenAsync("a reservation exists", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
+#line hidden
+#line 14
+            await testRunner.WhenAsync("the reservation is retrieved by id", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
+#line hidden
+#line 15
+            await testRunner.ThenAsync("the reservation get response should contain the reservation", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
 #line hidden
             }
             await this.ScenarioCleanupAsync();
@@ -214,9 +214,9 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.Reservations
             string pickleIndex = "2";
             global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("Cancelling a reservation should return the cancelled reservation", null, tagsOfScenario, argumentsOfScenario, featureTags, pickleIndex);
             string[] tagsOfRule = ((string[])(null));
-            global::Reqnroll.RuleInfo ruleInfo = null;
-#line 15
-    this.ScenarioInitialize(scenarioInfo, ruleInfo);
+            global::Reqnroll.RuleInfo ruleInfo = new global::Reqnroll.RuleInfo("Reservations can be cancelled once", null, tagsOfRule);
+#line 19
+        this.ScenarioInitialize(scenarioInfo, ruleInfo);
 #line hidden
             if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
             {
@@ -225,14 +225,14 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.Reservations
             else
             {
                 await this.ScenarioStartAsync();
-#line 16
-        await testRunner.GivenAsync("a reservation exists", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
+#line 20
+            await testRunner.GivenAsync("a reservation exists", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
 #line hidden
-#line 17
-        await testRunner.WhenAsync("the reservation is cancelled", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
+#line 21
+            await testRunner.WhenAsync("the reservation is cancelled", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
 #line hidden
-#line 18
-        await testRunner.ThenAsync("the cancellation response should indicate the reservation is cancelled", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
+#line 22
+            await testRunner.ThenAsync("the cancellation response should indicate the reservation is cancelled", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
 #line hidden
             }
             await this.ScenarioCleanupAsync();
@@ -248,9 +248,9 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.Reservations
             string pickleIndex = "3";
             global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("Cancelling an already cancelled reservation should return a conflict response", null, tagsOfScenario, argumentsOfScenario, featureTags, pickleIndex);
             string[] tagsOfRule = ((string[])(null));
-            global::Reqnroll.RuleInfo ruleInfo = null;
-#line 20
-    this.ScenarioInitialize(scenarioInfo, ruleInfo);
+            global::Reqnroll.RuleInfo ruleInfo = new global::Reqnroll.RuleInfo("Reservations can be cancelled once", null, tagsOfRule);
+#line 24
+        this.ScenarioInitialize(scenarioInfo, ruleInfo);
 #line hidden
             if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
             {
@@ -259,14 +259,14 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.Reservations
             else
             {
                 await this.ScenarioStartAsync();
-#line 21
-        await testRunner.GivenAsync("a cancelled reservation exists", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
+#line 25
+            await testRunner.GivenAsync("a cancelled reservation exists", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
 #line hidden
-#line 22
-        await testRunner.WhenAsync("the reservation is cancelled again", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
+#line 26
+            await testRunner.WhenAsync("the reservation is cancelled again", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
 #line hidden
-#line 23
-        await testRunner.ThenAsync("the cancellation response should indicate a conflict", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
+#line 27
+            await testRunner.ThenAsync("the cancellation response should indicate a conflict", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
 #line hidden
             }
             await this.ScenarioCleanupAsync();
@@ -282,9 +282,9 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.Reservations
             string pickleIndex = "4";
             global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("Deleting a reservation should return no content", null, tagsOfScenario, argumentsOfScenario, featureTags, pickleIndex);
             string[] tagsOfRule = ((string[])(null));
-            global::Reqnroll.RuleInfo ruleInfo = null;
-#line 25
-    this.ScenarioInitialize(scenarioInfo, ruleInfo);
+            global::Reqnroll.RuleInfo ruleInfo = new global::Reqnroll.RuleInfo("Reservations can be deleted", null, tagsOfRule);
+#line 31
+        this.ScenarioInitialize(scenarioInfo, ruleInfo);
 #line hidden
             if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
             {
@@ -293,14 +293,14 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.Reservations
             else
             {
                 await this.ScenarioStartAsync();
-#line 26
-        await testRunner.GivenAsync("a reservation exists", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
+#line 32
+            await testRunner.GivenAsync("a reservation exists", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
 #line hidden
-#line 27
-        await testRunner.WhenAsync("the reservation is deleted", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
+#line 33
+            await testRunner.WhenAsync("the reservation is deleted", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
 #line hidden
-#line 28
-        await testRunner.ThenAsync("the reservation delete response should indicate no content", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
+#line 34
+            await testRunner.ThenAsync("the reservation delete response should indicate no content", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
 #line hidden
             }
             await this.ScenarioCleanupAsync();

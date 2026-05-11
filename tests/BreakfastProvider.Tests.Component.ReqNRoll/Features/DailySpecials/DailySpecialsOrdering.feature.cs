@@ -145,9 +145,9 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.DailySpecials
             string pickleIndex = "0";
             global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("A valid daily special order should return a confirmation", null, tagsOfScenario, argumentsOfScenario, featureTags, pickleIndex);
             string[] tagsOfRule = ((string[])(null));
-            global::Reqnroll.RuleInfo ruleInfo = null;
-#line 5
-    this.ScenarioInitialize(scenarioInfo, ruleInfo);
+            global::Reqnroll.RuleInfo ruleInfo = new global::Reqnroll.RuleInfo("Valid daily special orders are fulfilled", null, tagsOfRule);
+#line 7
+        this.ScenarioInitialize(scenarioInfo, ruleInfo);
 #line hidden
             if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
             {
@@ -156,17 +156,17 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.DailySpecials
             else
             {
                 await this.ScenarioStartAsync();
-#line 6
-        await testRunner.GivenAsync("the cinnamon swirl order count is reset", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
-#line hidden
-#line 7
-        await testRunner.AndAsync("a valid daily special order request for cinnamon swirl", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
-#line hidden
 #line 8
-        await testRunner.WhenAsync("the daily special order is submitted", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
+            await testRunner.GivenAsync("the cinnamon swirl order count is reset", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
 #line hidden
 #line 9
-        await testRunner.ThenAsync("the daily special order response should contain a valid confirmation", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
+            await testRunner.AndAsync("a valid daily special order request for cinnamon swirl", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
+#line hidden
+#line 10
+            await testRunner.WhenAsync("the daily special order is submitted", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
+#line hidden
+#line 11
+            await testRunner.ThenAsync("the daily special order response should contain a valid confirmation", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
 #line hidden
             }
             await this.ScenarioCleanupAsync();
@@ -182,9 +182,9 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.DailySpecials
             string pickleIndex = "1";
             global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("The daily specials endpoint should return all available specials", null, tagsOfScenario, argumentsOfScenario, featureTags, pickleIndex);
             string[] tagsOfRule = ((string[])(null));
-            global::Reqnroll.RuleInfo ruleInfo = null;
-#line 11
-    this.ScenarioInitialize(scenarioInfo, ruleInfo);
+            global::Reqnroll.RuleInfo ruleInfo = new global::Reqnroll.RuleInfo("Valid daily special orders are fulfilled", null, tagsOfRule);
+#line 13
+        this.ScenarioInitialize(scenarioInfo, ruleInfo);
 #line hidden
             if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
             {
@@ -193,11 +193,11 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.DailySpecials
             else
             {
                 await this.ScenarioStartAsync();
-#line 12
-        await testRunner.WhenAsync("the available daily specials are requested", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
+#line 14
+            await testRunner.WhenAsync("the available daily specials are requested", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
 #line hidden
-#line 13
-        await testRunner.ThenAsync("the daily specials response should contain all expected specials", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
+#line 15
+            await testRunner.ThenAsync("the daily specials response should contain all expected specials", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
 #line hidden
             }
             await this.ScenarioCleanupAsync();
@@ -215,9 +215,9 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.DailySpecials
             string pickleIndex = "2";
             global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("Ordering a daily special beyond the threshold should return a conflict response", null, tagsOfScenario, argumentsOfScenario, featureTags, pickleIndex);
             string[] tagsOfRule = ((string[])(null));
-            global::Reqnroll.RuleInfo ruleInfo = null;
-#line 16
-    this.ScenarioInitialize(scenarioInfo, ruleInfo);
+            global::Reqnroll.RuleInfo ruleInfo = new global::Reqnroll.RuleInfo("Orders are rejected when the daily limit is reached", null, tagsOfRule);
+#line 20
+        this.ScenarioInitialize(scenarioInfo, ruleInfo);
 #line hidden
             if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
             {
@@ -226,17 +226,17 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.DailySpecials
             else
             {
                 await this.ScenarioStartAsync();
-#line 17
-        await testRunner.GivenAsync("the matcha waffles order count is reset", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
+#line 21
+            await testRunner.GivenAsync("the matcha waffles order count is reset", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
 #line hidden
-#line 18
-        await testRunner.AndAsync("the matcha waffles special has been ordered up to the configured limit", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
+#line 22
+            await testRunner.AndAsync("the matcha waffles special has been ordered up to the configured limit", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
 #line hidden
-#line 19
-        await testRunner.WhenAsync("another order is placed for the matcha waffles special", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
+#line 23
+            await testRunner.WhenAsync("another order is placed for the matcha waffles special", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
 #line hidden
-#line 20
-        await testRunner.ThenAsync("the response should indicate the daily special is sold out", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
+#line 24
+            await testRunner.ThenAsync("the response should indicate the daily special is sold out", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
 #line hidden
             }
             await this.ScenarioCleanupAsync();
@@ -254,9 +254,9 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.DailySpecials
             string pickleIndex = "3";
             global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("Remaining quantity should decrease after each order", null, tagsOfScenario, argumentsOfScenario, featureTags, pickleIndex);
             string[] tagsOfRule = ((string[])(null));
-            global::Reqnroll.RuleInfo ruleInfo = null;
-#line 23
-    this.ScenarioInitialize(scenarioInfo, ruleInfo);
+            global::Reqnroll.RuleInfo ruleInfo = new global::Reqnroll.RuleInfo("Remaining quantity decreases with each order", null, tagsOfRule);
+#line 29
+        this.ScenarioInitialize(scenarioInfo, ruleInfo);
 #line hidden
             if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
             {
@@ -265,17 +265,17 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.DailySpecials
             else
             {
                 await this.ScenarioStartAsync();
-#line 24
-        await testRunner.GivenAsync("the lemon ricotta order count is reset", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
+#line 30
+            await testRunner.GivenAsync("the lemon ricotta order count is reset", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
 #line hidden
-#line 25
-        await testRunner.AndAsync("a daily special order for lemon ricotta of quantity one is placed", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
+#line 31
+            await testRunner.AndAsync("a daily special order for lemon ricotta of quantity one is placed", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
 #line hidden
-#line 26
-        await testRunner.WhenAsync("the available daily specials are requested", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
+#line 32
+            await testRunner.WhenAsync("the available daily specials are requested", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
 #line hidden
-#line 27
-        await testRunner.ThenAsync("the lemon ricotta special should have one fewer remaining", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
+#line 33
+            await testRunner.ThenAsync("the lemon ricotta special should have one fewer remaining", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
 #line hidden
             }
             await this.ScenarioCleanupAsync();

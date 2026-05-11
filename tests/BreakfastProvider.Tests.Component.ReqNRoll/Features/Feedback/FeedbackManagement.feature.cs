@@ -145,9 +145,9 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.Feedback
             string pickleIndex = "0";
             global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("Submitting feedback should return the created feedback", null, tagsOfScenario, argumentsOfScenario, featureTags, pickleIndex);
             string[] tagsOfRule = ((string[])(null));
-            global::Reqnroll.RuleInfo ruleInfo = null;
-#line 5
-    this.ScenarioInitialize(scenarioInfo, ruleInfo);
+            global::Reqnroll.RuleInfo ruleInfo = new global::Reqnroll.RuleInfo("Feedback can be submitted and retrieved", null, tagsOfRule);
+#line 7
+        this.ScenarioInitialize(scenarioInfo, ruleInfo);
 #line hidden
             if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
             {
@@ -156,14 +156,14 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.Feedback
             else
             {
                 await this.ScenarioStartAsync();
-#line 6
-        await testRunner.GivenAsync("a valid feedback request", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
-#line hidden
-#line 7
-        await testRunner.WhenAsync("the feedback is submitted", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
-#line hidden
 #line 8
-        await testRunner.ThenAsync("the feedback response should contain the created feedback", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
+            await testRunner.GivenAsync("a valid feedback request", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
+#line hidden
+#line 9
+            await testRunner.WhenAsync("the feedback is submitted", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
+#line hidden
+#line 10
+            await testRunner.ThenAsync("the feedback response should contain the created feedback", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
 #line hidden
             }
             await this.ScenarioCleanupAsync();
@@ -179,9 +179,9 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.Feedback
             string pickleIndex = "1";
             global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("Retrieving existing feedback by id should return the feedback", null, tagsOfScenario, argumentsOfScenario, featureTags, pickleIndex);
             string[] tagsOfRule = ((string[])(null));
-            global::Reqnroll.RuleInfo ruleInfo = null;
-#line 10
-    this.ScenarioInitialize(scenarioInfo, ruleInfo);
+            global::Reqnroll.RuleInfo ruleInfo = new global::Reqnroll.RuleInfo("Feedback can be submitted and retrieved", null, tagsOfRule);
+#line 12
+        this.ScenarioInitialize(scenarioInfo, ruleInfo);
 #line hidden
             if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
             {
@@ -190,14 +190,14 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.Feedback
             else
             {
                 await this.ScenarioStartAsync();
-#line 11
-        await testRunner.GivenAsync("a feedback entry exists", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
-#line hidden
-#line 12
-        await testRunner.WhenAsync("the feedback is retrieved by id", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
-#line hidden
 #line 13
-        await testRunner.ThenAsync("the feedback get response should contain the feedback", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
+            await testRunner.GivenAsync("a feedback entry exists", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
+#line hidden
+#line 14
+            await testRunner.WhenAsync("the feedback is retrieved by id", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
+#line hidden
+#line 15
+            await testRunner.ThenAsync("the feedback get response should contain the feedback", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
 #line hidden
             }
             await this.ScenarioCleanupAsync();
@@ -213,9 +213,9 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.Feedback
             string pickleIndex = "2";
             global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("Listing feedback for an order should return the feedback", null, tagsOfScenario, argumentsOfScenario, featureTags, pickleIndex);
             string[] tagsOfRule = ((string[])(null));
-            global::Reqnroll.RuleInfo ruleInfo = null;
-#line 15
-    this.ScenarioInitialize(scenarioInfo, ruleInfo);
+            global::Reqnroll.RuleInfo ruleInfo = new global::Reqnroll.RuleInfo("Feedback can be submitted and retrieved", null, tagsOfRule);
+#line 17
+        this.ScenarioInitialize(scenarioInfo, ruleInfo);
 #line hidden
             if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
             {
@@ -224,14 +224,14 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.Feedback
             else
             {
                 await this.ScenarioStartAsync();
-#line 16
-        await testRunner.GivenAsync("a feedback entry exists", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
-#line hidden
-#line 17
-        await testRunner.WhenAsync("the feedback is retrieved by order id", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
-#line hidden
 #line 18
-        await testRunner.ThenAsync("the feedback list response should contain the feedback", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
+            await testRunner.GivenAsync("a feedback entry exists", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
+#line hidden
+#line 19
+            await testRunner.WhenAsync("the feedback is retrieved by order id", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
+#line hidden
+#line 20
+            await testRunner.ThenAsync("the feedback list response should contain the feedback", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
 #line hidden
             }
             await this.ScenarioCleanupAsync();
@@ -247,9 +247,9 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.Feedback
             string pickleIndex = "3";
             global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("Retrieving non-existent feedback should return not found", null, tagsOfScenario, argumentsOfScenario, featureTags, pickleIndex);
             string[] tagsOfRule = ((string[])(null));
-            global::Reqnroll.RuleInfo ruleInfo = null;
-#line 20
-    this.ScenarioInitialize(scenarioInfo, ruleInfo);
+            global::Reqnroll.RuleInfo ruleInfo = new global::Reqnroll.RuleInfo("Non-existent feedback cannot be retrieved", null, tagsOfRule);
+#line 24
+        this.ScenarioInitialize(scenarioInfo, ruleInfo);
 #line hidden
             if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
             {
@@ -258,11 +258,11 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.Feedback
             else
             {
                 await this.ScenarioStartAsync();
-#line 21
-        await testRunner.WhenAsync("a non-existent feedback is retrieved", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
+#line 25
+            await testRunner.WhenAsync("a non-existent feedback is retrieved", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
 #line hidden
-#line 22
-        await testRunner.ThenAsync("the feedback get response should indicate not found", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
+#line 26
+            await testRunner.ThenAsync("the feedback get response should indicate not found", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
 #line hidden
             }
             await this.ScenarioCleanupAsync();
@@ -278,9 +278,9 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.Feedback
             string pickleIndex = "4";
             global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("Submitting feedback with missing customer name should return bad request", null, tagsOfScenario, argumentsOfScenario, featureTags, pickleIndex);
             string[] tagsOfRule = ((string[])(null));
-            global::Reqnroll.RuleInfo ruleInfo = null;
-#line 24
-    this.ScenarioInitialize(scenarioInfo, ruleInfo);
+            global::Reqnroll.RuleInfo ruleInfo = new global::Reqnroll.RuleInfo("Feedback requests must pass validation", null, tagsOfRule);
+#line 30
+        this.ScenarioInitialize(scenarioInfo, ruleInfo);
 #line hidden
             if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
             {
@@ -289,14 +289,14 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.Feedback
             else
             {
                 await this.ScenarioStartAsync();
-#line 25
-        await testRunner.GivenAsync("a feedback request with missing customer name", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
+#line 31
+            await testRunner.GivenAsync("a feedback request with missing customer name", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
 #line hidden
-#line 26
-        await testRunner.WhenAsync("the feedback is submitted", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
+#line 32
+            await testRunner.WhenAsync("the feedback is submitted", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
 #line hidden
-#line 27
-        await testRunner.ThenAsync("the feedback response should indicate bad request", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
+#line 33
+            await testRunner.ThenAsync("the feedback response should indicate bad request", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
 #line hidden
             }
             await this.ScenarioCleanupAsync();
@@ -312,9 +312,9 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.Feedback
             string pickleIndex = "5";
             global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("Submitting feedback with invalid rating should return bad request", null, tagsOfScenario, argumentsOfScenario, featureTags, pickleIndex);
             string[] tagsOfRule = ((string[])(null));
-            global::Reqnroll.RuleInfo ruleInfo = null;
-#line 29
-    this.ScenarioInitialize(scenarioInfo, ruleInfo);
+            global::Reqnroll.RuleInfo ruleInfo = new global::Reqnroll.RuleInfo("Feedback requests must pass validation", null, tagsOfRule);
+#line 35
+        this.ScenarioInitialize(scenarioInfo, ruleInfo);
 #line hidden
             if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
             {
@@ -323,14 +323,14 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.Feedback
             else
             {
                 await this.ScenarioStartAsync();
-#line 30
-        await testRunner.GivenAsync("a feedback request with an invalid rating", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
+#line 36
+            await testRunner.GivenAsync("a feedback request with an invalid rating", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
 #line hidden
-#line 31
-        await testRunner.WhenAsync("the feedback is submitted", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
+#line 37
+            await testRunner.WhenAsync("the feedback is submitted", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
 #line hidden
-#line 32
-        await testRunner.ThenAsync("the feedback response should indicate bad request", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
+#line 38
+            await testRunner.ThenAsync("the feedback response should indicate bad request", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
 #line hidden
             }
             await this.ScenarioCleanupAsync();

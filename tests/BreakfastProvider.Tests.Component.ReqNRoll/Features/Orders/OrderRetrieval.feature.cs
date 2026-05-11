@@ -147,9 +147,9 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.Orders
             string pickleIndex = "0";
             global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("A created order should be retrievable by its ID", null, tagsOfScenario, argumentsOfScenario, featureTags, pickleIndex);
             string[] tagsOfRule = ((string[])(null));
-            global::Reqnroll.RuleInfo ruleInfo = null;
-#line 5
-    this.ScenarioInitialize(scenarioInfo, ruleInfo);
+            global::Reqnroll.RuleInfo ruleInfo = new global::Reqnroll.RuleInfo("Existing orders can be retrieved", null, tagsOfRule);
+#line 7
+        this.ScenarioInitialize(scenarioInfo, ruleInfo);
 #line hidden
             if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
             {
@@ -158,14 +158,14 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.Orders
             else
             {
                 await this.ScenarioStartAsync();
-#line 6
-        await testRunner.GivenAsync("an order has been created", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
-#line hidden
-#line 7
-        await testRunner.WhenAsync("the order is retrieved by id", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
-#line hidden
 #line 8
-        await testRunner.ThenAsync("the order retrieval response should contain the order", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
+            await testRunner.GivenAsync("an order has been created", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
+#line hidden
+#line 9
+            await testRunner.WhenAsync("the order is retrieved by id", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
+#line hidden
+#line 10
+            await testRunner.ThenAsync("the order retrieval response should contain the order", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
 #line hidden
             }
             await this.ScenarioCleanupAsync();
@@ -181,9 +181,9 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.Orders
             string pickleIndex = "1";
             global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("Retrieving a non-existent order should return not found", null, tagsOfScenario, argumentsOfScenario, featureTags, pickleIndex);
             string[] tagsOfRule = ((string[])(null));
-            global::Reqnroll.RuleInfo ruleInfo = null;
-#line 10
-    this.ScenarioInitialize(scenarioInfo, ruleInfo);
+            global::Reqnroll.RuleInfo ruleInfo = new global::Reqnroll.RuleInfo("Non-existent orders return not found", null, tagsOfRule);
+#line 14
+        this.ScenarioInitialize(scenarioInfo, ruleInfo);
 #line hidden
             if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
             {
@@ -192,11 +192,11 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.Orders
             else
             {
                 await this.ScenarioStartAsync();
-#line 11
-        await testRunner.WhenAsync("a non-existent order is retrieved", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
+#line 15
+            await testRunner.WhenAsync("a non-existent order is retrieved", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
 #line hidden
-#line 12
-        await testRunner.ThenAsync("the order retrieval response should indicate not found", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
+#line 16
+            await testRunner.ThenAsync("the order retrieval response should indicate not found", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
 #line hidden
             }
             await this.ScenarioCleanupAsync();

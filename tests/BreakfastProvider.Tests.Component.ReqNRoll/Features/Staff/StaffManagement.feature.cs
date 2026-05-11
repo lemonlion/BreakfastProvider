@@ -145,9 +145,9 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.Staff
             string pickleIndex = "0";
             global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("Adding a new staff member should return the created member", null, tagsOfScenario, argumentsOfScenario, featureTags, pickleIndex);
             string[] tagsOfRule = ((string[])(null));
-            global::Reqnroll.RuleInfo ruleInfo = null;
-#line 5
-    this.ScenarioInitialize(scenarioInfo, ruleInfo);
+            global::Reqnroll.RuleInfo ruleInfo = new global::Reqnroll.RuleInfo("Staff members support CRUD operations", null, tagsOfRule);
+#line 7
+        this.ScenarioInitialize(scenarioInfo, ruleInfo);
 #line hidden
             if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
             {
@@ -156,14 +156,14 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.Staff
             else
             {
                 await this.ScenarioStartAsync();
-#line 6
-        await testRunner.GivenAsync("a valid staff member request", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
-#line hidden
-#line 7
-        await testRunner.WhenAsync("the staff member is submitted", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
-#line hidden
 #line 8
-        await testRunner.ThenAsync("the staff response should contain the created member", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
+            await testRunner.GivenAsync("a valid staff member request", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
+#line hidden
+#line 9
+            await testRunner.WhenAsync("the staff member is submitted", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
+#line hidden
+#line 10
+            await testRunner.ThenAsync("the staff response should contain the created member", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
 #line hidden
             }
             await this.ScenarioCleanupAsync();
@@ -179,9 +179,9 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.Staff
             string pickleIndex = "1";
             global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("Retrieving an existing staff member should return the member", null, tagsOfScenario, argumentsOfScenario, featureTags, pickleIndex);
             string[] tagsOfRule = ((string[])(null));
-            global::Reqnroll.RuleInfo ruleInfo = null;
-#line 10
-    this.ScenarioInitialize(scenarioInfo, ruleInfo);
+            global::Reqnroll.RuleInfo ruleInfo = new global::Reqnroll.RuleInfo("Staff members support CRUD operations", null, tagsOfRule);
+#line 12
+        this.ScenarioInitialize(scenarioInfo, ruleInfo);
 #line hidden
             if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
             {
@@ -190,14 +190,14 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.Staff
             else
             {
                 await this.ScenarioStartAsync();
-#line 11
-        await testRunner.GivenAsync("a staff member exists", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
-#line hidden
-#line 12
-        await testRunner.WhenAsync("the staff member is retrieved by id", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
-#line hidden
 #line 13
-        await testRunner.ThenAsync("the staff get response should contain the member", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
+            await testRunner.GivenAsync("a staff member exists", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
+#line hidden
+#line 14
+            await testRunner.WhenAsync("the staff member is retrieved by id", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
+#line hidden
+#line 15
+            await testRunner.ThenAsync("the staff get response should contain the member", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
 #line hidden
             }
             await this.ScenarioCleanupAsync();
@@ -213,9 +213,9 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.Staff
             string pickleIndex = "2";
             global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("Deleting a staff member should return no content", null, tagsOfScenario, argumentsOfScenario, featureTags, pickleIndex);
             string[] tagsOfRule = ((string[])(null));
-            global::Reqnroll.RuleInfo ruleInfo = null;
-#line 15
-    this.ScenarioInitialize(scenarioInfo, ruleInfo);
+            global::Reqnroll.RuleInfo ruleInfo = new global::Reqnroll.RuleInfo("Staff members support CRUD operations", null, tagsOfRule);
+#line 17
+        this.ScenarioInitialize(scenarioInfo, ruleInfo);
 #line hidden
             if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
             {
@@ -224,14 +224,14 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.Staff
             else
             {
                 await this.ScenarioStartAsync();
-#line 16
-        await testRunner.GivenAsync("a staff member exists", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
-#line hidden
-#line 17
-        await testRunner.WhenAsync("the staff member is deleted", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
-#line hidden
 #line 18
-        await testRunner.ThenAsync("the staff delete response should indicate no content", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
+            await testRunner.GivenAsync("a staff member exists", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
+#line hidden
+#line 19
+            await testRunner.WhenAsync("the staff member is deleted", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
+#line hidden
+#line 20
+            await testRunner.ThenAsync("the staff delete response should indicate no content", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
 #line hidden
             }
             await this.ScenarioCleanupAsync();
@@ -247,9 +247,9 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.Staff
             string pickleIndex = "3";
             global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("Adding a staff member with an invalid role should return a bad request response", null, tagsOfScenario, argumentsOfScenario, featureTags, pickleIndex);
             string[] tagsOfRule = ((string[])(null));
-            global::Reqnroll.RuleInfo ruleInfo = null;
-#line 20
-    this.ScenarioInitialize(scenarioInfo, ruleInfo);
+            global::Reqnroll.RuleInfo ruleInfo = new global::Reqnroll.RuleInfo("Staff requests must pass validation", null, tagsOfRule);
+#line 24
+        this.ScenarioInitialize(scenarioInfo, ruleInfo);
 #line hidden
             if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
             {
@@ -258,14 +258,14 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.Staff
             else
             {
                 await this.ScenarioStartAsync();
-#line 21
-        await testRunner.GivenAsync("a staff member request with an invalid role", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
+#line 25
+            await testRunner.GivenAsync("a staff member request with an invalid role", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
 #line hidden
-#line 22
-        await testRunner.WhenAsync("the staff member is submitted", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
+#line 26
+            await testRunner.WhenAsync("the staff member is submitted", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
 #line hidden
-#line 23
-        await testRunner.ThenAsync("the staff response should indicate bad request", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
+#line 27
+            await testRunner.ThenAsync("the staff response should indicate bad request", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
 #line hidden
             }
             await this.ScenarioCleanupAsync();

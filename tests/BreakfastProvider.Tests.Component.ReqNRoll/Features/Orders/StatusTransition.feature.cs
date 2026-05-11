@@ -149,9 +149,9 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.Orders
             string pickleIndex = @__pickleIndex;
             global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("A valid status transition should update the order", null, tagsOfScenario, argumentsOfScenario, featureTags, pickleIndex);
             string[] tagsOfRule = ((string[])(null));
-            global::Reqnroll.RuleInfo ruleInfo = null;
-#line 4
-    this.ScenarioInitialize(scenarioInfo, ruleInfo);
+            global::Reqnroll.RuleInfo ruleInfo = new global::Reqnroll.RuleInfo("Valid status transitions are accepted", null, tagsOfRule);
+#line 6
+        this.ScenarioInitialize(scenarioInfo, ruleInfo);
 #line hidden
             if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
             {
@@ -160,14 +160,14 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.Orders
             else
             {
                 await this.ScenarioStartAsync();
-#line 5
-        await testRunner.GivenAsync(string.Format("an order exists with status \"{0}\"", fromStatus), ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
-#line hidden
-#line 6
-        await testRunner.WhenAsync(string.Format("the order status is updated to \"{0}\"", toStatus), ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
-#line hidden
 #line 7
-        await testRunner.ThenAsync(string.Format("the order status should be updated successfully to \"{0}\"", toStatus), ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
+            await testRunner.GivenAsync(string.Format("an order exists with status \"{0}\"", fromStatus), ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
+#line hidden
+#line 8
+            await testRunner.WhenAsync(string.Format("the order status is updated to \"{0}\"", toStatus), ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
+#line hidden
+#line 9
+            await testRunner.ThenAsync(string.Format("the order status should be updated successfully to \"{0}\"", toStatus), ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
 #line hidden
             }
             await this.ScenarioCleanupAsync();
@@ -192,9 +192,9 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.Orders
             string pickleIndex = @__pickleIndex;
             global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("An invalid status transition should return a conflict response", null, tagsOfScenario, argumentsOfScenario, featureTags, pickleIndex);
             string[] tagsOfRule = ((string[])(null));
-            global::Reqnroll.RuleInfo ruleInfo = null;
-#line 16
-    this.ScenarioInitialize(scenarioInfo, ruleInfo);
+            global::Reqnroll.RuleInfo ruleInfo = new global::Reqnroll.RuleInfo("Invalid status transitions are rejected", null, tagsOfRule);
+#line 20
+        this.ScenarioInitialize(scenarioInfo, ruleInfo);
 #line hidden
             if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
             {
@@ -203,14 +203,14 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.Orders
             else
             {
                 await this.ScenarioStartAsync();
-#line 17
-        await testRunner.GivenAsync(string.Format("an order exists with status \"{0}\"", fromStatus), ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
+#line 21
+            await testRunner.GivenAsync(string.Format("an order exists with status \"{0}\"", fromStatus), ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
 #line hidden
-#line 18
-        await testRunner.WhenAsync(string.Format("the order status is updated to \"{0}\"", toStatus), ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
+#line 22
+            await testRunner.WhenAsync(string.Format("the order status is updated to \"{0}\"", toStatus), ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
 #line hidden
-#line 19
-        await testRunner.ThenAsync("the response should indicate an invalid state transition", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
+#line 23
+            await testRunner.ThenAsync("the response should indicate an invalid state transition", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
 #line hidden
             }
             await this.ScenarioCleanupAsync();

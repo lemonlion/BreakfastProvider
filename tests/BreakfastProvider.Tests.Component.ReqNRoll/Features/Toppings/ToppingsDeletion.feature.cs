@@ -145,9 +145,9 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.Toppings
             string pickleIndex = "0";
             global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("Deleting an existing topping should return no content", null, tagsOfScenario, argumentsOfScenario, featureTags, pickleIndex);
             string[] tagsOfRule = ((string[])(null));
-            global::Reqnroll.RuleInfo ruleInfo = null;
-#line 5
-    this.ScenarioInitialize(scenarioInfo, ruleInfo);
+            global::Reqnroll.RuleInfo ruleInfo = new global::Reqnroll.RuleInfo("Existing toppings can be deleted", null, tagsOfRule);
+#line 7
+        this.ScenarioInitialize(scenarioInfo, ruleInfo);
 #line hidden
             if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
             {
@@ -156,14 +156,14 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.Toppings
             else
             {
                 await this.ScenarioStartAsync();
-#line 6
-        await testRunner.GivenAsync("a known topping exists", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
-#line hidden
-#line 7
-        await testRunner.WhenAsync("the topping is deleted", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
-#line hidden
 #line 8
-        await testRunner.ThenAsync("the delete response should indicate success", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
+            await testRunner.GivenAsync("a known topping exists", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
+#line hidden
+#line 9
+            await testRunner.WhenAsync("the topping is deleted", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
+#line hidden
+#line 10
+            await testRunner.ThenAsync("the delete response should indicate success", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
 #line hidden
             }
             await this.ScenarioCleanupAsync();
@@ -179,9 +179,9 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.Toppings
             string pickleIndex = "1";
             global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("Deleting a non-existent topping should return not found", null, tagsOfScenario, argumentsOfScenario, featureTags, pickleIndex);
             string[] tagsOfRule = ((string[])(null));
-            global::Reqnroll.RuleInfo ruleInfo = null;
-#line 10
-    this.ScenarioInitialize(scenarioInfo, ruleInfo);
+            global::Reqnroll.RuleInfo ruleInfo = new global::Reqnroll.RuleInfo("Non-existent toppings cannot be deleted", null, tagsOfRule);
+#line 14
+        this.ScenarioInitialize(scenarioInfo, ruleInfo);
 #line hidden
             if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
             {
@@ -190,14 +190,14 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.Toppings
             else
             {
                 await this.ScenarioStartAsync();
-#line 11
-        await testRunner.GivenAsync("a topping id that does not exist", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
+#line 15
+            await testRunner.GivenAsync("a topping id that does not exist", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
 #line hidden
-#line 12
-        await testRunner.WhenAsync("the topping is deleted", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
+#line 16
+            await testRunner.WhenAsync("the topping is deleted", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
 #line hidden
-#line 13
-        await testRunner.ThenAsync("the delete response should indicate not found", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
+#line 17
+            await testRunner.ThenAsync("the delete response should indicate not found", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
 #line hidden
             }
             await this.ScenarioCleanupAsync();

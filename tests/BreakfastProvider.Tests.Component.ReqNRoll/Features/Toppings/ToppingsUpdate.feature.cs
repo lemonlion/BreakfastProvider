@@ -145,9 +145,9 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.Toppings
             string pickleIndex = "0";
             global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("Updating an existing topping should return the updated topping", null, tagsOfScenario, argumentsOfScenario, featureTags, pickleIndex);
             string[] tagsOfRule = ((string[])(null));
-            global::Reqnroll.RuleInfo ruleInfo = null;
-#line 5
-    this.ScenarioInitialize(scenarioInfo, ruleInfo);
+            global::Reqnroll.RuleInfo ruleInfo = new global::Reqnroll.RuleInfo("Existing toppings can be updated", null, tagsOfRule);
+#line 7
+        this.ScenarioInitialize(scenarioInfo, ruleInfo);
 #line hidden
             if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
             {
@@ -156,17 +156,17 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.Toppings
             else
             {
                 await this.ScenarioStartAsync();
-#line 6
-        await testRunner.GivenAsync("a known blueberry topping exists", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
-#line hidden
-#line 7
-        await testRunner.AndAsync("a valid update topping request", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
-#line hidden
 #line 8
-        await testRunner.WhenAsync("the topping is updated", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
+            await testRunner.GivenAsync("a known blueberry topping exists", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
 #line hidden
 #line 9
-        await testRunner.ThenAsync("the update response should contain the updated topping", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
+            await testRunner.AndAsync("a valid update topping request", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
+#line hidden
+#line 10
+            await testRunner.WhenAsync("the topping is updated", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
+#line hidden
+#line 11
+            await testRunner.ThenAsync("the update response should contain the updated topping", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
 #line hidden
             }
             await this.ScenarioCleanupAsync();
@@ -182,9 +182,9 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.Toppings
             string pickleIndex = "1";
             global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("Updating a non-existent topping should return not found", null, tagsOfScenario, argumentsOfScenario, featureTags, pickleIndex);
             string[] tagsOfRule = ((string[])(null));
-            global::Reqnroll.RuleInfo ruleInfo = null;
-#line 11
-    this.ScenarioInitialize(scenarioInfo, ruleInfo);
+            global::Reqnroll.RuleInfo ruleInfo = new global::Reqnroll.RuleInfo("Non-existent toppings cannot be updated", null, tagsOfRule);
+#line 15
+        this.ScenarioInitialize(scenarioInfo, ruleInfo);
 #line hidden
             if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
             {
@@ -193,17 +193,17 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.Toppings
             else
             {
                 await this.ScenarioStartAsync();
-#line 12
-        await testRunner.GivenAsync("a topping id that does not exist", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
+#line 16
+            await testRunner.GivenAsync("a topping id that does not exist", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
 #line hidden
-#line 13
-        await testRunner.AndAsync("a valid update topping request", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
+#line 17
+            await testRunner.AndAsync("a valid update topping request", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
 #line hidden
-#line 14
-        await testRunner.WhenAsync("the topping is updated", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
+#line 18
+            await testRunner.WhenAsync("the topping is updated", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
 #line hidden
-#line 15
-        await testRunner.ThenAsync("the update response should indicate not found", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
+#line 19
+            await testRunner.ThenAsync("the update response should indicate not found", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
 #line hidden
             }
             await this.ScenarioCleanupAsync();
@@ -230,9 +230,9 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.Toppings
             string pickleIndex = @__pickleIndex;
             global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("Update toppings endpoint is called with invalid or dangerous input", null, tagsOfScenario, argumentsOfScenario, featureTags, pickleIndex);
             string[] tagsOfRule = ((string[])(null));
-            global::Reqnroll.RuleInfo ruleInfo = null;
-#line 17
-    this.ScenarioInitialize(scenarioInfo, ruleInfo);
+            global::Reqnroll.RuleInfo ruleInfo = new global::Reqnroll.RuleInfo("Update requests must pass validation and XSS checks", null, tagsOfRule);
+#line 23
+        this.ScenarioInitialize(scenarioInfo, ruleInfo);
 #line hidden
             if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
             {
@@ -241,17 +241,17 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.Toppings
             else
             {
                 await this.ScenarioStartAsync();
-#line 18
-        await testRunner.GivenAsync("a known topping exists", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
+#line 24
+            await testRunner.GivenAsync("a known topping exists", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
 #line hidden
-#line 19
-        await testRunner.AndAsync(string.Format("a valid update topping request with \"{0}\" set to \"{1}\"", field, value), ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
+#line 25
+            await testRunner.AndAsync(string.Format("a valid update topping request with \"{0}\" set to \"{1}\"", field, value), ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
 #line hidden
-#line 20
-        await testRunner.WhenAsync("the invalid update topping request is submitted", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
+#line 26
+            await testRunner.WhenAsync("the invalid update topping request is submitted", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
 #line hidden
-#line 21
-        await testRunner.ThenAsync(string.Format("the update response should contain error \"{0}\" with status \"{1}\"", errorMessage, responseStatus), ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
+#line 27
+            await testRunner.ThenAsync(string.Format("the update response should contain error \"{0}\" with status \"{1}\"", errorMessage, responseStatus), ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
 #line hidden
             }
             await this.ScenarioCleanupAsync();

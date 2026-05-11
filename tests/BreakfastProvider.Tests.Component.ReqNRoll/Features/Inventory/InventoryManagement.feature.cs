@@ -145,9 +145,9 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.Inventory
             string pickleIndex = "0";
             global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("Adding a new inventory item should return the created item", null, tagsOfScenario, argumentsOfScenario, featureTags, pickleIndex);
             string[] tagsOfRule = ((string[])(null));
-            global::Reqnroll.RuleInfo ruleInfo = null;
-#line 5
-    this.ScenarioInitialize(scenarioInfo, ruleInfo);
+            global::Reqnroll.RuleInfo ruleInfo = new global::Reqnroll.RuleInfo("Inventory items support full CRUD operations", null, tagsOfRule);
+#line 7
+        this.ScenarioInitialize(scenarioInfo, ruleInfo);
 #line hidden
             if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
             {
@@ -156,14 +156,14 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.Inventory
             else
             {
                 await this.ScenarioStartAsync();
-#line 6
-        await testRunner.GivenAsync("a valid inventory item request", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
-#line hidden
-#line 7
-        await testRunner.WhenAsync("the inventory item is submitted", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
-#line hidden
 #line 8
-        await testRunner.ThenAsync("the inventory response should contain the created item", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
+            await testRunner.GivenAsync("a valid inventory item request", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
+#line hidden
+#line 9
+            await testRunner.WhenAsync("the inventory item is submitted", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
+#line hidden
+#line 10
+            await testRunner.ThenAsync("the inventory response should contain the created item", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
 #line hidden
             }
             await this.ScenarioCleanupAsync();
@@ -179,9 +179,9 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.Inventory
             string pickleIndex = "1";
             global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("Retrieving an existing inventory item should return the item", null, tagsOfScenario, argumentsOfScenario, featureTags, pickleIndex);
             string[] tagsOfRule = ((string[])(null));
-            global::Reqnroll.RuleInfo ruleInfo = null;
-#line 10
-    this.ScenarioInitialize(scenarioInfo, ruleInfo);
+            global::Reqnroll.RuleInfo ruleInfo = new global::Reqnroll.RuleInfo("Inventory items support full CRUD operations", null, tagsOfRule);
+#line 12
+        this.ScenarioInitialize(scenarioInfo, ruleInfo);
 #line hidden
             if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
             {
@@ -190,14 +190,14 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.Inventory
             else
             {
                 await this.ScenarioStartAsync();
-#line 11
-        await testRunner.GivenAsync("an inventory item exists", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
-#line hidden
-#line 12
-        await testRunner.WhenAsync("the inventory item is retrieved by id", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
-#line hidden
 #line 13
-        await testRunner.ThenAsync("the inventory get response should contain the item", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
+            await testRunner.GivenAsync("an inventory item exists", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
+#line hidden
+#line 14
+            await testRunner.WhenAsync("the inventory item is retrieved by id", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
+#line hidden
+#line 15
+            await testRunner.ThenAsync("the inventory get response should contain the item", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
 #line hidden
             }
             await this.ScenarioCleanupAsync();
@@ -213,9 +213,9 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.Inventory
             string pickleIndex = "2";
             global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("Listing all inventory items should return all items", null, tagsOfScenario, argumentsOfScenario, featureTags, pickleIndex);
             string[] tagsOfRule = ((string[])(null));
-            global::Reqnroll.RuleInfo ruleInfo = null;
-#line 15
-    this.ScenarioInitialize(scenarioInfo, ruleInfo);
+            global::Reqnroll.RuleInfo ruleInfo = new global::Reqnroll.RuleInfo("Inventory items support full CRUD operations", null, tagsOfRule);
+#line 17
+        this.ScenarioInitialize(scenarioInfo, ruleInfo);
 #line hidden
             if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
             {
@@ -224,14 +224,14 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.Inventory
             else
             {
                 await this.ScenarioStartAsync();
-#line 16
-        await testRunner.GivenAsync("an inventory item exists", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
-#line hidden
-#line 17
-        await testRunner.WhenAsync("all inventory items are requested", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
-#line hidden
 #line 18
-        await testRunner.ThenAsync("the inventory list response should contain the item", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
+            await testRunner.GivenAsync("an inventory item exists", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
+#line hidden
+#line 19
+            await testRunner.WhenAsync("all inventory items are requested", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
+#line hidden
+#line 20
+            await testRunner.ThenAsync("the inventory list response should contain the item", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
 #line hidden
             }
             await this.ScenarioCleanupAsync();
@@ -247,9 +247,9 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.Inventory
             string pickleIndex = "3";
             global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("Updating an inventory item should return the updated item", null, tagsOfScenario, argumentsOfScenario, featureTags, pickleIndex);
             string[] tagsOfRule = ((string[])(null));
-            global::Reqnroll.RuleInfo ruleInfo = null;
-#line 20
-    this.ScenarioInitialize(scenarioInfo, ruleInfo);
+            global::Reqnroll.RuleInfo ruleInfo = new global::Reqnroll.RuleInfo("Inventory items support full CRUD operations", null, tagsOfRule);
+#line 22
+        this.ScenarioInitialize(scenarioInfo, ruleInfo);
 #line hidden
             if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
             {
@@ -258,14 +258,14 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.Inventory
             else
             {
                 await this.ScenarioStartAsync();
-#line 21
-        await testRunner.GivenAsync("an inventory item exists", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
-#line hidden
-#line 22
-        await testRunner.WhenAsync("the inventory item is updated", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
-#line hidden
 #line 23
-        await testRunner.ThenAsync("the inventory update response should contain the updated values", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
+            await testRunner.GivenAsync("an inventory item exists", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
+#line hidden
+#line 24
+            await testRunner.WhenAsync("the inventory item is updated", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
+#line hidden
+#line 25
+            await testRunner.ThenAsync("the inventory update response should contain the updated values", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
 #line hidden
             }
             await this.ScenarioCleanupAsync();
@@ -281,9 +281,9 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.Inventory
             string pickleIndex = "4";
             global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("Deleting an inventory item should return no content", null, tagsOfScenario, argumentsOfScenario, featureTags, pickleIndex);
             string[] tagsOfRule = ((string[])(null));
-            global::Reqnroll.RuleInfo ruleInfo = null;
-#line 25
-    this.ScenarioInitialize(scenarioInfo, ruleInfo);
+            global::Reqnroll.RuleInfo ruleInfo = new global::Reqnroll.RuleInfo("Inventory items support full CRUD operations", null, tagsOfRule);
+#line 27
+        this.ScenarioInitialize(scenarioInfo, ruleInfo);
 #line hidden
             if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
             {
@@ -292,14 +292,14 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.Inventory
             else
             {
                 await this.ScenarioStartAsync();
-#line 26
-        await testRunner.GivenAsync("an inventory item exists", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
-#line hidden
-#line 27
-        await testRunner.WhenAsync("the inventory item is deleted", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
-#line hidden
 #line 28
-        await testRunner.ThenAsync("the inventory delete response should indicate no content", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
+            await testRunner.GivenAsync("an inventory item exists", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
+#line hidden
+#line 29
+            await testRunner.WhenAsync("the inventory item is deleted", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
+#line hidden
+#line 30
+            await testRunner.ThenAsync("the inventory delete response should indicate no content", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
 #line hidden
             }
             await this.ScenarioCleanupAsync();
@@ -315,9 +315,9 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.Inventory
             string pickleIndex = "5";
             global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("Retrieving a non-existent inventory item should return not found", null, tagsOfScenario, argumentsOfScenario, featureTags, pickleIndex);
             string[] tagsOfRule = ((string[])(null));
-            global::Reqnroll.RuleInfo ruleInfo = null;
-#line 30
-    this.ScenarioInitialize(scenarioInfo, ruleInfo);
+            global::Reqnroll.RuleInfo ruleInfo = new global::Reqnroll.RuleInfo("Non-existent inventory items cannot be retrieved", null, tagsOfRule);
+#line 34
+        this.ScenarioInitialize(scenarioInfo, ruleInfo);
 #line hidden
             if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
             {
@@ -326,11 +326,11 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.Inventory
             else
             {
                 await this.ScenarioStartAsync();
-#line 31
-        await testRunner.WhenAsync("a non-existent inventory item is retrieved", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
+#line 35
+            await testRunner.WhenAsync("a non-existent inventory item is retrieved", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
 #line hidden
-#line 32
-        await testRunner.ThenAsync("the inventory get response should indicate not found", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
+#line 36
+            await testRunner.ThenAsync("the inventory get response should indicate not found", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
 #line hidden
             }
             await this.ScenarioCleanupAsync();

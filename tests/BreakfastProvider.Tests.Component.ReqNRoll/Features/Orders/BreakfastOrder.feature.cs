@@ -145,9 +145,9 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.Orders
             string pickleIndex = "0";
             global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("A valid order should be created and an event published", null, tagsOfScenario, argumentsOfScenario, featureTags, pickleIndex);
             string[] tagsOfRule = ((string[])(null));
-            global::Reqnroll.RuleInfo ruleInfo = null;
-#line 5
-    this.ScenarioInitialize(scenarioInfo, ruleInfo);
+            global::Reqnroll.RuleInfo ruleInfo = new global::Reqnroll.RuleInfo("Creating an order publishes events and notifies the kitchen", null, tagsOfRule);
+#line 7
+        this.ScenarioInitialize(scenarioInfo, ruleInfo);
 #line hidden
             if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
             {
@@ -156,23 +156,23 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.Orders
             else
             {
                 await this.ScenarioStartAsync();
-#line 6
-        await testRunner.GivenAsync("a pancake batch has been created", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
-#line hidden
-#line 7
-        await testRunner.AndAsync("a valid order request for the created batch", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
-#line hidden
 #line 8
-        await testRunner.WhenAsync("the breakfast order is placed", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
+            await testRunner.GivenAsync("a pancake batch has been created", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
 #line hidden
 #line 9
-        await testRunner.ThenAsync("the order response should contain a complete order", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
+            await testRunner.AndAsync("a valid order request for the created batch", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
 #line hidden
 #line 10
-        await testRunner.AndAsync("an order created event should have been published", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
+            await testRunner.WhenAsync("the breakfast order is placed", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
 #line hidden
 #line 11
-        await testRunner.AndAsync("the kitchen service should have received a preparation request", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
+            await testRunner.ThenAsync("the order response should contain a complete order", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
+#line hidden
+#line 12
+            await testRunner.AndAsync("an order created event should have been published", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
+#line hidden
+#line 13
+            await testRunner.AndAsync("the kitchen service should have received a preparation request", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
 #line hidden
             }
             await this.ScenarioCleanupAsync();
@@ -188,9 +188,9 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.Orders
             string pickleIndex = "1";
             global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("Creating an order should produce an audit log entry and events", null, tagsOfScenario, argumentsOfScenario, featureTags, pickleIndex);
             string[] tagsOfRule = ((string[])(null));
-            global::Reqnroll.RuleInfo ruleInfo = null;
-#line 13
-    this.ScenarioInitialize(scenarioInfo, ruleInfo);
+            global::Reqnroll.RuleInfo ruleInfo = new global::Reqnroll.RuleInfo("Creating an order produces audit and recipe logs", null, tagsOfRule);
+#line 17
+        this.ScenarioInitialize(scenarioInfo, ruleInfo);
 #line hidden
             if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
             {
@@ -199,23 +199,23 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.Orders
             else
             {
                 await this.ScenarioStartAsync();
-#line 14
-        await testRunner.GivenAsync("a pancake batch has been created", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
-#line hidden
-#line 15
-        await testRunner.AndAsync("a valid order request for the created batch", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
-#line hidden
-#line 16
-        await testRunner.WhenAsync("the breakfast order is placed", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
-#line hidden
-#line 17
-        await testRunner.ThenAsync("the order response should contain a complete order", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
-#line hidden
 #line 18
-        await testRunner.AndAsync("an order created event should have been published", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
+            await testRunner.GivenAsync("a pancake batch has been created", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
 #line hidden
 #line 19
-        await testRunner.AndAsync("a recipe log should have been published to kafka", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
+            await testRunner.AndAsync("a valid order request for the created batch", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
+#line hidden
+#line 20
+            await testRunner.WhenAsync("the breakfast order is placed", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
+#line hidden
+#line 21
+            await testRunner.ThenAsync("the order response should contain a complete order", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
+#line hidden
+#line 22
+            await testRunner.AndAsync("an order created event should have been published", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
+#line hidden
+#line 23
+            await testRunner.AndAsync("a recipe log should have been published to kafka", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
 #line hidden
             }
             await this.ScenarioCleanupAsync();
@@ -231,9 +231,9 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.Orders
             string pickleIndex = "2";
             global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("Creating an order should write an outbox message that gets processed", null, tagsOfScenario, argumentsOfScenario, featureTags, pickleIndex);
             string[] tagsOfRule = ((string[])(null));
-            global::Reqnroll.RuleInfo ruleInfo = null;
-#line 21
-    this.ScenarioInitialize(scenarioInfo, ruleInfo);
+            global::Reqnroll.RuleInfo ruleInfo = new global::Reqnroll.RuleInfo("Creating an order writes an outbox message for reliable delivery", null, tagsOfRule);
+#line 27
+        this.ScenarioInitialize(scenarioInfo, ruleInfo);
 #line hidden
             if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
             {
@@ -242,23 +242,23 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.Orders
             else
             {
                 await this.ScenarioStartAsync();
-#line 22
-        await testRunner.GivenAsync("a pancake batch has been created", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
+#line 28
+            await testRunner.GivenAsync("a pancake batch has been created", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
 #line hidden
-#line 23
-        await testRunner.AndAsync("a valid order request for the created batch", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
+#line 29
+            await testRunner.AndAsync("a valid order request for the created batch", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
 #line hidden
-#line 24
-        await testRunner.WhenAsync("the breakfast order is placed", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
+#line 30
+            await testRunner.WhenAsync("the breakfast order is placed", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
 #line hidden
-#line 25
-        await testRunner.ThenAsync("the order response should contain a complete order", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
+#line 31
+            await testRunner.ThenAsync("the order response should contain a complete order", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
 #line hidden
-#line 26
-        await testRunner.AndAsync("an outbox message should have been written for the order created event", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
+#line 32
+            await testRunner.AndAsync("an outbox message should have been written for the order created event", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
 #line hidden
-#line 27
-        await testRunner.AndAsync("the outbox message should have been processed", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
+#line 33
+            await testRunner.AndAsync("the outbox message should have been processed", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
 #line hidden
             }
             await this.ScenarioCleanupAsync();

@@ -10,8 +10,6 @@ namespace BreakfastProvider.Tests.Component.BDDfy.Scenarios.Orders;
 public class Orders_Validation_Tests : BaseFixture
 {
     private InvalidFieldFromRequest _input = null!;
-    private string _expectedError = null!;
-    private string _expectedStatus = null!;
     private VerifiableErrorResult? _actual;
 
     [Theory]
@@ -23,13 +21,10 @@ public class Orders_Validation_Tests : BaseFixture
     public void Order_with_invalid_field_should_return_bad_request(
         string field, string? value, string reason, string expectedError, string expectedStatus)
     {
-        _input = new InvalidFieldFromRequest(field, value, reason);
-        _expectedError = expectedError;
-        _expectedStatus = expectedStatus;
-
-        this.Given(x => x.A_valid_order_request_with_an_invalid_field())
+        this.Given(x => x.An_order_request_with_an_invalid_FIELD(field, value, reason))
             .When(x => x.The_order_request_is_sent())
-            .Then(x => x.The_response_should_contain_the_expected_validation_error())
+            .Then(x => x.The_response_should_contain_error(expectedError))
+            .And(x => x.The_response_status_should_be(expectedStatus))
             .BDDfy();
     }
 
@@ -38,21 +33,18 @@ public class Orders_Validation_Tests : BaseFixture
     public void Order_status_update_with_invalid_field_should_return_bad_request(
         string field, string value, string reason, string expectedError, string expectedStatus)
     {
-        _input = new InvalidFieldFromRequest(field, value, reason);
-        _expectedError = expectedError;
-        _expectedStatus = expectedStatus;
-
-        this.Given(x => x.A_valid_order_status_update_request_with_an_invalid_field())
+        this.Given(x => x.An_order_status_update_request_with_an_invalid_FIELD(field, value, reason))
             .When(x => x.The_order_status_update_request_is_sent())
-            .Then(x => x.The_response_should_contain_the_expected_validation_error())
+            .Then(x => x.The_response_should_contain_error(expectedError))
+            .And(x => x.The_response_status_should_be(expectedStatus))
             .BDDfy();
     }
 
     #region Steps
 
-    private Task A_valid_order_request_with_an_invalid_field()
+    private void An_order_request_with_an_invalid_FIELD(string field, string? value, string reason)
     {
-        return Task.CompletedTask;
+        _input = new InvalidFieldFromRequest(field, value, reason);
     }
 
     private async Task The_order_request_is_sent()
@@ -79,9 +71,9 @@ public class Orders_Validation_Tests : BaseFixture
         _actual = actualResults.Single();
     }
 
-    private Task A_valid_order_status_update_request_with_an_invalid_field()
+    private void An_order_status_update_request_with_an_invalid_FIELD(string field, string value, string reason)
     {
-        return Task.CompletedTask;
+        _input = new InvalidFieldFromRequest(field, value, reason);
     }
 
     private async Task The_order_status_update_request_is_sent()
@@ -99,11 +91,14 @@ public class Orders_Validation_Tests : BaseFixture
         _actual = actualResults.Single();
     }
 
-    private Task The_response_should_contain_the_expected_validation_error()
+    private void The_response_should_contain_error(string expectedError)
     {
-        _actual!.ErrorMessage.Should().Be(_expectedError);
-        _actual!.ResponseStatus.Should().Be(_expectedStatus);
-        return Task.CompletedTask;
+        _actual!.ErrorMessage.Should().Be(expectedError);
+    }
+
+    private void The_response_status_should_be(string expectedStatus)
+    {
+        _actual!.ResponseStatus.Should().Be(expectedStatus);
     }
 
     #endregion

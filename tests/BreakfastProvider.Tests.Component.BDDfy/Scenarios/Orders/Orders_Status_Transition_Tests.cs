@@ -20,8 +20,6 @@ public class Orders_Status_Transition_Tests : BaseFixture
     private readonly PatchOrderStatusSteps _patchSteps;
 
     private Guid _orderId;
-    private string _fromStatus = null!;
-    private string _toStatus = null!;
 
     public Orders_Status_Transition_Tests()
     {
@@ -85,12 +83,9 @@ public class Orders_Status_Transition_Tests : BaseFixture
     [InlineData("Ready", "Completed")]
     public void Valid_status_transition_should_update_the_order(string fromStatus, string toStatus)
     {
-        _fromStatus = fromStatus;
-        _toStatus = toStatus;
-
-        this.Given(x => x.An_order_exists_with_the_initial_status())
-            .When(x => x.The_order_status_is_updated())
-            .Then(x => x.The_response_should_indicate_the_updated_status())
+        this.Given(x => x.An_order_exists_with_STATUS(fromStatus))
+            .When(x => x.The_order_status_is_updated_to_STATUS(toStatus))
+            .Then(x => x.The_response_should_indicate_status(toStatus))
             .BDDfy();
     }
 
@@ -104,38 +99,34 @@ public class Orders_Status_Transition_Tests : BaseFixture
     [InlineData("Cancelled", "Ready")]
     public void Invalid_status_transition_should_return_conflict(string fromStatus, string toStatus)
     {
-        _fromStatus = fromStatus;
-        _toStatus = toStatus;
-
-        this.Given(x => x.An_order_exists_with_the_initial_status())
-            .When(x => x.The_order_status_is_updated())
+        this.Given(x => x.An_order_exists_with_STATUS(fromStatus))
+            .When(x => x.The_order_status_is_updated_to_STATUS(toStatus))
             .Then(x => x.The_response_should_indicate_a_conflict())
             .BDDfy();
     }
 
     #region Steps
 
-    private async Task An_order_exists_with_the_initial_status()
+    private async Task An_order_exists_with_STATUS(string status)
     {
-        await CreateOrderWithStatus(_fromStatus);
+        await CreateOrderWithStatus(status);
     }
 
-    private async Task The_order_status_is_updated()
+    private async Task The_order_status_is_updated_to_STATUS(string toStatus)
     {
-        await _patchSteps.Send(_orderId, _toStatus);
+        await _patchSteps.Send(_orderId, toStatus);
     }
 
-    private async Task The_response_should_indicate_the_updated_status()
+    private async Task The_response_should_indicate_status(string expectedStatus)
     {
         _patchSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
         await _patchSteps.ParseResponse();
-        _patchSteps.Response!.Status.Should().Be(_toStatus);
+        _patchSteps.Response!.Status.Should().Be(expectedStatus);
     }
 
-    private Task The_response_should_indicate_a_conflict()
+    private void The_response_should_indicate_a_conflict()
     {
         _patchSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Conflict);
-        return Task.CompletedTask;
     }
 
     #endregion

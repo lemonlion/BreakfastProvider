@@ -21,7 +21,7 @@ public class Orders_Validation_Tests : BaseFixture
     public void Order_with_invalid_field_should_return_bad_request(
         string field, string? value, string reason, string expectedError, string expectedStatus)
     {
-        this.Given(x => x.An_order_request_with_an_invalid_FIELD(field, value, reason))
+        this.Given(x => x.An_order_request_with_invalid_field(field, value, reason), "An order request with invalid {0}")
             .When(x => x.The_order_request_is_sent())
             .Then(x => x.The_response_should_contain_error(expectedError))
             .And(x => x.The_response_status_should_be(expectedStatus))
@@ -33,7 +33,7 @@ public class Orders_Validation_Tests : BaseFixture
     public void Order_status_update_with_invalid_field_should_return_bad_request(
         string field, string value, string reason, string expectedError, string expectedStatus)
     {
-        this.Given(x => x.An_order_status_update_request_with_an_invalid_FIELD(field, value, reason))
+        this.Given(x => x.An_order_status_update_request_with_invalid_field(field, value, reason), "An order status update request with invalid {0}")
             .When(x => x.The_order_status_update_request_is_sent())
             .Then(x => x.The_response_should_contain_error(expectedError))
             .And(x => x.The_response_status_should_be(expectedStatus))
@@ -42,7 +42,7 @@ public class Orders_Validation_Tests : BaseFixture
 
     #region Steps
 
-    private void An_order_request_with_an_invalid_FIELD(string field, string? value, string reason)
+    private void An_order_request_with_invalid_field(string field, string? value, string reason)
     {
         _input = new InvalidFieldFromRequest(field, value, reason);
     }
@@ -71,7 +71,7 @@ public class Orders_Validation_Tests : BaseFixture
         _actual = actualResults.Single();
     }
 
-    private void An_order_status_update_request_with_an_invalid_FIELD(string field, string value, string reason)
+    private void An_order_status_update_request_with_invalid_field(string field, string value, string reason)
     {
         _input = new InvalidFieldFromRequest(field, value, reason);
     }

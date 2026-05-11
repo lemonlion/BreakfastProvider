@@ -73,7 +73,7 @@ public class Apple_Cinnamon_Muffins_Creation_Tests : BaseFixture
     public void Muffin_request_with_invalid_field_should_return_bad_request(
         string field, string value, string reason, string expectedError, string expectedStatus)
     {
-        this.Given(x => x.A_muffin_request_with_an_invalid_FIELD(field, value, reason))
+        this.Given(x => x.A_muffin_request_with_invalid_field(field, value, reason), "A muffin request with invalid {0}")
             .When(x => x.The_muffin_validation_request_is_sent())
             .Then(x => x.The_response_should_contain_error(expectedError))
             .And(x => x.The_response_status_should_be(expectedStatus))
@@ -168,7 +168,7 @@ public class Apple_Cinnamon_Muffins_Creation_Tests : BaseFixture
         bakingTemperatureMatchesExpectation.Should().BeTrue();
     }
 
-    private void A_muffin_request_with_an_invalid_FIELD(string field, string value, string reason)
+    private void A_muffin_request_with_invalid_field(string field, string value, string reason)
     {
         _input = new InvalidFieldFromRequest(field, value, reason);
     }

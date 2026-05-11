@@ -22,7 +22,7 @@ public class Toppings_Xss_Validation_Tests : BaseFixture
     public void Topping_request_with_invalid_or_dangerous_input_should_return_bad_request(
         string field, string value, string reason, string expectedError, string expectedStatus)
     {
-        this.Given(x => x.A_topping_request_with_an_invalid_FIELD(field, value, reason))
+        this.Given(x => x.A_topping_request_with_invalid_field(field, value, reason), "A topping request with invalid {0}")
             .When(x => x.The_topping_request_is_sent())
             .Then(x => x.The_response_should_contain_error(expectedError))
             .And(x => x.The_response_status_should_be(expectedStatus))
@@ -31,7 +31,7 @@ public class Toppings_Xss_Validation_Tests : BaseFixture
 
     #region Steps
 
-    private void A_topping_request_with_an_invalid_FIELD(string field, string value, string reason)
+    private void A_topping_request_with_invalid_field(string field, string value, string reason)
     {
         _input = new InvalidFieldFromRequest(field, value, reason);
     }

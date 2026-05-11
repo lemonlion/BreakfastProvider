@@ -53,7 +53,7 @@ public class Toppings_Update_Tests : BaseFixture
     public void Update_topping_with_invalid_or_dangerous_input_should_return_bad_request(
         string field, string value, string reason, string expectedError, string expectedStatus)
     {
-        this.Given(x => x.An_update_topping_request_with_an_invalid_FIELD(field, value, reason))
+        this.Given(x => x.An_update_topping_request_with_invalid_field(field, value, reason), "An update topping request with invalid {0}")
             .When(x => x.The_update_topping_request_is_sent())
             .Then(x => x.The_response_should_contain_error(expectedError))
             .And(x => x.The_response_status_should_be(expectedStatus))
@@ -101,7 +101,7 @@ public class Toppings_Update_Tests : BaseFixture
         _putSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 
-    private void An_update_topping_request_with_an_invalid_FIELD(string field, string value, string reason)
+    private void An_update_topping_request_with_invalid_field(string field, string value, string reason)
     {
         _input = new InvalidFieldFromRequest(field, value, reason);
     }

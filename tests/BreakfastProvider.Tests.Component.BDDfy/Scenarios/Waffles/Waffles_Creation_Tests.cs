@@ -59,7 +59,7 @@ public class Waffles_Creation_Tests : BaseFixture
     public void Waffle_request_with_invalid_ingredient_should_return_bad_request(
         string field, string value, string reason, string expectedError, string expectedStatus)
     {
-        this.Given(x => x.A_waffle_request_with_an_invalid_FIELD(field, value, reason))
+        this.Given(x => x.A_waffle_request_with_invalid_field(field, value, reason), "A waffle request with invalid {0}")
             .When(x => x.The_waffle_validation_request_is_sent())
             .Then(x => x.The_response_should_contain_error(expectedError))
             .And(x => x.The_response_status_should_be(expectedStatus))
@@ -133,7 +133,7 @@ public class Waffles_Creation_Tests : BaseFixture
         body.Should().Contain(WaffleValidationMessages.MaxToppingsExceeded);
     }
 
-    private void A_waffle_request_with_an_invalid_FIELD(string field, string value, string reason)
+    private void A_waffle_request_with_invalid_field(string field, string value, string reason)
     {
         _input = new InvalidFieldFromRequest(field, value, reason);
     }

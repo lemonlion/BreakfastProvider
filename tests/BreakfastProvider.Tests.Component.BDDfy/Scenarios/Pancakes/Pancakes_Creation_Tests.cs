@@ -59,7 +59,7 @@ public class Pancakes_Creation_Tests : BaseFixture
     public void Pancake_request_with_invalid_ingredient_should_return_bad_request(
         string field, string value, string reason, string expectedError, string expectedStatus)
     {
-        this.Given(x => x.A_pancake_request_with_an_invalid_FIELD(field, value, reason))
+        this.Given(x => x.A_pancake_request_with_invalid_field(field, value, reason), "A pancake request with invalid {0}")
             .When(x => x.The_pancake_validation_request_is_sent())
             .Then(x => x.The_response_should_contain_error(expectedError))
             .And(x => x.The_response_status_should_be(expectedStatus))
@@ -130,7 +130,7 @@ public class Pancakes_Creation_Tests : BaseFixture
         body.Should().Contain(PancakeValidationMessages.MaxToppingsExceeded);
     }
 
-    private void A_pancake_request_with_an_invalid_FIELD(string field, string value, string reason)
+    private void A_pancake_request_with_invalid_field(string field, string value, string reason)
     {
         _input = new InvalidFieldFromRequest(field, value, reason);
     }

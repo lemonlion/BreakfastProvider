@@ -83,8 +83,8 @@ public class Orders_Status_Transition_Tests : BaseFixture
     [InlineData("Ready", "Completed")]
     public void Valid_status_transition_should_update_the_order(string fromStatus, string toStatus)
     {
-        this.Given(x => x.An_order_exists_with_STATUS(fromStatus))
-            .When(x => x.The_order_status_is_updated_to_STATUS(toStatus))
+        this.Given(x => x.An_order_exists_with_status(fromStatus))
+            .When(x => x.The_order_status_is_updated_to(toStatus))
             .Then(x => x.The_response_should_indicate_status(toStatus))
             .BDDfy();
     }
@@ -99,20 +99,20 @@ public class Orders_Status_Transition_Tests : BaseFixture
     [InlineData("Cancelled", "Ready")]
     public void Invalid_status_transition_should_return_conflict(string fromStatus, string toStatus)
     {
-        this.Given(x => x.An_order_exists_with_STATUS(fromStatus))
-            .When(x => x.The_order_status_is_updated_to_STATUS(toStatus))
+        this.Given(x => x.An_order_exists_with_status(fromStatus))
+            .When(x => x.The_order_status_is_updated_to(toStatus))
             .Then(x => x.The_response_should_indicate_a_conflict())
             .BDDfy();
     }
 
     #region Steps
 
-    private async Task An_order_exists_with_STATUS(string status)
+    private async Task An_order_exists_with_status(string status)
     {
         await CreateOrderWithStatus(status);
     }
 
-    private async Task The_order_status_is_updated_to_STATUS(string toStatus)
+    private async Task The_order_status_is_updated_to(string toStatus)
     {
         await _patchSteps.Send(_orderId, toStatus);
     }

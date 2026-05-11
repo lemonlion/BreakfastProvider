@@ -89,6 +89,7 @@ public partial class Specifications__Async_Api_Feature : BaseFixture
             try
             {
                 await File.WriteAllTextAsync(path, _asyncApiJsonString, Encoding.UTF8);
+                await StepExecution.AttachFile(m => m.CreateFromFile(path, "asyncapi.json"));
                 return;
             }
             catch (IOException) when (attempt < maxRetries)

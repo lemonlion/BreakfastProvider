@@ -5,6 +5,7 @@ using BreakfastProvider.Tests.Component.ReqNRoll.Support;
 using BreakfastProvider.Tests.Component.Shared.Constants;
 using BreakfastProvider.Tests.Component.Shared.Util;
 using Reqnroll;
+using Reqnroll.Infrastructure;
 
 namespace BreakfastProvider.Tests.Component.ReqNRoll.StepDefinitions.OpenApi;
 
@@ -13,7 +14,7 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.StepDefinitions.OpenApi;
 /// Combined into one binding class because "the response should be valid" is shared across features.
 /// </summary>
 [Binding]
-public class ApiSpecificationSteps(AppManager appManager)
+public class ApiSpecificationSteps(AppManager appManager, IReqnrollOutputHelper outputHelper)
 {
     private HttpResponseMessage? _swaggerResponse;
     private string? _swaggerJsonString;
@@ -114,6 +115,7 @@ public class ApiSpecificationSteps(AppManager appManager)
             try
             {
                 await File.WriteAllTextAsync(path, _swaggerJsonString!, Encoding.UTF8);
+                outputHelper.AddAttachment(path);
                 return;
             }
             catch (IOException) when (attempt < maxRetries)
@@ -156,6 +158,7 @@ public class ApiSpecificationSteps(AppManager appManager)
             try
             {
                 await File.WriteAllTextAsync(path, _asyncApiJsonString, Encoding.UTF8);
+                outputHelper.AddAttachment(path);
                 return;
             }
             catch (IOException) when (attempt < maxRetries)

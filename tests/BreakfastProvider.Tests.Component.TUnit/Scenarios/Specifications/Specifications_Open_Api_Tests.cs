@@ -4,6 +4,7 @@ using System.Text.Json;
 using BreakfastProvider.Tests.Component.Shared.Constants;
 using BreakfastProvider.Tests.Component.Shared.Util;
 using BreakfastProvider.Tests.Component.TUnit.Infrastructure;
+using TestTrackingDiagrams.Tracking;
 using TestTrackingDiagrams.TUnit;
 
 namespace BreakfastProvider.Tests.Component.TUnit.Scenarios.Specifications;
@@ -47,6 +48,7 @@ public class Specifications_Open_Api_Tests : BaseFixture
             try
             {
                 await File.WriteAllTextAsync(path, swaggerJsonString, Encoding.UTF8);
+                Track.Attachment(path, "openapi.json");
                 return;
             }
             catch (IOException) when (attempt < maxRetries)

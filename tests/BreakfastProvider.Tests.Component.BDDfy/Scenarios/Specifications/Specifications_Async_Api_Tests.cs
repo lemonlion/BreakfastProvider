@@ -4,7 +4,7 @@ using System.Text.Json;
 using BreakfastProvider.Tests.Component.Shared.Constants;
 using BreakfastProvider.Tests.Component.Shared.Util;
 using BreakfastProvider.Tests.Component.BDDfy.Infrastructure;
-
+using TestTrackingDiagrams.Tracking;
 using TestStack.BDDfy;
 using TestTrackingDiagrams.BDDfy.xUnit3;
 namespace BreakfastProvider.Tests.Component.BDDfy.Scenarios.Specifications;
@@ -82,6 +82,7 @@ public class Specifications_Async_Api_Tests : BaseFixture
             try
             {
                 await File.WriteAllTextAsync(path, _asyncApiJsonString, Encoding.UTF8);
+                Track.Attachment(path, "asyncapi.json");
                 return;
             }
             catch (IOException) when (attempt < writeRetries)

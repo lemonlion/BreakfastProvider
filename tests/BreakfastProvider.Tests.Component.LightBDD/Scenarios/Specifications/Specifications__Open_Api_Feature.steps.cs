@@ -77,7 +77,7 @@ public partial class Specifications__Open_Api_Feature : BaseFixture
 
     private async Task The_openapi_spec_is_written_to_disk_as_json()
     {
-        var path = $"{OpenApiSpecs.SpecificationsFolderPath}{OpenApiSpecs.JsonFileName}";
+        var path = Path.GetFullPath($"{OpenApiSpecs.SpecificationsFolderPath}{OpenApiSpecs.JsonFileName}");
         var content = _swaggerJsonString!;
         const int maxRetries = 3;
         for (var attempt = 1; attempt <= maxRetries; attempt++)

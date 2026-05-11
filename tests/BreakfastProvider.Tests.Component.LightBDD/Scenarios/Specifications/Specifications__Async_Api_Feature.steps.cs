@@ -82,7 +82,7 @@ public partial class Specifications__Async_Api_Feature : BaseFixture
 
     private async Task The_asyncapi_spec_is_written_to_disk_as_json()
     {
-        var path = $"{AsyncApiSpecs.SpecificationsFolderPath}{AsyncApiSpecs.JsonFileName}";
+        var path = Path.GetFullPath($"{AsyncApiSpecs.SpecificationsFolderPath}{AsyncApiSpecs.JsonFileName}");
         const int maxRetries = 3;
         for (var attempt = 1; attempt <= maxRetries; attempt++)
         {

@@ -17,8 +17,8 @@ public partial class Orders__Status_Transition_Feature
     {
         await Runner.RunScenarioAsync(
             given => An_order_exists_with_status(fromStatus),
-            when => The_order_status_is_updated_to(toStatus),
-            then => The_order_status_should_be_updated_successfully(toStatus));
+            when => The_order_status_is_updated_to_STATUS(toStatus),
+            then => The_order_should_be_updated_successfully_to_STATUS(toStatus));
     }
 
     [Scenario]
@@ -33,7 +33,7 @@ public partial class Orders__Status_Transition_Feature
     {
         await Runner.RunScenarioAsync(
             given => An_order_exists_with_status(fromStatus),
-            when => The_order_status_is_updated_to(toStatus),
+            when => The_order_status_is_updated_to_STATUS(toStatus),
             then => The_response_should_indicate_an_invalid_state_transition());
     }
 }

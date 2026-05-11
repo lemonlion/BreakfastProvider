@@ -37,32 +37,32 @@ public partial class Grpc__Recipe_Summary_Feature : BaseFixture
     private async Task<CompositeStep> The_recipe_summary_should_contain_pancake_data()
     {
         return Sub.Steps(
-            _ => The_recipe_type_should_be("Pancakes"),
-            _ => The_total_batches_should_be(42),
+            _ => The_recipe_type_should_be_TYPE("Pancakes"),
+            _ => The_total_batches_should_be_COUNT(42),
             _ => The_common_ingredients_should_contain("Milk", "Flour", "Eggs"));
     }
 
     private async Task<CompositeStep> The_recipe_summary_should_contain_waffle_data()
     {
         return Sub.Steps(
-            _ => The_recipe_type_should_be("Waffles"),
-            _ => The_total_batches_should_be(28),
+            _ => The_recipe_type_should_be_TYPE("Waffles"),
+            _ => The_total_batches_should_be_COUNT(28),
             _ => The_common_ingredients_should_contain("Milk", "Flour", "Eggs", "Butter"));
     }
 
     private async Task<CompositeStep> The_recipe_summary_should_contain_zero_batches_and_no_ingredients()
     {
         return Sub.Steps(
-            _ => The_recipe_type_should_be("Unknown"),
-            _ => The_total_batches_should_be(0),
+            _ => The_recipe_type_should_be_TYPE("Unknown"),
+            _ => The_total_batches_should_be_COUNT(0),
             _ => The_common_ingredients_should_be_empty());
     }
 
-    private async Task The_recipe_type_should_be(string expected)
-        => _grpcSteps.RecipeSummaryReply!.RecipeType.Should().Be(expected);
+    private async Task The_recipe_type_should_be_TYPE(string type)
+        => _grpcSteps.RecipeSummaryReply!.RecipeType.Should().Be(type);
 
-    private async Task The_total_batches_should_be(int expected)
-        => _grpcSteps.RecipeSummaryReply!.TotalBatches.Should().Be(expected);
+    private async Task The_total_batches_should_be_COUNT(int count)
+        => _grpcSteps.RecipeSummaryReply!.TotalBatches.Should().Be(count);
 
     private async Task The_common_ingredients_should_contain(params string[] expected)
         => _grpcSteps.RecipeSummaryReply!.CommonIngredients.Should().BeEquivalentTo(expected);

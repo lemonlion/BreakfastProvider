@@ -12,9 +12,9 @@ public partial class Pancakes__Content_Negotiation_Feature : BaseFixture
 
     #region Given
 
-    private async Task A_pancake_request_with_content_type(string contentType)
+    private async Task A_pancake_request_with_content_type(string type)
     {
-        _contentType = contentType;
+        _contentType = type;
     }
 
     #endregion

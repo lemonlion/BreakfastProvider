@@ -27,7 +27,7 @@ public partial class Apple_Cinnamon_Muffins__Creation_Feature
         string recipeName, MuffinRecipeTestData recipe, int temperature, int durationMinutes, string panType, MuffinBatchExpectation expected)
     {
         await Runner.RunScenarioAsync(
-            given => A_muffin_recipe_with_ingredients_and_baking_profile(recipeName, recipe, temperature, durationMinutes, panType),
+            given => A_NAME_muffin_recipe_at_TEMPERATURE_degrees_for_DURATION_minutes_in_PAN(recipeName, recipe, temperature, durationMinutes, panType),
             when => The_muffins_are_prepared(),
             then => The_muffin_batch_should_match_the_expected_outcome(expected));
     }
@@ -43,8 +43,8 @@ public partial class Apple_Cinnamon_Muffins__Creation_Feature
         string field, string value, string reason, string expectedError, string expectedStatus)
     {
         await Runner.RunScenarioAsync(
-            given => A_valid_muffin_request_with_an_invalid_field(field, value),
+            given => A_valid_muffin_request_with_an_invalid_field_set_to_VALUE(field, value),
             when => The_invalid_muffin_request_is_submitted(),
-            then => The_muffin_response_should_contain_the_validation_error(expectedError, expectedStatus));
+            then => The_muffin_response_should_contain_ERROR_with_STATUS(expectedError, expectedStatus));
     }
 }

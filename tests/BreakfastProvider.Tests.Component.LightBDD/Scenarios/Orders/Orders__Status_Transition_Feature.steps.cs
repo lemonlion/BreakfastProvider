@@ -40,7 +40,7 @@ public partial class Orders__Status_Transition_Feature : BaseFixture
         return Sub.Steps(
             _ => A_pancake_batch_is_created(),
             _ => An_order_is_created_for_the_batch(),
-            _ => The_order_is_transitioned_to_status(status));
+            _ => The_order_is_transitioned_to_STATUS(status));
     }
 
     private async Task A_pancake_batch_is_created()
@@ -71,10 +71,10 @@ public partial class Orders__Status_Transition_Feature : BaseFixture
         _orderId = _orderSteps.Response!.OrderId;
     }
 
-    private async Task The_order_is_transitioned_to_status(string targetStatus)
+    private async Task The_order_is_transitioned_to_STATUS(string status)
     {
         // Walk the state machine from Created to the target status
-        var path = GetTransitionPath(targetStatus);
+        var path = GetTransitionPath(status);
         foreach (var intermediateStatus in path)
         {
             await _patchSteps.Send(_orderId, intermediateStatus);
@@ -82,7 +82,7 @@ public partial class Orders__Status_Transition_Feature : BaseFixture
         }
     }
 
-    private static List<string> GetTransitionPath(string targetStatus) => targetStatus switch
+    private static List<string> GetTransitionPath(string status) => status switch
     {
         OrderStatuses.Created => [],
         OrderStatuses.Preparing => [OrderStatuses.Preparing],
@@ -96,27 +96,27 @@ public partial class Orders__Status_Transition_Feature : BaseFixture
 
     #region When
 
-    private async Task The_order_status_is_updated_to(string toStatus)
-        => await _patchSteps.Send(_orderId, toStatus);
+    private async Task The_order_status_is_updated_to_STATUS(string status)
+        => await _patchSteps.Send(_orderId, status);
 
     #endregion
 
     #region Then
 
-    private async Task<CompositeStep> The_order_status_should_be_updated_successfully(string expectedStatus)
+    private async Task<CompositeStep> The_order_should_be_updated_successfully_to_STATUS(string status)
     {
         return Sub.Steps(
             _ => The_patch_response_http_status_should_be_ok(),
-            _ => The_updated_order_status_should_be(expectedStatus));
+            _ => The_updated_order_status_should_be_STATUS(status));
     }
 
     private async Task The_patch_response_http_status_should_be_ok()
         => _patchSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
 
-    private async Task The_updated_order_status_should_be(string expectedStatus)
+    private async Task The_updated_order_status_should_be_STATUS(string status)
     {
         await _patchSteps.ParseResponse();
-        _patchSteps.Response!.Status.Should().Be(expectedStatus);
+        _patchSteps.Response!.Status.Should().Be(status);
     }
 
     private async Task The_response_should_indicate_an_invalid_state_transition()

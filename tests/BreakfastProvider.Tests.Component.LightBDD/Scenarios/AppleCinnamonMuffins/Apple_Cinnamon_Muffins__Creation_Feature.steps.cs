@@ -60,7 +60,7 @@ public partial class Apple_Cinnamon_Muffins__Creation_Feature : BaseFixture
         ];
     }
 
-    private async Task A_muffin_recipe_with_ingredients_and_baking_profile(string recipeName, MuffinRecipeTestData recipe, int temperature, int durationMinutes, string panType)
+    private async Task A_NAME_muffin_recipe_at_TEMPERATURE_degrees_for_DURATION_minutes_in_PAN(string name, MuffinRecipeTestData recipeData, int temperature, int duration, string pan)
     {
         await _milkSteps.Retrieve();
         _milkSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -70,21 +70,21 @@ public partial class Apple_Cinnamon_Muffins__Creation_Feature : BaseFixture
         _eggsSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
         _muffinSteps.Request.Eggs = _eggsSteps.EggsResponse.Eggs;
 
-        _muffinSteps.Request.Flour = recipe.Ingredients.Flour;
-        _muffinSteps.Request.Apples = recipe.Ingredients.Apples;
-        _muffinSteps.Request.Cinnamon = recipe.Ingredients.Cinnamon;
+        _muffinSteps.Request.Flour = recipeData.Ingredients.Flour;
+        _muffinSteps.Request.Apples = recipeData.Ingredients.Apples;
+        _muffinSteps.Request.Cinnamon = recipeData.Ingredients.Cinnamon;
         _muffinSteps.Request.Baking = new TestBakingProfile
         {
             Temperature = temperature,
-            DurationMinutes = durationMinutes,
-            PanType = panType
+            DurationMinutes = duration,
+            PanType = pan
         };
-        _muffinSteps.Request.Toppings = recipe.Toppings?
+        _muffinSteps.Request.Toppings = recipeData.Toppings?
             .Select(t => new TestMuffinTopping { Name = t.Name, Amount = t.Amount })
             .ToList();
     }
 
-    private async Task A_valid_muffin_request_with_an_invalid_field(string field, string value)
+    private async Task A_valid_muffin_request_with_an_invalid_field_set_to_VALUE(string field, string value)
     {
         _muffinSteps.Request = new TestMuffinRequest
         {
@@ -147,10 +147,10 @@ public partial class Apple_Cinnamon_Muffins__Creation_Feature : BaseFixture
         bakingTemperatureMatchesExpectation.Should().BeTrue();
     }
 
-    private async Task The_muffin_response_should_contain_the_validation_error(string expectedError, string expectedStatus)
+    private async Task The_muffin_response_should_contain_ERROR_with_STATUS(string error, string status)
     {
         var responseBody = await _muffinSteps.ResponseMessage!.Content.ReadAsStringAsync();
-        responseBody.Should().Contain(expectedError);
+        responseBody.Should().Contain(error);
         _muffinSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     }
 

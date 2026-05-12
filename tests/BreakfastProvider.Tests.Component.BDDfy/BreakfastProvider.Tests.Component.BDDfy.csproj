@@ -37,8 +37,8 @@
     <PackageReference Include="AutoFixture" Version="4.18.1" />
     <PackageReference Include="Spanner.InMemoryEmulator" Version="1.0.20" />
     <PackageReference Include="TestStack.BDDfy" Version="8.0.1.3" />
-    <PackageReference Include="TestTrackingDiagrams.BDDfy.xUnit3" Version="2.33.68" />
-    <PackageReference Include="TestTrackingDiagrams.AssertionTracking" Version="2.33.68" />
+    <PackageReference Include="TestTrackingDiagrams.BDDfy.xUnit3" Version="2.33.70" />
+    <PackageReference Include="TestTrackingDiagrams.AssertionTracking" Version="2.33.70" />
     <PackageReference Include="xunit.v3" Version="3.2.2" />
     <PackageReference Include="coverlet.collector" Version="6.0.4">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

@@ -11,10 +11,14 @@ namespace BreakfastProvider.Api.Filters;
 
 internal class AsyncApiDynamicConfigurationProviderFilter(
     IOptions<KafkaConfig> kafkaSettings,
-    IOptions<PubSubConfig> pubSubSettings) : IAsyncApiDocumentTransformer
+    IOptions<PubSubConfig> pubSubSettings,
+    IOptions<EventGridConfig> eventGridSettings,
+    IOptions<EventHubConfig> eventHubSettings) : IAsyncApiDocumentTransformer
 {
     private readonly KafkaConfig _kafkaSettings = kafkaSettings.Value;
     private readonly PubSubConfig _pubSubSettings = pubSubSettings.Value;
+    private readonly EventGridConfig _eventGridSettings = eventGridSettings.Value;
+    private readonly EventHubConfig _eventHubSettings = eventHubSettings.Value;
 
     public Task TransformAsync(AsyncApiDocument document, AsyncApiDocumentTransformerContext context, CancellationToken cancellationToken)
     {
@@ -68,6 +72,28 @@ internal class AsyncApiDynamicConfigurationProviderFilter(
         {
             var meta = IPubSubEvent.GetAsyncApiMetadata(eventType);
             RegisterPubSubEvent(document, eventType, meta);
+        }
+
+        // Discover all IEventGridEvent types in the same assembly
+        var eventGridEventTypes = typeof(IEventGridEvent).Assembly
+            .GetTypes()
+            .Where(t => t is { IsClass: true, IsAbstract: false } && typeof(IEventGridEvent).IsAssignableFrom(t));
+
+        foreach (var eventType in eventGridEventTypes)
+        {
+            var meta = IEventGridEvent.GetAsyncApiMetadata(eventType);
+            RegisterEventGridEvent(document, eventType, meta);
+        }
+
+        // Discover all IEventHubEvent types in the same assembly
+        var eventHubEventTypes = typeof(IEventHubEvent).Assembly
+            .GetTypes()
+            .Where(t => t is { IsClass: true, IsAbstract: false } && typeof(IEventHubEvent).IsAssignableFrom(t));
+
+        foreach (var eventType in eventHubEventTypes)
+        {
+            var meta = IEventHubEvent.GetAsyncApiMetadata(eventType);
+            RegisterEventHubEvent(document, eventType, meta);
         }
     }
 
@@ -124,6 +150,92 @@ internal class AsyncApiDynamicConfigurationProviderFilter(
         };
 
         // Message (Pub/Sub messages use CloudEvents attributes, not Kafka headers)
+        var message = new AsyncApiMessage
+        {
+            Name = meta.MessageId,
+            Title = meta.MessageTitle,
+            Summary = meta.MessageSummary,
+            Payload = new AsyncApiJsonSchemaReference($"#/components/schemas/{meta.SchemaId}")
+        };
+        document.Components.Messages![meta.MessageId] = message;
+
+        // Channel
+        var channel = new AsyncApiChannel
+        {
+            Address = meta.ChannelName,
+            Description = meta.ChannelDescription,
+            Messages = new Dictionary<string, AsyncApiMessage>
+            {
+                [meta.MessageId] = new AsyncApiMessageReference($"#/components/messages/{meta.MessageId}")
+            }
+        };
+        document.Channels[meta.ChannelName] = channel;
+
+        // Operation
+        var operation = new AsyncApiOperation
+        {
+            Title = meta.OperationId,
+            Summary = meta.OperationSummary,
+            Description = meta.OperationDescription,
+            Action = AsyncApiAction.Send,
+            Channel = new AsyncApiChannelReference($"#/channels/{meta.ChannelName}"),
+            Messages = [new AsyncApiMessageReference($"#/channels/{meta.ChannelName}/messages/{meta.MessageId}")]
+        };
+        document.Operations[meta.OperationId] = operation;
+    }
+
+    private static void RegisterEventGridEvent(AsyncApiDocument document, Type eventType, EventGridEventAsyncApiMetadata meta)
+    {
+        // Schema
+        document.Components!.Schemas![meta.SchemaId] = new AsyncApiMultiFormatSchema
+        {
+            Schema = BuildSchemaFromType(eventType, meta.SchemaId)
+        };
+
+        // Message (Event Grid uses CloudEvents envelope)
+        var message = new AsyncApiMessage
+        {
+            Name = meta.MessageId,
+            Title = meta.MessageTitle,
+            Summary = meta.MessageSummary,
+            Payload = new AsyncApiJsonSchemaReference($"#/components/schemas/{meta.SchemaId}")
+        };
+        document.Components.Messages![meta.MessageId] = message;
+
+        // Channel
+        var channel = new AsyncApiChannel
+        {
+            Address = meta.ChannelName,
+            Description = meta.ChannelDescription,
+            Messages = new Dictionary<string, AsyncApiMessage>
+            {
+                [meta.MessageId] = new AsyncApiMessageReference($"#/components/messages/{meta.MessageId}")
+            }
+        };
+        document.Channels[meta.ChannelName] = channel;
+
+        // Operation
+        var operation = new AsyncApiOperation
+        {
+            Title = meta.OperationId,
+            Summary = meta.OperationSummary,
+            Description = meta.OperationDescription,
+            Action = AsyncApiAction.Send,
+            Channel = new AsyncApiChannelReference($"#/channels/{meta.ChannelName}"),
+            Messages = [new AsyncApiMessageReference($"#/channels/{meta.ChannelName}/messages/{meta.MessageId}")]
+        };
+        document.Operations[meta.OperationId] = operation;
+    }
+
+    private static void RegisterEventHubEvent(AsyncApiDocument document, Type eventType, EventHubEventAsyncApiMetadata meta)
+    {
+        // Schema
+        document.Components!.Schemas![meta.SchemaId] = new AsyncApiMultiFormatSchema
+        {
+            Schema = BuildSchemaFromType(eventType, meta.SchemaId)
+        };
+
+        // Message
         var message = new AsyncApiMessage
         {
             Name = meta.MessageId,

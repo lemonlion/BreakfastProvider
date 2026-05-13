@@ -52,7 +52,8 @@ public static class ServiceCollectionExtensions
                         Verbosity = CosmosTrackingVerbosity.Summarised,
                         CurrentTestInfoFetcher = _currentTestInfoFetcher
                     },
-                    fakeHandler)));
+                    fakeHandler,
+                    new HttpContextAccessor())));
 
         return services;
     }
@@ -836,7 +837,7 @@ public static class ServiceCollectionExtensions
             CurrentTestInfoFetcher = currentTestInfoFetcher
         };
 
-        var subscriber = new MongoDbTrackingSubscriber(trackingOptions);
+        var subscriber = new MongoDbTrackingSubscriber(trackingOptions, new HttpContextAccessor());
 
         services.UseInMemoryMongoDB(options =>
         {
@@ -940,7 +941,7 @@ public static class ServiceCollectionExtensions
                 }.Build());
             });
             options.WithHttpMessageHandlerWrapper(fakeHandler =>
-                new BigQueryTrackingMessageHandler(trackingOptions, fakeHandler));
+                new BigQueryTrackingMessageHandler(trackingOptions, fakeHandler, new HttpContextAccessor()));
         });
 
         return services;

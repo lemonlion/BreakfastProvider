@@ -836,13 +836,18 @@ public static class ServiceCollectionExtensions
             CurrentTestInfoFetcher = currentTestInfoFetcher
         };
 
+        var subscriber = new MongoDbTrackingSubscriber(trackingOptions);
+
         services.UseInMemoryMongoDB(options =>
         {
             options.DatabaseName = "BreakfastDb";
             options.AddCollection<Api.Services.RecipeReviewDocument>("recipe_reviews");
-            // TODO: Wire tracking once TTD adds Subscribe(CommandEventSubscriptionBuilder) overload
-            // See: https://github.com/lemonlion/TestTrackingDiagrams/issues/56
-            // options.ClusterConfigurator = builder => subscriber.Subscribe(builder);
+            options.ClusterConfigurator = builder =>
+            {
+                builder.Subscribe<MongoDB.Driver.Core.Events.CommandStartedEvent>(subscriber.OnCommandStarted);
+                builder.Subscribe<MongoDB.Driver.Core.Events.CommandSucceededEvent>(subscriber.OnCommandSucceeded);
+                builder.Subscribe<MongoDB.Driver.Core.Events.CommandFailedEvent>(subscriber.OnCommandFailed);
+            };
         });
 
         return services;

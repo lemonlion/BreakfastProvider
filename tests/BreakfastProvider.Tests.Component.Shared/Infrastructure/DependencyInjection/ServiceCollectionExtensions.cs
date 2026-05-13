@@ -828,26 +828,21 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection UseInMemoryMongoDatabase(this IServiceCollection services,
         Func<(string Name, string Id)> currentTestInfoFetcher)
     {
+        var trackingOptions = new MongoDbTrackingOptions
+        {
+            ServiceName = Documentation.ServiceNames.MongoDB,
+            CallerName = Documentation.ServiceNames.BreakfastProvider,
+            Verbosity = MongoDbTrackingVerbosity.Detailed,
+            CurrentTestInfoFetcher = currentTestInfoFetcher
+        };
+
         services.UseInMemoryMongoDB(options =>
         {
             options.DatabaseName = "BreakfastDb";
             options.AddCollection<Api.Services.RecipeReviewDocument>("recipe_reviews");
-            options.OnClientCreated = client =>
-            {
-                // In-memory emulator does not fire MongoDB driver command events
-                // (CommandStartedEvent/CommandSucceededEvent) because it uses direct
-                // interface implementation rather than the driver's cluster/connection layer.
-                // Tracking is not possible until InMemoryEmulator.MongoDB adds event support.
-                // See: https://github.com/lemonlion/InMemoryEmulator.MongoDB/issues/16
-            };
-        });
-
-        services.AddMongoDbTestTracking(options =>
-        {
-            options.ServiceName = Documentation.ServiceNames.MongoDB;
-            options.CallerName = Documentation.ServiceNames.BreakfastProvider;
-            options.Verbosity = MongoDbTrackingVerbosity.Detailed;
-            options.CurrentTestInfoFetcher = currentTestInfoFetcher;
+            // TODO: Wire tracking once TTD adds Subscribe(CommandEventSubscriptionBuilder) overload
+            // See: https://github.com/lemonlion/TestTrackingDiagrams/issues/56
+            // options.ClusterConfigurator = builder => subscriber.Subscribe(builder);
         });
 
         return services;
@@ -916,6 +911,14 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection UseInMemoryBigQuery(this IServiceCollection services,
         Func<(string Name, string Id)> currentTestInfoFetcher)
     {
+        var trackingOptions = new BigQueryTrackingMessageHandlerOptions
+        {
+            ServiceName = Documentation.ServiceNames.BigQuery,
+            CallerName = Documentation.ServiceNames.BreakfastProvider,
+            Verbosity = BigQueryTrackingVerbosity.Detailed,
+            CurrentTestInfoFetcher = currentTestInfoFetcher
+        };
+
         services.UseInMemoryBigQuery(options =>
         {
             options.ProjectId = "test-project";
@@ -931,18 +934,8 @@ public static class ServiceCollectionExtensions
                     { "recorded_at", Google.Cloud.BigQuery.V2.BigQueryDbType.String },
                 }.Build());
             });
-            // In-memory emulator does not expose a WithHttpMessageHandlerWrapper hook
-            // to chain BigQueryTrackingMessageHandler around FakeBigQueryHandler.
-            // Tracking is not possible until InMemoryEmulator.BigQuery adds handler wrapper support.
-            // See: https://github.com/lemonlion/InMemoryEmulator.BigQuery/issues/1
-        });
-
-        services.AddBigQueryTestTracking(options =>
-        {
-            options.ServiceName = Documentation.ServiceNames.BigQuery;
-            options.CallerName = Documentation.ServiceNames.BreakfastProvider;
-            options.Verbosity = BigQueryTrackingVerbosity.Detailed;
-            options.CurrentTestInfoFetcher = currentTestInfoFetcher;
+            options.WithHttpMessageHandlerWrapper(fakeHandler =>
+                new BigQueryTrackingMessageHandler(trackingOptions, fakeHandler));
         });
 
         return services;

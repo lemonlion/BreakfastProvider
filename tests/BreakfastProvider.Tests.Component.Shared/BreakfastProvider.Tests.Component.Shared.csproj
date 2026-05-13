@@ -38,8 +38,8 @@
     <PackageReference Include="TestTrackingDiagrams.Extensions.MongoDB" Version="2.33.74" />
     <PackageReference Include="TestTrackingDiagrams.Extensions.BigQuery" Version="2.33.74" />
     <PackageReference Include="Spanner.InMemoryEmulator" Version="1.0.20" />
-    <PackageReference Include="InMemoryEmulator.MongoDB" Version="1.0.0" />
-    <PackageReference Include="InMemoryEmulator.BigQuery" Version="1.0.0" />
+    <PackageReference Include="InMemoryEmulator.MongoDB" Version="1.1.0" />
+    <PackageReference Include="InMemoryEmulator.BigQuery" Version="1.0.104" />
     <PackageReference Include="Grpc.Net.Client" Version="2.80.0" />
   </ItemGroup>
 

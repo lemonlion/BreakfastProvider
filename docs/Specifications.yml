@@ -1,45 +1,23 @@
-TtdVersion: 2.33.7+c891f196235b03935f871006a6fb27d64f95f6e7
+TtdVersion: 2.33.74+07ed8f328c6ab301dd90833c9ce1de9781ebdb09
 Title: Breakfast Provider Specifications
 Features:
-  - Feature: Grpc Recipe Summary Tests
+  - Feature: Recipe Review Management Tests
     Scenarios:
-      - Scenario: Pancake recipe summary should return correct data
+      - Scenario: Submitting a recipe review should return the created review
         IsHappyPath: true
 
-  - Feature: Pancakes Content Negotiation Tests
-    Scenarios:
-      - Scenario: Request with unsupported content type should return unsupported media type <contentType = "application/xml">
+      - Scenario: Listing reviews by recipe should return matching reviews
         IsHappyPath: false
 
-      - Scenario: Request with unsupported content type should return unsupported media type <contentType = "text/html">
+      - Scenario: Retrieving existing review by id should return the review
         IsHappyPath: false
 
-      - Scenario: Request with unsupported content type should return unsupported media type <contentType = "text/plain">
+      - Scenario: Retrieving non existent review should return not found
         IsHappyPath: false
 
-  - Feature: Pancakes Creation Tests
-    Scenarios:
-      - Scenario: Valid pancake request with all ingredients should return a fresh batch
-        IsHappyPath: true
-
-      - Scenario: Pancake request with invalid ingredient should return bad request <field = "Eggs", value = "", reason = "Eggs is required", expectedError = "'Eggs' is required.", expectedStatus = "Bad Request">
+      - Scenario: Submitting review with invalid rating should return bad request
         IsHappyPath: false
 
-      - Scenario: Pancake request with invalid ingredient should return bad request <field = "Eggs", value = "javascript:void(0)", reason = "XSS in eggs", expectedError = "Eggs contains potentially dangerous content.", expectedStatus = "Bad Request">
-        IsHappyPath: false
-
-      - Scenario: Pancake request with invalid ingredient should return bad request <field = "Flour", value = "", reason = "Flour is required", expectedError = "'Flour' is required.", expectedStatus = "Bad Request">
-        IsHappyPath: false
-
-      - Scenario: Pancake request with invalid ingredient should return bad request <field = "Flour", value = "<img onerror=x>", reason = "XSS in flour", expectedError = "Flour contains potentially dangerous content.", expectedStatus = "Bad Request">
-        IsHappyPath: false
-
-      - Scenario: Pancake request with invalid ingredient should return bad request <field = "Milk", value = "", reason = "Milk is required", expectedError = "'Milk' is required.", expectedStatus = "Bad Request">
-        IsHappyPath: false
-
-      - Scenario: Pancake request with invalid ingredient should return bad request <field = "Milk", value = "<script>alert</script>", reason = "XSS in milk", expectedError = "Milk contains potentially dangerous content.", expectedStatus = "Bad Request">
-        IsHappyPath: false
-
-      - Scenario: Pancake request with more toppings than allowed should return bad request
+      - Scenario: Submitting review with missing recipe name should return bad request
         IsHappyPath: false
 

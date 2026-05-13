@@ -1,6 +1,7 @@
 using BreakfastProvider.Api.Models.Requests;
 using BreakfastProvider.Api.Models.Responses;
 using BreakfastProvider.Api.Telemetry;
+using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Driver;
 
 namespace BreakfastProvider.Api.Services;
@@ -73,6 +74,7 @@ public class RecipeReviewService(IMongoClient mongoClient, ILogger<RecipeReviewS
 
 public class RecipeReviewDocument
 {
+    [BsonId]
     public string ReviewId { get; set; } = string.Empty;
     public string RecipeName { get; set; } = string.Empty;
     public string ReviewerName { get; set; } = string.Empty;

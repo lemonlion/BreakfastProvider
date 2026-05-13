@@ -10,12 +10,14 @@ using BreakfastProvider.Tests.Component.Shared.Common.DailySpecials;
 using BreakfastProvider.Tests.Component.Shared.Common.Downstream;
 using BreakfastProvider.Tests.Component.Shared.Common.Feedback;
 using BreakfastProvider.Tests.Component.Shared.Common.Grpc;
+using BreakfastProvider.Tests.Component.Shared.Common.IngredientUsage;
 using BreakfastProvider.Tests.Component.Shared.Common.Ingredients;
 using BreakfastProvider.Tests.Component.Shared.Common.Inventory;
 using BreakfastProvider.Tests.Component.Shared.Common.Menu;
 using BreakfastProvider.Tests.Component.Shared.Common.Orders;
 using BreakfastProvider.Tests.Component.Shared.Common.AppleCinnamonMuffins;
 using BreakfastProvider.Tests.Component.Shared.Common.Pancakes;
+using BreakfastProvider.Tests.Component.Shared.Common.RecipeReviews;
 using BreakfastProvider.Tests.Component.Shared.Common.Reporting;
 using BreakfastProvider.Tests.Component.Shared.Common.Reservations;
 using BreakfastProvider.Tests.Component.Shared.Common.Staff;
@@ -145,6 +147,10 @@ public abstract class BaseFixture : FeatureFixture, IDisposable, IIgnorable<Comp
         services.AddTransient<GetFeedbackSteps>();
         services.AddTransient<PutCustomerPreferenceSteps>();
         services.AddTransient<GetCustomerPreferenceSteps>();
+        services.AddTransient<PostIngredientUsageSteps>();
+        services.AddTransient<GetIngredientUsageSteps>();
+        services.AddTransient<PostRecipeReviewSteps>();
+        services.AddTransient<GetRecipeReviewSteps>();
         services.AddTransient<GrpcBreakfastSteps>();
 
         if (!delayAppCreation && !Settings.RunAgainstExternalServiceUnderTest)

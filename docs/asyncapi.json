@@ -120,6 +120,24 @@
         }
       },
       "description": "Published when a waffle batch is completed."
+    },
+    "OrderCreatedEvent": {
+      "address": "OrderCreatedEvent",
+      "messages": {
+        "orderCreatedMessage": {
+          "$ref": "#/components/messages/orderCreatedMessage"
+        }
+      },
+      "description": "Published when a new breakfast order is created."
+    },
+    "EquipmentAlertEvent": {
+      "address": "EquipmentAlertEvent",
+      "messages": {
+        "equipmentAlertMessage": {
+          "$ref": "#/components/messages/equipmentAlertMessage"
+        }
+      },
+      "description": "Published when kitchen equipment is used during batch preparation."
     }
   },
   "operations": {
@@ -290,6 +308,34 @@
           "$ref": "#/channels/waffle-batch-completed/messages/waffleBatchCompletedMessage"
         }
       ]
+    },
+    "EventGridOrderCreated": {
+      "action": "send",
+      "channel": {
+        "$ref": "#/channels/OrderCreatedEvent"
+      },
+      "title": "EventGridOrderCreated",
+      "summary": "Order Created",
+      "description": "Published when a new breakfast order is created.",
+      "messages": [
+        {
+          "$ref": "#/channels/OrderCreatedEvent/messages/orderCreatedMessage"
+        }
+      ]
+    },
+    "EventHubEquipmentAlert": {
+      "action": "send",
+      "channel": {
+        "$ref": "#/channels/EquipmentAlertEvent"
+      },
+      "title": "EventHubEquipmentAlert",
+      "summary": "Equipment Alert",
+      "description": "Published when kitchen equipment is used during batch preparation.",
+      "messages": [
+        {
+          "$ref": "#/channels/EquipmentAlertEvent/messages/equipmentAlertMessage"
+        }
+      ]
     }
   },
   "components": {
@@ -319,6 +365,36 @@
             "type": "string",
             "format": "date-time",
             "description": "Timestamp when the order was placed (ISO 8601 format)."
+          }
+        },
+        "additionalProperties": false
+      },
+      "equipmentAlertEvent": {
+        "type": "object",
+        "description": "Published when kitchen equipment is used during batch preparation.",
+        "properties": {
+          "alertId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Unique alert identifier."
+          },
+          "batchId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Batch ID that triggered the alert."
+          },
+          "equipmentName": {
+            "type": "string",
+            "description": "Name of the equipment used."
+          },
+          "alertType": {
+            "type": "string",
+            "description": "Type of alert (e.g. UsageCycleCompleted, MaintenanceDue)."
+          },
+          "alertedAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp when the alert was raised (ISO 8601 format)."
           }
         },
         "additionalProperties": false
@@ -479,6 +555,35 @@
             "type": "string",
             "format": "date-time",
             "description": "Timestamp when the batch was completed (ISO 8601 format)."
+          }
+        },
+        "additionalProperties": false
+      },
+      "orderCreatedEvent": {
+        "type": "object",
+        "description": "Published when a new breakfast order is created.",
+        "properties": {
+          "orderId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Unique order identifier."
+          },
+          "customerName": {
+            "type": "string",
+            "description": "Name of the customer who placed the order."
+          },
+          "itemCount": {
+            "type": "integer",
+            "description": "Number of items in the order."
+          },
+          "tableNumber": {
+            "type": "string",
+            "description": "Table number for the order, if applicable."
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp when the order was created (ISO 8601 format)."
           }
         },
         "additionalProperties": false
@@ -786,6 +891,22 @@
         "name": "waffleBatchCompletedMessage",
         "title": "Waffle Batch Completed Message",
         "summary": "Published when a waffle batch is completed."
+      },
+      "orderCreatedMessage": {
+        "payload": {
+          "$ref": "#/components/schemas/orderCreatedEvent"
+        },
+        "name": "orderCreatedMessage",
+        "title": "Order Created Message",
+        "summary": "Published when a new breakfast order is created."
+      },
+      "equipmentAlertMessage": {
+        "payload": {
+          "$ref": "#/components/schemas/equipmentAlertEvent"
+        },
+        "name": "equipmentAlertMessage",
+        "title": "Equipment Alert Message",
+        "summary": "Published when kitchen equipment is used during batch preparation."
       }
     }
   }

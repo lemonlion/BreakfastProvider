@@ -432,3 +432,10 @@ docker/*.pem
 docker/*.cer
 ttd_decompiled.txt
 build-out.txt
+build-output.txt
+all-assertions.txt
+bddfy-build.txt
+bddfy_il.txt
+test-results.txt
+publish-output/
+coverage/

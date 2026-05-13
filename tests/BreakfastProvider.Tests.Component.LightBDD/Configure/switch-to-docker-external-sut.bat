@@ -18,6 +18,8 @@ powershell -NoProfile -Command ^
   "$f = $f -replace '\"RunWithAnInMemoryReportingDatabase\": true', '\"RunWithAnInMemoryReportingDatabase\": false';" ^
   "$f = $f -replace '\"RunWithAnInMemoryBreakfastDatabase\": true', '\"RunWithAnInMemoryBreakfastDatabase\": false';" ^
   "$f = $f -replace '\"RunWithAnInMemorySpannerDatabase\": true', '\"RunWithAnInMemorySpannerDatabase\": false';" ^
+  "$f = $f -replace '\"RunWithAnInMemoryMongoDatabase\": true', '\"RunWithAnInMemoryMongoDatabase\": false';" ^
+  "$f = $f -replace '\"RunWithAnInMemoryBigQuery\": true', '\"RunWithAnInMemoryBigQuery\": false';" ^
   "$f = $f -replace '\"RunWithAnInMemoryNotificationService\": true', '\"RunWithAnInMemoryNotificationService\": false';" ^
   "$f = $f -replace '\"RunWithAnInMemoryEventHub\": true', '\"RunWithAnInMemoryEventHub\": false';" ^
   "$f = $f -replace '\"RunWithAnInMemoryPubSub\": true', '\"RunWithAnInMemoryPubSub\": false';" ^

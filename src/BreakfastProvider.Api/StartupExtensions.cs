@@ -274,7 +274,19 @@ public static class StartupExtensions
 
         if (!string.IsNullOrWhiteSpace(bigQueryConfig.ProjectId))
         {
-            services.AddSingleton(Google.Cloud.BigQuery.V2.BigQueryClient.Create(bigQueryConfig.ProjectId));
+            if (!string.IsNullOrWhiteSpace(bigQueryConfig.EmulatorEndpoint))
+            {
+                services.AddSingleton(sp => new Google.Cloud.BigQuery.V2.BigQueryClientBuilder
+                {
+                    ProjectId = bigQueryConfig.ProjectId,
+                    BaseUri = bigQueryConfig.EmulatorEndpoint,
+                    Credential = Google.Apis.Auth.OAuth2.GoogleCredential.FromAccessToken("emulator")
+                }.Build());
+            }
+            else
+            {
+                services.AddSingleton(sp => Google.Cloud.BigQuery.V2.BigQueryClient.Create(bigQueryConfig.ProjectId));
+            }
         }
 
         services.AddScoped<IIngredientUsageService, IngredientUsageService>();

@@ -36,6 +36,10 @@ services:
         condition: service_started
       notification-service:
         condition: service_started
+      mongodb:
+        condition: service_healthy
+      bigquery-emulator:
+        condition: service_started
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - Kestrel__Endpoints__Http__Url=http://+:8080
@@ -77,6 +81,11 @@ services:
       - EventHubConfig__BlobStorageConnectionString=DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://storage.local:10000/devstoreaccount1;
       - EventHubConfig__BlobContainerName=eventhub-checkpoints
       - DatabaseConfig__ConnectionString=Server=sqlserver-database.local,1433;Database=BreakfastProvider;User Id=sa;Password=YourStr0ngP@ssword;TrustServerCertificate=True
+      - MongoDbConfig__ConnectionString=mongodb://admin:password@mongodb.local:27017
+      - MongoDbConfig__DatabaseName=breakfast_reviews
+      - BigQueryConfig__ProjectId=breakfast-provider-project
+      - BigQueryConfig__DatasetId=breakfast_analytics
+      - BigQueryConfig__EmulatorEndpoint=http://bigquery-emulator.local:9050/bigquery/v2/
     volumes:
       - ./kafka-config/certificates/ca.crt:/certs/kafka-ca.crt:ro
       - ./docker-entrypoint.sh:/app/docker-entrypoint.sh:ro

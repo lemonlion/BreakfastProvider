@@ -125,6 +125,9 @@ jobs:
           echo "SPANNER_EMULATOR_HOST=localhost:9010" >> $GITHUB_ENV
           echo "PUBSUB_EMULATOR_HOST=localhost:8085" >> $GITHUB_ENV
           echo "CosmosConfig__RequestTimeoutSeconds=60" >> $GITHUB_ENV
+          echo "BigQueryConfig__EmulatorEndpoint=http://localhost:9050/bigquery/v2/" >> $GITHUB_ENV
+          echo "MongoDbConfig__ConnectionString=mongodb://admin:password@localhost:27017" >> $GITHUB_ENV
+          echo "MongoDbConfig__DatabaseName=breakfast_reviews" >> $GITHUB_ENV
 
       - name: Make entrypoint script executable
         if: ${{ inputs.test-run-type == 'external-sut' }}

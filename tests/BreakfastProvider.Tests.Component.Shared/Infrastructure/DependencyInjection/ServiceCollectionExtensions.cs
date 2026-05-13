@@ -600,6 +600,22 @@ public static class ServiceCollectionExtensions
 
         services.AddHostedService<InMemoryPubSubBatchCompletionConsumerService>();
 
+        // Replace the real customer feedback Pub/Sub consumer with an in-memory variant.
+        var feedbackConsumerDescriptor = services
+            .FirstOrDefault(d => d.ImplementationType == typeof(PubSubCustomerFeedbackConsumerService));
+        if (feedbackConsumerDescriptor is not null)
+            services.Remove(feedbackConsumerDescriptor);
+
+        services.AddHostedService<InMemoryCustomerFeedbackConsumerService>();
+
+        // Replace the real recipe cost Kafka consumer with an in-memory variant.
+        var recipeCostConsumerDescriptor = services
+            .FirstOrDefault(d => d.ImplementationType == typeof(KafkaRecipeCostConsumerService));
+        if (recipeCostConsumerDescriptor is not null)
+            services.Remove(recipeCostConsumerDescriptor);
+
+        services.AddHostedService<InMemoryRecipeCostConsumerService>();
+
         return services;
     }
 
@@ -843,6 +859,7 @@ public static class ServiceCollectionExtensions
         {
             options.DatabaseName = "BreakfastDb";
             options.AddCollection<Api.Services.RecipeReviewDocument>("recipe_reviews");
+            options.AddCollection<Api.Reporting.CustomerFeedbackAlertDocument>("feedback_alerts");
             options.ClusterConfigurator = builder =>
             {
                 builder.Subscribe<MongoDB.Driver.Core.Events.CommandStartedEvent>(subscriber.OnCommandStarted);
@@ -938,6 +955,15 @@ public static class ServiceCollectionExtensions
                     { "unit", Google.Cloud.BigQuery.V2.BigQueryDbType.String },
                     { "recipe_name", Google.Cloud.BigQuery.V2.BigQueryDbType.String },
                     { "recorded_at", Google.Cloud.BigQuery.V2.BigQueryDbType.String },
+                }.Build());
+                ds.AddTable("recipe_costs", new Google.Cloud.BigQuery.V2.TableSchemaBuilder
+                {
+                    { "calculation_id", Google.Cloud.BigQuery.V2.BigQueryDbType.String },
+                    { "recipe_name", Google.Cloud.BigQuery.V2.BigQueryDbType.String },
+                    { "ingredients", Google.Cloud.BigQuery.V2.BigQueryDbType.String },
+                    { "total_cost", Google.Cloud.BigQuery.V2.BigQueryDbType.Float64 },
+                    { "currency", Google.Cloud.BigQuery.V2.BigQueryDbType.String },
+                    { "calculated_at", Google.Cloud.BigQuery.V2.BigQueryDbType.String },
                 }.Build());
             });
             options.WithHttpMessageHandlerWrapper(fakeHandler =>

@@ -11,6 +11,8 @@ using BreakfastProvider.Tests.Component.Shared.Common.Menu;
 using BreakfastProvider.Tests.Component.Shared.Common.Orders;
 using BreakfastProvider.Tests.Component.Shared.Common.AppleCinnamonMuffins;
 using BreakfastProvider.Tests.Component.Shared.Common.Pancakes;
+using BreakfastProvider.Tests.Component.Shared.Common.CustomerFeedback;
+using BreakfastProvider.Tests.Component.Shared.Common.RecipeCosts;
 using BreakfastProvider.Tests.Component.Shared.Common.RecipeReviews;
 using BreakfastProvider.Tests.Component.Shared.Common.Reporting;
 using BreakfastProvider.Tests.Component.Shared.Common.Reservations;
@@ -81,6 +83,8 @@ public class DependencyInjectionSetup
         services.AddScoped<GetIngredientUsageSteps>();
         services.AddScoped<PostRecipeReviewSteps>();
         services.AddScoped<GetRecipeReviewSteps>();
+        services.AddScoped<PostCustomerFeedbackSteps>();
+        services.AddScoped<PostRecipeCostSteps>();
 
         return services;
     }

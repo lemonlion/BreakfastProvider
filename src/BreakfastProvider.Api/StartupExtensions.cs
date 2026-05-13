@@ -25,6 +25,7 @@ public static class StartupExtensions
         services.AddSingleton<IProducerFactory, KafkaProducerFactory>();
         services.AddSingleton<IKafkaProducerConfigurationFactory, KafkaProducerConfigurationFactory>();
         services.AddSingleton<KafkaEventPublisher<RecipeLogEvent>>();
+        services.AddSingleton<KafkaEventPublisher<RecipeCostCalculatedEvent>>();
         services.AddOptions<ProgramSettings>().Bind(configuration);
         services.AddOptions<KafkaConfig>()
             .Bind(configuration.GetSection("KafkaConfig"))
@@ -70,6 +71,7 @@ public static class StartupExtensions
             services.AddSingleton(_ => new PubSubEventPublisher<PancakeBatchCompletedEvent>());
             services.AddSingleton(_ => new PubSubEventPublisher<WaffleBatchCompletedEvent>());
             services.AddSingleton(_ => new PubSubEventPublisher<MuffinBatchCompletedEvent>());
+            services.AddSingleton(_ => new PubSubEventPublisher<CustomerFeedbackReceivedEvent>());
             return services;
         }
 
@@ -98,6 +100,7 @@ public static class StartupExtensions
         RegisterKeyedPublisher<PancakeBatchCompletedEvent>(services);
         RegisterKeyedPublisher<MuffinBatchCompletedEvent>(services);
         RegisterKeyedPublisher<WaffleBatchCompletedEvent>(services);
+        RegisterKeyedPublisher<CustomerFeedbackReceivedEvent>(services);
 
         return services;
     }
@@ -169,8 +172,12 @@ public static class StartupExtensions
             sp.GetRequiredService<IDbContextFactory<ReportingDbContext>>().CreateDbContext());
 
         services.AddScoped<IReportingIngester, ReportingIngester>();
+        services.AddScoped<ICustomerFeedbackAlertService, CustomerFeedbackAlertService>();
+        services.AddScoped<IRecipeCostAnalysisService, RecipeCostAnalysisService>();
         services.AddHostedService<ReportingKafkaConsumerService>();
         services.AddHostedService<PubSubBatchCompletionConsumerService>();
+        services.AddHostedService<PubSubCustomerFeedbackConsumerService>();
+        services.AddHostedService<KafkaRecipeCostConsumerService>();
         services.AddHostedService<EventHubEquipmentAlertConsumerService>();
 
         services.AddGraphQLServer()

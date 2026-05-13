@@ -33,6 +33,13 @@ public class DownstreamRequestSteps(FakeRequestStore fakeRequestStore, RequestCo
             && r.Method == HttpMethod.Post);
     }
 
+    public void AssertSupplierServiceReceivedFeedbackRequest()
+    {
+        var requests = fakeRequestStore.GetRequests(context.RequestId, ServiceNames.SupplierService);
+        requests.Should().Contain(r => r.RequestUri!.AbsolutePath == "/ingredients/feedback"
+            && r.Method == HttpMethod.Post);
+    }
+
     public void AssertDownstreamReceivedCorrelationId(string serviceName, string expectedCorrelationId)
     {
         var requests = fakeRequestStore.GetRequests(context.RequestId, serviceName);

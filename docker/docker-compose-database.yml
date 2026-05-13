@@ -173,7 +173,7 @@ services:
       - '9050:9050'
     command: ["--project=breakfast-provider-project", "--port=9050"]
     healthcheck:
-      test: ["CMD-SHELL", "nc -z localhost 9050 || exit 1"]
+      test: ["CMD-SHELL", "grep -q ':235A' /proc/net/tcp6 || exit 1"]
       interval: 5s
       timeout: 5s
       retries: 30
@@ -182,3 +182,29 @@ services:
       localdev:
         aliases:
           - bigquery-emulator.local
+
+  bigquery-init:
+    container_name: bigquery-init
+    image: curlimages/curl:latest
+    depends_on:
+      bigquery-emulator:
+        condition: service_healthy
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        set -e
+        EMULATOR=http://bigquery-emulator.local:9050/bigquery/v2
+
+        echo "Creating BigQuery dataset..."
+        curl -sf -X POST "$$EMULATOR/projects/breakfast-provider-project/datasets" \
+          -H "Content-Type: application/json" \
+          -d '{"datasetReference":{"datasetId":"breakfast_analytics","projectId":"breakfast-provider-project"}}'
+
+        echo "Creating BigQuery table..."
+        curl -sf -X POST "$$EMULATOR/projects/breakfast-provider-project/datasets/breakfast_analytics/tables" \
+          -H "Content-Type: application/json" \
+          -d '{"tableReference":{"tableId":"ingredient_usage","datasetId":"breakfast_analytics","projectId":"breakfast-provider-project"},"schema":{"fields":[{"name":"usage_id","type":"STRING","mode":"REQUIRED"},{"name":"ingredient_name","type":"STRING","mode":"REQUIRED"},{"name":"quantity_used","type":"FLOAT","mode":"REQUIRED"},{"name":"unit","type":"STRING","mode":"REQUIRED"},{"name":"recipe_name","type":"STRING","mode":"REQUIRED"},{"name":"recorded_at","type":"STRING","mode":"REQUIRED"}]}}'
+
+        echo "BigQuery initialisation complete."
+    networks:
+      - localdev

@@ -1,23 +1,20 @@
 TtdVersion: 2.33.74+07ed8f328c6ab301dd90833c9ce1de9781ebdb09
 Title: Breakfast Provider Specifications
 Features:
-  - Feature: Recipe Review Management Tests
+  - Feature: Ingredient Usage Analytics Tests
     Scenarios:
-      - Scenario: Submitting a recipe review should return the created review
+      - Scenario: Recording ingredient usage should return the created record
         IsHappyPath: true
 
-      - Scenario: Listing reviews by recipe should return matching reviews
+      - Scenario: Getting usage summary should return aggregated data
         IsHappyPath: false
 
-      - Scenario: Retrieving existing review by id should return the review
+      - Scenario: Listing usage by ingredient should return matching records
         IsHappyPath: false
 
-      - Scenario: Retrieving non existent review should return not found
+      - Scenario: Recording usage with missing ingredient name should return bad request
         IsHappyPath: false
 
-      - Scenario: Submitting review with invalid rating should return bad request
-        IsHappyPath: false
-
-      - Scenario: Submitting review with missing recipe name should return bad request
+      - Scenario: Recording usage with zero quantity should return bad request
         IsHappyPath: false
 

@@ -38,8 +38,8 @@ services:
         condition: service_started
       mongodb:
         condition: service_healthy
-      bigquery-emulator:
-        condition: service_started
+      bigquery-init:
+        condition: service_completed_successfully
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - Kestrel__Endpoints__Http__Url=http://+:8080

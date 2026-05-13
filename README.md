@@ -4,6 +4,10 @@ Provides breakfast preparation capabilities including pancake/waffle creation, o
 
 **See the output [here](https://lemonlion.github.io/BreakfastProvider/)**
 
+
+> [!NOTE]
+> Ignore the UI, it's a work in progress and completely separate from the rest of the project
+
 ## Purpose [↑](#top)<a name="purpose"></a>
 
 This project is a **deliberately opinionated reference implementation** of a component testing design philosophy. It exists to demonstrate how a modern .NET service can be built and tested, serving as a template for teams adopting outside-in component testing, running all dependencies both in memory and in docker/external (depending on a config switch) and using [TestTrackingDiagrams](https://lemonlion.github.io/TestTrackingDiagrams) to autogenerate test reports that have [interactive sequence diagrams](https://lemonlion.github.io/BreakfastProvider/) of your tests.

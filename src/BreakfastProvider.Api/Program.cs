@@ -231,6 +231,12 @@ public class Program
         // Google Cloud Spanner (Feedback, Customer Preferences)
         builder.Services.AddSpannerDatabase(builder.Configuration);
 
+        // MongoDB (Recipe Reviews)
+        builder.Services.AddMongoDb(builder.Configuration);
+
+        // Google BigQuery (Ingredient Usage Analytics)
+        builder.Services.AddBigQuery(builder.Configuration);
+
         // gRPC
         builder.Services.AddGrpc();
         builder.Services.AddNotificationGrpcClient(builder.Configuration);

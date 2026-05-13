@@ -21,6 +21,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using CosmosDB.InMemoryEmulator;
+using InMemoryEmulator.MongoDB;
+using InMemoryEmulator.BigQuery;
 using Spanner.InMemoryEmulator;
 using TestTrackingDiagrams.Constants;
 using TestTrackingDiagrams.Extensions;
@@ -28,6 +30,8 @@ using TestTrackingDiagrams.Extensions.CosmosDB;
 using TestTrackingDiagrams.Extensions.EfCore.Relational;
 using TestTrackingDiagrams.Extensions.Grpc;
 using TestTrackingDiagrams.Extensions.Kafka;
+using TestTrackingDiagrams.Extensions.MongoDB;
+using TestTrackingDiagrams.Extensions.BigQuery;
 using TestTrackingDiagrams.Extensions.Spanner;
 using TestTrackingDiagrams.Tracking;
 
@@ -730,6 +734,122 @@ public static class ServiceCollectionExtensions
                 // IHttpContextAccessor is auto-resolved from DI — no manual wiring needed
             });
 
+        return services;
+    }
+
+    /// <summary>
+    /// Replaces the real <see cref="MongoDB.Driver.IMongoClient"/> with an in-memory
+    /// MongoDB emulator backed by <c>InMemoryEmulator.MongoDB</c> and wires up
+    /// TTD tracking via <c>MongoDbTrackingSubscriber</c>.
+    /// </summary>
+    public static IServiceCollection UseInMemoryMongoDatabase(this IServiceCollection services,
+        Func<(string Name, string Id)> currentTestInfoFetcher)
+    {
+        var trackingOptions = new MongoDbTrackingOptions
+        {
+            ServiceName = Documentation.ServiceNames.MongoDB,
+            CallerName = Documentation.ServiceNames.BreakfastProvider,
+            Verbosity = MongoDbTrackingVerbosity.Detailed,
+            CurrentTestInfoFetcher = currentTestInfoFetcher
+        };
+
+        services.UseInMemoryMongoDB(options =>
+        {
+            options.DatabaseName = "BreakfastDb";
+            options.AddCollection<Api.Services.RecipeReviewDocument>("recipe_reviews");
+            options.OnClientCreated = client =>
+            {
+                // Wire up TTD tracking via the client settings
+                // The InMemoryMongoClient exposes settings that can be configured
+            };
+        });
+
+        services.AddMongoDbTestTracking(options =>
+        {
+            options.ServiceName = Documentation.ServiceNames.MongoDB;
+            options.CallerName = Documentation.ServiceNames.BreakfastProvider;
+            options.Verbosity = MongoDbTrackingVerbosity.Detailed;
+            options.CurrentTestInfoFetcher = currentTestInfoFetcher;
+        });
+
+        return services;
+    }
+
+    /// <summary>
+    /// Replaces the MongoDB health check with a no-op that always returns Healthy.
+    /// </summary>
+    public static IServiceCollection ReplaceMongoHealthCheckWithNoOp(this IServiceCollection services)
+    {
+        services.Configure<Microsoft.Extensions.Diagnostics.HealthChecks.HealthCheckServiceOptions>(options =>
+        {
+            var mongoReg = options.Registrations.FirstOrDefault(r => r.Name == Api.Services.HealthChecks.HealthCheckNames.MongoDB);
+            if (mongoReg is not null)
+            {
+                options.Registrations.Remove(mongoReg);
+                options.Registrations.Add(new Microsoft.Extensions.Diagnostics.HealthChecks.HealthCheckRegistration(
+                    Api.Services.HealthChecks.HealthCheckNames.MongoDB,
+                    _ => new Api.Services.HealthChecks.NoOpHealthCheck("MongoDB replaced with in-memory emulator."),
+                    failureStatus: Microsoft.Extensions.Diagnostics.HealthChecks.HealthStatus.Healthy,
+                    tags: [Api.Services.HealthChecks.HealthCheckTags.Infrastructure, Api.Services.HealthChecks.HealthCheckTags.Database]));
+            }
+        });
+        return services;
+    }
+
+    /// <summary>
+    /// Replaces the real <see cref="Google.Cloud.BigQuery.V2.BigQueryClient"/> with an
+    /// in-memory BigQuery emulator backed by <c>InMemoryEmulator.BigQuery</c> and wires
+    /// up TTD tracking via <c>BigQueryTrackingMessageHandler</c>.
+    /// </summary>
+    public static IServiceCollection UseInMemoryBigQuery(this IServiceCollection services,
+        Func<(string Name, string Id)> currentTestInfoFetcher)
+    {
+        services.UseInMemoryBigQuery(options =>
+        {
+            options.ProjectId = "test-project";
+            options.AddDataset("breakfast_analytics", ds =>
+            {
+                ds.AddTable("ingredient_usage", new Google.Cloud.BigQuery.V2.TableSchemaBuilder
+                {
+                    { "usage_id", Google.Cloud.BigQuery.V2.BigQueryDbType.String },
+                    { "ingredient_name", Google.Cloud.BigQuery.V2.BigQueryDbType.String },
+                    { "quantity_used", Google.Cloud.BigQuery.V2.BigQueryDbType.Float64 },
+                    { "unit", Google.Cloud.BigQuery.V2.BigQueryDbType.String },
+                    { "recipe_name", Google.Cloud.BigQuery.V2.BigQueryDbType.String },
+                    { "recorded_at", Google.Cloud.BigQuery.V2.BigQueryDbType.String },
+                }.Build());
+            });
+        });
+
+        services.AddBigQueryTestTracking(options =>
+        {
+            options.ServiceName = Documentation.ServiceNames.BigQuery;
+            options.CallerName = Documentation.ServiceNames.BreakfastProvider;
+            options.Verbosity = BigQueryTrackingVerbosity.Detailed;
+            options.CurrentTestInfoFetcher = currentTestInfoFetcher;
+        });
+
+        return services;
+    }
+
+    /// <summary>
+    /// Replaces the BigQuery health check with a no-op that always returns Healthy.
+    /// </summary>
+    public static IServiceCollection ReplaceBigQueryHealthCheckWithNoOp(this IServiceCollection services)
+    {
+        services.Configure<Microsoft.Extensions.Diagnostics.HealthChecks.HealthCheckServiceOptions>(options =>
+        {
+            var bqReg = options.Registrations.FirstOrDefault(r => r.Name == Api.Services.HealthChecks.HealthCheckNames.BigQuery);
+            if (bqReg is not null)
+            {
+                options.Registrations.Remove(bqReg);
+                options.Registrations.Add(new Microsoft.Extensions.Diagnostics.HealthChecks.HealthCheckRegistration(
+                    Api.Services.HealthChecks.HealthCheckNames.BigQuery,
+                    _ => new Api.Services.HealthChecks.NoOpHealthCheck("BigQuery replaced with in-memory emulator."),
+                    failureStatus: Microsoft.Extensions.Diagnostics.HealthChecks.HealthStatus.Healthy,
+                    tags: [Api.Services.HealthChecks.HealthCheckTags.Infrastructure, Api.Services.HealthChecks.HealthCheckTags.Database]));
+            }
+        });
         return services;
     }
 }

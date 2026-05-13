@@ -365,6 +365,18 @@ public abstract class BaseFixture : DiagrammedComponentTest, IDisposable
         if (Settings.RunWithAnInMemoryNotificationService)
             services.UseTrackedGrpcNotificationClient(CurrentTestInfo.Fetcher, Settings.NotificationServiceBaseUrl!);
 
+        if (Settings.RunWithAnInMemoryMongoDatabase)
+        {
+            services.UseInMemoryMongoDatabase(CurrentTestInfo.Fetcher);
+            services.ReplaceMongoHealthCheckWithNoOp();
+        }
+
+        if (Settings.RunWithAnInMemoryBigQuery)
+        {
+            services.UseInMemoryBigQuery(CurrentTestInfo.Fetcher);
+            services.ReplaceBigQueryHealthCheckWithNoOp();
+        }
+
         services.UseTrackedOutboxWriter(CurrentTestInfo.Fetcher);
         services.UseTrackedKafkaProducer(CurrentTestInfo.Fetcher);
         services.UseTrackedPubSubPublishers();

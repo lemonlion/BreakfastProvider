@@ -13,6 +13,8 @@ public static class HealthCheckNames
     public const string Kafka = "Kafka";
     public const string PubSub = "PubSub";
     public const string Spanner = "Spanner";
+    public const string MongoDB = "MongoDB";
+    public const string BigQuery = "BigQuery";
 }
 
 public static class HealthCheckTags
@@ -84,6 +86,26 @@ public static class HealthCheckServiceExtensions
             {
                 var spannerCheck = sp.GetService<SpannerHealthCheck>();
                 return spannerCheck ?? (IHealthCheck)new NoOpHealthCheck("Spanner not configured.");
+            },
+            failureStatus: HealthStatus.Unhealthy,
+            tags: [HealthCheckTags.Infrastructure, HealthCheckTags.Database]));
+
+        builder.Add(new HealthCheckRegistration(
+            HealthCheckNames.MongoDB,
+            sp =>
+            {
+                var mongoCheck = sp.GetService<MongoDbHealthCheck>();
+                return mongoCheck ?? (IHealthCheck)new NoOpHealthCheck("MongoDB not configured.");
+            },
+            failureStatus: HealthStatus.Unhealthy,
+            tags: [HealthCheckTags.Infrastructure, HealthCheckTags.Database]));
+
+        builder.Add(new HealthCheckRegistration(
+            HealthCheckNames.BigQuery,
+            sp =>
+            {
+                var bigQueryCheck = sp.GetService<BigQueryHealthCheck>();
+                return bigQueryCheck ?? (IHealthCheck)new NoOpHealthCheck("BigQuery not configured.");
             },
             failureStatus: HealthStatus.Unhealthy,
             tags: [HealthCheckTags.Infrastructure, HealthCheckTags.Database]));

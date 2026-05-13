@@ -24,6 +24,8 @@ public static class Endpoints
     public const string Reservations = "reservations";
     public const string Feedback = "feedback";
     public const string CustomerPreferences = "customer-preferences";
+    public const string RecipeReviews = "recipe-reviews";
+    public const string IngredientUsage = "ingredient-usage";
     public const string EventGridWebhook = "webhooks/eventgrid";
 
     public static class Swagger

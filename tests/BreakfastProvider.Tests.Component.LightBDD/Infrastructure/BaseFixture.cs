@@ -405,6 +405,18 @@ public abstract class BaseFixture : FeatureFixture, IDisposable, IIgnorable<Comp
         if (Settings.RunWithAnInMemoryNotificationService)
             services.UseTrackedGrpcNotificationClient(CurrentTestInfo.Fetcher, Settings.NotificationServiceBaseUrl!);
 
+        if (Settings.RunWithAnInMemoryMongoDatabase)
+        {
+            services.UseInMemoryMongoDatabase(CurrentTestInfo.Fetcher);
+            services.ReplaceMongoHealthCheckWithNoOp();
+        }
+
+        if (Settings.RunWithAnInMemoryBigQuery)
+        {
+            services.UseInMemoryBigQuery(CurrentTestInfo.Fetcher);
+            services.ReplaceBigQueryHealthCheckWithNoOp();
+        }
+
         // Tracking wrappers must be registered AFTER the in-memory/real publishers
         services.UseTrackedOutboxWriter(CurrentTestInfo.Fetcher);
         services.UseTrackedKafkaProducer(CurrentTestInfo.Fetcher);

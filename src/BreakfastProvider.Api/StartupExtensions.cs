@@ -244,6 +244,43 @@ public static class StartupExtensions
 
         return services;
     }
+
+    public static IServiceCollection AddMongoDb(this IServiceCollection services, IConfiguration configuration)
+    {
+        var mongoConfig = configuration.GetSection(nameof(MongoDbConfig)).Get<MongoDbConfig>()
+            ?? new MongoDbConfig();
+
+        services.AddOptions<MongoDbConfig>()
+            .Bind(configuration.GetSection(nameof(MongoDbConfig)));
+
+        if (!string.IsNullOrWhiteSpace(mongoConfig.ConnectionString))
+        {
+            services.AddSingleton<MongoDB.Driver.IMongoClient>(
+                new MongoDB.Driver.MongoClient(mongoConfig.ConnectionString));
+        }
+
+        services.AddScoped<IRecipeReviewService, RecipeReviewService>();
+
+        return services;
+    }
+
+    public static IServiceCollection AddBigQuery(this IServiceCollection services, IConfiguration configuration)
+    {
+        var bigQueryConfig = configuration.GetSection("BigQueryConfig").Get<Configuration.BigQueryConfig>()
+            ?? new Configuration.BigQueryConfig();
+
+        services.AddOptions<Configuration.BigQueryConfig>()
+            .Bind(configuration.GetSection("BigQueryConfig"));
+
+        if (!string.IsNullOrWhiteSpace(bigQueryConfig.ProjectId))
+        {
+            services.AddSingleton(Google.Cloud.BigQuery.V2.BigQueryClient.Create(bigQueryConfig.ProjectId));
+        }
+
+        services.AddScoped<IIngredientUsageService, IngredientUsageService>();
+
+        return services;
+    }
 }
 
 public static class Documentation
@@ -263,5 +300,7 @@ public static class Documentation
         public const string BreakfastDatabase = "Breakfast Database (SQL Server)";
         public const string Spanner = "Spanner";
         public const string NotificationService = "Notification Service (gRPC)";
+        public const string MongoDB = "MongoDB";
+        public const string BigQuery = "BigQuery";
     }
 }

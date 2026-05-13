@@ -14,6 +14,8 @@ public record ComponentTestSettings
     public bool RunWithAnInMemoryReportingDatabase { get; set; }
     public bool RunWithAnInMemoryBreakfastDatabase { get; set; }
     public bool RunWithAnInMemorySpannerDatabase { get; set; }
+    public bool RunWithAnInMemoryMongoDatabase { get; set; }
+    public bool RunWithAnInMemoryBigQuery { get; set; }
     public bool RunWithAnInMemoryNotificationService { get; set; }
     public bool RunWithAnInMemoryEventHub { get; set; }
     public bool RunWithAnInMemoryPubSub { get; set; }

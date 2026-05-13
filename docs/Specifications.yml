@@ -1,20 +1,2351 @@
-TtdVersion: 2.33.74+07ed8f328c6ab301dd90833c9ce1de9781ebdb09
+TtdVersion: 2.33.65+936cfb01cf438e8732ffbb14e1b73d8a2484bd3b
 Title: Breakfast Provider Specifications
 Features:
-  - Feature: Ingredient Usage Analytics Tests
+  - Feature: Apple Cinnamon Muffins Creation Feature
+    Description: /muffins - Creating apple cinnamon muffins with baking profiles and toppings
     Scenarios:
-      - Scenario: Recording ingredient usage should return the created record
+      - Scenario: A Valid Apple Cinnamon Muffin Request Should Return A Fresh Batch
         IsHappyPath: true
+        Labels:
+          - Happy Path
+        Steps:
+          - GIVEN A valid muffin recipe with all ingredients
+            - Milk steps response message status code should be OK
+            - Eggs steps response message status code should be OK
+            - Flour steps response message status code should be OK
+          - WHEN The muffins are prepared
+          - THEN The muffin response should contain a valid batch with all ingredients
+            - Muffin steps response message status code should be Created
+            - Response content is valid json should be true
+            - Muffin steps response ingredients should contain 'Some_Fresh_Milk'
+            - Muffin steps response ingredients should contain 'Some_Eggs'
+            - Muffin steps response ingredients should contain 'Some_Flour'
+            - Muffin steps response ingredients should contain GrannySmithApples
+            - Muffin steps response ingredients should contain CeylonCinnamon
+            - Muffin steps response toppings should have count 1
+            - Muffin steps response baking temperature should be DefaultTemperature
+            - Muffin steps response baking duration should be DefaultDuration
+          - AND The cow service should have received a milk request
+            - Requests should contain < r => r.RequestUri.AbsolutePath == "/milk" (and)(and) r.Method == HttpMethod.Get >
 
-      - Scenario: Getting usage summary should return aggregated data
+      - Scenario: Different Muffin Recipes Should Produce The Expected "MuffinBatchExpectation ( ExpectedIngredientCount = 5, ExpectedToppingCount = 2, HasBakingInfo = True )" Batch <recipeName = "Classic"> <recipe = "MuffinRecipeTestData ( Ingredients = IngredientSet ( Flour = Plain Flour, Apples = Granny Smith, Cinnamon = Ceylon ), Toppings = System.Collections.Generic.List'1<BreakfastProvider.Tests.Component.Shared.Models.AppleCinnamonMuffins.ToppingData> )"> <temperature = "180"> <durationMinutes = "25"> <panType = "Standard">
         IsHappyPath: false
+        Steps:
+          - GIVEN A "Classic" muffin recipe at "180" degrees for "25" minutes in "Standard" <recipeData = "MuffinRecipeTestData ( Ingredients = IngredientSet ( Flour = Plain Flour, Apples = Granny Smith, Cinnamon = Ceylon ), Toppings = System.Collections.Generic.List'1<BreakfastProvider.Tests.Component.Shared.Models.AppleCinnamonMuffins.ToppingData> )">
+            - Milk steps response message status code should be OK
+            - Eggs steps response message status code should be OK
+          - WHEN The muffins are prepared
+          - THEN The muffin batch should match the expected "MuffinBatchExpectation ( ExpectedIngredientCount = 5, ExpectedToppingCount = 2, HasBakingInfo = True )" outcome
+            - Muffin steps response message status code should be Created
+            - Response content is valid json should be true
+            - Muffin steps response ingredients should have count '5'
+            - Muffin steps response toppings should have count '2'
+            - Baking temperature matches expectation should be true
 
-      - Scenario: Listing usage by ingredient should return matching records
+      - Scenario: Different Muffin Recipes Should Produce The Expected "MuffinBatchExpectation ( ExpectedIngredientCount = 5, ExpectedToppingCount = 2, HasBakingInfo = True )" Batch <recipeName = "Rustic Wholesome"> <recipe = "MuffinRecipeTestData ( Ingredients = IngredientSet ( Flour = Whole Wheat, Apples = Honeycrisp, Cinnamon = Cassia ), Toppings = System.Collections.Generic.List'1<BreakfastProvider.Tests.Component.Shared.Models.AppleCinnamonMuffins.ToppingData> )"> <temperature = "175"> <durationMinutes = "30"> <panType = "Cast Iron">
         IsHappyPath: false
+        Steps:
+          - GIVEN A "Rustic Wholesome" muffin recipe at "175" degrees for "30" minutes in "Cast Iron" <recipeData = "MuffinRecipeTestData ( Ingredients = IngredientSet ( Flour = Whole Wheat, Apples = Honeycrisp, Cinnamon = Cassia ), Toppings = System.Collections.Generic.List'1<BreakfastProvider.Tests.Component.Shared.Models.AppleCinnamonMuffins.ToppingData> )">
+            - Milk steps response message status code should be OK
+            - Eggs steps response message status code should be OK
+          - WHEN The muffins are prepared
+          - THEN The muffin batch should match the expected "MuffinBatchExpectation ( ExpectedIngredientCount = 5, ExpectedToppingCount = 2, HasBakingInfo = True )" outcome
+            - Muffin steps response message status code should be Created
+            - Response content is valid json should be true
+            - Muffin steps response ingredients should have count '5'
+            - Muffin steps response toppings should have count '2'
+            - Baking temperature matches expectation should be true
 
-      - Scenario: Recording usage with missing ingredient name should return bad request
+      - Scenario: Different Muffin Recipes Should Produce The Expected "MuffinBatchExpectation ( ExpectedIngredientCount = 5, ExpectedToppingCount = 2, HasBakingInfo = True )" Batch <recipeName = "Spiced Deluxe"> <recipe = "MuffinRecipeTestData ( Ingredients = IngredientSet ( Flour = Almond Flour, Apples = Pink Lady, Cinnamon = Saigon ), Toppings = System.Collections.Generic.List'1<BreakfastProvider.Tests.Component.Shared.Models.AppleCinnamonMuffins.ToppingData> )"> <temperature = "190"> <durationMinutes = "20"> <panType = "Silicone">
         IsHappyPath: false
+        Steps:
+          - GIVEN A "Spiced Deluxe" muffin recipe at "190" degrees for "20" minutes in "Silicone" <recipeData = "MuffinRecipeTestData ( Ingredients = IngredientSet ( Flour = Almond Flour, Apples = Pink Lady, Cinnamon = Saigon ), Toppings = System.Collections.Generic.List'1<BreakfastProvider.Tests.Component.Shared.Models.AppleCinnamonMuffins.ToppingData> )">
+            - Milk steps response message status code should be OK
+            - Eggs steps response message status code should be OK
+          - WHEN The muffins are prepared
+          - THEN The muffin batch should match the expected "MuffinBatchExpectation ( ExpectedIngredientCount = 5, ExpectedToppingCount = 2, HasBakingInfo = True )" outcome
+            - Muffin steps response message status code should be Created
+            - Response content is valid json should be true
+            - Muffin steps response ingredients should have count '5'
+            - Muffin steps response toppings should have count '2'
+            - Baking temperature matches expectation should be true
 
-      - Scenario: Recording usage with zero quantity should return bad request
+      - Scenario: Muffins Endpoint Is Called With An Invalid Field "Apples" Should Return A Bad Request Response <value = ""> <reason = "Apples is required"> <expectedError = "'Apples' is required."> <expectedStatus = "Bad Request">
         IsHappyPath: false
+        Steps:
+          - GIVEN A valid muffin request with an invalid field "Apples" set to ""
+          - WHEN The invalid muffin request is submitted
+          - THEN The muffin response should contain "'Apples' is required." with "Bad Request"
+            - Response body should contain ''Apples' is required.'
+            - Muffin steps response message status code should be BadRequest
+
+      - Scenario: Muffins Endpoint Is Called With An Invalid Field "Cinnamon" Should Return A Bad Request Response <value = ""> <reason = "Cinnamon is required"> <expectedError = "'Cinnamon' is required."> <expectedStatus = "Bad Request">
+        IsHappyPath: false
+        Steps:
+          - GIVEN A valid muffin request with an invalid field "Cinnamon" set to ""
+          - WHEN The invalid muffin request is submitted
+          - THEN The muffin response should contain "'Cinnamon' is required." with "Bad Request"
+            - Response body should contain ''Cinnamon' is required.'
+            - Muffin steps response message status code should be BadRequest
+
+      - Scenario: Muffins Endpoint Is Called With An Invalid Field "Cinnamon" Should Return A Bad Request Response <value = "<script>alert('xss')</script>"> <reason = "XSS in cinnamon"> <expectedError = "Cinnamon contains potentially dangerous content."> <expectedStatus = "Bad Request">
+        IsHappyPath: false
+        Steps:
+          - GIVEN A valid muffin request with an invalid field "Cinnamon" set to "<script>alert('xss')</script>"
+          - WHEN The invalid muffin request is submitted
+          - THEN The muffin response should contain "Cinnamon contains potentially dangerous content." with "Bad Request"
+            - Response body should contain 'Cinnamon contains potentially dangerous content.'
+            - Muffin steps response message status code should be BadRequest
+
+      - Scenario: Muffins Endpoint Is Called With An Invalid Field "Eggs" Should Return A Bad Request Response <value = ""> <reason = "Eggs is required"> <expectedError = "'Eggs' is required."> <expectedStatus = "Bad Request">
+        IsHappyPath: false
+        Steps:
+          - GIVEN A valid muffin request with an invalid field "Eggs" set to ""
+          - WHEN The invalid muffin request is submitted
+          - THEN The muffin response should contain "'Eggs' is required." with "Bad Request"
+            - Response body should contain ''Eggs' is required.'
+            - Muffin steps response message status code should be BadRequest
+
+      - Scenario: Muffins Endpoint Is Called With An Invalid Field "Flour" Should Return A Bad Request Response <value = ""> <reason = "Flour is required"> <expectedError = "'Flour' is required."> <expectedStatus = "Bad Request">
+        IsHappyPath: false
+        Steps:
+          - GIVEN A valid muffin request with an invalid field "Flour" set to ""
+          - WHEN The invalid muffin request is submitted
+          - THEN The muffin response should contain "'Flour' is required." with "Bad Request"
+            - Response body should contain ''Flour' is required.'
+            - Muffin steps response message status code should be BadRequest
+
+      - Scenario: Muffins Endpoint Is Called With An Invalid Field "Milk" Should Return A Bad Request Response <value = ""> <reason = "Milk is required"> <expectedError = "'Milk' is required."> <expectedStatus = "Bad Request">
+        IsHappyPath: false
+        Steps:
+          - GIVEN A valid muffin request with an invalid field "Milk" set to ""
+          - WHEN The invalid muffin request is submitted
+          - THEN The muffin response should contain "'Milk' is required." with "Bad Request"
+            - Response body should contain ''Milk' is required.'
+            - Muffin steps response message status code should be BadRequest
+
+  - Feature: Audit Logs Filtering Feature
+    Description: /audit-logs - Filtering audit logs by entity type and entity ID
+    Scenarios:
+      - Scenario: Audit Logs Should Be Filterable By Entity Id
+        IsHappyPath: false
+        Steps:
+          - GIVEN An order has been created to generate an audit log
+            - A pancake batch is created
+              - Response content is valid json should be true
+            - An order is created for the batch
+              - Response content is valid json should be true
+          - WHEN Audit logs are requested filtered by entity id
+          - THEN The audit log response should contain the specific order entry
+            - The audit log response status should be ok
+              - Audit log response status code should be OK
+            - The audit logs should contain the created order
+              - Audit logs should contain < l => l.EntityId == 'd61ad46b-80ea-40ac-91b4-31e5eb169970' >
+
+      - Scenario: Audit Logs Should Be Filterable By Entity Type
+        IsHappyPath: false
+        Steps:
+          - GIVEN An order has been created to generate an audit log
+            - A pancake batch is created
+              - Response content is valid json should be true
+            - An order is created for the batch
+              - Response content is valid json should be true
+          - WHEN Audit logs are requested filtered by entity type
+          - THEN The audit log response should only contain order entries
+            - The audit log response status should be ok
+              - Audit log response status code should be OK
+            - The audit logs should only contain order entity type
+              - Audit logs should only contain < l => l.EntityType == AuditLogDefaults.OrderEntityType >
+
+      - Scenario: Audit Logs Should Be Returned In Descending Timestamp Order
+        IsHappyPath: false
+        Steps:
+          - GIVEN An order has been created to generate an audit log
+            - A pancake batch is created
+              - Response content is valid json should be true
+            - An order is created for the batch
+              - Response content is valid json should be true
+          - WHEN Audit logs are requested filtered by entity type
+          - THEN The audit logs should be ordered by timestamp descending
+            - Audit logs should not be null or empty
+            - Audit logs should be in descending order < l => l.Timestamp >
+
+      - Scenario: Filtering Audit Logs By A Non Existent Entity Type Should Return An Empty Collection
+        IsHappyPath: false
+        Steps:
+          - WHEN Audit logs are requested filtered by a non existent entity type
+          - THEN The audit log response should be an empty collection
+            - The audit log response status should be ok
+              - Audit log response status code should be OK
+            - The audit logs list should be empty
+              - Audit logs from different time range should be empty
+
+  - Feature: Audit Logs Retrieval Feature
+    Description: /audit-logs - Retrieving audit log entries for order operations
+    Scenarios:
+      - Scenario: Creating An Order Should Produce A Retrievable Audit Log Entry
+        IsHappyPath: true
+        Labels:
+          - Happy Path
+        Steps:
+          - GIVEN A pancake batch has been created
+            - A pancake request is submitted with ingredients
+            - The pancake batch response should be successful
+              - Pancake steps response message status code should be Created
+              - Response content is valid json should be true
+              - Pancake steps response should not be null
+              - Pancake steps response batch id should not be empty
+          - AND An order has been created for the batch
+            - An order request is submitted
+            - The order creation response should be successful
+              - Order steps response message status code should be Created
+              - Response content is valid json should be true
+              - Order steps response should not be null
+              - Order steps response order id should not be empty
+          - WHEN The audit logs are retrieved
+          - THEN The audit log response should contain the order creation entry
+            - The audit log response http status should be ok
+              - Audit steps response message status code should be OK
+            - The audit log response should be valid json
+              - Response content is valid json should be true
+            - The audit log should contain an order created entry
+              - Audit steps response should contain < a => a.Action == AuditLogDefaults.CreatedAction (and)(and) a.EntityType == AuditLogDefaults.OrderEntityType (and)(and) a.Details.Contains('TestCustomer_6228133549113536406') >
+          - AND The cow service should have received a milk request
+            - Requests should contain < r => r.RequestUri.AbsolutePath == "/milk" (and)(and) r.Method == HttpMethod.Get >
+          - AND The kitchen service should have received a preparation request
+            - Requests should contain < r => r.RequestUri.AbsolutePath == "/prepare" (and)(and) r.Method == HttpMethod.Post >
+
+  - Feature: Customer Preferences Management Feature
+    Description: /customer-preferences - Managing customer breakfast preferences
+    Scenarios:
+      - Scenario: Saving Customer Preferences Should Return The Saved Preferences
+        IsHappyPath: true
+        Labels:
+          - Happy Path
+        Steps:
+          - GIVEN A valid customer preference request
+          - WHEN The customer preferences are saved
+          - THEN The preference response should contain the saved preferences
+            - The put response http status should be ok
+              - Put steps response message status code should be OK
+            - The put response should be valid json
+              - Response content is valid json should be true
+            - The saved preferences should have the correct milk type
+              - Put steps response preferred milk type should be "Oat"
+            - The saved preferences should have the correct favourite item
+              - Put steps response favourite item should be "Blueberry Pancakes"
+
+      - Scenario: Retrieving Existing Customer Preferences Should Return The Preferences
+        IsHappyPath: false
+        Steps:
+          - GIVEN Customer preferences exist
+            - A valid customer preference request
+            - The customer preferences are saved
+            - The setup response should be ok
+              - Put steps response message status code should be OK
+              - Response content is valid json should be true
+          - WHEN The customer preferences are retrieved
+          - THEN The preference get response should contain the preferences
+            - The get response http status should be ok
+              - Get steps response message status code should be OK
+            - The get response should be valid json
+              - Response content is valid json should be true
+            - The retrieved preferences should match the saved preferences
+              - Get steps response customer id should be '40e64a82c8264f6288c30ebd7ec654e6'
+              - Get steps response preferred milk type should be "Oat"
+              - Get steps response likes extra toppings should be true
+
+      - Scenario: Retrieving Non Existent Customer Preferences Should Return Not Found
+        IsHappyPath: false
+        Steps:
+          - WHEN Non existent customer preferences are retrieved
+          - THEN The preference get response should indicate not found
+            - Get steps response message status code should be NotFound
+
+      - Scenario: Saving Customer Preferences With Missing Customer Name Should Return Bad Request
+        IsHappyPath: false
+        Steps:
+          - GIVEN A customer preference request with missing customer name
+          - WHEN The customer preferences are saved
+          - THEN The preference response should indicate bad request
+            - Put steps response message status code should be BadRequest
+
+      - Scenario: Updating Customer Preferences Should Return The Updated Preferences
+        IsHappyPath: false
+        Steps:
+          - GIVEN Customer preferences exist
+            - A valid customer preference request
+            - The customer preferences are saved
+            - The setup response should be ok
+              - Put steps response message status code should be OK
+              - Response content is valid json should be true
+          - WHEN The customer preferences are updated
+          - THEN The preference update response should contain the updated values
+            - The update response http status should be ok
+              - Put steps response message status code should be OK
+            - The update response should be valid json
+              - Response content is valid json should be true
+            - The updated preferences should have the new milk type
+              - Put steps response preferred milk type should be "Almond"
+            - The updated preferences should have the new favourite item
+              - Put steps response favourite item should be "Belgian Waffles"
+
+  - Feature: Daily Specials Idempotency Feature
+    Description: /daily-specials/orders - Idempotent order creation using Idempotency-Key header
+    Scenarios:
+      - Scenario: Submitting The Same Order With Different Idempotency Keys Should Return Different Confirmations
+        IsHappyPath: false
+        Steps:
+          - AND An order request for the same special
+          - WHEN The order is submitted with two different idempotency keys
+            - Post steps response message status code should be Created
+            - Response content is valid json should be true
+            - Post steps response message status code should be Created
+            - Response content is valid json should be true
+          - THEN The responses should have different confirmation ids
+            - First confirmation id should not be '4691c017-9367-4798-b93e-a36f135c9f80'
+
+      - Scenario: Submitting The Same Order With The Same Idempotency Key Should Return The Same Confirmation
+        IsHappyPath: false
+        Steps:
+          - AND An order request with an idempotency key
+          - WHEN The order is submitted twice with the same idempotency key
+            - Post steps response message status code should be Created
+            - Response content is valid json should be true
+            - Post steps response message status code should be Created
+            - Response content is valid json should be true
+          - THEN Both responses should return the same confirmation id
+            - First confirmation id should be 'a3b26e59-d881-4edb-bb8e-a4624285b8be'
+
+  - Feature: Daily Specials Not Found Feature
+    Description: /daily-specials/orders - Ordering a non-existent daily special
+    Scenarios:
+      - Scenario: Ordering A Non Existent Daily Special Should Return Not Found
+        IsHappyPath: false
+        Steps:
+          - GIVEN A daily special order request for a non existent special
+          - WHEN The daily special order is submitted
+          - THEN The response should indicate not found
+            - Post steps response message status code should be NotFound
+
+  - Feature: Daily Specials Ordering Feature
+    Description: /daily-specials - Ordering daily specials with threshold limits
+    Scenarios:
+      - Scenario: A Valid Daily Special Order Should Return A Confirmation
+        IsHappyPath: true
+        Labels:
+          - Happy Path
+        Steps:
+          - GIVEN The cinnamon swirl order count is reset
+          - AND A valid daily special order request for cinnamon swirl
+          - WHEN The daily special order is submitted
+          - THEN The daily special order response should contain a valid confirmation
+            - The post response http status should be created
+              - Post steps response message status code should be Created
+            - The order response should be valid json
+              - Response content is valid json should be true
+            - The order response should contain the correct special id
+              - Post steps response special id should be CinnamonSwirlId
+            - The order response should have a valid confirmation id
+              - Post steps response order confirmation id should not be empty
+
+      - Scenario: Ordering A Daily Special Beyond The Threshold Should Return A Conflict Response
+        IsHappyPath: false
+        Steps:
+          - GIVEN The matcha waffles order count is reset
+          - AND The matcha waffles special has been ordered up to the configured limit
+            - Post steps response message status code should be Created
+          - WHEN Another order is placed for the matcha waffles special
+          - THEN The response should indicate the daily special is sold out
+            - Post steps response message status code should be Conflict
+
+      - Scenario: Remaining Quantity Should Decrease After Each Order
+        IsHappyPath: false
+        Steps:
+          - GIVEN The lemon ricotta order count is reset
+          - AND A daily special order for lemon ricotta of quantity one is placed
+            - Post steps response message status code should be Created
+          - WHEN The available daily specials are requested
+          - THEN The lemon ricotta special should have one fewer remaining
+            - Response content is valid json should be true
+            - Lemon ricotta remaining quantity should be MaxOrdersPerSpecial - 1
+
+      - Scenario: The Daily Specials Endpoint Should Return All Available Specials
+        IsHappyPath: false
+        Steps:
+          - WHEN The available daily specials are requested
+          - THEN The daily specials response should contain all expected specials
+            - The get response http status should be ok
+              - Get steps response message status code should be OK
+            - The daily specials response should be valid json
+              - Response content is valid json should be true
+            - The daily specials list should contain all expected specials
+              - Get steps response should have count ExpectedSpecialsCount
+
+  - Feature: Daily Specials Validation Feature
+    Description: /daily-specials/orders - Input validation for daily special orders
+    Scenarios:
+      - Scenario: Daily Special Order Endpoint Is Called With Invalid Fields Should Return A Bad Request Response <inputs = "InvalidFieldFromRequest ( Field = SpecialId, Value = , Reason = Special ID is required ), InvalidFieldFromRequest ( Field = Quantity, Value = 0, Reason = Quantity must be greater than zero )"> <outputs = "VerifiableErrorResult ( ErrorMessage = 'Special Id' is required., ResponseStatus = Bad Request ), VerifiableErrorResult ( ErrorMessage = Quantity must be greater than zero., ResponseStatus = Bad Request )">
+        IsHappyPath: false
+        Steps:
+          - GIVEN Valid daily special order requests with an invalid field <inputs = "InvalidFieldFromRequest ( Field = SpecialId, Value = , Reason = Special ID is required ), InvalidFieldFromRequest ( Field = Quantity, Value = 0, Reason = Quantity must be greater than zero )">
+          - WHEN The invalid daily special order requests are submitted
+          - THEN The responses should each contain the validation error for the invalid field <expectedOutputs = "VerifiableErrorResult ( ErrorMessage = 'Special Id' is required., ResponseStatus = Bad Request ), VerifiableErrorResult ( ErrorMessage = Quantity must be greater than zero., ResponseStatus = Bad Request )">
+
+  - Feature: Feedback Management Feature
+    Description: /feedback - Submitting and retrieving customer feedback
+    Scenarios:
+      - Scenario: Submitting Feedback Should Return The Created Feedback
+        IsHappyPath: true
+        Labels:
+          - Happy Path
+        Steps:
+          - GIVEN A valid feedback request
+          - WHEN The feedback is submitted
+          - THEN The feedback response should contain the created feedback
+            - The post response http status should be created
+              - Post steps response message status code should be Created
+            - The post response should be valid json
+              - Response content is valid json should be true
+            - The created feedback should have the correct customer name
+              - Post steps response customer name should be 'Customer-48cf8da0212243dfb8cb4d2c2fcf90bf'
+            - The created feedback should have the correct rating
+              - Post steps response rating should be 4
+
+      - Scenario: Listing Feedback For An Order Should Return The Feedback
+        IsHappyPath: false
+        Steps:
+          - GIVEN A feedback entry exists
+            - A valid feedback request
+            - The feedback is submitted
+            - The setup response should be created
+              - Post steps response message status code should be Created
+              - Response content is valid json should be true
+          - WHEN The feedback is retrieved by order id
+          - THEN The feedback list response should contain the feedback
+            - The list response http status should be ok
+              - Get steps response message status code should be OK
+            - The list response should be valid json
+              - Response content is valid json should be true
+            - The list should contain the created feedback
+              - Get steps list response should contain < f => f.FeedbackId == '4458962b-da33-4812-ac8f-5a4350d56fa9' >
+
+      - Scenario: Retrieving Existing Feedback By Id Should Return The Feedback
+        IsHappyPath: false
+        Steps:
+          - GIVEN A feedback entry exists
+            - A valid feedback request
+            - The feedback is submitted
+            - The setup response should be created
+              - Post steps response message status code should be Created
+              - Response content is valid json should be true
+          - WHEN The feedback is retrieved by id
+          - THEN The feedback get response should contain the feedback
+            - The get response http status should be ok
+              - Get steps response message status code should be OK
+            - The get response should be valid json
+              - Response content is valid json should be true
+            - The retrieved feedback should match the created feedback
+              - Get steps response feedback id should be '20889b93-56a4-49d7-b10e-e1fd7e309b04'
+              - Get steps response customer name should be 'CustomerName'
+              - Get steps response rating should be 4
+
+      - Scenario: Retrieving Non Existent Feedback Should Return Not Found
+        IsHappyPath: false
+        Steps:
+          - WHEN A non existent feedback is retrieved
+          - THEN The feedback get response should indicate not found
+            - Get steps response message status code should be NotFound
+
+      - Scenario: Submitting Feedback With Invalid Rating Should Return Bad Request
+        IsHappyPath: false
+        Steps:
+          - GIVEN A feedback request with an invalid rating
+          - WHEN The feedback is submitted
+          - THEN The feedback response should indicate bad request
+            - Post steps response message status code should be BadRequest
+
+      - Scenario: Submitting Feedback With Missing Customer Name Should Return Bad Request
+        IsHappyPath: false
+        Steps:
+          - GIVEN A feedback request with missing customer name
+          - WHEN The feedback is submitted
+          - THEN The feedback response should indicate bad request
+            - Post steps response message status code should be BadRequest
+
+  - Feature: Grpc Order Status Feature
+    Description: /grpc - Retrieving order status via gRPC
+    Scenarios:
+      - Scenario: Order Status Via Grpc Should Return Order Details
+        IsHappyPath: true
+        Labels:
+          - Happy Path
+        Steps:
+          - GIVEN A pancake batch has been created
+            - A pancake request is submitted with ingredients
+            - The pancake batch response should be successful
+              - Pancake steps response message status code should be Created
+              - Response content is valid json should be true
+          - AND An order has been created for the batch
+            - An order request is submitted
+            - The order creation response should be successful
+              - Order steps response message status code should be Created
+              - Response content is valid json should be true
+          - WHEN The order status is requested via grpc
+          - THEN The grpc response should contain the order details
+            - The grpc order id should match
+              - Grpc steps order status reply order id should be _createdOrderId.ToString()
+            - The grpc customer name should match
+              - Grpc steps order status reply customer name should be 'TestCustomer_1729502973931861970'
+            - The grpc status should be created
+              - Grpc steps order status reply status should be Created
+
+      - Scenario: Order Status For Non Existent Order Should Return Not Found
+        IsHappyPath: false
+        Steps:
+          - WHEN The order status for a non existent order is requested via grpc
+          - THEN The grpc response should be a not found error
+            - Grpc steps rpc exception should not be null
+            - Grpc steps rpc exception status code should be NotFound
+
+  - Feature: Grpc Recipe Summary Feature
+    Description: /grpc - Retrieving recipe summaries via gRPC
+    Scenarios:
+      - Scenario: Pancake Recipe Summary Should Return Correct Data
+        IsHappyPath: true
+        Labels:
+          - Happy Path
+        Steps:
+          - WHEN A recipe summary is requested for pancakes via grpc
+          - THEN The recipe summary should contain pancake data
+            - The recipe type should be "Pancakes"
+              - Grpc steps recipe summary reply recipe type should be 'Pancakes'
+            - The total batches should be "42"
+              - Grpc steps recipe summary reply total batches should be '42'
+            - The common ingredients should contain <expected = "Milk, Flour, Eggs">
+              - Grpc steps recipe summary reply common ingredients should be equivalent to '< "Milk", "Flour", "Eggs" >'
+
+      - Scenario: Waffle Recipe Summary Should Return Correct Data
+        IsHappyPath: true
+        Labels:
+          - Happy Path
+        Steps:
+          - WHEN A recipe summary is requested for waffles via grpc
+          - THEN The recipe summary should contain waffle data
+            - The recipe type should be "Waffles"
+              - Grpc steps recipe summary reply recipe type should be 'Waffles'
+            - The total batches should be "28"
+              - Grpc steps recipe summary reply total batches should be '28'
+            - The common ingredients should contain <expected = "Milk, Flour, Eggs, Butter">
+              - Grpc steps recipe summary reply common ingredients should be equivalent to '< "Milk", "Flour", "Eggs", "Butter" >'
+
+      - Scenario: Unknown Recipe Type Should Return Zero Batches
+        IsHappyPath: false
+        Steps:
+          - WHEN A recipe summary is requested for an unknown type via grpc
+          - THEN The recipe summary should contain zero batches and no ingredients
+            - The recipe type should be "Unknown"
+              - Grpc steps recipe summary reply recipe type should be 'Unknown'
+            - The total batches should be "0"
+              - Grpc steps recipe summary reply total batches should be '0'
+            - The common ingredients should be empty
+              - Grpc steps recipe summary reply common ingredients should be empty
+
+  - Feature: Grpc Stream Order Updates Feature
+    Description: /grpc - Streaming order updates via gRPC server streaming
+    Scenarios:
+      - Scenario: Streaming Order Updates Should Return The Current Status
+        IsHappyPath: true
+        Labels:
+          - Happy Path
+        Steps:
+          - GIVEN A pancake batch has been created
+            - A pancake request is submitted with ingredients
+            - The pancake batch response should be successful
+              - Pancake steps response message status code should be Created
+              - Response content is valid json should be true
+          - AND An order has been created for the batch
+            - An order request is submitted
+            - The order creation response should be successful
+              - Order steps response message status code should be Created
+              - Response content is valid json should be true
+          - WHEN Order updates are streamed via grpc
+          - THEN The streamed response should contain the order status
+            - The stream should contain one reply
+              - Grpc steps streamed replies should have count 1
+            - The streamed order id should match
+              - Grpc steps streamed replies<0> order id should be _createdOrderId.ToString()
+            - The streamed customer name should match
+              - Grpc steps streamed replies<0> customer name should be 'TestCustomer_9171972459270345585'
+            - The streamed status should be created
+              - Grpc steps streamed replies<0> status should be Created
+
+      - Scenario: Streaming Updates For Non Existent Order Should Return Not Found
+        IsHappyPath: false
+        Steps:
+          - WHEN Order updates for a non existent order are streamed via grpc
+          - THEN The grpc stream should return a not found error
+            - Grpc steps rpc exception should not be null
+            - Grpc steps rpc exception status code should be NotFound
+
+  - Feature: Infrastructure Correlation Id Feature
+    Description: Cross-cutting - X-Correlation-Id header propagation across API responses
+    Scenarios:
+      - Scenario: A Request With A Correlation Id Should Return The Same Id In The Response
+        IsHappyPath: true
+        Labels:
+          - Happy Path
+        Steps:
+          - GIVEN A request with a known correlation id
+          - WHEN The request is sent to the menu endpoint
+          - THEN The response should contain the same correlation id
+            - Response contains correlation id header should be true
+            - First correlation id header value should be 'deac74d0-d99c-4cbf-a1fa-9aacffebb047'
+
+      - Scenario: A Request Without A Correlation Id Should Have One Generated In The Response
+        IsHappyPath: false
+        Steps:
+          - WHEN A request without a correlation id is sent to the menu endpoint
+          - THEN The response should contain a generated correlation id
+            - Response contains correlation id header should be true
+            - First correlation id header value should not be null or empty
+
+  - Feature: Infrastructure Degraded Health Check Feature
+    Description: /health - Health check endpoint reporting degraded status when downstream services are unavailable
+    Scenarios:
+      - Scenario: Health Check Should Report Degraded When Multiple Downstream Services Are Unavailable
+        IsHappyPath: false
+        Steps:
+          - AND The supplier service is configured to be unreachable
+          - WHEN The health check endpoint is called
+          - THEN The health check response should indicate a degraded status
+            - The health check response status should be ok
+              - Health response status code should be OK
+            - The health check response should be valid json
+              - Health check result should not be null
+            - The overall status should be degraded
+              - Health check result status should be Degraded
+          - AND The cow service dependency should report degraded
+            - Health check result results should contain key CowService
+            - Health check result results< health check names cow service> status should be Degraded
+          - AND The supplier service dependency should report degraded
+            - Health check result results should contain key SupplierService
+            - Health check result results< health check names supplier service> status should be Degraded
+
+      - Scenario: Health Check Should Report Degraded When The Cow Service Is Unavailable
+        IsHappyPath: false
+        Steps:
+          - WHEN The health check endpoint is called
+          - THEN The health check response should indicate a degraded status
+            - The health check response status should be ok
+              - Health response status code should be OK
+            - The health check response should be valid json
+              - Health check result should not be null
+            - The overall status should be degraded
+              - Health check result status should be Degraded
+          - AND The cow service dependency should report degraded
+            - Health check result results should contain key CowService
+            - Health check result results< health check names cow service> status should be Degraded
+
+  - Feature: Infrastructure Downstream Error Health Check Feature
+    Description: /health - Health check reports degraded when a downstream service returns a non-success HTTP status
+    Scenarios:
+      - Scenario: Health Check Should Report Degraded When A Downstream Service Returns A Non Success Status
+        IsHappyPath: false
+        Steps:
+          - GIVEN The kitchen service health check is configured to use a failing endpoint
+          - WHEN The health check endpoint is called
+          - THEN The health check response should indicate a degraded status
+            - The health check response status should be ok
+              - Health response status code should be OK
+            - The health check response should be valid json
+              - Health check result should not be null
+            - The overall status should be degraded
+              - Health check result status should be Degraded
+          - AND The kitchen service dependency should report degraded with a status code description
+            - Health check result results should contain key KitchenService
+            - Kitchen service health status should be Degraded
+            - Kitchen service health description should contain "503"
+
+  - Feature: Infrastructure Header Propagation Feature
+    Description: /milk; /menu - X-Correlation-Id header propagation to downstream services
+    Scenarios:
+      - Scenario: A Request With A Correlation Id Should Forward It To The Cow Service
+        IsHappyPath: true
+        Labels:
+          - Happy Path
+        Steps:
+          - WHEN Milk is requested from the milk endpoint
+          - THEN The cow service should have received the correlation id
+            - Requests should not be empty
+            - Request headers should contain key CorrelationId
+            - Request headers< custom headers correlation id> should be '75459d36-4177-44ec-abdd-d670385b18a7'
+
+      - Scenario: A Request With A Correlation Id Should Forward It To The Supplier Service
+        IsHappyPath: false
+        Steps:
+          - AND The menu cache is cleared
+          - WHEN The menu is requested
+          - THEN The supplier service should have received the correlation id
+            - Requests should not be empty
+            - Request headers should contain key CorrelationId
+            - Request headers< custom headers correlation id> should be '85343f4c-2844-40f5-a95f-59c0298cada4'
+
+  - Feature: Infrastructure Health Check Detail Feature
+    Description: /health - Health check response includes detailed entry descriptions and data
+    Scenarios:
+      - Scenario: The Health Check Response Should Include Description And Data For Each Entry
+        IsHappyPath: false
+        Steps:
+          - WHEN The health check endpoint is called
+          - THEN The health check response should contain detailed entries
+            - The health check response status should be ok
+              - Health response status code should be OK
+            - The health check response should be valid json
+              - Health check result should not be null
+            - Each entry should have a status
+              - Health check entry status should not be null or empty  $"health check entry '(entry.Key)' should have a status"
+              - Health check entry status should not be null or empty  $"health check entry '(entry.Key)' should have a status"
+              - Health check entry status should not be null or empty  $"health check entry '(entry.Key)' should have a status"
+              - Health check entry status should not be null or empty  $"health check entry '(entry.Key)' should have a status"
+              - Health check entry status should not be null or empty  $"health check entry '(entry.Key)' should have a status"
+              - Health check entry status should not be null or empty  $"health check entry '(entry.Key)' should have a status"
+              - Health check entry status should not be null or empty  $"health check entry '(entry.Key)' should have a status"
+              - Health check entry status should not be null or empty  $"health check entry '(entry.Key)' should have a status"
+            - Each downstream entry should have a description
+              - Health check result results should contain key 'CowService'
+              - Health check description should not be null or empty  $"health check entry '(checkName)' should have a description"
+              - Health check result results should contain key 'GoatService'
+              - Health check description should not be null or empty  $"health check entry '(checkName)' should have a description"
+              - Health check result results should contain key 'SupplierService'
+              - Health check description should not be null or empty  $"health check entry '(checkName)' should have a description"
+              - Health check result results should contain key 'KitchenService'
+              - Health check description should not be null or empty  $"health check entry '(checkName)' should have a description"
+            - Each entry should have a data object
+              - Health check entry data should not be null  $"health check entry '(entry.Key)' should have a data object"
+              - Health check entry data should not be null  $"health check entry '(entry.Key)' should have a data object"
+              - Health check entry data should not be null  $"health check entry '(entry.Key)' should have a data object"
+              - Health check entry data should not be null  $"health check entry '(entry.Key)' should have a data object"
+              - Health check entry data should not be null  $"health check entry '(entry.Key)' should have a data object"
+              - Health check entry data should not be null  $"health check entry '(entry.Key)' should have a data object"
+              - Health check entry data should not be null  $"health check entry '(entry.Key)' should have a data object"
+              - Health check entry data should not be null  $"health check entry '(entry.Key)' should have a data object"
+
+  - Feature: Infrastructure Health Check Feature
+    Description: /health - Health check endpoint with dependency status for monitoring
+    Scenarios:
+      - Scenario: The Health Check Endpoint Should Return A Healthy Status With Dependency Details
+        IsHappyPath: true
+        Labels:
+          - Happy Path
+        Steps:
+          - WHEN The health check endpoint is called
+          - THEN The health check response should indicate healthy with all dependencies
+            - The health check response status should be ok
+              - Health response status code should be OK
+            - The health check response should be valid json
+              - Health check result should not be null
+            - The overall status should be healthy
+              - Health check result status should be Healthy
+            - The response should include cow service check
+              - Health check result results should contain key CowService
+            - The response should include goat service check
+              - Health check result results should contain key GoatService
+            - The response should include supplier service check
+              - Health check result results should contain key SupplierService
+            - The response should include kitchen service check
+              - Health check result results should contain key KitchenService
+            - The response should include cosmos db check
+              - Health check result results should contain key CosmosDb
+            - The response should include kafka check
+              - Health check result results should contain key Kafka
+
+  - Feature: Infrastructure Heartbeat Feature
+    Description: / - Heartbeat endpoint confirming the service is running
+    Scenarios:
+      - Scenario: The Heartbeat Endpoint Should Return A Running Message
+        IsHappyPath: true
+        Labels:
+          - Happy Path
+        Steps:
+          - WHEN The heartbeat endpoint is called
+          - THEN The heartbeat response should indicate the service is running
+            - The heartbeat response status should be ok
+              - Heartbeat response status code should be OK
+            - The heartbeat response should be valid json
+              - Heartbeat result should not be null
+            - The heartbeat status should be ok
+              - Heartbeat result status should be HeartbeatStatus
+
+  - Feature: Infrastructure Telemetry Feature
+    Description: /orders - Structured logging and telemetry verification
+    Scenarios:
+      - Scenario: Creating An Order Should Emit A Structured Log Entry
+        IsHappyPath: true
+        Labels:
+          - Happy Path
+        Steps:
+          - GIVEN The application is configured with an in memory log capture
+          - AND A pancake batch has been created
+            - A pancake request is submitted with ingredients
+            - The pancake batch should be successful
+              - Pancake steps response message status code should be Created
+              - Response content is valid json should be true
+          - AND A valid order request
+          - WHEN The order is submitted
+            - Order steps response message status code should be Created
+          - THEN A structured log entry should have been captured for order creation
+            - The log should contain an order created message
+              - Log provider entries should contain < e => e.Message.Contains("created for customer") >
+            - The log message should include the customer name
+              - => _log provider entries should contain < e => e.Message.Contains('TelemetryTest_900421811505201299') >
+            - The log message should include the item count
+              - => _log provider entries should contain < e => e.Message.Contains("1 items") >
+
+  - Feature: Ingredients Goat Milk Downstream Failure Feature
+    Description: /goat-milk - Handling downstream Goat Service failures
+    Scenarios:
+      - Scenario: Requesting Goat Milk When The Goat Service Is Unavailable Should Return A Bad Gateway Response
+        IsHappyPath: false
+        Steps:
+          - GIVEN The goat service will return service unavailable
+          - WHEN Goat milk is requested
+          - THEN The goat milk response should indicate a bad gateway
+            - The goat milk response http status should be bad gateway
+              - Goat milk steps response message status code should be BadGateway
+            - The goat milk error should indicate goat service unavailable
+              - Goat milk error response body should contain GoatServiceUnavailableTitle
+
+      - Scenario: Requesting Goat Milk When The Goat Service Returns An Invalid Response Should Return A Bad Gateway Response
+        IsHappyPath: false
+        Steps:
+          - GIVEN The goat service will return an invalid response
+          - WHEN Goat milk is requested
+          - THEN The goat milk response should indicate a bad gateway
+            - The goat milk response http status should be bad gateway
+              - Goat milk steps response message status code should be BadGateway
+            - The goat milk error should indicate goat service unavailable
+              - Goat milk error response body should contain GoatServiceUnavailableTitle
+
+  - Feature: Ingredients Goat Milk Feature Flag Feature
+    Description: /goat-milk - Goat milk availability controlled by feature flag
+    Scenarios:
+      - Scenario: Goat Milk Endpoint Should Return Fresh Goat Milk When Feature Is Enabled
+        IsHappyPath: false
+        Steps:
+          - GIVEN The goat milk feature flag is enabled
+          - WHEN Goat milk is requested
+          - THEN The goat milk response should contain fresh goat milk
+            - The goat milk response http status should be ok
+              - Goat milk steps response message status code should be OK
+            - The goat milk should be fresh
+              - Goat milk steps goat milk response goat milk should be FreshGoatMilk
+
+      - Scenario: Goat Milk Endpoint Should Return Not Found When Feature Is Disabled
+        IsHappyPath: false
+        Steps:
+          - GIVEN The goat milk feature flag is disabled
+          - WHEN Goat milk is requested
+          - THEN The goat milk response should indicate feature disabled
+            - The goat milk response http status should be not found
+              - Goat milk steps response message status code should be NotFound
+            - The goat milk error should indicate feature disabled
+              - Goat milk feature disabled response body should contain FeatureDisabled
+
+  - Feature: Ingredients Goat Milk Sourcing Feature
+    Description: /goat-milk - Sourcing goat milk from the Goat Service
+    Scenarios:
+      - Scenario: The Goat Milk Endpoint Should Return Fresh Goat Milk From The Goat Service
+        IsHappyPath: true
+        Labels:
+          - Happy Path
+        Steps:
+          - WHEN Goat milk is requested
+          - THEN The goat milk response should contain fresh goat milk
+            - The goat milk response http status should be ok
+              - Goat milk steps response message status code should be OK
+            - The goat milk response should be valid json
+              - Goat milk steps goat milk response should not be null
+            - The goat milk should be fresh
+              - Goat milk steps goat milk response goat milk should be FreshGoatMilk
+          - AND The goat service should have received a goat milk request
+            - Requests should contain < r => r.RequestUri.AbsolutePath == "/goat-milk" (and)(and) r.Method == HttpMethod.Get >
+
+  - Feature: Ingredients Milk Downstream Failure Feature
+    Description: /milk - Handling downstream Cow Service failures
+    Scenarios:
+      - Scenario: Requesting Milk When The Cow Service Is Unavailable Should Return A Bad Gateway Response
+        IsHappyPath: false
+        Steps:
+          - GIVEN The cow service will return service unavailable
+          - WHEN Milk is requested
+          - THEN The milk response should indicate a bad gateway
+            - The milk response http status should be bad gateway
+              - Milk steps response message status code should be BadGateway
+            - The milk error should indicate cow service unavailable
+              - Milk error response body should contain CowServiceUnavailableTitle
+
+      - Scenario: Requesting Milk When The Cow Service Returns An Invalid Response Should Return A Bad Gateway Response
+        IsHappyPath: false
+        Steps:
+          - GIVEN The cow service will return an invalid response
+          - WHEN Milk is requested
+          - THEN The milk response should indicate a bad gateway
+            - The milk response http status should be bad gateway
+              - Milk steps response message status code should be BadGateway
+            - The milk error should indicate cow service unavailable
+              - Milk error response body should contain CowServiceUnavailableTitle
+
+      - Scenario: Requesting Milk When The Cow Service Times Out Should Return A Bad Gateway Response
+        IsHappyPath: false
+        Steps:
+          - GIVEN The cow service will return a timeout
+          - WHEN Milk is requested
+          - THEN The milk response should indicate a bad gateway
+            - The milk response http status should be bad gateway
+              - Milk steps response message status code should be BadGateway
+            - The milk error should indicate cow service unavailable
+              - Milk error response body should contain CowServiceUnavailableTitle
+
+  - Feature: Inventory Management Feature
+    Description: /inventory - Managing ingredient inventory with full CRUD operations
+    Scenarios:
+      - Scenario: Adding A New Inventory Item Should Return The Created Item
+        IsHappyPath: true
+        Labels:
+          - Happy Path
+        Steps:
+          - GIVEN A valid inventory item request
+          - WHEN The inventory item is submitted
+          - THEN The inventory response should contain the created item
+            - The post response http status should be created
+              - Post steps response message status code should be Created
+            - The post response should be valid json
+              - Response content is valid json should be true
+            - The created item should have the correct name
+              - Post steps response name should be 'Flour-0556ff933b8c408c8c68e7be2897bb79'
+            - The created item should have the correct category
+              - Post steps response category should be "Dry Goods"
+
+      - Scenario: Deleting An Inventory Item Should Return No Content
+        IsHappyPath: false
+        Steps:
+          - GIVEN An inventory item exists
+            - A valid inventory item request
+            - The inventory item is submitted
+            - The setup response should be created
+              - Post steps response message status code should be Created
+              - Response content is valid json should be true
+          - WHEN The inventory item is deleted
+          - THEN The inventory delete response should indicate no content
+            - Delete steps response message status code should be NoContent
+
+      - Scenario: Listing All Inventory Items Should Return All Items
+        IsHappyPath: false
+        Steps:
+          - GIVEN An inventory item exists
+            - A valid inventory item request
+            - The inventory item is submitted
+            - The setup response should be created
+              - Post steps response message status code should be Created
+              - Response content is valid json should be true
+          - WHEN All inventory items are requested
+          - THEN The inventory list response should contain the item
+            - The list response http status should be ok
+              - Get steps response message status code should be OK
+            - The list response should be valid json
+              - Response content is valid json should be true
+            - The list should contain the created item
+              - Get steps list response should contain < i => i.Id == '2' >
+
+      - Scenario: Retrieving A Non Existent Inventory Item Should Return Not Found
+        IsHappyPath: false
+        Steps:
+          - WHEN A non existent inventory item is retrieved
+          - THEN The inventory get response should indicate not found
+            - Get steps response message status code should be NotFound
+
+      - Scenario: Retrieving An Existing Inventory Item Should Return The Item
+        IsHappyPath: false
+        Steps:
+          - GIVEN An inventory item exists
+            - A valid inventory item request
+            - The inventory item is submitted
+            - The setup response should be created
+              - Post steps response message status code should be Created
+              - Response content is valid json should be true
+          - WHEN The inventory item is retrieved by id
+          - THEN The inventory get response should contain the item
+            - The get response http status should be ok
+              - Get steps response message status code should be OK
+            - The get response should be valid json
+              - Response content is valid json should be true
+            - The retrieved item should match the created item
+              - Get steps response id should be '5'
+              - Get steps response name should be 'Name'
+
+      - Scenario: Updating An Inventory Item Should Return The Updated Item
+        IsHappyPath: false
+        Steps:
+          - GIVEN An inventory item exists
+            - A valid inventory item request
+            - The inventory item is submitted
+            - The setup response should be created
+              - Post steps response message status code should be Created
+              - Response content is valid json should be true
+          - WHEN The inventory item is updated
+          - THEN The inventory update response should contain the updated values
+            - The put response http status should be ok
+              - Put steps response message status code should be OK
+            - The put response should be valid json
+              - Response content is valid json should be true
+            - The updated item should have the new category
+              - Put steps response category should be "Updated Category"
+
+  - Feature: Menu Availability Feature
+    Description: /menu - Retrieving the breakfast menu with ingredient availability
+    Scenarios:
+      - Scenario: The Menu Endpoint Should Return All Menu Items With Availability
+        IsHappyPath: true
+        Labels:
+          - Happy Path
+        Steps:
+          - WHEN The menu is requested
+          - THEN The menu response should contain all menu items
+            - The menu response http status should be ok
+              - Menu steps response message status code should be OK
+            - The menu list should be valid json
+              - Response content is valid json should be true
+            - The menu should contain classic pancakes
+              - Menu steps response should contain < m => m.Name == MenuDefaults.ClassicPancakes >
+            - The menu should contain belgian waffles
+              - Menu steps response should contain < m => m.Name == MenuDefaults.BelgianWaffles >
+            - The menu should contain goat milk pancakes
+              - Menu steps response should contain < m => m.Name == MenuDefaults.GoatMilkPancakes >
+          - AND The menu items should be in alphabetical order
+            - Response content is valid json should be true
+            - Menu steps response should be in ascending order < m => m.Name >
+          - AND The supplier service should have received an availability request
+            - Requests should contain < r => r.RequestUri.AbsolutePath.Contains("/availability") (and)(and) r.Method == HttpMethod.Get >
+
+  - Feature: Menu Caching Feature
+    Description: /menu - Menu response caching behaviour
+    Scenarios:
+      - Scenario: The Menu Should Return Cached Results On Subsequent Requests
+        IsHappyPath: false
+        Steps:
+          - GIVEN The menu has been requested and cached
+            - The menu cache is cleared
+            - The first menu request is sent
+            - The first menu response should be successful
+              - Menu steps response message status code should be OK
+          - AND The supplier service is then made unavailable
+          - WHEN The menu is requested again
+          - THEN The menu response should still return available items
+            - The cached menu response http status should be ok
+              - Second menu steps response message status code should be OK
+            - The cached menu list should be valid json
+              - Response content is valid json should be true
+            - The cached menu should contain available items
+              - Second menu steps response should contain < m => m.IsAvailable >
+
+  - Feature: Menu Downstream Failure Feature
+    Description: /menu - Handling downstream Supplier Service failures
+    Scenarios:
+      - Scenario: Requesting The Menu When The Supplier Service Is Unavailable Should Mark Items As Unavailable
+        IsHappyPath: false
+        Steps:
+          - GIVEN The supplier service will return service unavailable
+          - WHEN The menu is requested
+          - THEN The menu response should mark all items as unavailable
+            - The menu response http status should be ok
+              - Menu steps response message status code should be OK
+            - The menu list should be valid json
+              - Response content is valid json should be true
+            - All menu items should be marked as unavailable
+              - Menu steps response should only contain < m => m.IsAvailable == false >
+
+  - Feature: Orders Breakfast Order Feature
+    Description: /orders - Creating and managing breakfast orders with event publishing
+    Scenarios:
+      - Scenario: A Valid Order Should Be Created And An Event Published
+        IsHappyPath: true
+        Labels:
+          - Happy Path
+        Steps:
+          - AND An order created event should have been published
+          - AND The kitchen service should have received a preparation request
+            - Requests should contain < r => r.RequestUri.AbsolutePath == "/prepare" (and)(and) r.Method == HttpMethod.Post >
+
+      - Scenario: Creating An Order Should Produce An Audit Log Entry And Events
+        IsHappyPath: false
+        Steps:
+          - AND An order created event should have been published
+          - AND A recipe log should have been published to kafka
+
+      - Scenario: Creating An Order Should Write An Outbox Message That Gets Processed
+        IsHappyPath: false
+        Steps:
+          - AND An outbox message should have been written for the order created event
+            - Outbox messages should contain < m => m.EventType == 'OrderCreatedEvent', $"an outbox message should exist for event type '(eventType)'" >
+          - AND The outbox message should have been processed
+
+  - Feature: Orders Complete Lifecycle Feature
+    Description: /orders - Complete order lifecycle from creation through to completion
+    Scenarios:
+      - Scenario: An Order Should Progress Through All Status Transitions To Completion
+        IsHappyPath: true
+        Labels:
+          - Happy Path
+        Steps:
+          - GIVEN A pancake batch has been created
+            - Milk is retrieved from the milk endpoint
+            - The milk response should be successful
+              - Milk steps response message status code should be OK
+            - Eggs are retrieved from the eggs endpoint
+            - The eggs response should be successful
+              - Eggs steps response message status code should be OK
+            - Flour is retrieved from the flour endpoint
+            - The flour response should be successful
+              - Flour steps response message status code should be OK
+            - A pancake request is submitted with all ingredients
+            - The pancake batch response should be successful
+              - Pancake steps response message status code should be Created
+              - Response content is valid json should be true
+              - Pancake steps response should not be null
+              - Pancake steps response batch id should not be empty
+          - AND A breakfast order has been placed for the batch
+            - An order request is submitted for the pancake batch
+            - The order creation response should be successful
+              - Order steps response message status code should be Created
+              - Response content is valid json should be true
+              - Order steps response should not be null
+            - The order id is captured from the order response
+              - Order id should not be empty
+          - WHEN The order is progressed through the complete lifecycle
+            - The order status is updated to preparing
+            - The preparing transition should succeed
+              - Patch steps response message status code should be OK
+            - The order status is updated to ready
+            - The ready transition should succeed
+              - Patch steps response message status code should be OK
+            - The order status is updated to completed
+            - The completed transition should succeed
+              - Patch steps response message status code should be OK
+          - THEN The completed order should be retrievable with all details
+            - The order is retrieved by id
+            - The retrieval response should be ok
+              - Retrieval steps response message status code should be OK
+            - The retrieved order should be valid json
+              - Response content is valid json should be true
+            - The retrieved order status should be completed
+              - Retrieval steps response status should be Completed
+            - The retrieved customer name should match
+              - Retrieval steps response customer name should be 'LifecycleTestCustomer_349953675114687235'
+            - The retrieved items should match
+              - Retrieval steps response items should have count 1
+            - The retrieved table number should match
+              - Retrieval steps response table number should be 4
+          - AND The order timestamps should be recent
+            - Retrieval steps response created at should be close to DateTime.UtcNow, TimeSpan.FromMinutes(2)
+          - AND The order id should be a valid guid format
+            - Retrieval steps response order id to string() should match regex (at)"^<0-9a-f>(8)-<0-9a-f>(4)-<0-9a-f>(4)-<0-9a-f>(4)-<0-9a-f>(12)$"
+          - AND An audit log entry should exist for the order
+            - Audit logs are retrieved for the order
+              - Audit log response status code should be OK
+            - The audit logs should contain the order creation entry
+              - Audit logs should contain < l => l.EntityId == '550863fc-305d-4f3d-986d-277a40703ef6' (and)(and) l.Action == AuditLogDefaults.CreatedAction >
+          - AND The cow service should have received a milk request
+            - Requests should contain < r => r.RequestUri.AbsolutePath == "/milk" (and)(and) r.Method == HttpMethod.Get >
+          - AND The kitchen service should have received a preparation request
+            - Requests should contain < r => r.RequestUri.AbsolutePath == "/prepare" (and)(and) r.Method == HttpMethod.Post >
+
+  - Feature: Orders Cross Field Validation Feature
+    Description: /orders - Cross-field validation with configurable item limits
+    Scenarios:
+      - Scenario: An Order At The Maximum Items Per Order Should Be Accepted
+        IsHappyPath: false
+        Steps:
+          - AND An order request with two items
+          - WHEN The order is submitted
+          - THEN The response should indicate success
+            - Order steps response message status code should be Created
+
+      - Scenario: An Order Exceeding The Maximum Items Per Order Should Be Rejected
+        IsHappyPath: false
+        Steps:
+          - AND An order request with three items
+          - WHEN The order is submitted
+          - THEN The response should indicate a validation error
+            - The order response status should be bad request
+              - Order steps response message status code should be BadRequest
+          - AND The error message should reference the item limit
+            - Order validation errors should contain < e => e.Contains("cannot contain more than 2 items") >
+
+  - Feature: Orders Kitchen Service Failure Feature
+    Description: /orders - Creating orders when the Kitchen Service returns an error
+    Scenarios:
+      - Scenario: Creating An Order When The Kitchen Service Returns An Error Should Still Create The Order
+        IsHappyPath: false
+        Steps:
+          - GIVEN A pancake batch has been created
+            - Milk is retrieved
+            - The milk response should be successful
+              - Milk steps response message status code should be OK
+            - Eggs are retrieved
+            - The eggs response should be successful
+              - Eggs steps response message status code should be OK
+            - Flour is retrieved
+            - The flour response should be successful
+              - Flour steps response message status code should be OK
+            - A pancake request is submitted
+            - The pancake response should be successful
+              - Pancake steps response message status code should be Created
+              - Response content is valid json should be true
+              - Pancake steps response should not be null
+          - AND A valid order request for the created batch
+          - AND The kitchen service will return an error
+          - WHEN The breakfast order is placed
+          - THEN The order should still be created successfully
+            - The order response http status should be created
+              - Order steps response message status code should be Created
+            - The order response should be valid json
+              - Response content is valid json should be true
+            - The order should contain the customer name
+              - Order steps response customer name should be 'TestCustomer_8788269236391472950'
+          - AND The order should be retrievable by its id
+            - Get order steps response message status code should be OK
+
+  - Feature: Orders Order Retrieval Feature
+    Description: /orders - Retrieving breakfast orders by ID
+    Scenarios:
+      - Scenario: A Previously Created Order Should Be Retrievable By Id
+        IsHappyPath: true
+        Labels:
+          - Happy Path
+        Steps:
+          - GIVEN A pancake batch has been created
+            - A pancake request is submitted with ingredients
+            - The pancake batch response should be successful
+              - Pancake steps response message status code should be Created
+              - Response content is valid json should be true
+              - Pancake steps response should not be null
+              - Pancake steps response batch id should not be empty
+          - AND An order has been created for the batch
+            - An order request is submitted
+            - The order creation response should be successful
+              - Order steps response message status code should be Created
+              - Response content is valid json should be true
+              - Order steps response should not be null
+              - Order steps response order id should not be empty
+          - WHEN The order is retrieved by id
+          - THEN The retrieved order should match the created order
+            - The retrieval response http status should be ok
+              - Retrieval steps response message status code should be OK
+            - The retrieval response should be valid json
+              - Response content is valid json should be true
+            - The retrieved order id should match
+              - Retrieval steps response order id should be 'OrderId'
+            - The retrieved customer name should match
+              - Retrieval steps response customer name should be 'TestCustomer_7604704470193228727'
+            - The retrieved items should match
+              - Retrieval steps response items should have count 1
+          - AND The cow service should have received a milk request
+            - Requests should contain < r => r.RequestUri.AbsolutePath == "/milk" (and)(and) r.Method == HttpMethod.Get >
+          - AND The kitchen service should have received a preparation request
+            - Requests should contain < r => r.RequestUri.AbsolutePath == "/prepare" (and)(and) r.Method == HttpMethod.Post >
+
+      - Scenario: Retrieving A Non Existent Order Should Return Not Found
+        IsHappyPath: false
+        Steps:
+          - GIVEN A non existent order id
+          - WHEN The order is retrieved by id
+          - THEN The response should be not found
+            - Retrieval steps response message status code should be NotFound
+
+  - Feature: Orders Outbox Retry Exhaustion Feature
+    Description: /orders - Outbox message transitions to failed after exhausting retries
+    Scenarios:
+      - Scenario: An Outbox Message Should Transition To Failed After Exhausting Retries
+        IsHappyPath: false
+        Steps:
+          - GIVEN A pending outbox message with a test specific destination
+          - THEN The outbox message should transition to failed
+
+  - Feature: Orders Pagination Feature
+    Description: /orders - Paginated listing of breakfast orders
+    Scenarios:
+      - Scenario: Listing Orders Should Return A Paginated Response
+        IsHappyPath: true
+        Labels:
+          - Happy Path
+        Steps:
+          - GIVEN Multiple orders have been created
+            - A pancake batch is created
+              - Pancake steps response message status code should be Created
+              - Response content is valid json should be true
+            - Two orders are created for the batch
+              - Order steps response message status code should be Created
+              - Order steps response message status code should be Created
+          - WHEN Orders are listed with default pagination
+          - THEN The paginated response should contain the correct metadata
+            - The list response should be ok
+              - List steps response message status code should be OK
+            - The list response should be valid json
+              - Response content is valid json should be true
+            - The response should contain the created orders
+              - List steps response items should have count greater than or equal to '2'
+            - The page number should be one
+              - List steps response page should be 1
+            - The total count should match the created order count
+              - List steps response total count should be greater than or equal to '2'
+
+      - Scenario: Listing Orders When None Exist Should Return An Empty Page
+        IsHappyPath: false
+        Steps:
+          - WHEN Orders are listed with default pagination
+          - THEN The paginated response should be empty
+            - The list response should be ok
+              - List steps response message status code should be OK
+            - The list response should be valid json
+              - Response content is valid json should be true
+            - The items list should be empty
+              - List steps response items should be empty
+            - The total count should be zero
+              - List steps response total count should be 0
+
+      - Scenario: Listing Orders With A Small Page Size Should Limit Results
+        IsHappyPath: false
+        Steps:
+          - GIVEN Multiple orders have been created
+            - A pancake batch is created
+              - Pancake steps response message status code should be Created
+              - Response content is valid json should be true
+            - Two orders are created for the batch
+              - Order steps response message status code should be Created
+              - Order steps response message status code should be Created
+          - WHEN Orders are listed with a page size of one
+          - THEN The paginated response should contain only one item
+            - List steps response message status code should be OK
+            - Response content is valid json should be true
+            - List steps response items should have count 1
+          - AND The total pages should reflect the full order count
+            - List steps response total pages should be greater than or equal to '2'
+
+      - Scenario: Requesting The Second Page Should Return Different Orders
+        IsHappyPath: false
+        Steps:
+          - GIVEN Multiple orders have been created
+            - A pancake batch is created
+              - Pancake steps response message status code should be Created
+              - Response content is valid json should be true
+            - Two orders are created for the batch
+              - Order steps response message status code should be Created
+              - Order steps response message status code should be Created
+          - WHEN The second page of orders is requested with a page size of one
+          - THEN The paginated response should contain only one item
+            - List steps response message status code should be OK
+            - Response content is valid json should be true
+            - List steps response items should have count 1
+          - AND The page number should be two
+            - List steps response page should be 2
+
+  - Feature: Orders Rate Limiting Feature
+    Description: /orders - Rate limiting on order creation
+    Scenarios:
+      - Scenario: Exceeding The Rate Limit Should Return Too Many Requests
+        IsHappyPath: false
+        Steps:
+          - GIVEN The rate limit is configured to allow one request per window
+          - AND A pancake batch has been created
+            - A pancake request is submitted with ingredients
+            - The pancake batch should be successful
+              - Pancake steps response message status code should be Created
+              - Response content is valid json should be true
+          - AND A valid order request
+          - WHEN The order is submitted twice in rapid succession
+          - THEN The first request should succeed
+            - First response status code should be Created
+          - AND The second request should be rate limited
+            - Second response status code should be TooManyRequests
+
+  - Feature: Orders Status Transition Feature
+    Description: /orders - Order status transitions following the order lifecycle
+    Scenarios:
+      - Scenario: A Valid Status Transition Should Update The Order <fromStatus = "Created"> <toStatus = "Cancelled">
+        IsHappyPath: false
+        Steps:
+          - GIVEN An order exists with status "Created"
+            - A pancake batch is created
+              - Response content is valid json should be true
+            - An order is created for the batch
+              - Response content is valid json should be true
+            - The order is transitioned to "Created"
+          - WHEN The order status is updated to "Cancelled"
+          - THEN The order should be updated successfully to "Cancelled"
+            - The patch response http status should be ok
+              - Patch steps response message status code should be OK
+            - The updated order status should be "Cancelled"
+              - Response content is valid json should be true
+              - Patch steps response status should be 'Cancelled'
+
+      - Scenario: A Valid Status Transition Should Update The Order <fromStatus = "Created"> <toStatus = "Preparing">
+        IsHappyPath: false
+        Steps:
+          - GIVEN An order exists with status "Created"
+            - A pancake batch is created
+              - Response content is valid json should be true
+            - An order is created for the batch
+              - Response content is valid json should be true
+            - The order is transitioned to "Created"
+          - WHEN The order status is updated to "Preparing"
+          - THEN The order should be updated successfully to "Preparing"
+            - The patch response http status should be ok
+              - Patch steps response message status code should be OK
+            - The updated order status should be "Preparing"
+              - Response content is valid json should be true
+              - Patch steps response status should be 'Preparing'
+
+      - Scenario: A Valid Status Transition Should Update The Order <fromStatus = "Preparing"> <toStatus = "Ready">
+        IsHappyPath: false
+        Steps:
+          - GIVEN An order exists with status "Preparing"
+            - A pancake batch is created
+              - Response content is valid json should be true
+            - An order is created for the batch
+              - Response content is valid json should be true
+            - The order is transitioned to "Preparing"
+              - Patch steps response message status code should be OK
+          - WHEN The order status is updated to "Ready"
+          - THEN The order should be updated successfully to "Ready"
+            - The patch response http status should be ok
+              - Patch steps response message status code should be OK
+            - The updated order status should be "Ready"
+              - Response content is valid json should be true
+              - Patch steps response status should be 'Ready'
+
+      - Scenario: A Valid Status Transition Should Update The Order <fromStatus = "Ready"> <toStatus = "Completed">
+        IsHappyPath: false
+        Steps:
+          - GIVEN An order exists with status "Ready"
+            - A pancake batch is created
+              - Response content is valid json should be true
+            - An order is created for the batch
+              - Response content is valid json should be true
+            - The order is transitioned to "Ready"
+              - Patch steps response message status code should be OK
+              - Patch steps response message status code should be OK
+          - WHEN The order status is updated to "Completed"
+          - THEN The order should be updated successfully to "Completed"
+            - The patch response http status should be ok
+              - Patch steps response message status code should be OK
+            - The updated order status should be "Completed"
+              - Response content is valid json should be true
+              - Patch steps response status should be 'Completed'
+
+      - Scenario: An Invalid Status Transition Should Return A Conflict Response <fromStatus = "Cancelled"> <toStatus = "Preparing">
+        IsHappyPath: false
+        Steps:
+          - GIVEN An order exists with status "Cancelled"
+            - A pancake batch is created
+              - Response content is valid json should be true
+            - An order is created for the batch
+              - Response content is valid json should be true
+            - The order is transitioned to "Cancelled"
+              - Patch steps response message status code should be OK
+          - WHEN The order status is updated to "Preparing"
+          - THEN The response should indicate an invalid state transition
+            - Patch steps response message status code should be Conflict
+
+      - Scenario: An Invalid Status Transition Should Return A Conflict Response <fromStatus = "Cancelled"> <toStatus = "Ready">
+        IsHappyPath: false
+        Steps:
+          - GIVEN An order exists with status "Cancelled"
+            - A pancake batch is created
+              - Response content is valid json should be true
+            - An order is created for the batch
+              - Response content is valid json should be true
+            - The order is transitioned to "Cancelled"
+              - Patch steps response message status code should be OK
+          - WHEN The order status is updated to "Ready"
+          - THEN The response should indicate an invalid state transition
+            - Patch steps response message status code should be Conflict
+
+      - Scenario: An Invalid Status Transition Should Return A Conflict Response <fromStatus = "Completed"> <toStatus = "Preparing">
+        IsHappyPath: false
+        Steps:
+          - GIVEN An order exists with status "Completed"
+            - A pancake batch is created
+              - Response content is valid json should be true
+            - An order is created for the batch
+              - Response content is valid json should be true
+            - The order is transitioned to "Completed"
+              - Patch steps response message status code should be OK
+              - Patch steps response message status code should be OK
+              - Patch steps response message status code should be OK
+          - WHEN The order status is updated to "Preparing"
+          - THEN The response should indicate an invalid state transition
+            - Patch steps response message status code should be Conflict
+
+      - Scenario: An Invalid Status Transition Should Return A Conflict Response <fromStatus = "Created"> <toStatus = "Completed">
+        IsHappyPath: false
+        Steps:
+          - GIVEN An order exists with status "Created"
+            - A pancake batch is created
+              - Response content is valid json should be true
+            - An order is created for the batch
+              - Response content is valid json should be true
+            - The order is transitioned to "Created"
+          - WHEN The order status is updated to "Completed"
+          - THEN The response should indicate an invalid state transition
+            - Patch steps response message status code should be Conflict
+
+      - Scenario: An Invalid Status Transition Should Return A Conflict Response <fromStatus = "Created"> <toStatus = "Ready">
+        IsHappyPath: false
+        Steps:
+          - GIVEN An order exists with status "Created"
+            - A pancake batch is created
+              - Response content is valid json should be true
+            - An order is created for the batch
+              - Response content is valid json should be true
+            - The order is transitioned to "Created"
+          - WHEN The order status is updated to "Ready"
+          - THEN The response should indicate an invalid state transition
+            - Patch steps response message status code should be Conflict
+
+      - Scenario: An Invalid Status Transition Should Return A Conflict Response <fromStatus = "Preparing"> <toStatus = "Cancelled">
+        IsHappyPath: false
+        Steps:
+          - GIVEN An order exists with status "Preparing"
+            - A pancake batch is created
+              - Response content is valid json should be true
+            - An order is created for the batch
+              - Response content is valid json should be true
+            - The order is transitioned to "Preparing"
+              - Patch steps response message status code should be OK
+          - WHEN The order status is updated to "Cancelled"
+          - THEN The response should indicate an invalid state transition
+            - Patch steps response message status code should be Conflict
+
+      - Scenario: An Invalid Status Transition Should Return A Conflict Response <fromStatus = "Ready"> <toStatus = "Preparing">
+        IsHappyPath: false
+        Steps:
+          - GIVEN An order exists with status "Ready"
+            - A pancake batch is created
+              - Response content is valid json should be true
+            - An order is created for the batch
+              - Response content is valid json should be true
+            - The order is transitioned to "Ready"
+              - Patch steps response message status code should be OK
+              - Patch steps response message status code should be OK
+          - WHEN The order status is updated to "Preparing"
+          - THEN The response should indicate an invalid state transition
+            - Patch steps response message status code should be Conflict
+
+  - Feature: Orders Status Update Not Found Feature
+    Description: /orders - Updating the status of a non-existent order
+    Scenarios:
+      - Scenario: Updating The Status Of A Non Existent Order Should Return Not Found
+        IsHappyPath: false
+        Steps:
+          - GIVEN A non existent order id
+          - WHEN The order status is updated to preparing
+          - THEN The response should indicate not found
+            - Patch steps response message status code should be NotFound
+
+  - Feature: Orders Validation Feature
+    Description: /orders - Input validation for order creation and status updates
+    Scenarios:
+      - Scenario: Order Status Update Endpoint Is Called With Invalid Fields Should Return A Bad Request Response <inputs = "InvalidFieldFromRequest ( Field = Status, Value = , Reason = Status is required )"> <outputs = "VerifiableErrorResult ( ErrorMessage = 'Status' is required., ResponseStatus = Bad Request )">
+        IsHappyPath: false
+        Steps:
+          - GIVEN Valid status update requests with an invalid field <inputs = "InvalidFieldFromRequest ( Field = Status, Value = , Reason = Status is required )">
+          - WHEN The invalid status update requests are submitted
+          - THEN The status update responses should each contain the validation error for the invalid field <expectedOutputs = "VerifiableErrorResult ( ErrorMessage = 'Status' is required., ResponseStatus = Bad Request )">
+
+      - Scenario: Orders Endpoint Is Called With Invalid Fields Should Return A Bad Request Response <inputs = "InvalidFieldFromRequest ( Field = CustomerName, Value = , Reason = Customer name is required ), InvalidFieldFromRequest ( Field = Items, Value = , Reason = At least one item is required ), InvalidFieldFromRequest ( Field = Items<0>.ItemType, Value = , Reason = Item type is required ), InvalidFieldFromRequest ( Field = Items<0>.BatchId, Value = , Reason = Batch ID is required ), InvalidFieldFromRequest ( Field = Items<0>.Quantity, Value = 0, Reason = Quantity must be greater than zero )"> <outputs = "VerifiableErrorResult ( ErrorMessage = 'Customer Name' is required., ResponseStatus = Bad Request ), VerifiableErrorResult ( ErrorMessage = The Items field is required., ResponseStatus = Bad Request ), VerifiableErrorResult ( ErrorMessage = 'Item Type' is required., ResponseStatus = Bad Request ), VerifiableErrorResult ( ErrorMessage = 'Batch Id' is required., ResponseStatus = Bad Request ), VerifiableErrorResult ( ErrorMessage = Quantity must be greater than zero., ResponseStatus = Bad Request )">
+        IsHappyPath: false
+        Steps:
+          - GIVEN Valid order requests with an invalid field <inputs = "InvalidFieldFromRequest ( Field = CustomerName, Value = , Reason = Customer name is required ), InvalidFieldFromRequest ( Field = Items, Value = , Reason = At least one item is required ), InvalidFieldFromRequest ( Field = Items<0>.ItemType, Value = , Reason = Item type is required ), InvalidFieldFromRequest ( Field = Items<0>.BatchId, Value = , Reason = Batch ID is required ), InvalidFieldFromRequest ( Field = Items<0>.Quantity, Value = 0, Reason = Quantity must be greater than zero )">
+          - WHEN The invalid order requests are submitted
+          - THEN The responses should each contain the validation error for the invalid field <expectedOutputs = "VerifiableErrorResult ( ErrorMessage = 'Customer Name' is required., ResponseStatus = Bad Request ), VerifiableErrorResult ( ErrorMessage = The Items field is required., ResponseStatus = Bad Request ), VerifiableErrorResult ( ErrorMessage = 'Item Type' is required., ResponseStatus = Bad Request ), VerifiableErrorResult ( ErrorMessage = 'Batch Id' is required., ResponseStatus = Bad Request ), VerifiableErrorResult ( ErrorMessage = Quantity must be greater than zero., ResponseStatus = Bad Request )">
+
+  - Feature: Pancakes Content Negotiation Feature
+    Description: /pancakes - Content negotiation and unsupported media types
+    Scenarios:
+      - Scenario: Sending A Request With An Unsupported Content Type Should Return An Unsupported Media Type Response <contentType = "application/xml">
+        IsHappyPath: false
+        Steps:
+          - GIVEN A pancake request with content type "application/xml"
+          - WHEN The pancakes are prepared
+          - THEN The response should indicate unsupported media type
+            - Response status code should be UnsupportedMediaType
+
+      - Scenario: Sending A Request With An Unsupported Content Type Should Return An Unsupported Media Type Response <contentType = "text/html">
+        IsHappyPath: false
+        Steps:
+          - GIVEN A pancake request with content type "text/html"
+          - WHEN The pancakes are prepared
+          - THEN The response should indicate unsupported media type
+            - Response status code should be UnsupportedMediaType
+
+      - Scenario: Sending A Request With An Unsupported Content Type Should Return An Unsupported Media Type Response <contentType = "text/plain">
+        IsHappyPath: false
+        Steps:
+          - GIVEN A pancake request with content type "text/plain"
+          - WHEN The pancakes are prepared
+          - THEN The response should indicate unsupported media type
+            - Response status code should be UnsupportedMediaType
+
+  - Feature: Pancakes Creation Feature
+    Description: /pancakes - Creating pancakes with ingredients and optional toppings
+    Scenarios:
+      - Scenario: A Valid Pancake Request Should Return A Fresh Batch
+        IsHappyPath: true
+        Labels:
+          - Happy Path
+        Steps:
+          - GIVEN A valid pancake recipe with all ingredients
+            - A valid request body
+              - The body specifies milk
+                - Milk is retrieved from the get milk endpoint
+                - The milk response should be successful
+                  - Milk steps response message status code should be OK
+                - Retrieved milk is set on the body
+              - The body specifies eggs
+                - Eggs are retrieved from the get eggs endpoint
+                - The eggs response should be successful
+                  - Eggs steps response message status code should be OK
+                - Retrieved eggs are set on the body
+              - The body specifies flour
+                - Flour is retrieved from the get flour endpoint
+                - The flour response should be successful
+                  - Flour steps response message status code should be OK
+                - Retrieved flour is set on the body
+          - WHEN The pancakes are prepared
+          - THEN The pancakes response should contain a valid batch with all ingredients
+            - The response http status should be created
+              - Pancake steps response message status code should be Created
+            - The response should be valid json
+              - Response content is valid json should be true
+            - The response ingredients should include milk
+              - Pancake steps response ingredients should contain 'Some_Fresh_Milk'
+            - The response ingredients should include eggs
+              - Pancake steps response ingredients should contain 'Some_Eggs'
+            - The response ingredients should include flour
+              - Pancake steps response ingredients should contain 'Some_Flour'
+          - AND The cow service should have received a milk request
+            - Requests should contain < r => r.RequestUri.AbsolutePath == "/milk" (and)(and) r.Method == HttpMethod.Get >
+
+      - Scenario: A Pancake Request With More Toppings Than Allowed Should Return A Bad Request Response
+        IsHappyPath: false
+        Steps:
+          - GIVEN The max toppings per item is "5"
+          - AND A valid pancake recipe with all ingredients
+            - A valid request body
+              - The body specifies milk
+                - Milk is retrieved from the get milk endpoint
+                - The milk response should be successful
+                  - Milk steps response message status code should be OK
+                - Retrieved milk is set on the body
+              - The body specifies eggs
+                - Eggs are retrieved from the get eggs endpoint
+                - The eggs response should be successful
+                  - Eggs steps response message status code should be OK
+                - Retrieved eggs are set on the body
+              - The body specifies flour
+                - Flour is retrieved from the get flour endpoint
+                - The flour response should be successful
+                  - Flour steps response message status code should be OK
+                - Retrieved flour is set on the body
+          - AND The request has more toppings than the configured limit
+          - WHEN The pancakes are prepared
+          - THEN The pancakes response should indicate too many toppings
+            - The response http status should be bad request
+              - Pancake steps response message status code should be BadRequest
+            - The response should contain max toppings error
+              - Pancake error response body should contain MaxToppingsExceeded
+
+      - Scenario: Pancakes Endpoint Is Called With Invalid Ingredients Should Return A Bad Request Response <inputs = "InvalidFieldFromRequest ( Field = Milk, Value = , Reason = Milk is required ), InvalidFieldFromRequest ( Field = Flour, Value = , Reason = Flour is required ), InvalidFieldFromRequest ( Field = Eggs, Value = , Reason = Eggs is required ), InvalidFieldFromRequest ( Field = Milk, Value = <script>alert</script>, Reason = XSS in milk ), InvalidFieldFromRequest ( Field = Flour, Value = <img onerror=x>, Reason = XSS in flour ), InvalidFieldFromRequest ( Field = Eggs, Value = javascript:void(0), Reason = XSS in eggs )"> <outputs = "VerifiableErrorResult ( ErrorMessage = 'Milk' is required., ResponseStatus = Bad Request ), VerifiableErrorResult ( ErrorMessage = 'Flour' is required., ResponseStatus = Bad Request ), VerifiableErrorResult ( ErrorMessage = 'Eggs' is required., ResponseStatus = Bad Request ), VerifiableErrorResult ( ErrorMessage = Milk contains potentially dangerous content., ResponseStatus = Bad Request ), VerifiableErrorResult ( ErrorMessage = Flour contains potentially dangerous content., ResponseStatus = Bad Request ), VerifiableErrorResult ( ErrorMessage = Eggs contains potentially dangerous content., ResponseStatus = Bad Request )">
+        IsHappyPath: false
+        Steps:
+          - GIVEN Valid pancake requests with an invalid field <inputs = "InvalidFieldFromRequest ( Field = Milk, Value = , Reason = Milk is required ), InvalidFieldFromRequest ( Field = Flour, Value = , Reason = Flour is required ), InvalidFieldFromRequest ( Field = Eggs, Value = , Reason = Eggs is required ), InvalidFieldFromRequest ( Field = Milk, Value = <script>alert</script>, Reason = XSS in milk ), InvalidFieldFromRequest ( Field = Flour, Value = <img onerror=x>, Reason = XSS in flour ), InvalidFieldFromRequest ( Field = Eggs, Value = javascript:void(0), Reason = XSS in eggs )">
+          - WHEN The invalid pancake requests are submitted
+          - THEN The responses should each contain the validation error for the invalid field <expectedOutputs = "VerifiableErrorResult ( ErrorMessage = 'Milk' is required., ResponseStatus = Bad Request ), VerifiableErrorResult ( ErrorMessage = 'Flour' is required., ResponseStatus = Bad Request ), VerifiableErrorResult ( ErrorMessage = 'Eggs' is required., ResponseStatus = Bad Request ), VerifiableErrorResult ( ErrorMessage = Milk contains potentially dangerous content., ResponseStatus = Bad Request ), VerifiableErrorResult ( ErrorMessage = Flour contains potentially dangerous content., ResponseStatus = Bad Request ), VerifiableErrorResult ( ErrorMessage = Eggs contains potentially dangerous content., ResponseStatus = Bad Request )">
+
+  - Feature: Reporting Batch Completions Feature
+    Description: /graphql - Querying batch completion records populated by Pub/Sub consumption
+    Scenarios:
+      - Scenario: Batch Completions Should Contain Data Ingested Via PubSub Consumer
+        IsHappyPath: true
+        Labels:
+          - Happy Path
+        Steps:
+          - GIVEN A pancake batch has been created
+            - Milk is retrieved from the milk endpoint
+            - The milk response should be successful
+              - Milk steps response message status code should be OK
+            - Eggs are retrieved from the eggs endpoint
+            - The eggs response should be successful
+              - Eggs steps response message status code should be OK
+            - Flour is retrieved from the flour endpoint
+            - The flour response should be successful
+              - Flour steps response message status code should be OK
+            - A pancake request is submitted with all ingredients
+            - The pancake batch response should be successful
+              - Pancake steps response message status code should be Created
+              - Response content is valid json should be true
+              - Pancake steps response should not be null
+              - Pancake steps response batch id should not be empty
+          - WHEN The batch completions are queried via graphql
+          - THEN The graphql response should contain the batch completion record
+            - The batch completions response should be successful
+              - Graph ql steps response message status code should be OK
+            - The batch completions response should be valid json
+            - The batch completions should contain the pancake batch
+              - Graph ql steps batch completions should contain < r => r.BatchId == '0cc85d33-b4d9-40ed-95b1-138658264b70' (and)(and) r.RecipeType == "Pancakes" (and)(and) r.Ingredients.Contains("Milk") >
+
+  - Feature: Reporting Equipment Alerts Feature
+    Description: /graphql - Querying equipment alerts populated by Event Hub consumption
+    Scenarios:
+      - Scenario: Equipment Alerts Should Contain Data Ingested Via Event Hub Consumer
+        IsHappyPath: true
+        Labels:
+          - Happy Path
+        Steps:
+          - GIVEN A pancake batch has been created
+            - Milk is retrieved from the milk endpoint
+            - The milk response should be successful
+              - Milk steps response message status code should be OK
+            - Eggs are retrieved from the eggs endpoint
+            - The eggs response should be successful
+              - Eggs steps response message status code should be OK
+            - Flour is retrieved from the flour endpoint
+            - The flour response should be successful
+              - Flour steps response message status code should be OK
+            - A pancake request is submitted with all ingredients
+            - The pancake batch response should be successful
+              - Pancake steps response message status code should be Created
+              - Response content is valid json should be true
+              - Pancake steps response should not be null
+              - Pancake steps response batch id should not be empty
+          - WHEN The equipment alerts are queried via graphql
+          - THEN The graphql response should contain the equipment alert record
+            - The equipment alerts response should be successful
+              - Graph ql steps response message status code should be OK
+            - The equipment alerts response should be valid json
+            - The equipment alerts should contain the pancake batch alert
+              - Graph ql steps equipment alerts should contain < a => a.BatchId == '14f1897f-2b64-4019-b6d1-97e802bc1644' (and)(and) a.EquipmentName == "Griddle" (and)(and) a.AlertType == "UsageCycleCompleted" >
+
+  - Feature: Reporting Event Grid Webhook Feature
+    Description: /webhooks/eventgrid - Receiving and processing EventGrid webhook events
+    Scenarios:
+      - Scenario: Ingredient Shipments Should Be Recorded When Delivered Via EventGrid Webhook
+        IsHappyPath: true
+        Labels:
+          - Happy Path
+        Steps:
+          - GIVEN An ingredient delivery event has been received via eventgrid webhook
+            - An ingredient delivery event is posted to the webhook
+            - The webhook response should be successful
+              - Webhook response status code should be OK
+          - WHEN The ingredient shipments are queried via graphql
+          - THEN The graphql response should contain the ingredient shipment
+            - The ingredient shipments response should be successful
+              - Graph ql steps response message status code should be OK
+            - The ingredient shipments response should be valid json
+            - The ingredient shipments should contain the delivery
+              - Graph ql steps ingredient shipments should contain < s => s.DeliveryId == '5195a9b8-4ebf-40ea-adeb-a37f98cc9673' (and)(and) s.IngredientName == "Milk" (and)(and) s.Quantity == 50.0m >
+
+  - Feature: Reporting Order Summaries Feature
+    Description: /graphql - Querying order summary reports via GraphQL
+    Scenarios:
+      - Scenario: Order Summaries Should Contain Ingested Order Data
+        IsHappyPath: true
+        Labels:
+          - Happy Path
+        Steps:
+          - GIVEN A pancake batch has been created
+            - Milk is retrieved from the milk endpoint
+            - The milk response should be successful
+              - Milk steps response message status code should be OK
+            - Eggs are retrieved from the eggs endpoint
+            - The eggs response should be successful
+              - Eggs steps response message status code should be OK
+            - Flour is retrieved from the flour endpoint
+            - The flour response should be successful
+              - Flour steps response message status code should be OK
+            - A pancake request is submitted with all ingredients
+            - The pancake batch response should be successful
+              - Pancake steps response message status code should be Created
+              - Response content is valid json should be true
+              - Pancake steps response should not be null
+              - Pancake steps response batch id should not be empty
+          - AND A breakfast order has been placed for the batch
+            - An order request is submitted for the pancake batch
+            - The order creation response should be successful
+              - Order steps response message status code should be Created
+              - Response content is valid json should be true
+              - Order steps response should not be null
+            - The order id is captured from the order response
+              - Order id should not be empty
+          - WHEN The order summaries are queried via graphql
+          - THEN The graphql response should contain the ingested order summary
+            - The graphql response should be successful
+              - Graph ql steps response message status code should be OK
+            - The order summaries response should be valid json
+            - The order summaries should contain the test order
+              - Graph ql steps order summaries should contain < o => o.OrderId == 'daee0612-c7a8-4bb5-994d-76a987f7d207' (and)(and) o.CustomerName == 'TestCustomer_4031889838581962728' (and)(and) o.ItemCount == 1 (and)(and) o.TableNumber == 7 >
+
+      - Scenario: Order Summaries Should Return An Empty List When No Orders Exist
+        IsHappyPath: false
+        Steps:
+          - WHEN The order summaries are queried via graphql
+          - THEN The graphql response should be successful
+            - Graph ql steps response message status code should be OK
+          - AND The order summaries list should be empty or not contain the test order
+            - Graph ql steps order summaries should not contain < o => o.OrderId == '00000000-0000-0000-0000-000000000000' >
+
+  - Feature: Reporting Recipe Reports Feature
+    Description: /graphql - Querying recipe reports and aggregations via GraphQL
+    Scenarios:
+      - Scenario: Recipe Reports Should Contain Ingested Recipe Data
+        IsHappyPath: true
+        Labels:
+          - Happy Path
+        Steps:
+          - GIVEN A pancake batch has been created
+            - Milk is retrieved from the milk endpoint
+            - The milk response should be successful
+              - Milk steps response message status code should be OK
+            - Eggs are retrieved from the eggs endpoint
+            - The eggs response should be successful
+              - Eggs steps response message status code should be OK
+            - Flour is retrieved from the flour endpoint
+            - The flour response should be successful
+              - Flour steps response message status code should be OK
+            - A pancake request is submitted with all ingredients
+            - The pancake batch response should be successful
+              - Pancake steps response message status code should be Created
+              - Response content is valid json should be true
+              - Pancake steps response should not be null
+              - Pancake steps response batch id should not be empty
+          - WHEN The recipe reports are queried via graphql
+          - THEN The graphql response should contain the ingested recipe reports
+            - The recipe reports response should be successful
+              - Graph ql steps response message status code should be OK
+            - The recipe reports response should be valid json
+            - The recipe reports should contain the pancake entry
+              - Graph ql steps recipe reports should contain < r => r.OrderId == '755ad4b2-cd61-4ce2-b407-fee84e5c234c' (and)(and) r.RecipeType == "Pancakes" (and)(and) r.Ingredients.Contains("Milk") >
+
+      - Scenario: Ingredient Usage Should Aggregate Across Multiple Recipes
+        IsHappyPath: false
+        Steps:
+          - GIVEN Multiple recipe logs have been ingested with overlapping ingredients
+            - A pancake recipe is seeded with common ingredients
+            - A waffle recipe is seeded with overlapping ingredients
+          - WHEN The ingredient usage is queried via graphql
+          - THEN The ingredient usage should reflect aggregated counts
+            - The ingredient usage response should be successful
+              - Graph ql steps response message status code should be OK
+            - The ingredient usage response should be valid json
+            - Milk should appear in two recipes
+              - Graph ql steps ingredient usage should contain < i => i.Ingredient == "Milk" (and)(and) i.Count >= 2 >
+            - Butter should appear in one recipe
+              - Graph ql steps ingredient usage should contain < i => i.Ingredient == "Butter" (and)(and) i.Count >= 1 >
+
+      - Scenario: Popular Recipes Should Return Recipe Types Ordered By Frequency
+        IsHappyPath: false
+        Steps:
+          - GIVEN Multiple recipe logs of different types have been ingested
+            - Two pancake recipes are seeded
+            - One waffle recipe is seeded
+          - WHEN The popular recipes are queried via graphql
+          - THEN The popular recipes should be ordered by count descending
+            - The popular recipes response should be successful
+              - Graph ql steps response message status code should be OK
+            - The popular recipes response should be valid json
+            - Pancakes should be the most popular recipe
+              - Pancakes should not be null
+              - Pancakes count should be greater than or equal to 2
+            - Waffles should also be in the results
+              - Graph ql steps popular recipes should contain < r => r.RecipeType == "Waffles" (and)(and) r.Count >= 1 >
+
+  - Feature: Reservations Management Feature
+    Description: /reservations - Managing table reservations with full CRUD operations and cancellation
+    Scenarios:
+      - Scenario: Creating A Reservation Should Return The Confirmed Reservation
+        IsHappyPath: true
+        Labels:
+          - Happy Path
+        Steps:
+          - GIVEN A valid reservation request
+          - WHEN The reservation is submitted
+          - THEN The reservation response should contain the confirmed booking
+            - The post response http status should be created
+              - Post steps response message status code should be Created
+            - The post response should be valid json
+              - Response content is valid json should be true
+            - The reservation status should be confirmed
+              - Post steps response status should be "Confirmed"
+            - The reservation customer name should match
+              - Post steps response customer name should be 'Customer-2b55aa461e2c4f7f8a0328cac90b624d'
+
+      - Scenario: Cancelling A Reservation Should Return The Cancelled Reservation
+        IsHappyPath: false
+        Steps:
+          - GIVEN A reservation exists
+            - A valid reservation request
+            - The reservation is submitted
+            - The setup response should be created
+              - Post steps response message status code should be Created
+              - Response content is valid json should be true
+          - WHEN The reservation is cancelled
+          - THEN The cancellation response should indicate the reservation is cancelled
+            - The cancel response http status should be ok
+              - Cancel steps response message status code should be OK
+            - The cancel response should be valid json
+              - Response content is valid json should be true
+            - The cancelled reservation status should be cancelled
+              - Cancel steps response status should be "Cancelled"
+
+      - Scenario: Cancelling An Already Cancelled Reservation Should Return A Conflict Response
+        IsHappyPath: false
+        Steps:
+          - GIVEN A cancelled reservation exists
+            - A valid reservation request
+            - The reservation is submitted
+            - The setup response should be created
+              - Post steps response message status code should be Created
+              - Response content is valid json should be true
+            - The reservation is cancelled for setup
+            - The setup cancellation should succeed
+              - Cancel steps response message status code should be OK
+          - WHEN The reservation is cancelled again
+          - THEN The cancellation response should indicate a conflict
+            - Cancel steps response message status code should be Conflict
+
+      - Scenario: Deleting A Reservation Should Return No Content
+        IsHappyPath: false
+        Steps:
+          - GIVEN A reservation exists
+            - A valid reservation request
+            - The reservation is submitted
+            - The setup response should be created
+              - Post steps response message status code should be Created
+              - Response content is valid json should be true
+          - WHEN The reservation is deleted
+          - THEN The reservation delete response should indicate no content
+            - Delete response status code should be NoContent
+
+      - Scenario: Retrieving An Existing Reservation Should Return The Reservation
+        IsHappyPath: false
+        Steps:
+          - GIVEN A reservation exists
+            - A valid reservation request
+            - The reservation is submitted
+            - The setup response should be created
+              - Post steps response message status code should be Created
+              - Response content is valid json should be true
+          - WHEN The reservation is retrieved by id
+          - THEN The reservation get response should contain the reservation
+            - The get response http status should be ok
+              - Get steps response message status code should be OK
+            - The get response should be valid json
+              - Response content is valid json should be true
+            - The retrieved reservation should match the created booking
+              - Get steps response id should be '5'
+              - Get steps response customer name should be 'CustomerName'
+              - Get steps response status should be "Confirmed"
+
+  - Feature: Specifications Async Api Feature
+    Description: /asyncapi/v1.json - Serving the AsyncAPI specification describing event-driven messaging
+    Scenarios:
+      - Scenario: The AsyncApi Endpoint Should Return A Valid Specification
+        IsHappyPath: true
+        Labels:
+          - Happy Path
+        Steps:
+          - WHEN The asyncapi endpoint is called
+          - THEN The response should be valid
+            - The response status should be ok
+              - Async api response status code should be OK
+            - The response should be valid json
+              - Async api response is valid json should be true $"response body (first 500 chars) = (_asyncApiJsonString?<..Math.Min(_asyncApiJsonString.Length, 500)>)"
+          - AND The asyncapi spec is written to disk
+            - The asyncapi spec should contain "asyncapi"
+              - Async api json root element get property(name) should not be null
+            - The asyncapi spec should contain "info"
+              - Async api json root element get property(name) should not be null
+            - The asyncapi spec should contain "defaultContentType"
+              - Async api json root element get property(name) should not be null
+            - The asyncapi spec should contain "channels"
+              - Async api json root element get property(name) should not be null
+            - The asyncapi spec should contain "operations"
+              - Async api json root element get property(name) should not be null
+            - The asyncapi spec should contain "components"
+              - Async api json root element get property(name) should not be null
+            - The asyncapi spec is written to disk as json
+
+  - Feature: Specifications Open Api Feature
+    Description: /openapi/v1.json - Serving the OpenAPI specification describing all REST endpoints
+    Scenarios:
+      - Scenario: The OpenApi Endpoint Should Return A Valid Specification
+        IsHappyPath: true
+        Labels:
+          - Happy Path
+        Steps:
+          - WHEN The open api endpoint is called
+          - THEN The response should be valid
+            - The response status should be ok
+              - Swagger response status code should be OK
+            - The response should be valid json
+              - Open api response is valid json should be true
+          - AND The response should contain all the endpoints
+            - The response should contain the endpoint "/pancakes"
+              - Swagger json root element get property("paths") get property(path) should not be null
+            - The response should contain the endpoint "/waffles"
+              - Swagger json root element get property("paths") get property(path) should not be null
+            - The response should contain the endpoint "/orders"
+              - Swagger json root element get property("paths") get property(path) should not be null
+            - The response should contain the endpoint "/orders/(orderId)"
+              - Swagger json root element get property("paths") get property(path) should not be null
+            - The response should contain the endpoint "/toppings"
+              - Swagger json root element get property("paths") get property(path) should not be null
+            - The response should contain the endpoint "/menu"
+              - Swagger json root element get property("paths") get property(path) should not be null
+            - The response should contain the endpoint "/milk"
+              - Swagger json root element get property("paths") get property(path) should not be null
+            - The response should contain the endpoint "/eggs"
+              - Swagger json root element get property("paths") get property(path) should not be null
+            - The response should contain the endpoint "/flour"
+              - Swagger json root element get property("paths") get property(path) should not be null
+            - The response should contain the endpoint "/goat-milk"
+              - Swagger json root element get property("paths") get property(path) should not be null
+            - The response should contain the endpoint "/audit-logs"
+              - Swagger json root element get property("paths") get property(path) should not be null
+          - AND The openapi spec is written to disk
+            - The openapi spec is written to disk as json
+
+  - Feature: Specifications Open Api Scalar UI Feature
+    Description: /scalar/v1 - Serving the interactive API documentation UI powered by Scalar
+    Scenarios:
+      - Scenario: The Scalar UI Endpoint Should Return A Valid Page
+        IsHappyPath: true
+        Labels:
+          - Happy Path
+        Steps:
+          - WHEN The scalar ui endpoint is called
+          - THEN The response should be a valid scalar page
+            - The response status should be ok
+              - Scalar response status code should be OK
+            - The response should be valid html
+              - Scalar ui response body should contain "<html"
+            - The response should refer to scalar
+              - Scalar ui response body should contain "scalar"
+
+  - Feature: Staff Management Feature
+    Description: /staff - Managing kitchen staff members with full CRUD operations
+    Scenarios:
+      - Scenario: Adding A New Staff Member Should Return The Created Member
+        IsHappyPath: true
+        Labels:
+          - Happy Path
+        Steps:
+          - GIVEN A valid staff member request
+          - WHEN The staff member is submitted
+          - THEN The staff response should contain the created member
+            - The post response http status should be created
+              - Post steps response message status code should be Created
+            - The post response should be valid json
+              - Response content is valid json should be true
+            - The created member should have the correct name
+              - Post steps response name should be 'Chef-2ca67c71c1c4428db877a35605fe7f2b'
+            - The created member should have the correct role
+              - Post steps response role should be "Chef"
+
+      - Scenario: Adding A Staff Member With An Invalid Role Should Return A Bad Request Response
+        IsHappyPath: false
+        Steps:
+          - GIVEN A staff member request with an invalid role
+          - WHEN The staff member is submitted
+          - THEN The staff response should indicate bad request
+            - Post steps response message status code should be BadRequest
+
+      - Scenario: Deleting A Staff Member Should Return No Content
+        IsHappyPath: false
+        Steps:
+          - GIVEN A staff member exists
+            - A valid staff member request
+            - The staff member is submitted
+            - The setup response should be created
+              - Post steps response message status code should be Created
+              - Response content is valid json should be true
+          - WHEN The staff member is deleted
+          - THEN The staff delete response should indicate no content
+            - Delete response status code should be NoContent
+
+      - Scenario: Retrieving An Existing Staff Member Should Return The Member
+        IsHappyPath: false
+        Steps:
+          - GIVEN A staff member exists
+            - A valid staff member request
+            - The staff member is submitted
+            - The setup response should be created
+              - Post steps response message status code should be Created
+              - Response content is valid json should be true
+          - WHEN The staff member is retrieved by id
+          - THEN The staff get response should contain the member
+            - The get response http status should be ok
+              - Get steps response message status code should be OK
+            - The get response should be valid json
+              - Response content is valid json should be true
+            - The retrieved member should match the created member
+              - Get steps response id should be '1'
+              - Get steps response name should be 'Name'
+              - Get steps response role should be "Chef"
+
+  - Feature: Toppings Deletion Feature
+    Description: /toppings - Deleting toppings from the system
+    Scenarios:
+      - Scenario: Deleting An Existing Topping Should Return No Content
+        IsHappyPath: true
+        Labels:
+          - Happy Path
+        Steps:
+          - GIVEN A known topping exists
+          - WHEN The topping is deleted
+          - THEN The delete response should indicate success
+            - Delete steps response message status code should be NoContent
+
+      - Scenario: Deleting A Non Existent Topping Should Return Not Found
+        IsHappyPath: false
+        Steps:
+          - GIVEN A topping id that does not exist
+          - WHEN The topping is deleted
+          - THEN The delete response should indicate not found
+            - Delete steps response message status code should be NotFound
+
+  - Feature: Toppings Feature Flag Feature
+    Description: /toppings - Topping availability controlled by feature flags
+    Scenarios:
+      - Scenario: Toppings Should Exclude Raspberries When Feature Flag Is Disabled
+        IsHappyPath: false
+        Steps:
+          - GIVEN The raspberry topping feature flag is disabled
+          - WHEN Toppings are requested
+          - THEN The toppings response should not include raspberries
+            - The toppings response http status should be ok
+              - Toppings steps response message status code should be OK
+            - The toppings list should be valid json
+              - Response content is valid json should be true
+            - The toppings list should not contain raspberries
+              - Toppings steps response should not contain < t => t.Name == ToppingDefaults.Raspberries >
+
+      - Scenario: Toppings Should Include Raspberries When Feature Flag Is Enabled
+        IsHappyPath: false
+        Steps:
+          - GIVEN The raspberry topping feature flag is enabled
+          - WHEN Toppings are requested
+          - THEN The toppings response should include raspberries
+            - The toppings response http status should be ok
+              - Toppings steps response message status code should be OK
+            - The toppings list should be valid json
+              - Response content is valid json should be true
+            - The toppings list should contain raspberries
+              - Toppings steps response should contain < t => t.Name == ToppingDefaults.Raspberries >
+
+  - Feature: Toppings Management Feature
+    Description: /toppings - Listing available toppings and adding custom toppings
+    Scenarios:
+      - Scenario: The Toppings Endpoint Should Return All Available Toppings
+        IsHappyPath: true
+        Labels:
+          - Happy Path
+        Steps:
+          - WHEN The available toppings are requested
+          - THEN The toppings response should contain the default toppings
+            - The toppings get response http status should be ok
+              - Get steps response message status code should be OK
+            - The toppings list should be valid json
+              - Response content is valid json should be true
+            - The toppings list should contain the expected items
+              - Get steps response should have count ExpectedToppingCount
+              - Get steps response should contain < t => t.Name == ToppingDefaults.Raspberries >
+              - Get steps response should contain < t => t.Name == ToppingDefaults.Blueberries >
+              - Get steps response should contain < t => t.Name == ToppingDefaults.MapleSyrup >
+              - Get steps response should contain < t => t.Name == ToppingDefaults.WhippedCream >
+              - Get steps response should contain < t => t.Name == ToppingDefaults.ChocolateChips >
+
+      - Scenario: Adding A New Topping Should Return The Created Topping
+        IsHappyPath: false
+        Steps:
+          - GIVEN A valid topping request
+          - WHEN The new topping is submitted
+          - THEN The topping response should contain the created topping
+            - The topping post response http status should be created
+              - Post steps response message status code should be Created
+            - The topping post response should be valid json
+              - Response content is valid json should be true
+            - The created topping should have the correct name
+              - Post steps response name should be Strawberries
+            - The created topping should have the correct category
+              - Post steps response category should be FruitCategory
+
+  - Feature: Toppings Update Feature
+    Description: /toppings - Updating existing toppings
+    Scenarios:
+      - Scenario: Updating An Existing Topping Should Return The Updated Topping
+        IsHappyPath: true
+        Labels:
+          - Happy Path
+        Steps:
+          - GIVEN A known topping exists
+          - AND A valid update topping request
+          - WHEN The topping is updated
+          - THEN The update response should contain the updated topping
+            - The update response http status should be ok
+              - Put steps response message status code should be OK
+            - The update response should be valid json
+              - Response content is valid json should be true
+            - The updated topping should have the correct id
+              - Put steps response topping id should be KnownBlueberryToppingId
+            - The updated topping should have the correct name
+              - Put steps response name should be Strawberries
+            - The updated topping should have the correct category
+              - Put steps response category should be FruitCategory
+
+      - Scenario: Update Toppings Endpoint Is Called With Invalid Or Dangerous Input <inputs = "InvalidFieldFromRequest ( Field = Name, Value = <script>alert('xss')</script>, Reason = Script tag in name ), InvalidFieldFromRequest ( Field = Name, Value = <img src=x onerror=alert(1)>, Reason = Event handler in name ), InvalidFieldFromRequest ( Field = Category, Value = <script>alert('xss')</script>, Reason = Script tag in category ), InvalidFieldFromRequest ( Field = Category, Value = javascript:alert(1), Reason = Javascript protocol ), InvalidFieldFromRequest ( Field = Name, Value = , Reason = Name is required ), InvalidFieldFromRequest ( Field = Category, Value = , Reason = Category is required )"> <outputs = "VerifiableErrorResult ( ErrorMessage = Name contains potentially dangerous content., ResponseStatus = Bad Request ), VerifiableErrorResult ( ErrorMessage = Name contains potentially dangerous content., ResponseStatus = Bad Request ), VerifiableErrorResult ( ErrorMessage = Category contains potentially dangerous content., ResponseStatus = Bad Request ), VerifiableErrorResult ( ErrorMessage = Category contains potentially dangerous content., ResponseStatus = Bad Request ), VerifiableErrorResult ( ErrorMessage = 'Name' is required., ResponseStatus = Bad Request ), VerifiableErrorResult ( ErrorMessage = 'Category' is required., ResponseStatus = Bad Request )">
+        IsHappyPath: false
+        Steps:
+          - GIVEN A known topping exists
+          - AND Valid update topping requests with an invalid field <inputs = "InvalidFieldFromRequest ( Field = Name, Value = <script>alert('xss')</script>, Reason = Script tag in name ), InvalidFieldFromRequest ( Field = Name, Value = <img src=x onerror=alert(1)>, Reason = Event handler in name ), InvalidFieldFromRequest ( Field = Category, Value = <script>alert('xss')</script>, Reason = Script tag in category ), InvalidFieldFromRequest ( Field = Category, Value = javascript:alert(1), Reason = Javascript protocol ), InvalidFieldFromRequest ( Field = Name, Value = , Reason = Name is required ), InvalidFieldFromRequest ( Field = Category, Value = , Reason = Category is required )">
+          - WHEN The invalid update topping requests are submitted
+          - THEN The update responses should each contain the validation error for the invalid field <expectedOutputs = "VerifiableErrorResult ( ErrorMessage = Name contains potentially dangerous content., ResponseStatus = Bad Request ), VerifiableErrorResult ( ErrorMessage = Name contains potentially dangerous content., ResponseStatus = Bad Request ), VerifiableErrorResult ( ErrorMessage = Category contains potentially dangerous content., ResponseStatus = Bad Request ), VerifiableErrorResult ( ErrorMessage = Category contains potentially dangerous content., ResponseStatus = Bad Request ), VerifiableErrorResult ( ErrorMessage = 'Name' is required., ResponseStatus = Bad Request ), VerifiableErrorResult ( ErrorMessage = 'Category' is required., ResponseStatus = Bad Request )">
+
+      - Scenario: Updating A Non Existent Topping Should Return Not Found
+        IsHappyPath: false
+        Steps:
+          - GIVEN A topping id that does not exist
+          - AND A valid update topping request
+          - WHEN The topping is updated
+          - THEN The update response should indicate not found
+            - Put steps response message status code should be NotFound
+
+  - Feature: Toppings Xss Validation Feature
+    Description: /toppings - XSS and input validation for toppings
+    Scenarios:
+      - Scenario: Toppings Endpoint Is Called With Invalid Or Dangerous Input <inputs = "InvalidFieldFromRequest ( Field = Name, Value = <script>alert('xss')</script>, Reason = Script tag in name ), InvalidFieldFromRequest ( Field = Name, Value = <img src=x onerror=alert(1)>, Reason = Event handler in name ), InvalidFieldFromRequest ( Field = Category, Value = <script>alert('xss')</script>, Reason = Script tag in category ), InvalidFieldFromRequest ( Field = Category, Value = javascript:alert(1), Reason = Javascript protocol ), InvalidFieldFromRequest ( Field = Name, Value = , Reason = Name is required ), InvalidFieldFromRequest ( Field = Category, Value = , Reason = Category is required )"> <outputs = "VerifiableErrorResult ( ErrorMessage = Name contains potentially dangerous content., ResponseStatus = Bad Request ), VerifiableErrorResult ( ErrorMessage = Name contains potentially dangerous content., ResponseStatus = Bad Request ), VerifiableErrorResult ( ErrorMessage = Category contains potentially dangerous content., ResponseStatus = Bad Request ), VerifiableErrorResult ( ErrorMessage = Category contains potentially dangerous content., ResponseStatus = Bad Request ), VerifiableErrorResult ( ErrorMessage = 'Name' is required., ResponseStatus = Bad Request ), VerifiableErrorResult ( ErrorMessage = 'Category' is required., ResponseStatus = Bad Request )">
+        IsHappyPath: false
+        Steps:
+          - GIVEN Valid topping requests with an invalid field <inputs = "InvalidFieldFromRequest ( Field = Name, Value = <script>alert('xss')</script>, Reason = Script tag in name ), InvalidFieldFromRequest ( Field = Name, Value = <img src=x onerror=alert(1)>, Reason = Event handler in name ), InvalidFieldFromRequest ( Field = Category, Value = <script>alert('xss')</script>, Reason = Script tag in category ), InvalidFieldFromRequest ( Field = Category, Value = javascript:alert(1), Reason = Javascript protocol ), InvalidFieldFromRequest ( Field = Name, Value = , Reason = Name is required ), InvalidFieldFromRequest ( Field = Category, Value = , Reason = Category is required )">
+          - WHEN The invalid topping requests are submitted
+          - THEN The responses should each contain the validation error for the invalid field <expectedOutputs = "VerifiableErrorResult ( ErrorMessage = Name contains potentially dangerous content., ResponseStatus = Bad Request ), VerifiableErrorResult ( ErrorMessage = Name contains potentially dangerous content., ResponseStatus = Bad Request ), VerifiableErrorResult ( ErrorMessage = Category contains potentially dangerous content., ResponseStatus = Bad Request ), VerifiableErrorResult ( ErrorMessage = Category contains potentially dangerous content., ResponseStatus = Bad Request ), VerifiableErrorResult ( ErrorMessage = 'Name' is required., ResponseStatus = Bad Request ), VerifiableErrorResult ( ErrorMessage = 'Category' is required., ResponseStatus = Bad Request )">
+
+  - Feature: Waffles Content Negotiation Feature
+    Description: /waffles - Content negotiation and unsupported media types
+    Scenarios:
+      - Scenario: Sending A Request With An Unsupported Content Type Should Return An Unsupported Media Type Response <contentType = "application/xml">
+        IsHappyPath: false
+        Steps:
+          - GIVEN A waffle request with content type "application/xml"
+          - WHEN The waffles are prepared
+          - THEN The response should indicate unsupported media type
+            - Response status code should be UnsupportedMediaType
+
+      - Scenario: Sending A Request With An Unsupported Content Type Should Return An Unsupported Media Type Response <contentType = "text/html">
+        IsHappyPath: false
+        Steps:
+          - GIVEN A waffle request with content type "text/html"
+          - WHEN The waffles are prepared
+          - THEN The response should indicate unsupported media type
+            - Response status code should be UnsupportedMediaType
+
+      - Scenario: Sending A Request With An Unsupported Content Type Should Return An Unsupported Media Type Response <contentType = "text/plain">
+        IsHappyPath: false
+        Steps:
+          - GIVEN A waffle request with content type "text/plain"
+          - WHEN The waffles are prepared
+          - THEN The response should indicate unsupported media type
+            - Response status code should be UnsupportedMediaType
+
+  - Feature: Waffles Creation Feature
+    Description: /waffles - Creating waffles with ingredients and optional toppings
+    Scenarios:
+      - Scenario: A Valid Waffle Request Should Return A Fresh Batch
+        IsHappyPath: true
+        Labels:
+          - Happy Path
+        Steps:
+          - GIVEN A valid waffle recipe with all ingredients
+            - A valid request body
+              - The body specifies milk
+                - Milk is retrieved from the get milk endpoint
+                - The milk response should be successful
+                  - Milk steps response message status code should be OK
+                - Retrieved milk is set on the body
+              - The body specifies eggs
+                - Eggs are retrieved from the get eggs endpoint
+                - The eggs response should be successful
+                  - Eggs steps response message status code should be OK
+                - Retrieved eggs are set on the body
+              - The body specifies flour
+                - Flour is retrieved from the get flour endpoint
+                - The flour response should be successful
+                  - Flour steps response message status code should be OK
+                - Retrieved flour is set on the body
+              - The body specifies butter
+          - WHEN The waffles are prepared
+          - THEN The waffles response should contain a valid batch with all ingredients
+            - The response http status should be created
+              - Waffle steps response message status code should be Created
+            - The response should be valid json
+              - Response content is valid json should be true
+            - The response ingredients should include milk
+              - Waffle steps response ingredients should contain 'Some_Fresh_Milk'
+            - The response ingredients should include eggs
+              - Waffle steps response ingredients should contain 'Some_Eggs'
+            - The response ingredients should include flour
+              - Waffle steps response ingredients should contain 'Some_Flour'
+            - The response ingredients should include butter
+              - Waffle steps response ingredients should contain UnsaltedButter
+          - AND The cow service should have received a milk request
+            - Requests should contain < r => r.RequestUri.AbsolutePath == "/milk" (and)(and) r.Method == HttpMethod.Get >
+
+      - Scenario: A Waffle Request With More Toppings Than Allowed Should Return A Bad Request Response
+        IsHappyPath: false
+        Steps:
+          - GIVEN The max toppings per item is "5"
+          - AND A valid waffle recipe with all ingredients
+            - A valid request body
+              - The body specifies milk
+                - Milk is retrieved from the get milk endpoint
+                - The milk response should be successful
+                  - Milk steps response message status code should be OK
+                - Retrieved milk is set on the body
+              - The body specifies eggs
+                - Eggs are retrieved from the get eggs endpoint
+                - The eggs response should be successful
+                  - Eggs steps response message status code should be OK
+                - Retrieved eggs are set on the body
+              - The body specifies flour
+                - Flour is retrieved from the get flour endpoint
+                - The flour response should be successful
+                  - Flour steps response message status code should be OK
+                - Retrieved flour is set on the body
+              - The body specifies butter
+          - AND The request has more toppings than the configured limit
+          - WHEN The waffles are prepared
+          - THEN The waffles response should indicate too many toppings
+            - The response http status should be bad request
+              - Waffle steps response message status code should be BadRequest
+            - The response should contain max toppings error
+              - Waffle error response body should contain MaxToppingsExceeded
+
+      - Scenario: Waffles Endpoint Is Called With Invalid Ingredients Should Return A Bad Request Response <inputs = "InvalidFieldFromRequest ( Field = Milk, Value = , Reason = Milk is required ), InvalidFieldFromRequest ( Field = Flour, Value = , Reason = Flour is required ), InvalidFieldFromRequest ( Field = Eggs, Value = , Reason = Eggs is required ), InvalidFieldFromRequest ( Field = Butter, Value = , Reason = Butter is required ), InvalidFieldFromRequest ( Field = Milk, Value = <script>alert</script>, Reason = XSS in milk ), InvalidFieldFromRequest ( Field = Butter, Value = <img onerror=x>, Reason = XSS in butter )"> <outputs = "VerifiableErrorResult ( ErrorMessage = 'Milk' is required., ResponseStatus = Bad Request ), VerifiableErrorResult ( ErrorMessage = 'Flour' is required., ResponseStatus = Bad Request ), VerifiableErrorResult ( ErrorMessage = 'Eggs' is required., ResponseStatus = Bad Request ), VerifiableErrorResult ( ErrorMessage = 'Butter' is required., ResponseStatus = Bad Request ), VerifiableErrorResult ( ErrorMessage = Milk contains potentially dangerous content., ResponseStatus = Bad Request ), VerifiableErrorResult ( ErrorMessage = Butter contains potentially dangerous content., ResponseStatus = Bad Request )">
+        IsHappyPath: false
+        Steps:
+          - GIVEN Valid waffle requests with an invalid field <inputs = "InvalidFieldFromRequest ( Field = Milk, Value = , Reason = Milk is required ), InvalidFieldFromRequest ( Field = Flour, Value = , Reason = Flour is required ), InvalidFieldFromRequest ( Field = Eggs, Value = , Reason = Eggs is required ), InvalidFieldFromRequest ( Field = Butter, Value = , Reason = Butter is required ), InvalidFieldFromRequest ( Field = Milk, Value = <script>alert</script>, Reason = XSS in milk ), InvalidFieldFromRequest ( Field = Butter, Value = <img onerror=x>, Reason = XSS in butter )">
+          - WHEN The invalid waffle requests are submitted
+          - THEN The responses should each contain the validation error for the invalid field <expectedOutputs = "VerifiableErrorResult ( ErrorMessage = 'Milk' is required., ResponseStatus = Bad Request ), VerifiableErrorResult ( ErrorMessage = 'Flour' is required., ResponseStatus = Bad Request ), VerifiableErrorResult ( ErrorMessage = 'Eggs' is required., ResponseStatus = Bad Request ), VerifiableErrorResult ( ErrorMessage = 'Butter' is required., ResponseStatus = Bad Request ), VerifiableErrorResult ( ErrorMessage = Milk contains potentially dangerous content., ResponseStatus = Bad Request ), VerifiableErrorResult ( ErrorMessage = Butter contains potentially dangerous content., ResponseStatus = Bad Request )">
 

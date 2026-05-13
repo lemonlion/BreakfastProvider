@@ -297,6 +297,12 @@ public abstract class BaseFixture : FeatureFixture, IDisposable, IIgnorable<Comp
                     services.Remove(ehConsumer);
             }
         }
+        else
+        {
+            // Docker mode (static factory): replace production CosmosClient with a
+            // tracked version that captures operations for PlantUML sequence diagrams.
+            services.UseTrackedCosmosClient(CurrentTestInfo.Fetcher);
+        }
 
         if (Settings.RunWithAnInMemoryReportingDatabase)
         {
@@ -325,6 +331,10 @@ public abstract class BaseFixture : FeatureFixture, IDisposable, IIgnorable<Comp
         {
             services.UseInMemorySpannerDatabase(_fakeSpannerServer!, CurrentTestInfo.Fetcher);
             services.ReplaceSpannerHealthCheckWithNoOp();
+        }
+        else
+        {
+            services.UseTrackedSpannerDatabase(CurrentTestInfo.Fetcher);
         }
 
         if (Settings.RunWithAnInMemoryEventGrid)
@@ -416,11 +426,19 @@ public abstract class BaseFixture : FeatureFixture, IDisposable, IIgnorable<Comp
             services.UseInMemoryMongoDatabase(CurrentTestInfo.Fetcher);
             services.ReplaceMongoHealthCheckWithNoOp();
         }
+        else
+        {
+            services.UseTrackedMongoClient(CurrentTestInfo.Fetcher);
+        }
 
         if (Settings.RunWithAnInMemoryBigQuery)
         {
             services.UseInMemoryBigQuery(CurrentTestInfo.Fetcher);
             services.ReplaceBigQueryHealthCheckWithNoOp();
+        }
+        else
+        {
+            services.UseTrackedBigQueryClient(CurrentTestInfo.Fetcher);
         }
 
         // Tracking wrappers must be registered AFTER the in-memory/real publishers

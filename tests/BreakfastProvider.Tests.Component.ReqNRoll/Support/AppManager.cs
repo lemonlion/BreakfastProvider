@@ -203,6 +203,12 @@ public sealed class AppManager : IDisposable
                     services.Remove(ehConsumer);
             }
         }
+        else
+        {
+            // Docker mode (static factory): replace production CosmosClient with a
+            // tracked version that captures operations for PlantUML sequence diagrams.
+            services.UseTrackedCosmosClient(CurrentTestInfo.Fetcher);
+        }
 
         if (Settings.RunWithAnInMemoryReportingDatabase)
         {
@@ -231,6 +237,10 @@ public sealed class AppManager : IDisposable
         {
             services.UseInMemorySpannerDatabase(_fakeSpannerServer!, CurrentTestInfo.Fetcher);
             services.ReplaceSpannerHealthCheckWithNoOp();
+        }
+        else
+        {
+            services.UseTrackedSpannerDatabase(CurrentTestInfo.Fetcher);
         }
 
         if (Settings.RunWithAnInMemoryEventGrid)
@@ -315,11 +325,19 @@ public sealed class AppManager : IDisposable
             services.UseInMemoryMongoDatabase(CurrentTestInfo.Fetcher);
             services.ReplaceMongoHealthCheckWithNoOp();
         }
+        else
+        {
+            services.UseTrackedMongoClient(CurrentTestInfo.Fetcher);
+        }
 
         if (Settings.RunWithAnInMemoryBigQuery)
         {
             services.UseInMemoryBigQuery(CurrentTestInfo.Fetcher);
             services.ReplaceBigQueryHealthCheckWithNoOp();
+        }
+        else
+        {
+            services.UseTrackedBigQueryClient(CurrentTestInfo.Fetcher);
         }
 
         services.UseTrackedOutboxWriter(CurrentTestInfo.Fetcher);

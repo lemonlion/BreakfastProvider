@@ -57,6 +57,47 @@ public static class ServiceCollectionExtensions
         return services;
     }
 
+    /// <summary>
+    /// Replaces the production <see cref="Microsoft.Azure.Cosmos.CosmosClient"/> with a tracked
+    /// version that uses <c>CosmosClientOptions.WithTestTrackingAndCustomSslValidation()</c>.
+    /// Use in Docker mode where the real Cosmos emulator accepts HTTP requests over self-signed TLS.
+    /// </summary>
+    public static IServiceCollection UseTrackedCosmosClient(this IServiceCollection services,
+        Func<(string Name, string Id)> currentTestInfoFetcher)
+    {
+        var trackingOptions = new CosmosTrackingMessageHandlerOptions
+        {
+            ServiceName = Documentation.ServiceNames.CosmosDb,
+            CallerName = Documentation.ServiceNames.BreakfastProvider,
+            Verbosity = CosmosTrackingVerbosity.Summarised,
+            CurrentTestInfoFetcher = currentTestInfoFetcher
+        };
+
+        // Remove the production CosmosClient and re-register with tracking wired in
+        var existingDescriptor = services.FirstOrDefault(d => d.ServiceType == typeof(Microsoft.Azure.Cosmos.CosmosClient));
+        if (existingDescriptor is not null)
+        {
+            services.RemoveAll<Microsoft.Azure.Cosmos.CosmosClient>();
+            services.AddSingleton(sp =>
+            {
+                var config = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<Api.Configuration.CosmosConfig>>().Value;
+                var options = new Microsoft.Azure.Cosmos.CosmosClientOptions
+                {
+                    RequestTimeout = TimeSpan.FromSeconds(config.RequestTimeoutSeconds),
+                    MaxRetryAttemptsOnRateLimitedRequests = config.MaxRetryAttempts,
+                    SerializerOptions = new Microsoft.Azure.Cosmos.CosmosSerializationOptions
+                    {
+                        PropertyNamingPolicy = Microsoft.Azure.Cosmos.CosmosPropertyNamingPolicy.CamelCase
+                    }
+                };
+                options.WithTestTrackingAndCustomSslValidation(trackingOptions);
+                return new Microsoft.Azure.Cosmos.CosmosClient(config.ConnectionString, options);
+            });
+        }
+
+        return services;
+    }
+
     public static IServiceCollection UseInMemoryEventGrid(this IServiceCollection services)
     {
         // Discover which concrete IEventPublisher<T> types the app registered
@@ -711,6 +752,48 @@ public static class ServiceCollectionExtensions
     }
 
     /// <summary>
+    /// Replaces the production <see cref="ISpannerConnectionFactory"/> with a tracked
+    /// version that uses <c>SpannerConnectionStringBuilder.WithTestTracking()</c> to wire
+    /// up a gRPC interceptor capturing all Spanner operations for test diagrams.
+    /// Use in Docker mode where the real Spanner emulator accepts gRPC requests.
+    /// </summary>
+    public static IServiceCollection UseTrackedSpannerDatabase(this IServiceCollection services,
+        Func<(string Name, string Id)> currentTestInfoFetcher)
+    {
+        var trackingOptions = new SpannerTrackingOptions
+        {
+            ServiceName = Documentation.ServiceNames.Spanner,
+            CallerName = Documentation.ServiceNames.BreakfastProvider,
+            Verbosity = SpannerTrackingVerbosity.Raw,
+            CurrentTestInfoFetcher = currentTestInfoFetcher,
+            ExcludedOperations =
+            {
+                SpannerOperation.CreateSession,
+                SpannerOperation.DeleteSession,
+                SpannerOperation.BeginTransaction
+            }
+        };
+
+        var existingDescriptor = services.FirstOrDefault(d => d.ServiceType == typeof(ISpannerConnectionFactory));
+        if (existingDescriptor is not null)
+        {
+            services.RemoveAll<ISpannerConnectionFactory>();
+            services.AddSingleton<ISpannerConnectionFactory>(sp =>
+            {
+                var config = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<Api.Configuration.SpannerConfig>>().Value;
+                var httpContextAccessor = sp.GetService<Microsoft.AspNetCore.Http.IHttpContextAccessor>();
+                var builder = new Google.Cloud.Spanner.Data.SpannerConnectionStringBuilder(config.ConnectionString)
+                {
+                    EmulatorDetection = Google.Api.Gax.EmulatorDetection.EmulatorOnly
+                }.WithTestTracking(trackingOptions, httpContextAccessor);
+                return new InMemorySpannerConnectionFactory(builder);
+            });
+        }
+
+        return services;
+    }
+
+    /// <summary>
     /// Replaces the production <see cref="BreakfastProvider.Api.Grpc.NotificationGrpc.NotificationGrpcClient"/>
     /// with a tracked version that routes calls to a Kestrel-hosted fake notification
     /// gRPC service over real HTTP/2 (h2c) and records all calls for PlantUML sequence
@@ -745,22 +828,17 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection UseInMemoryMongoDatabase(this IServiceCollection services,
         Func<(string Name, string Id)> currentTestInfoFetcher)
     {
-        var trackingOptions = new MongoDbTrackingOptions
-        {
-            ServiceName = Documentation.ServiceNames.MongoDB,
-            CallerName = Documentation.ServiceNames.BreakfastProvider,
-            Verbosity = MongoDbTrackingVerbosity.Detailed,
-            CurrentTestInfoFetcher = currentTestInfoFetcher
-        };
-
         services.UseInMemoryMongoDB(options =>
         {
             options.DatabaseName = "BreakfastDb";
             options.AddCollection<Api.Services.RecipeReviewDocument>("recipe_reviews");
             options.OnClientCreated = client =>
             {
-                // Wire up TTD tracking via the client settings
-                // The InMemoryMongoClient exposes settings that can be configured
+                // In-memory emulator does not fire MongoDB driver command events
+                // (CommandStartedEvent/CommandSucceededEvent) because it uses direct
+                // interface implementation rather than the driver's cluster/connection layer.
+                // Tracking is not possible until InMemoryEmulator.MongoDB adds event support.
+                // See: https://github.com/lemonlion/InMemoryEmulator.MongoDB/issues/16
             };
         });
 
@@ -771,6 +849,40 @@ public static class ServiceCollectionExtensions
             options.Verbosity = MongoDbTrackingVerbosity.Detailed;
             options.CurrentTestInfoFetcher = currentTestInfoFetcher;
         });
+
+        return services;
+    }
+
+    /// <summary>
+    /// Replaces the production <see cref="MongoDB.Driver.IMongoClient"/> with a tracked
+    /// version that uses <c>MongoClientSettings.WithTestTracking()</c> to wire up
+    /// <c>MongoDbTrackingSubscriber</c> via the driver's <c>ClusterConfigurator</c>.
+    /// Use in Docker mode where the real MongoDB container fires command events.
+    /// </summary>
+    public static IServiceCollection UseTrackedMongoClient(this IServiceCollection services,
+        Func<(string Name, string Id)> currentTestInfoFetcher)
+    {
+        var trackingOptions = new MongoDbTrackingOptions
+        {
+            ServiceName = Documentation.ServiceNames.MongoDB,
+            CallerName = Documentation.ServiceNames.BreakfastProvider,
+            Verbosity = MongoDbTrackingVerbosity.Detailed,
+            CurrentTestInfoFetcher = currentTestInfoFetcher
+        };
+
+        // Remove the production IMongoClient and re-register with tracking wired in
+        var existingDescriptor = services.FirstOrDefault(d => d.ServiceType == typeof(MongoDB.Driver.IMongoClient));
+        if (existingDescriptor is not null)
+        {
+            services.RemoveAll<MongoDB.Driver.IMongoClient>();
+            services.AddSingleton<MongoDB.Driver.IMongoClient>(sp =>
+            {
+                var config = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<Api.Configuration.MongoDbConfig>>().Value;
+                var settings = MongoDB.Driver.MongoClientSettings.FromConnectionString(config.ConnectionString);
+                settings.WithTestTracking(trackingOptions);
+                return new MongoDB.Driver.MongoClient(settings);
+            });
+        }
 
         return services;
     }
@@ -819,6 +931,10 @@ public static class ServiceCollectionExtensions
                     { "recorded_at", Google.Cloud.BigQuery.V2.BigQueryDbType.String },
                 }.Build());
             });
+            // In-memory emulator does not expose a WithHttpMessageHandlerWrapper hook
+            // to chain BigQueryTrackingMessageHandler around FakeBigQueryHandler.
+            // Tracking is not possible until InMemoryEmulator.BigQuery adds handler wrapper support.
+            // See: https://github.com/lemonlion/InMemoryEmulator.BigQuery/issues/1
         });
 
         services.AddBigQueryTestTracking(options =>
@@ -828,6 +944,44 @@ public static class ServiceCollectionExtensions
             options.Verbosity = BigQueryTrackingVerbosity.Detailed;
             options.CurrentTestInfoFetcher = currentTestInfoFetcher;
         });
+
+        return services;
+    }
+
+    /// <summary>
+    /// Replaces the production <see cref="Google.Cloud.BigQuery.V2.BigQueryClient"/> with
+    /// a tracked version that uses <c>BigQueryClientBuilder.WithTestTracking()</c> to wire
+    /// up <c>BigQueryTrackingMessageHandler</c> in the SDK's HTTP pipeline.
+    /// Use in Docker mode where the real BigQuery emulator accepts HTTP requests.
+    /// </summary>
+    public static IServiceCollection UseTrackedBigQueryClient(this IServiceCollection services,
+        Func<(string Name, string Id)> currentTestInfoFetcher)
+    {
+        var trackingOptions = new BigQueryTrackingMessageHandlerOptions
+        {
+            ServiceName = Documentation.ServiceNames.BigQuery,
+            CallerName = Documentation.ServiceNames.BreakfastProvider,
+            Verbosity = BigQueryTrackingVerbosity.Detailed,
+            CurrentTestInfoFetcher = currentTestInfoFetcher
+        };
+
+        // Remove the production BigQueryClient and re-register with tracking wired in
+        var existingDescriptor = services.FirstOrDefault(d => d.ServiceType == typeof(Google.Cloud.BigQuery.V2.BigQueryClient));
+        if (existingDescriptor is not null)
+        {
+            services.RemoveAll<Google.Cloud.BigQuery.V2.BigQueryClient>();
+            services.AddSingleton(sp =>
+            {
+                var config = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<Api.Configuration.BigQueryConfig>>().Value;
+                var builder = new Google.Cloud.BigQuery.V2.BigQueryClientBuilder
+                {
+                    ProjectId = config.ProjectId,
+                    BaseUri = config.EmulatorEndpoint,
+                    Credential = Google.Apis.Auth.OAuth2.GoogleCredential.FromAccessToken("emulator")
+                };
+                return builder.WithTestTracking(trackingOptions).Build();
+            });
+        }
 
         return services;
     }

@@ -229,7 +229,7 @@ jobs:
         run: echo "path=$(dirname "${{ inputs.features-report-path }}")" >> $GITHUB_OUTPUT
 
       - name: Upload report artifact
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v7
         if: ${{ !cancelled() }}
         with:
           name: ${{ inputs.test-run-description }}-report

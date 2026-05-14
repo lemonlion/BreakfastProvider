@@ -31,7 +31,7 @@ jobs:
           echo "${HOME}/.dotnet/tools" >> $GITHUB_PATH
 
       - name: Download code coverage XML artifact
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v7
         with:
           name: ${{ inputs.coverage-file }}
 
@@ -66,20 +66,20 @@ jobs:
           echo "codecoverage_file=Code-Coverage-${coverage_file_base}-report" >> $GITHUB_OUTPUT
 
       - name: Upload summary coverage report
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v7
         with:
           name: ${{ steps.get-coverage-report-file-name-prefix.outputs.codecoverage_file }}-summary.html
           path: summary.html
           retention-days: 1
 
       - name: Upload full coverage report
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v7
         with:
           name: ${{ steps.get-coverage-report-file-name-prefix.outputs.codecoverage_file }}-full-report
           path: code-coverage-full-report
           retention-days: 1
 
       - name: Delete code coverage XML artifact
-        uses: geekyeggo/delete-artifact@v5
+        uses: geekyeggo/delete-artifact@v6
         with:
           name: ${{ inputs.coverage-file }}

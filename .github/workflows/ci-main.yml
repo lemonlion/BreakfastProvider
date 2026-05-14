@@ -584,37 +584,37 @@ jobs:
             docs/asyncapi.json
 
       - name: Download LightBDD report
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v7
         with:
           name: lightbdd-in-memory-report
           path: site/reports/lightbdd
 
       - name: Download ReqNRoll report
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v7
         with:
           name: reqnroll-in-memory-report
           path: site/reports/reqnroll
 
       - name: Download xUnit report
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v7
         with:
           name: xunit-in-memory-report
           path: site/reports/xunit
 
       - name: Download TUnit report
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v7
         with:
           name: tunit-in-memory-report
           path: site/reports/tunit
 
       - name: Download NUnit report
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v7
         with:
           name: nunit-in-memory-report
           path: site/reports/nunit
 
       - name: Download BDDfy report
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v7
         with:
           name: bddfy-in-memory-report
           path: site/reports/bddfy
@@ -622,37 +622,37 @@ jobs:
       # ─── Docker reports ───────────────────────────────────────────────────
 
       - name: Download LightBDD docker report
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v7
         with:
           name: lightbdd-in-docker-report
           path: site/reports/docker/lightbdd
 
       - name: Download ReqNRoll docker report
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v7
         with:
           name: reqnroll-in-docker-report
           path: site/reports/docker/reqnroll
 
       - name: Download xUnit docker report
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v7
         with:
           name: xunit-in-docker-report
           path: site/reports/docker/xunit
 
       - name: Download TUnit docker report
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v7
         with:
           name: tunit-in-docker-report
           path: site/reports/docker/tunit
 
       - name: Download NUnit docker report
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v7
         with:
           name: nunit-in-docker-report
           path: site/reports/docker/nunit
 
       - name: Download BDDfy docker report
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v7
         with:
           name: bddfy-in-docker-report
           path: site/reports/docker/bddfy
@@ -660,37 +660,37 @@ jobs:
       # ─── Docker SUT reports ───────────────────────────────────────────────
 
       - name: Download LightBDD external SUT report
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v7
         with:
           name: lightbdd-external-sut-report
           path: site/reports/docker-sut/lightbdd
 
       - name: Download ReqNRoll external SUT report
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v7
         with:
           name: reqnroll-external-sut-report
           path: site/reports/docker-sut/reqnroll
 
       - name: Download xUnit external SUT report
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v7
         with:
           name: xunit-external-sut-report
           path: site/reports/docker-sut/xunit
 
       - name: Download TUnit external SUT report
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v7
         with:
           name: tunit-external-sut-report
           path: site/reports/docker-sut/tunit
 
       - name: Download NUnit external SUT report
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v7
         with:
           name: nunit-external-sut-report
           path: site/reports/docker-sut/nunit
 
       - name: Download BDDfy external SUT report
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v7
         with:
           name: bddfy-external-sut-report
           path: site/reports/docker-sut/bddfy

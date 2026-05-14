@@ -298,19 +298,19 @@ jobs:
           path: ${{ steps.get-coverage-file-name.outputs.coverage_file }}
           retention-days: 1
 
-      - id: get-lightbdd-test-results-file-name
+      - id: get-test-results-file-name
         if: ${{ !(cancelled()) && inputs.test-type == 'component' }}
-        name: Generate LightBDD Tests Results file name
+        name: Generate test results file name
         run: |
-          echo "lightbdd_file=LightBDD-${{ inputs.test-run-description }}-report" >> $GITHUB_OUTPUT
+          echo "report_file=${{ inputs.test-run-description }}-report" >> $GITHUB_OUTPUT
           echo "reports_dir=$(dirname "${{ inputs.features-report-path }}")" >> $GITHUB_OUTPUT
 
-      - name: Upload LightBDD test results report to artifacts
+      - name: Upload test results report to artifacts
         uses: actions/upload-artifact@v5
         if: ${{ !(cancelled()) && inputs.test-type == 'component' }}
         with:
-          name: ${{ steps.get-lightbdd-test-results-file-name.outputs.lightbdd_file }}
-          path: ${{ steps.get-lightbdd-test-results-file-name.outputs.reports_dir }}
+          name: ${{ steps.get-test-results-file-name.outputs.report_file }}
+          path: ${{ steps.get-test-results-file-name.outputs.reports_dir }}
           retention-days: 1
 
       - name: Copy generated Component Specifications to docs

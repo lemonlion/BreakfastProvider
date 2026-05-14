@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using System.Text.Json;
 using BreakfastProvider.Api;
 using BreakfastProvider.Api.Reporting;
@@ -15,6 +16,8 @@ public class InMemoryRecipeCostConsumerService(
     [FromKeyedServices("Kafka")] MessageTracker messageTracker,
     ILogger<InMemoryRecipeCostConsumerService> logger) : IHostedService
 {
+    private static readonly ConcurrentDictionary<Guid, byte> ProcessedCalculations = new();
+
     private const string EventTypeName = "RecipeCostCalculatedEvent";
     private const string TopicName = "breakfast_recipe_costs";
 
@@ -45,6 +48,12 @@ public class InMemoryRecipeCostConsumerService(
         {
             var message = JsonSerializer.Deserialize<RecipeCostMessage>(json, JsonOptions);
             if (message is null) return;
+
+            // Guard: multiple WebApplicationFactory instances share the same global
+            // ConsumedKafkaMessageStore, so each factory's subscriber receives ALL
+            // messages. Dedup by CalculationId ensures exactly-once processing.
+            if (!ProcessedCalculations.TryAdd(message.CalculationId, 0))
+                return;
 
             messageTracker.TrackConsumeEvent(
                 protocol: "Consume (Kafka)",

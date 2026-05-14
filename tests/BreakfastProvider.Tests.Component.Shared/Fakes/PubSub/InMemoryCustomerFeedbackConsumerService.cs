@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using System.Text.Json;
 using BreakfastProvider.Api;
 using BreakfastProvider.Api.Reporting;
@@ -11,6 +12,8 @@ namespace BreakfastProvider.Tests.Component.Shared.Fakes.PubSub;
 
 public class InMemoryCustomerFeedbackConsumerService : IHostedService
 {
+    private static readonly ConcurrentDictionary<Guid, byte> ProcessedFeedback = new();
+
     private readonly ConsumedPubSubMessageStore _consumedStore;
     private readonly IServiceScopeFactory _scopeFactory;
     private readonly MessageTracker _messageTracker;
@@ -58,6 +61,12 @@ public class InMemoryCustomerFeedbackConsumerService : IHostedService
         {
             var message = JsonSerializer.Deserialize<CustomerFeedbackMessage>(json, JsonOptions);
             if (message is null) return;
+
+            // Guard: multiple WebApplicationFactory instances share the same global
+            // ConsumedPubSubMessageStore, so each factory's subscriber receives ALL
+            // messages. Dedup by FeedbackId ensures exactly-once processing.
+            if (!ProcessedFeedback.TryAdd(message.FeedbackId, 0))
+                return;
 
             _messageTracker.TrackConsumeEvent(
                 protocol: "Consume (Pub/Sub)",

@@ -232,6 +232,6 @@ jobs:
         uses: actions/upload-artifact@v5
         if: ${{ !cancelled() }}
         with:
-          name: LightBDD-${{ inputs.test-run-description }}-report
+          name: ${{ inputs.test-run-description }}-report
           path: ${{ steps.reports-dir.outputs.path }}
           retention-days: 1

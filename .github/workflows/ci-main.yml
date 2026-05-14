@@ -568,37 +568,37 @@ jobs:
       - name: Download LightBDD report
         uses: actions/download-artifact@v5
         with:
-          name: LightBDD-lightbdd-in-memory-report
+          name: lightbdd-in-memory-report
           path: site/reports/lightbdd
 
       - name: Download ReqNRoll report
         uses: actions/download-artifact@v5
         with:
-          name: LightBDD-reqnroll-in-memory-report
+          name: reqnroll-in-memory-report
           path: site/reports/reqnroll
 
       - name: Download xUnit report
         uses: actions/download-artifact@v5
         with:
-          name: LightBDD-xunit-in-memory-report
+          name: xunit-in-memory-report
           path: site/reports/xunit
 
       - name: Download TUnit report
         uses: actions/download-artifact@v5
         with:
-          name: LightBDD-tunit-in-memory-report
+          name: tunit-in-memory-report
           path: site/reports/tunit
 
       - name: Download NUnit report
         uses: actions/download-artifact@v5
         with:
-          name: LightBDD-nunit-in-memory-report
+          name: nunit-in-memory-report
           path: site/reports/nunit
 
       - name: Download BDDfy report
         uses: actions/download-artifact@v5
         with:
-          name: LightBDD-bddfy-in-memory-report
+          name: bddfy-in-memory-report
           path: site/reports/bddfy
 
       - name: Copy API specs and generate UI pages

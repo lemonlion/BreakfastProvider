@@ -291,9 +291,15 @@ public abstract class BaseFixture : IDisposable
                 services.AddHostedService<ReportingKafkaConsumerService>();
             }
         }
+        else
+        {
+            services.UseTrackedReportingDatabase();
+        }
 
         if (Settings.RunWithAnInMemoryBreakfastDatabase)
             services.UseInMemoryBreakfastDatabase();
+        else
+            services.UseTrackedBreakfastDatabase();
 
         if (Settings.RunWithAnInMemorySpannerDatabase)
         {
@@ -366,7 +372,10 @@ public abstract class BaseFixture : IDisposable
         if (Settings.RunWithAnInMemoryEventHub)
             services.UseInMemoryEventHub(ConsumedEventHubMessageStore);
         else
+        {
             services.UseRealEventHub();
+            services.UseTrackedEventHubPublisher();
+        }
 
         services.UseTrackedGrpcNotificationClient(CurrentTestInfo.Fetcher, Settings.NotificationServiceBaseUrl!);
 

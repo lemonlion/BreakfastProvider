@@ -229,9 +229,15 @@ public sealed class AppManager : IDisposable
                 services.AddHostedService<ReportingKafkaConsumerService>();
             }
         }
+        else
+        {
+            services.UseTrackedReportingDatabase();
+        }
 
         if (Settings.RunWithAnInMemoryBreakfastDatabase)
             services.UseInMemoryBreakfastDatabase();
+        else
+            services.UseTrackedBreakfastDatabase();
 
         if (Settings.RunWithAnInMemorySpannerDatabase)
         {
@@ -314,7 +320,10 @@ public sealed class AppManager : IDisposable
         if (Settings.RunWithAnInMemoryEventHub)
             services.UseInMemoryEventHub(ConsumedEventHubMessageStore);
         else
+        {
             services.UseRealEventHub();
+            services.UseTrackedEventHubPublisher();
+        }
 
         // gRPC Notification Service — always use tracked client (supports h2c for Docker mode)
         services.UseTrackedGrpcNotificationClient(CurrentTestInfo.Fetcher, Settings.NotificationServiceBaseUrl!);

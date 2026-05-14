@@ -1031,4 +1031,105 @@ public static class ServiceCollectionExtensions
         });
         return services;
     }
+
+    /// <summary>
+    /// Replaces the production <see cref="ReportingDbContext"/> registration with one
+    /// that adds a <see cref="SqlTrackingInterceptor"/> so that SQL operations against
+    /// the real SQL Server reporting database appear in PlantUML sequence diagrams.
+    /// Use in Docker mode where the real SQL Server container accepts connections.
+    /// </summary>
+    public static IServiceCollection UseTrackedReportingDatabase(this IServiceCollection services)
+    {
+        var toRemove = services
+            .Where(d =>
+                d.ServiceType == typeof(IDbContextFactory<ReportingDbContext>) ||
+                d.ServiceType == typeof(ReportingDbContext) ||
+                d.ServiceType == typeof(DbContextOptions<ReportingDbContext>) ||
+                (d.ServiceType.IsGenericType &&
+                 d.ServiceType.GetGenericArguments().Contains(typeof(ReportingDbContext))))
+            .ToList();
+
+        foreach (var d in toRemove)
+            services.Remove(d);
+
+        services.AddSingleton<IDbContextFactory<ReportingDbContext>>(sp =>
+        {
+            var config = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<ReportingConfig>>().Value;
+            var options = new DbContextOptionsBuilder<ReportingDbContext>()
+                .UseSqlServer(config.ConnectionString)
+                .AddInterceptors(new SqlTrackingInterceptor(
+                    new SqlTrackingInterceptorOptions
+                    {
+                        ServiceName = Documentation.ServiceNames.ReportingDatabase,
+                        CallerName = Documentation.ServiceNames.BreakfastProvider,
+                        Verbosity = SqlTrackingVerbosity.Summarised
+                    },
+                    sp.GetRequiredService<IHttpContextAccessor>()))
+                .Options;
+            return new TestReportingDbContextFactory(options);
+        });
+
+        services.AddScoped(sp =>
+            sp.GetRequiredService<IDbContextFactory<ReportingDbContext>>().CreateDbContext());
+
+        return services;
+    }
+
+    /// <summary>
+    /// Replaces the production <see cref="BreakfastDbContext"/> registration with one
+    /// that adds a <see cref="SqlTrackingInterceptor"/> so that SQL operations against
+    /// the real SQL Server breakfast database appear in PlantUML sequence diagrams.
+    /// Use in Docker mode where the real SQL Server container accepts connections.
+    /// </summary>
+    public static IServiceCollection UseTrackedBreakfastDatabase(this IServiceCollection services)
+    {
+        var toRemove = services
+            .Where(d =>
+                d.ServiceType == typeof(IDbContextFactory<BreakfastDbContext>) ||
+                d.ServiceType == typeof(BreakfastDbContext) ||
+                d.ServiceType == typeof(DbContextOptions<BreakfastDbContext>) ||
+                (d.ServiceType.IsGenericType &&
+                 d.ServiceType.GetGenericArguments().Contains(typeof(BreakfastDbContext))))
+            .ToList();
+
+        foreach (var d in toRemove)
+            services.Remove(d);
+
+        services.AddSingleton<IDbContextFactory<BreakfastDbContext>>(sp =>
+        {
+            var config = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<Api.Configuration.DatabaseConfig>>().Value;
+            var options = new DbContextOptionsBuilder<BreakfastDbContext>()
+                .UseSqlServer(config.ConnectionString)
+                .AddInterceptors(new SqlTrackingInterceptor(
+                    new SqlTrackingInterceptorOptions
+                    {
+                        ServiceName = Documentation.ServiceNames.BreakfastDatabase,
+                        CallerName = Documentation.ServiceNames.BreakfastProvider,
+                        Verbosity = SqlTrackingVerbosity.Summarised
+                    },
+                    sp.GetRequiredService<IHttpContextAccessor>()))
+                .Options;
+            return new TestBreakfastDbContextFactory(options);
+        });
+
+        services.AddScoped(sp =>
+            sp.GetRequiredService<IDbContextFactory<BreakfastDbContext>>().CreateDbContext());
+
+        return services;
+    }
+
+    /// <summary>
+    /// Wraps the existing <see cref="EventHubEventPublisher{T}"/> registrations with
+    /// <see cref="TrackedEventHubEventPublisher{T}"/> decorators so that Event Hub event
+    /// publications appear in the PlantUML sequence diagrams.
+    /// Use in Docker mode where the real Event Hub (emulator) accepts connections.
+    /// </summary>
+    public static IServiceCollection UseTrackedEventHubPublisher(this IServiceCollection services)
+    {
+        services.DecorateAllOpen(
+            typeof(EventHubEventPublisher<>),
+            typeof(Fakes.EventHub.TrackedEventHubEventPublisher<>));
+
+        return services;
+    }
 }

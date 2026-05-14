@@ -1008,6 +1008,8 @@ public static class ServiceCollectionExtensions
             services.RemoveAll<Google.Cloud.BigQuery.V2.BigQueryClient>();
             services.AddSingleton(sp =>
             {
+                var httpContextAccessor = sp.GetService<Microsoft.AspNetCore.Http.IHttpContextAccessor>();
+                trackingOptions.HttpContextAccessor = httpContextAccessor;
                 var config = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<Api.Configuration.BigQueryConfig>>().Value;
                 var builder = new Google.Cloud.BigQuery.V2.BigQueryClientBuilder
                 {

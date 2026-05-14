@@ -81,6 +81,8 @@ public static class ServiceCollectionExtensions
             services.RemoveAll<Microsoft.Azure.Cosmos.CosmosClient>();
             services.AddSingleton(sp =>
             {
+                var httpContextAccessor = sp.GetService<Microsoft.AspNetCore.Http.IHttpContextAccessor>();
+                trackingOptions.HttpContextAccessor = httpContextAccessor;
                 var config = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<Api.Configuration.CosmosConfig>>().Value;
                 var options = new Microsoft.Azure.Cosmos.CosmosClientOptions
                 {

@@ -26,8 +26,8 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.CustomerFeedback
         
         private static string[] featureTags = ((string[])(null));
         
-        private static global::Reqnroll.FeatureInfo featureInfo = new global::Reqnroll.FeatureInfo(new global::System.Globalization.CultureInfo("en-US"), "Features/CustomerFeedback", "Customer Feedback Alert Processing", "    /customer-feedback - Customer feedback alert processing (PubSub → MongoDB → g" +
-                "RPC → HTTP)", global::Reqnroll.ProgrammingLanguage.CSharp, featureTags, InitializeCucumberMessages());
+        private static global::Reqnroll.FeatureInfo featureInfo = new global::Reqnroll.FeatureInfo(new global::System.Globalization.CultureInfo("en-US"), "Features/CustomerFeedback", "Customer Feedback Alert Processing", "    PubSub → BreakfastProvider → MongoDB + gRPC + HTTP: Customer feedback event c" +
+                "onsumption and downstream processing", global::Reqnroll.ProgrammingLanguage.CSharp, featureTags, InitializeCucumberMessages());
         
 #line 1 "CustomerFeedbackAlertProcessing.feature"
 #line hidden
@@ -134,20 +134,19 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.CustomerFeedback
             await this.TestTearDownAsync();
         }
         
-        [global::Xunit.FactAttribute(DisplayName="Submitting customer feedback should trigger event consumption and downstream call" +
-            "s")]
+        [global::Xunit.FactAttribute(DisplayName="Consuming customer feedback event should trigger downstream processing")]
         [global::Xunit.TraitAttribute("FeatureTitle", "Customer Feedback Alert Processing")]
-        [global::Xunit.TraitAttribute("Description", "Submitting customer feedback should trigger event consumption and downstream call" +
-            "s")]
+        [global::Xunit.TraitAttribute("Description", "Consuming customer feedback event should trigger downstream processing")]
         [global::Xunit.TraitAttribute("Category", "happy-path")]
-        public async global::System.Threading.Tasks.Task SubmittingCustomerFeedbackShouldTriggerEventConsumptionAndDownstreamCalls()
+        [global::Xunit.TraitAttribute("Category", "IgnoreIfExternalSut")]
+        public async global::System.Threading.Tasks.Task ConsumingCustomerFeedbackEventShouldTriggerDownstreamProcessing()
         {
             string[] tagsOfScenario = new string[] {
-                    "happy-path"};
+                    "happy-path",
+                    "IgnoreIfExternalSut"};
             global::System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new global::System.Collections.Specialized.OrderedDictionary();
             string pickleIndex = "0";
-            global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("Submitting customer feedback should trigger event consumption and downstream call" +
-                    "s", null, tagsOfScenario, argumentsOfScenario, featureTags, pickleIndex);
+            global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("Consuming customer feedback event should trigger downstream processing", null, tagsOfScenario, argumentsOfScenario, featureTags, pickleIndex);
             string[] tagsOfRule = ((string[])(null));
             global::Reqnroll.RuleInfo ruleInfo = null;
 #line 5
@@ -161,13 +160,13 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.CustomerFeedback
             {
                 await this.ScenarioStartAsync();
 #line 6
-        await testRunner.GivenAsync("a valid customer feedback request", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
+        await testRunner.GivenAsync("a customer feedback received event", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
 #line hidden
 #line 7
-        await testRunner.WhenAsync("the customer feedback is submitted", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
+        await testRunner.WhenAsync("the event is published to PubSub", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
 #line hidden
 #line 8
-        await testRunner.ThenAsync("the feedback response should be accepted", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
+        await testRunner.ThenAsync("the feedback ID should be generated", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
 #line hidden
 #line 9
         await testRunner.AndAsync("the supplier service should have received the feedback", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");

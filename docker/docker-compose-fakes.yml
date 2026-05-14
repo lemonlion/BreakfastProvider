@@ -53,7 +53,7 @@ services:
     ports:
       - "5035:8080"
     environment:
-      - ASPNETCORE_URLS=http://+:8080
-      - Kestrel__EndpointDefaults__Protocols=Http1AndHttp2
+      - Kestrel__Endpoints__Default__Url=http://+:8080
+      - Kestrel__Endpoints__Default__Protocols=Http2
     networks:
       - localdev

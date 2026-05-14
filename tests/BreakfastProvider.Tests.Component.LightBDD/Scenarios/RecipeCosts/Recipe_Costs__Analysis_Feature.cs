@@ -1,22 +1,23 @@
-using BreakfastProvider.Tests.Component.Shared.Constants;
 using LightBDD.Framework;
 using LightBDD.Framework.Scenarios;
 using LightBDD.XUnit3;
+using BreakfastProvider.Tests.Component.LightBDD.Infrastructure;
 using TestTrackingDiagrams.LightBDD;
 
 namespace BreakfastProvider.Tests.Component.LightBDD.Scenarios.RecipeCosts;
 
-[FeatureDescription($"/{Endpoints.RecipeCosts} - Recipe cost analysis processing (Kafka → BigQuery → gRPC → HTTP)")]
+[FeatureDescription("Kafka → BreakfastProvider → BigQuery + gRPC + HTTP: Recipe cost event consumption and downstream processing")]
 public partial class Recipe_Costs__Analysis_Feature
 {
     [HappyPath]
     [Scenario]
-    public async Task Submitting_Recipe_Cost_Should_Trigger_Event_Consumption_And_Downstream_Calls()
+    [IgnoreIf(nameof(Settings.RunAgainstExternalServiceUnderTest), NeedsInMemoryEventConsumer)]
+    public async Task Consuming_Recipe_Cost_Event_Should_Trigger_Downstream_Processing()
     {
         await Runner.RunScenarioAsync(
-            given => A_valid_recipe_cost_request(),
-            when => The_cost_calculation_is_submitted(),
-            then => The_response_should_be_accepted(),
+            given => A_recipe_cost_calculated_event(),
+            when => The_event_is_published_to_kafka(),
+            then => The_calculation_id_should_be_generated(),
             and => The_kitchen_service_should_have_received_the_preparation_request());
     }
 }

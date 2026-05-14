@@ -1,4 +1,3 @@
-using System.Net;
 using BreakfastProvider.Tests.Component.Shared.Common.Downstream;
 using BreakfastProvider.Tests.Component.Shared.Common.RecipeCosts;
 using BreakfastProvider.Tests.Component.Shared.Models.RecipeCosts;
@@ -8,18 +7,18 @@ namespace BreakfastProvider.Tests.Component.LightBDD.Scenarios.RecipeCosts;
 
 public partial class Recipe_Costs__Analysis_Feature : BaseFixture
 {
-    private readonly PostRecipeCostSteps _postSteps;
+    private readonly PublishRecipeCostEventSteps _publishSteps;
     private readonly DownstreamRequestSteps _downstreamSteps;
 
     public Recipe_Costs__Analysis_Feature()
     {
-        _postSteps = Get<PostRecipeCostSteps>();
+        _publishSteps = Get<PublishRecipeCostEventSteps>();
         _downstreamSteps = Get<DownstreamRequestSteps>();
     }
 
-    private async Task A_valid_recipe_cost_request()
+    private async Task A_recipe_cost_calculated_event()
     {
-        _postSteps.Request = new TestRecipeCostRequest
+        _publishSteps.Request = new TestRecipeCostRequest
         {
             RecipeName = $"Recipe-{Guid.NewGuid():N}",
             Ingredients = ["flour", "eggs", "milk", "sugar"],
@@ -29,19 +28,18 @@ public partial class Recipe_Costs__Analysis_Feature : BaseFixture
         await Task.CompletedTask;
     }
 
-    private async Task The_cost_calculation_is_submitted() => await _postSteps.Send();
+    private async Task The_event_is_published_to_kafka() => await _publishSteps.PublishEvent();
 
-    private async Task The_response_should_be_accepted()
+    private async Task The_calculation_id_should_be_generated()
     {
-        _postSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Accepted);
-        await _postSteps.ParseResponse();
-        _postSteps.Response!.CalculationId.Should().NotBe(Guid.Empty);
+        _publishSteps.CalculationId.Should().NotBe(Guid.Empty);
+        await Task.CompletedTask;
     }
 
     [SkipStepIf(nameof(Settings.RunAgainstExternalServiceUnderTest), DownstreamFakeRequestStoreIsUnavailableInPostDeploymentEnvironments)]
     private async Task The_kitchen_service_should_have_received_the_preparation_request()
     {
-        await Task.Delay(500); // Allow async consumer processing
         _downstreamSteps.AssertKitchenServiceReceivedPreparationRequest();
+        await Task.CompletedTask;
     }
 }

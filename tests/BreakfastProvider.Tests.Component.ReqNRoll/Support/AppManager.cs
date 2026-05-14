@@ -316,9 +316,8 @@ public sealed class AppManager : IDisposable
         else
             services.UseRealEventHub();
 
-        // gRPC Notification Service — tracked client pointing at fake service
-        if (Settings.RunWithAnInMemoryNotificationService)
-            services.UseTrackedGrpcNotificationClient(CurrentTestInfo.Fetcher, Settings.NotificationServiceBaseUrl!);
+        // gRPC Notification Service — always use tracked client (supports h2c for Docker mode)
+        services.UseTrackedGrpcNotificationClient(CurrentTestInfo.Fetcher, Settings.NotificationServiceBaseUrl!);
 
         if (Settings.RunWithAnInMemoryMongoDatabase)
         {
@@ -338,6 +337,29 @@ public sealed class AppManager : IDisposable
         else
         {
             services.UseTrackedBigQueryClient(CurrentTestInfo.Fetcher);
+        }
+
+        // Always replace the real recipe cost Kafka consumer and customer feedback
+        // Pub/Sub consumer with in-memory variants. Event-driven tests publish directly
+        // to the in-memory stores (ConsumedKafkaMessageStore / ConsumedPubSubMessageStore),
+        // so the in-memory consumers must be registered regardless of whether a real
+        // broker is available. UseInMemoryReportingDatabase already does this in in-memory
+        // mode, but in Docker mode we still need the replacement.
+        if (!Settings.RunWithAnInMemoryReportingDatabase)
+        {
+            var recipeCostConsumer = services
+                .FirstOrDefault(d => d.ImplementationType == typeof(KafkaRecipeCostConsumerService));
+            if (recipeCostConsumer is not null)
+                services.Remove(recipeCostConsumer);
+
+            services.AddHostedService<InMemoryRecipeCostConsumerService>();
+
+            var feedbackConsumer = services
+                .FirstOrDefault(d => d.ImplementationType == typeof(PubSubCustomerFeedbackConsumerService));
+            if (feedbackConsumer is not null)
+                services.Remove(feedbackConsumer);
+
+            services.AddHostedService<InMemoryCustomerFeedbackConsumerService>();
         }
 
         services.UseTrackedOutboxWriter(CurrentTestInfo.Fetcher);

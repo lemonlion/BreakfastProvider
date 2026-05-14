@@ -28,6 +28,16 @@ public class ConsumedKafkaMessageStore
         catch { /* subscriber errors must not break the producer */ }
     }
 
+    public void Add(Message<string, string> message, string eventTypeName)
+    {
+        var key = message.Key ?? string.Empty;
+        var json = message.Value ?? string.Empty;
+        _consumedEvents.Add(new StoredMessage(eventTypeName, key, json));
+
+        try { MessageStored?.Invoke(eventTypeName, key, json); }
+        catch { /* subscriber errors must not break the producer */ }
+    }
+
     public void AddRawJson(string eventTypeName, string key, string json)
         => _consumedEvents.Add(new StoredMessage(eventTypeName, key, json));
 

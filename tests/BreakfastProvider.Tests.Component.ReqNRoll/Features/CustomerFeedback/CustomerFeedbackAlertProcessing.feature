@@ -1,9 +1,9 @@
 Feature: Customer Feedback Alert Processing
-    /customer-feedback - Customer feedback alert processing (PubSub → MongoDB → gRPC → HTTP)
+    PubSub → BreakfastProvider → MongoDB + gRPC + HTTP: Customer feedback event consumption and downstream processing
 
-    @happy-path
-    Scenario: Submitting customer feedback should trigger event consumption and downstream calls
-        Given a valid customer feedback request
-        When the customer feedback is submitted
-        Then the feedback response should be accepted
+    @happy-path @IgnoreIfExternalSut
+    Scenario: Consuming customer feedback event should trigger downstream processing
+        Given a customer feedback received event
+        When the event is published to PubSub
+        Then the feedback ID should be generated
         And the supplier service should have received the feedback

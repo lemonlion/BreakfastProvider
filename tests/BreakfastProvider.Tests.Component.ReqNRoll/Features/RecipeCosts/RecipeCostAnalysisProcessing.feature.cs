@@ -26,8 +26,8 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.RecipeCosts
         
         private static string[] featureTags = ((string[])(null));
         
-        private static global::Reqnroll.FeatureInfo featureInfo = new global::Reqnroll.FeatureInfo(new global::System.Globalization.CultureInfo("en-US"), "Features/RecipeCosts", "Recipe Cost Analysis Processing", "    /recipe-costs - Recipe cost analysis processing (Kafka → BigQuery → gRPC → HT" +
-                "TP)", global::Reqnroll.ProgrammingLanguage.CSharp, featureTags, InitializeCucumberMessages());
+        private static global::Reqnroll.FeatureInfo featureInfo = new global::Reqnroll.FeatureInfo(new global::System.Globalization.CultureInfo("en-US"), "Features/RecipeCosts", "Recipe Cost Analysis Processing", "    Kafka → BreakfastProvider → BigQuery + gRPC + HTTP: Recipe cost event consump" +
+                "tion and downstream processing", global::Reqnroll.ProgrammingLanguage.CSharp, featureTags, InitializeCucumberMessages());
         
 #line 1 "RecipeCostAnalysisProcessing.feature"
 #line hidden
@@ -134,17 +134,19 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.RecipeCosts
             await this.TestTearDownAsync();
         }
         
-        [global::Xunit.FactAttribute(DisplayName="Submitting recipe cost should trigger event consumption and downstream calls")]
+        [global::Xunit.FactAttribute(DisplayName="Consuming recipe cost event should trigger downstream processing")]
         [global::Xunit.TraitAttribute("FeatureTitle", "Recipe Cost Analysis Processing")]
-        [global::Xunit.TraitAttribute("Description", "Submitting recipe cost should trigger event consumption and downstream calls")]
+        [global::Xunit.TraitAttribute("Description", "Consuming recipe cost event should trigger downstream processing")]
         [global::Xunit.TraitAttribute("Category", "happy-path")]
-        public async global::System.Threading.Tasks.Task SubmittingRecipeCostShouldTriggerEventConsumptionAndDownstreamCalls()
+        [global::Xunit.TraitAttribute("Category", "IgnoreIfExternalSut")]
+        public async global::System.Threading.Tasks.Task ConsumingRecipeCostEventShouldTriggerDownstreamProcessing()
         {
             string[] tagsOfScenario = new string[] {
-                    "happy-path"};
+                    "happy-path",
+                    "IgnoreIfExternalSut"};
             global::System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new global::System.Collections.Specialized.OrderedDictionary();
             string pickleIndex = "0";
-            global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("Submitting recipe cost should trigger event consumption and downstream calls", null, tagsOfScenario, argumentsOfScenario, featureTags, pickleIndex);
+            global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("Consuming recipe cost event should trigger downstream processing", null, tagsOfScenario, argumentsOfScenario, featureTags, pickleIndex);
             string[] tagsOfRule = ((string[])(null));
             global::Reqnroll.RuleInfo ruleInfo = null;
 #line 5
@@ -158,13 +160,13 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.RecipeCosts
             {
                 await this.ScenarioStartAsync();
 #line 6
-        await testRunner.GivenAsync("a valid recipe cost calculation request", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
+        await testRunner.GivenAsync("a recipe cost calculated event", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
 #line hidden
 #line 7
-        await testRunner.WhenAsync("the recipe cost calculation is submitted", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
+        await testRunner.WhenAsync("the event is published to Kafka", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
 #line hidden
 #line 8
-        await testRunner.ThenAsync("the cost response should be accepted", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
+        await testRunner.ThenAsync("the calculation ID should be generated", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
 #line hidden
 #line 9
         await testRunner.AndAsync("the kitchen service should have received the preparation request", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");

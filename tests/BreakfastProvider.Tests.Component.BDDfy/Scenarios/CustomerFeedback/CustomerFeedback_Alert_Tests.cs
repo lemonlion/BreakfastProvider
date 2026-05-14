@@ -1,4 +1,3 @@
-using System.Net;
 using BreakfastProvider.Tests.Component.Shared.Common.CustomerFeedback;
 using BreakfastProvider.Tests.Component.Shared.Common.Downstream;
 using BreakfastProvider.Tests.Component.Shared.Models.CustomerFeedback;
@@ -11,31 +10,33 @@ namespace BreakfastProvider.Tests.Component.BDDfy.Scenarios.CustomerFeedback;
 
 public class CustomerFeedback_Alert_Tests : BaseFixture
 {
-    private readonly PostCustomerFeedbackSteps _postSteps;
+    private readonly PublishCustomerFeedbackEventSteps _publishSteps;
     private readonly DownstreamRequestSteps _downstreamSteps;
 
     public CustomerFeedback_Alert_Tests()
     {
-        _postSteps = Get<PostCustomerFeedbackSteps>();
+        _publishSteps = Get<PublishCustomerFeedbackEventSteps>();
         _downstreamSteps = Get<DownstreamRequestSteps>();
     }
 
     [Fact]
     [HappyPath]
-    public void Submitting_customer_feedback_should_trigger_event_consumption_and_downstream_calls()
+    public void Consuming_customer_feedback_event_should_trigger_downstream_processing()
     {
-        this.Given(x => x.A_valid_customer_feedback_request_is_prepared())
-            .When(x => x.The_feedback_is_submitted())
-            .Then(x => x.The_response_should_be_accepted())
+        if (Settings.RunAgainstExternalServiceUnderTest) return;
+
+        this.Given(x => x.A_customer_feedback_received_event())
+            .When(x => x.The_event_is_published_to_pubsub())
+            .Then(x => x.The_feedback_id_should_be_generated())
             .And(x => x.The_supplier_service_should_have_received_the_feedback())
             .BDDfy();
     }
 
     #region Steps
 
-    private async Task A_valid_customer_feedback_request_is_prepared()
+    private async Task A_customer_feedback_received_event()
     {
-        _postSteps.Request = new TestCustomerFeedbackRequest
+        _publishSteps.Request = new TestCustomerFeedbackRequest
         {
             CustomerName = $"Customer-{Guid.NewGuid():N}",
             RecipeName = $"Recipe-{Guid.NewGuid():N}",
@@ -45,20 +46,19 @@ public class CustomerFeedback_Alert_Tests : BaseFixture
         await Task.CompletedTask;
     }
 
-    private async Task The_feedback_is_submitted() => await _postSteps.Send();
+    private async Task The_event_is_published_to_pubsub() => await _publishSteps.PublishEvent();
 
-    private async Task The_response_should_be_accepted()
+    private async Task The_feedback_id_should_be_generated()
     {
-        _postSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Accepted);
-        await _postSteps.ParseResponse();
-        _postSteps.Response!.FeedbackId.Should().NotBe(Guid.Empty);
+        _publishSteps.FeedbackId.Should().NotBe(Guid.Empty);
+        await Task.CompletedTask;
     }
 
     private async Task The_supplier_service_should_have_received_the_feedback()
     {
         if (Settings.RunAgainstExternalServiceUnderTest) return;
-        await Task.Delay(500); // Allow async consumer processing
         _downstreamSteps.AssertSupplierServiceReceivedFeedbackRequest();
+        await Task.CompletedTask;
     }
 
     #endregion

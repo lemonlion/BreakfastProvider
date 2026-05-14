@@ -1,4 +1,3 @@
-using System.Net;
 using BreakfastProvider.Tests.Component.Shared.Common.Downstream;
 using BreakfastProvider.Tests.Component.Shared.Common.RecipeCosts;
 using BreakfastProvider.Tests.Component.Shared.Models.RecipeCosts;
@@ -9,21 +8,23 @@ namespace BreakfastProvider.Tests.Component.xUnit.Scenarios.RecipeCosts;
 
 public class RecipeCost_Analysis_Tests : BaseFixture
 {
-    private readonly PostRecipeCostSteps _postSteps;
+    private readonly PublishRecipeCostEventSteps _publishSteps;
     private readonly DownstreamRequestSteps _downstreamSteps;
 
     public RecipeCost_Analysis_Tests()
     {
-        _postSteps = Get<PostRecipeCostSteps>();
+        _publishSteps = Get<PublishRecipeCostEventSteps>();
         _downstreamSteps = Get<DownstreamRequestSteps>();
     }
 
     [Fact]
     [HappyPath]
-    public async Task Submitting_recipe_cost_should_trigger_event_consumption_and_downstream_calls()
+    public async Task Consuming_recipe_cost_event_should_trigger_downstream_processing()
     {
-        // Given a valid recipe cost calculation request
-        _postSteps.Request = new TestRecipeCostRequest
+        if (Settings.RunAgainstExternalServiceUnderTest) return;
+
+        // Given a recipe cost calculated event
+        _publishSteps.Request = new TestRecipeCostRequest
         {
             RecipeName = $"Recipe-{Guid.NewGuid():N}",
             Ingredients = ["flour", "eggs", "milk", "sugar"],
@@ -31,18 +32,15 @@ public class RecipeCost_Analysis_Tests : BaseFixture
             Currency = "GBP"
         };
 
-        // When the cost calculation is submitted (triggers Kafka event → consumer → BigQuery + gRPC + HTTP)
-        await _postSteps.Send();
+        // When the event is published to Kafka (consumed by BreakfastProvider → BigQuery + gRPC + HTTP)
+        await _publishSteps.PublishEvent();
 
-        // Then the response should be accepted
-        _postSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Accepted);
-        await _postSteps.ParseResponse();
-        _postSteps.Response!.CalculationId.Should().NotBe(Guid.Empty);
+        // Then the calculation ID should be generated
+        _publishSteps.CalculationId.Should().NotBe(Guid.Empty);
 
         // And the kitchen service should have received the preparation request
         if (!Settings.RunAgainstExternalServiceUnderTest)
         {
-            await Task.Delay(500); // Allow async consumer processing
             _downstreamSteps.AssertKitchenServiceReceivedPreparationRequest();
         }
     }

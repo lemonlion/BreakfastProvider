@@ -1,9 +1,9 @@
 Feature: Recipe Cost Analysis Processing
-    /recipe-costs - Recipe cost analysis processing (Kafka → BigQuery → gRPC → HTTP)
+    Kafka → BreakfastProvider → BigQuery + gRPC + HTTP: Recipe cost event consumption and downstream processing
 
-    @happy-path
-    Scenario: Submitting recipe cost should trigger event consumption and downstream calls
-        Given a valid recipe cost calculation request
-        When the recipe cost calculation is submitted
-        Then the cost response should be accepted
+    @happy-path @IgnoreIfExternalSut
+    Scenario: Consuming recipe cost event should trigger downstream processing
+        Given a recipe cost calculated event
+        When the event is published to Kafka
+        Then the calculation ID should be generated
         And the kitchen service should have received the preparation request

@@ -41,9 +41,6 @@ public class InMemoryRecipeCostConsumerService(
         if (!string.Equals(eventType, EventTypeName, StringComparison.OrdinalIgnoreCase))
             return;
 
-        if (!messageTracker.IsCurrentRequestFromMyHost())
-            return;
-
         try
         {
             var message = JsonSerializer.Deserialize<RecipeCostMessage>(json, JsonOptions);

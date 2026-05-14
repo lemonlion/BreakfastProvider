@@ -1,31 +1,46 @@
-using System.Net.Http.Json;
-using BreakfastProvider.Tests.Component.Shared.Constants;
+using System.Text.Json;
+using BreakfastProvider.Tests.Component.Shared.Fakes.PubSub;
 using BreakfastProvider.Tests.Component.Shared.Models.CustomerFeedback;
-using BreakfastProvider.Tests.Component.Shared.Util;
+using TestTrackingDiagrams.Tracking;
 
 namespace BreakfastProvider.Tests.Component.Shared.Common.CustomerFeedback;
 
-public class PostCustomerFeedbackSteps(RequestContext context)
+public class PublishCustomerFeedbackEventSteps(
+    ConsumedPubSubMessageStore pubSubStore,
+    RequestContext context)
 {
     public TestCustomerFeedbackRequest Request { get; set; } = new();
-    public HttpResponseMessage? ResponseMessage { get; private set; }
-    public TestCustomerFeedbackResponse? Response { get; private set; }
+    public Guid FeedbackId { get; private set; }
 
-    public async Task Send()
+    public Task PublishEvent()
     {
-        var request = new HttpRequestMessage(HttpMethod.Post, Endpoints.CustomerFeedback)
+        FeedbackId = Guid.NewGuid();
+
+        var @event = new CustomerFeedbackReceivedEvent
         {
-            Content = JsonContent.Create(Request)
+            FeedbackId = FeedbackId,
+            CustomerName = Request.CustomerName!,
+            RecipeName = Request.RecipeName!,
+            Rating = Request.Rating,
+            Comments = Request.Comments ?? string.Empty,
+            ReceivedAt = DateTime.UtcNow
         };
-        request.Headers.Add(CustomHeaders.ComponentTestRequestId, context.RequestId);
-        ResponseMessage = await context.Client.SendAsync(request);
+
+        using (TestIdentityScope.Begin("CustomerFeedbackTest", context.RequestId))
+        {
+            pubSubStore.Add(@event, "CustomerFeedbackReceivedEvent");
+        }
+
+        return Task.CompletedTask;
     }
 
-    public async Task ParseResponse()
+    private class CustomerFeedbackReceivedEvent
     {
-        var content = await ResponseMessage!.Content.ReadAsStringAsync();
-        var responseContentIsValidJson = Json.IsValid(content);
-        responseContentIsValidJson.Should().BeTrue();
-        Response = Json.Deserialize<TestCustomerFeedbackResponse>(content)!;
+        public Guid FeedbackId { get; set; }
+        public string CustomerName { get; set; } = string.Empty;
+        public string RecipeName { get; set; } = string.Empty;
+        public int Rating { get; set; }
+        public string Comments { get; set; } = string.Empty;
+        public DateTime ReceivedAt { get; set; }
     }
 }

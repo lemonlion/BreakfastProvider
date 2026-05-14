@@ -1,4 +1,3 @@
-using System.Net;
 using BreakfastProvider.Tests.Component.Shared.Common.CustomerFeedback;
 using BreakfastProvider.Tests.Component.Shared.Common.Downstream;
 using BreakfastProvider.Tests.Component.Shared.Models.CustomerFeedback;
@@ -9,13 +8,13 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.StepDefinitions.CustomerFee
 
 [Binding]
 public class CustomerFeedbackAlertSteps(
-    PostCustomerFeedbackSteps postSteps,
+    PublishCustomerFeedbackEventSteps publishSteps,
     DownstreamRequestSteps downstreamSteps)
 {
-    [Given("a valid customer feedback request")]
-    public void GivenAValidCustomerFeedbackRequest()
+    [Given("a customer feedback received event")]
+    public void GivenACustomerFeedbackReceivedEvent()
     {
-        postSteps.Request = new TestCustomerFeedbackRequest
+        publishSteps.Request = new TestCustomerFeedbackRequest
         {
             CustomerName = $"Customer-{Guid.NewGuid():N}",
             RecipeName = $"Recipe-{Guid.NewGuid():N}",
@@ -24,25 +23,22 @@ public class CustomerFeedbackAlertSteps(
         };
     }
 
-    [When("the customer feedback is submitted")]
-    public async Task WhenTheCustomerFeedbackIsSubmitted()
+    [When("the event is published to PubSub")]
+    public async Task WhenTheEventIsPublishedToPubSub()
     {
-        await postSteps.Send();
+        await publishSteps.PublishEvent();
     }
 
-    [Then("the feedback response should be accepted")]
-    public async Task ThenTheFeedbackResponseShouldBeAccepted()
+    [Then("the feedback ID should be generated")]
+    public void ThenTheFeedbackIdShouldBeGenerated()
     {
-        postSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Accepted);
-        await postSteps.ParseResponse();
-        postSteps.Response!.FeedbackId.Should().NotBe(Guid.Empty);
+        publishSteps.FeedbackId.Should().NotBe(Guid.Empty);
     }
 
     [Then("the supplier service should have received the feedback")]
-    public async Task ThenTheSupplierServiceShouldHaveReceivedTheFeedback()
+    public void ThenTheSupplierServiceShouldHaveReceivedTheFeedback()
     {
         if (AppManager.Settings.RunAgainstExternalServiceUnderTest) return;
-        await Task.Delay(500); // Allow async consumer processing
         downstreamSteps.AssertSupplierServiceReceivedFeedbackRequest();
     }
 }

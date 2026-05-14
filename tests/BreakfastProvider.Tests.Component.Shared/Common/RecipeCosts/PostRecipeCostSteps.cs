@@ -1,31 +1,58 @@
-using System.Net.Http.Json;
-using BreakfastProvider.Tests.Component.Shared.Constants;
+using System.Text.Json;
+using BreakfastProvider.Tests.Component.Shared.Fakes.Kafka;
 using BreakfastProvider.Tests.Component.Shared.Models.RecipeCosts;
-using BreakfastProvider.Tests.Component.Shared.Util;
+using Confluent.Kafka;
+using TestTrackingDiagrams.Tracking;
 
 namespace BreakfastProvider.Tests.Component.Shared.Common.RecipeCosts;
 
-public class PostRecipeCostSteps(RequestContext context)
+public class PublishRecipeCostEventSteps(
+    ConsumedKafkaMessageStore kafkaStore,
+    RequestContext context)
 {
     public TestRecipeCostRequest Request { get; set; } = new();
-    public HttpResponseMessage? ResponseMessage { get; private set; }
-    public TestRecipeCostResponse? Response { get; private set; }
+    public Guid CalculationId { get; private set; }
 
-    public async Task Send()
+    public Task PublishEvent()
     {
-        var request = new HttpRequestMessage(HttpMethod.Post, Endpoints.RecipeCosts)
+        CalculationId = Guid.NewGuid();
+
+        var @event = new RecipeCostCalculatedEvent
         {
-            Content = JsonContent.Create(Request)
+            CalculationId = CalculationId,
+            RecipeName = Request.RecipeName!,
+            Ingredients = Request.Ingredients ?? [],
+            TotalCost = Request.TotalCost,
+            Currency = Request.Currency ?? "GBP",
+            CalculatedAt = DateTime.UtcNow
         };
-        request.Headers.Add(CustomHeaders.ComponentTestRequestId, context.RequestId);
-        ResponseMessage = await context.Client.SendAsync(request);
+
+        using (TestIdentityScope.Begin("RecipeCostTest", context.RequestId))
+        {
+            var message = new Message<string, string>
+            {
+                Key = CalculationId.ToString(),
+                Value = JsonSerializer.Serialize(@event),
+                Headers = new Headers
+                {
+                    { "ttd-test-name", System.Text.Encoding.UTF8.GetBytes("RecipeCostTest") },
+                    { "ttd-test-id", System.Text.Encoding.UTF8.GetBytes(context.RequestId) }
+                }
+            };
+
+            kafkaStore.Add(message, "RecipeCostCalculatedEvent");
+        }
+
+        return Task.CompletedTask;
     }
 
-    public async Task ParseResponse()
+    private class RecipeCostCalculatedEvent
     {
-        var content = await ResponseMessage!.Content.ReadAsStringAsync();
-        var responseContentIsValidJson = Json.IsValid(content);
-        responseContentIsValidJson.Should().BeTrue();
-        Response = Json.Deserialize<TestRecipeCostResponse>(content)!;
+        public Guid CalculationId { get; set; }
+        public string RecipeName { get; set; } = string.Empty;
+        public List<string> Ingredients { get; set; } = [];
+        public decimal TotalCost { get; set; }
+        public string Currency { get; set; } = "GBP";
+        public DateTime CalculatedAt { get; set; }
     }
 }

@@ -54,9 +54,6 @@ public class InMemoryCustomerFeedbackConsumerService : IHostedService
         if (!string.Equals(eventType, EventTypeName, StringComparison.OrdinalIgnoreCase))
             return;
 
-        if (!_messageTracker.IsCurrentRequestFromMyHost())
-            return;
-
         try
         {
             var message = JsonSerializer.Deserialize<CustomerFeedbackMessage>(json, JsonOptions);

@@ -26,6 +26,15 @@ public class ConsumedPubSubMessageStore
         catch { /* subscriber errors must not break the publisher */ }
     }
 
+    public void Add<T>(T @event, string eventTypeName)
+    {
+        var json = JsonSerializer.Serialize(@event);
+        _consumedEvents.Add(new StoredMessage(eventTypeName, json));
+
+        try { MessageStored?.Invoke(eventTypeName, json); }
+        catch { /* subscriber errors must not break the publisher */ }
+    }
+
     public void AddRawJson(string eventTypeName, string json)
         => _consumedEvents.Add(new StoredMessage(eventTypeName, json));
 

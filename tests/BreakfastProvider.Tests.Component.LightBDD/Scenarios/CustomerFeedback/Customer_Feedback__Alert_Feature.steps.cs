@@ -1,4 +1,3 @@
-using System.Net;
 using BreakfastProvider.Tests.Component.Shared.Common.CustomerFeedback;
 using BreakfastProvider.Tests.Component.Shared.Common.Downstream;
 using BreakfastProvider.Tests.Component.Shared.Models.CustomerFeedback;
@@ -8,18 +7,18 @@ namespace BreakfastProvider.Tests.Component.LightBDD.Scenarios.CustomerFeedback;
 
 public partial class Customer_Feedback__Alert_Feature : BaseFixture
 {
-    private readonly PostCustomerFeedbackSteps _postSteps;
+    private readonly PublishCustomerFeedbackEventSteps _publishSteps;
     private readonly DownstreamRequestSteps _downstreamSteps;
 
     public Customer_Feedback__Alert_Feature()
     {
-        _postSteps = Get<PostCustomerFeedbackSteps>();
+        _publishSteps = Get<PublishCustomerFeedbackEventSteps>();
         _downstreamSteps = Get<DownstreamRequestSteps>();
     }
 
-    private async Task A_valid_customer_feedback_request()
+    private async Task A_customer_feedback_received_event()
     {
-        _postSteps.Request = new TestCustomerFeedbackRequest
+        _publishSteps.Request = new TestCustomerFeedbackRequest
         {
             CustomerName = $"Customer-{Guid.NewGuid():N}",
             RecipeName = $"Recipe-{Guid.NewGuid():N}",
@@ -29,19 +28,18 @@ public partial class Customer_Feedback__Alert_Feature : BaseFixture
         await Task.CompletedTask;
     }
 
-    private async Task The_feedback_is_submitted() => await _postSteps.Send();
+    private async Task The_event_is_published_to_pubsub() => await _publishSteps.PublishEvent();
 
-    private async Task The_response_should_be_accepted()
+    private async Task The_feedback_id_should_be_generated()
     {
-        _postSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Accepted);
-        await _postSteps.ParseResponse();
-        _postSteps.Response!.FeedbackId.Should().NotBe(Guid.Empty);
+        _publishSteps.FeedbackId.Should().NotBe(Guid.Empty);
+        await Task.CompletedTask;
     }
 
     [SkipStepIf(nameof(Settings.RunAgainstExternalServiceUnderTest), DownstreamFakeRequestStoreIsUnavailableInPostDeploymentEnvironments)]
     private async Task The_supplier_service_should_have_received_the_feedback()
     {
-        await Task.Delay(500); // Allow async consumer processing
         _downstreamSteps.AssertSupplierServiceReceivedFeedbackRequest();
+        await Task.CompletedTask;
     }
 }

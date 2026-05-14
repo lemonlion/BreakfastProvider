@@ -1,4 +1,3 @@
-using System.Net;
 using BreakfastProvider.Tests.Component.Shared.Common.Downstream;
 using BreakfastProvider.Tests.Component.Shared.Common.RecipeCosts;
 using BreakfastProvider.Tests.Component.Shared.Models.RecipeCosts;
@@ -9,13 +8,13 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.StepDefinitions.RecipeCosts
 
 [Binding]
 public class RecipeCostAnalysisSteps(
-    PostRecipeCostSteps postSteps,
+    PublishRecipeCostEventSteps publishSteps,
     DownstreamRequestSteps downstreamSteps)
 {
-    [Given("a valid recipe cost calculation request")]
-    public void GivenAValidRecipeCostCalculationRequest()
+    [Given("a recipe cost calculated event")]
+    public void GivenARecipeCostCalculatedEvent()
     {
-        postSteps.Request = new TestRecipeCostRequest
+        publishSteps.Request = new TestRecipeCostRequest
         {
             RecipeName = $"Recipe-{Guid.NewGuid():N}",
             Ingredients = ["flour", "eggs", "milk", "sugar"],
@@ -24,25 +23,22 @@ public class RecipeCostAnalysisSteps(
         };
     }
 
-    [When("the recipe cost calculation is submitted")]
-    public async Task WhenTheRecipeCostCalculationIsSubmitted()
+    [When("the event is published to Kafka")]
+    public async Task WhenTheEventIsPublishedToKafka()
     {
-        await postSteps.Send();
+        await publishSteps.PublishEvent();
     }
 
-    [Then("the cost response should be accepted")]
-    public async Task ThenTheCostResponseShouldBeAccepted()
+    [Then("the calculation ID should be generated")]
+    public void ThenTheCalculationIdShouldBeGenerated()
     {
-        postSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.Accepted);
-        await postSteps.ParseResponse();
-        postSteps.Response!.CalculationId.Should().NotBe(Guid.Empty);
+        publishSteps.CalculationId.Should().NotBe(Guid.Empty);
     }
 
     [Then("the kitchen service should have received the preparation request")]
-    public async Task ThenTheKitchenServiceShouldHaveReceivedThePreparationRequest()
+    public void ThenTheKitchenServiceShouldHaveReceivedThePreparationRequest()
     {
         if (AppManager.Settings.RunAgainstExternalServiceUnderTest) return;
-        await Task.Delay(500); // Allow async consumer processing
         downstreamSteps.AssertKitchenServiceReceivedPreparationRequest();
     }
 }

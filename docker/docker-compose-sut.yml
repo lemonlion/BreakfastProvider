@@ -60,16 +60,24 @@ services:
       - KafkaConfig__ProducerConfigurations__RecipeLogEvent__TopicName=breakfast_recipe_logs
       - KafkaConfig__ProducerConfigurations__RecipeLogEvent__ApiKey=kafka-user
       - KafkaConfig__ProducerConfigurations__RecipeLogEvent__ApiSecret=kafka-user-secret
+      - KafkaConfig__ProducerConfigurations__RecipeCostCalculatedEvent__TopicName=breakfast_recipe_costs
+      - KafkaConfig__ProducerConfigurations__RecipeCostCalculatedEvent__ApiKey=kafka-user
+      - KafkaConfig__ProducerConfigurations__RecipeCostCalculatedEvent__ApiSecret=kafka-user-secret
       - KafkaConfig__ConsumerConfigurations__RecipeLogEvent__TopicName=breakfast_recipe_logs
       - KafkaConfig__ConsumerConfigurations__RecipeLogEvent__ApiKey=kafka-user
       - KafkaConfig__ConsumerConfigurations__RecipeLogEvent__ApiSecret=kafka-user-secret
+      - KafkaConfig__ConsumerConfigurations__RecipeCostCalculatedEvent__TopicName=breakfast_recipe_costs
+      - KafkaConfig__ConsumerConfigurations__RecipeCostCalculatedEvent__ApiKey=kafka-user
+      - KafkaConfig__ConsumerConfigurations__RecipeCostCalculatedEvent__ApiSecret=kafka-user-secret
       - KafkaConfig__SslCaLocation=/certs/kafka-ca.crt
       - FeatureSwitchesConfig__IsGoatMilkEnabled=true
       - ReportingConfig__ConnectionString=Server=sqlserver-database.local,1433;Database=BreakfastReporting;User Id=sa;Password=YourStr0ngP@ssword;TrustServerCertificate=True
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://jaeger.local:4317
       - PubSubConfig__ProjectId=breakfast-provider-project
       - PUBSUB_EMULATOR_HOST=pubsub-emulator.local:8085
+      - PubSubConfig__PublisherConfigurations__CustomerFeedbackReceivedEvent__TopicId=customer-feedback-received
       - PubSubConfig__SubscriberConfigurations__PancakeBatchCompletedEvent__SubscriptionId=pancake-batch-completed-sub
+      - PubSubConfig__SubscriberConfigurations__CustomerFeedbackReceivedEvent__SubscriptionId=customer-feedback-received-sub
       - SPANNER_EMULATOR_HOST=spanner-emulator.local:9010
       - SpannerConfig__ProjectId=breakfast-provider-project
       - SpannerConfig__InstanceId=breakfast-instance

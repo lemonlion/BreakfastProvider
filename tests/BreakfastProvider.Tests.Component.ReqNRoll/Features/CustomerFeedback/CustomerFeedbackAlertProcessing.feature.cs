@@ -140,17 +140,19 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.CustomerFeedback
         [global::Xunit.TraitAttribute("Description", "Submitting customer feedback should trigger event consumption and downstream call" +
             "s")]
         [global::Xunit.TraitAttribute("Category", "happy-path")]
+        [global::Xunit.TraitAttribute("Category", "IgnoreIfExternalSut")]
         public async global::System.Threading.Tasks.Task SubmittingCustomerFeedbackShouldTriggerEventConsumptionAndDownstreamCalls()
         {
             string[] tagsOfScenario = new string[] {
-                    "happy-path"};
+                    "happy-path",
+                    "IgnoreIfExternalSut"};
             global::System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new global::System.Collections.Specialized.OrderedDictionary();
             string pickleIndex = "0";
             global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("Submitting customer feedback should trigger event consumption and downstream call" +
                     "s", null, tagsOfScenario, argumentsOfScenario, featureTags, pickleIndex);
             string[] tagsOfRule = ((string[])(null));
             global::Reqnroll.RuleInfo ruleInfo = null;
-#line 5
+#line 6
     this.ScenarioInitialize(scenarioInfo, ruleInfo);
 #line hidden
             if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
@@ -160,16 +162,16 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.CustomerFeedback
             else
             {
                 await this.ScenarioStartAsync();
-#line 6
+#line 7
         await testRunner.GivenAsync("a valid customer feedback request", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
 #line hidden
-#line 7
+#line 8
         await testRunner.WhenAsync("the customer feedback is submitted", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
 #line hidden
-#line 8
+#line 9
         await testRunner.ThenAsync("the feedback response should be accepted", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
 #line hidden
-#line 9
+#line 10
         await testRunner.AndAsync("the supplier service should have received the feedback", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
 #line hidden
             }

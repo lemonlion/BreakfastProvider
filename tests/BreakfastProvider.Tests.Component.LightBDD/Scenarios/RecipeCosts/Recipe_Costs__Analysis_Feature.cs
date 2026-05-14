@@ -11,6 +11,7 @@ public partial class Recipe_Costs__Analysis_Feature
 {
     [HappyPath]
     [Scenario]
+    [IgnoreIf(nameof(Settings.RunAgainstExternalServiceUnderTest), NeedsEventAndKafkaInfrastructure)]
     public async Task Submitting_Recipe_Cost_Should_Trigger_Event_Consumption_And_Downstream_Calls()
     {
         await Runner.RunScenarioAsync(

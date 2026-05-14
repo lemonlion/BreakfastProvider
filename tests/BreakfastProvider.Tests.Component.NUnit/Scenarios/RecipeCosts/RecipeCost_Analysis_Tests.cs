@@ -22,6 +22,8 @@ public class RecipeCost_Analysis_Tests : BaseFixture
     [HappyPath]
     public async Task Submitting_recipe_cost_should_trigger_event_consumption_and_downstream_calls()
     {
+        if (Settings.RunAgainstExternalServiceUnderTest) return;
+
         // Given a valid recipe cost calculation request
         _postSteps.Request = new TestRecipeCostRequest
         {

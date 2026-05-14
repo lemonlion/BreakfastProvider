@@ -24,6 +24,8 @@ public class CustomerFeedback_Alert_Tests : BaseFixture
     [HappyPath]
     public void Submitting_customer_feedback_should_trigger_event_consumption_and_downstream_calls()
     {
+        if (Settings.RunAgainstExternalServiceUnderTest) return;
+
         this.Given(x => x.A_valid_customer_feedback_request_is_prepared())
             .When(x => x.The_feedback_is_submitted())
             .Then(x => x.The_response_should_be_accepted())

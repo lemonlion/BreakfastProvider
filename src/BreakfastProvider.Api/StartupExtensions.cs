@@ -264,6 +264,7 @@ public static class StartupExtensions
         }
 
         services.AddScoped<IRecipeReviewService, RecipeReviewService>();
+        services.AddScoped<IChefNoteService, ChefNoteService>();
 
         return services;
     }
@@ -294,6 +295,7 @@ public static class StartupExtensions
         }
 
         services.AddScoped<IIngredientUsageService, IngredientUsageService>();
+        services.AddScoped<IIngredientWasteService, IngredientWasteService>();
 
         return services;
     }

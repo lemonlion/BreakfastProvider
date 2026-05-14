@@ -859,6 +859,7 @@ public static class ServiceCollectionExtensions
         {
             options.DatabaseName = "BreakfastDb";
             options.AddCollection<Api.Services.RecipeReviewDocument>("recipe_reviews");
+            options.AddCollection<Api.Services.ChefNoteDocument>("chef_notes");
             options.AddCollection<Api.Reporting.CustomerFeedbackAlertDocument>("feedback_alerts");
             options.ClusterConfigurator = builder =>
             {
@@ -964,6 +965,16 @@ public static class ServiceCollectionExtensions
                     { "total_cost", Google.Cloud.BigQuery.V2.BigQueryDbType.Float64 },
                     { "currency", Google.Cloud.BigQuery.V2.BigQueryDbType.String },
                     { "calculated_at", Google.Cloud.BigQuery.V2.BigQueryDbType.String },
+                }.Build());
+                ds.AddTable("ingredient_waste", new Google.Cloud.BigQuery.V2.TableSchemaBuilder
+                {
+                    { "waste_id", Google.Cloud.BigQuery.V2.BigQueryDbType.String },
+                    { "ingredient_name", Google.Cloud.BigQuery.V2.BigQueryDbType.String },
+                    { "quantity_wasted", Google.Cloud.BigQuery.V2.BigQueryDbType.Float64 },
+                    { "unit", Google.Cloud.BigQuery.V2.BigQueryDbType.String },
+                    { "recipe_name", Google.Cloud.BigQuery.V2.BigQueryDbType.String },
+                    { "reason", Google.Cloud.BigQuery.V2.BigQueryDbType.String },
+                    { "recorded_at", Google.Cloud.BigQuery.V2.BigQueryDbType.String },
                 }.Build());
             });
             options.WithHttpMessageHandlerWrapper(fakeHandler =>

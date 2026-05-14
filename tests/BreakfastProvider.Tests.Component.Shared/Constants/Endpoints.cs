@@ -26,6 +26,8 @@ public static class Endpoints
     public const string CustomerPreferences = "customer-preferences";
     public const string RecipeReviews = "recipe-reviews";
     public const string IngredientUsage = "ingredient-usage";
+    public const string IngredientWaste = "ingredient-waste";
+    public const string ChefNotes = "chef-notes";
     public const string CustomerFeedback = "customer-feedback";
     public const string RecipeCosts = "recipe-costs";
     public const string EventGridWebhook = "webhooks/eventgrid";

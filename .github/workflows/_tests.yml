@@ -309,7 +309,7 @@ jobs:
         uses: actions/upload-artifact@v5
         if: ${{ !(cancelled()) && inputs.test-type == 'component' }}
         with:
-          name: ${{ steps.get-test-results-file-name.outputs.report_file }}
+          name: LightBDD-${{ steps.get-test-results-file-name.outputs.report_file }}
           path: ${{ steps.get-test-results-file-name.outputs.reports_dir }}
           retention-days: 1
 

@@ -215,6 +215,11 @@ services:
           -H "Content-Type: application/json" \
           -d '{"tableReference":{"tableId":"recipe_costs","datasetId":"breakfast_analytics","projectId":"breakfast-provider-project"},"schema":{"fields":[{"name":"calculation_id","type":"STRING","mode":"REQUIRED"},{"name":"recipe_name","type":"STRING","mode":"REQUIRED"},{"name":"ingredients","type":"STRING","mode":"REQUIRED"},{"name":"total_cost","type":"FLOAT","mode":"REQUIRED"},{"name":"currency","type":"STRING","mode":"REQUIRED"},{"name":"calculated_at","type":"STRING","mode":"REQUIRED"}]}}'
 
+        echo "Creating BigQuery ingredient_waste table..."
+        curl -sf -X POST "$$EMULATOR/projects/breakfast-provider-project/datasets/breakfast_analytics/tables" \
+          -H "Content-Type: application/json" \
+          -d '{"tableReference":{"tableId":"ingredient_waste","datasetId":"breakfast_analytics","projectId":"breakfast-provider-project"},"schema":{"fields":[{"name":"waste_id","type":"STRING","mode":"REQUIRED"},{"name":"ingredient_name","type":"STRING","mode":"REQUIRED"},{"name":"quantity_wasted","type":"FLOAT","mode":"REQUIRED"},{"name":"unit","type":"STRING","mode":"REQUIRED"},{"name":"recipe_name","type":"STRING","mode":"REQUIRED"},{"name":"reason","type":"STRING","mode":"REQUIRED"},{"name":"recorded_at","type":"STRING","mode":"REQUIRED"}]}}'
+
         echo "BigQuery initialisation complete."
     networks:
       - localdev

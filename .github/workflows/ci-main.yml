@@ -549,7 +549,25 @@ jobs:
 
   deploy-pages:
     name: Deploy to GitHub Pages
-    needs: [lightbdd-in-memory, reqnroll-in-memory, xunit-in-memory, tunit-in-memory, nunit-in-memory, bddfy-in-memory]
+    needs:
+      - lightbdd-in-memory
+      - reqnroll-in-memory
+      - xunit-in-memory
+      - tunit-in-memory
+      - nunit-in-memory
+      - bddfy-in-memory
+      - lightbdd-in-docker
+      - reqnroll-in-docker
+      - xunit-in-docker
+      - tunit-in-docker
+      - nunit-in-docker
+      - bddfy-in-docker
+      - lightbdd-external-sut
+      - reqnroll-external-sut
+      - xunit-external-sut
+      - tunit-external-sut
+      - nunit-external-sut
+      - bddfy-external-sut
     runs-on: ubuntu-24.04
     permissions:
       pages: write
@@ -600,6 +618,82 @@ jobs:
         with:
           name: bddfy-in-memory-report
           path: site/reports/bddfy
+
+      # ─── Docker reports ───────────────────────────────────────────────────
+
+      - name: Download LightBDD docker report
+        uses: actions/download-artifact@v5
+        with:
+          name: lightbdd-in-docker-report
+          path: site/reports/docker/lightbdd
+
+      - name: Download ReqNRoll docker report
+        uses: actions/download-artifact@v5
+        with:
+          name: reqnroll-in-docker-report
+          path: site/reports/docker/reqnroll
+
+      - name: Download xUnit docker report
+        uses: actions/download-artifact@v5
+        with:
+          name: xunit-in-docker-report
+          path: site/reports/docker/xunit
+
+      - name: Download TUnit docker report
+        uses: actions/download-artifact@v5
+        with:
+          name: tunit-in-docker-report
+          path: site/reports/docker/tunit
+
+      - name: Download NUnit docker report
+        uses: actions/download-artifact@v5
+        with:
+          name: nunit-in-docker-report
+          path: site/reports/docker/nunit
+
+      - name: Download BDDfy docker report
+        uses: actions/download-artifact@v5
+        with:
+          name: bddfy-in-docker-report
+          path: site/reports/docker/bddfy
+
+      # ─── Docker SUT reports ───────────────────────────────────────────────
+
+      - name: Download LightBDD external SUT report
+        uses: actions/download-artifact@v5
+        with:
+          name: lightbdd-external-sut-report
+          path: site/reports/docker-sut/lightbdd
+
+      - name: Download ReqNRoll external SUT report
+        uses: actions/download-artifact@v5
+        with:
+          name: reqnroll-external-sut-report
+          path: site/reports/docker-sut/reqnroll
+
+      - name: Download xUnit external SUT report
+        uses: actions/download-artifact@v5
+        with:
+          name: xunit-external-sut-report
+          path: site/reports/docker-sut/xunit
+
+      - name: Download TUnit external SUT report
+        uses: actions/download-artifact@v5
+        with:
+          name: tunit-external-sut-report
+          path: site/reports/docker-sut/tunit
+
+      - name: Download NUnit external SUT report
+        uses: actions/download-artifact@v5
+        with:
+          name: nunit-external-sut-report
+          path: site/reports/docker-sut/nunit
+
+      - name: Download BDDfy external SUT report
+        uses: actions/download-artifact@v5
+        with:
+          name: bddfy-external-sut-report
+          path: site/reports/docker-sut/bddfy
 
       - name: Copy API specs and generate UI pages
         run: |

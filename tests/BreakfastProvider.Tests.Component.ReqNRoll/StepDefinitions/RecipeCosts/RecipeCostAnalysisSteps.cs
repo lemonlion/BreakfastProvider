@@ -2,6 +2,7 @@ using System.Net;
 using BreakfastProvider.Tests.Component.Shared.Common.Downstream;
 using BreakfastProvider.Tests.Component.Shared.Common.RecipeCosts;
 using BreakfastProvider.Tests.Component.Shared.Models.RecipeCosts;
+using BreakfastProvider.Tests.Component.ReqNRoll.Support;
 using Reqnroll;
 
 namespace BreakfastProvider.Tests.Component.ReqNRoll.StepDefinitions.RecipeCosts;
@@ -40,6 +41,7 @@ public class RecipeCostAnalysisSteps(
     [Then("the kitchen service should have received the preparation request")]
     public async Task ThenTheKitchenServiceShouldHaveReceivedThePreparationRequest()
     {
+        if (AppManager.Settings.RunAgainstExternalServiceUnderTest) return;
         await Task.Delay(500); // Allow async consumer processing
         downstreamSteps.AssertKitchenServiceReceivedPreparationRequest();
     }

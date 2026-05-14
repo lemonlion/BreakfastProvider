@@ -38,6 +38,7 @@ public partial class Recipe_Costs__Analysis_Feature : BaseFixture
         _postSteps.Response!.CalculationId.Should().NotBe(Guid.Empty);
     }
 
+    [SkipStepIf(nameof(Settings.RunAgainstExternalServiceUnderTest), DownstreamFakeRequestStoreIsUnavailableInPostDeploymentEnvironments)]
     private async Task The_kitchen_service_should_have_received_the_preparation_request()
     {
         await Task.Delay(500); // Allow async consumer processing

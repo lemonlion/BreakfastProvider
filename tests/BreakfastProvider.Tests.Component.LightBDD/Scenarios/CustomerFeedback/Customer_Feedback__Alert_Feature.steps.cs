@@ -38,6 +38,7 @@ public partial class Customer_Feedback__Alert_Feature : BaseFixture
         _postSteps.Response!.FeedbackId.Should().NotBe(Guid.Empty);
     }
 
+    [SkipStepIf(nameof(Settings.RunAgainstExternalServiceUnderTest), DownstreamFakeRequestStoreIsUnavailableInPostDeploymentEnvironments)]
     private async Task The_supplier_service_should_have_received_the_feedback()
     {
         await Task.Delay(500); // Allow async consumer processing

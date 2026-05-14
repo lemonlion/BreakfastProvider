@@ -138,18 +138,16 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.RecipeCosts
         [global::Xunit.TraitAttribute("FeatureTitle", "Recipe Cost Analysis Processing")]
         [global::Xunit.TraitAttribute("Description", "Submitting recipe cost should trigger event consumption and downstream calls")]
         [global::Xunit.TraitAttribute("Category", "happy-path")]
-        [global::Xunit.TraitAttribute("Category", "IgnoreIfExternalSut")]
         public async global::System.Threading.Tasks.Task SubmittingRecipeCostShouldTriggerEventConsumptionAndDownstreamCalls()
         {
             string[] tagsOfScenario = new string[] {
-                    "happy-path",
-                    "IgnoreIfExternalSut"};
+                    "happy-path"};
             global::System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new global::System.Collections.Specialized.OrderedDictionary();
             string pickleIndex = "0";
             global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("Submitting recipe cost should trigger event consumption and downstream calls", null, tagsOfScenario, argumentsOfScenario, featureTags, pickleIndex);
             string[] tagsOfRule = ((string[])(null));
             global::Reqnroll.RuleInfo ruleInfo = null;
-#line 6
+#line 5
     this.ScenarioInitialize(scenarioInfo, ruleInfo);
 #line hidden
             if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
@@ -159,16 +157,16 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.RecipeCosts
             else
             {
                 await this.ScenarioStartAsync();
-#line 7
+#line 6
         await testRunner.GivenAsync("a valid recipe cost calculation request", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
 #line hidden
-#line 8
+#line 7
         await testRunner.WhenAsync("the recipe cost calculation is submitted", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
 #line hidden
-#line 9
+#line 8
         await testRunner.ThenAsync("the cost response should be accepted", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
 #line hidden
-#line 10
+#line 9
         await testRunner.AndAsync("the kitchen service should have received the preparation request", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
 #line hidden
             }

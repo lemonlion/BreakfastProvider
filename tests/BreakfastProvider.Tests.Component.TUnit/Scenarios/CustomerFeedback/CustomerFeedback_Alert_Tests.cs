@@ -22,8 +22,6 @@ public class CustomerFeedback_Alert_Tests : BaseFixture
     [HappyPath]
     public async Task Submitting_customer_feedback_should_trigger_event_consumption_and_downstream_calls()
     {
-        if (Settings.RunAgainstExternalServiceUnderTest) return;
-
         // Given a valid customer feedback request
         _postSteps.Request = new TestCustomerFeedbackRequest
         {
@@ -42,7 +40,10 @@ public class CustomerFeedback_Alert_Tests : BaseFixture
         await _postSteps.Response!.FeedbackId.Should().NotBeEqualTo(Guid.Empty);
 
         // And the supplier service should have received the feedback notification
-        await Task.Delay(500); // Allow async consumer processing
-        _downstreamSteps.AssertSupplierServiceReceivedFeedbackRequest();
+        if (!Settings.RunAgainstExternalServiceUnderTest)
+        {
+            await Task.Delay(500); // Allow async consumer processing
+            _downstreamSteps.AssertSupplierServiceReceivedFeedbackRequest();
+        }
     }
 }

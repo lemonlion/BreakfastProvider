@@ -2,6 +2,7 @@ using System.Net;
 using BreakfastProvider.Tests.Component.Shared.Common.CustomerFeedback;
 using BreakfastProvider.Tests.Component.Shared.Common.Downstream;
 using BreakfastProvider.Tests.Component.Shared.Models.CustomerFeedback;
+using BreakfastProvider.Tests.Component.ReqNRoll.Support;
 using Reqnroll;
 
 namespace BreakfastProvider.Tests.Component.ReqNRoll.StepDefinitions.CustomerFeedback;
@@ -40,6 +41,7 @@ public class CustomerFeedbackAlertSteps(
     [Then("the supplier service should have received the feedback")]
     public async Task ThenTheSupplierServiceShouldHaveReceivedTheFeedback()
     {
+        if (AppManager.Settings.RunAgainstExternalServiceUnderTest) return;
         await Task.Delay(500); // Allow async consumer processing
         downstreamSteps.AssertSupplierServiceReceivedFeedbackRequest();
     }

@@ -22,8 +22,6 @@ public class RecipeCost_Analysis_Tests : BaseFixture
     [HappyPath]
     public async Task Submitting_recipe_cost_should_trigger_event_consumption_and_downstream_calls()
     {
-        if (Settings.RunAgainstExternalServiceUnderTest) return;
-
         // Given a valid recipe cost calculation request
         _postSteps.Request = new TestRecipeCostRequest
         {
@@ -42,7 +40,10 @@ public class RecipeCost_Analysis_Tests : BaseFixture
         _postSteps.Response!.CalculationId.Should().NotBe(Guid.Empty);
 
         // And the kitchen service should have received the preparation request
-        await Task.Delay(500); // Allow async consumer processing
-        _downstreamSteps.AssertKitchenServiceReceivedPreparationRequest();
+        if (!Settings.RunAgainstExternalServiceUnderTest)
+        {
+            await Task.Delay(500); // Allow async consumer processing
+            _downstreamSteps.AssertKitchenServiceReceivedPreparationRequest();
+        }
     }
 }

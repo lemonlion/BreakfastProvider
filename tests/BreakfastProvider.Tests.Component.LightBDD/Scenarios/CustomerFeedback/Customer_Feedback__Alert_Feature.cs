@@ -11,7 +11,6 @@ public partial class Customer_Feedback__Alert_Feature
 {
     [HappyPath]
     [Scenario]
-    [IgnoreIf(nameof(Settings.RunAgainstExternalServiceUnderTest), NeedsEventAndKafkaInfrastructure)]
     public async Task Submitting_Customer_Feedback_Should_Trigger_Event_Consumption_And_Downstream_Calls()
     {
         await Runner.RunScenarioAsync(

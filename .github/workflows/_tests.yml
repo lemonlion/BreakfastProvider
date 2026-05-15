@@ -236,16 +236,29 @@ jobs:
             echo "No xunit.runner.json found in $csproj_dir — skipping parallelism throttle"
           fi
 
+      - id: get-trx-report-args
+        name: Determine TRX report arguments
+        run: |
+          if [[ "${{ inputs.csproj-path }}" == *"NUnit"* ]]; then
+            echo "args=--report-trx --report-trx-filename ${{ steps.get-trx-file-name.outputs.trx_file }}" >> $GITHUB_OUTPUT
+          else
+            echo "args=--report-xunit-trx --report-xunit-trx-filename ${{ steps.get-trx-file-name.outputs.trx_file }}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Install dotnet-coverage tool
+        run: dotnet tool install --global dotnet-coverage
+
       - name: Run tests
         run: >
-          dotnet test ${{ inputs.csproj-path }}
+          dotnet-coverage collect
+          --output ./coverage/coverage.cobertura.xml
+          --output-format cobertura
+          "dotnet test ${{ inputs.csproj-path }}
           -p:WarningLevel=0
-          --collect:"XPlat Code Coverage"
-          --settings coverage.runsettings
-          -l "trx;LogFileName=${{ steps.get-trx-file-name.outputs.trx_file }}"
           --results-directory ./coverage
-          --logger GitHubActions
           ${{ inputs.filter && format('--filter {0}', inputs.filter) || '' }}
+          --
+          ${{ steps.get-trx-report-args.outputs.args }}"
 
       - name: Dump container logs on failure
         if: ${{ failure() && (inputs.test-run-type == 'docker' || inputs.test-run-type == 'external-sut') }}

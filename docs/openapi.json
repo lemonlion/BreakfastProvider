@@ -97,6 +97,183 @@
         }
       }
     },
+    "/chef-notes": {
+      "post": {
+        "tags": [
+          "ChefNotes"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChefNoteRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChefNoteRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChefNoteResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/chef-notes/{noteId}": {
+      "get": {
+        "tags": [
+          "ChefNotes"
+        ],
+        "parameters": [
+          {
+            "name": "noteId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChefNoteResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "ChefNotes"
+        ],
+        "parameters": [
+          {
+            "name": "noteId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateChefNoteRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateChefNoteRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChefNoteResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/chef-notes/recipe/{recipeName}": {
+      "get": {
+        "tags": [
+          "ChefNotes"
+        ],
+        "parameters": [
+          {
+            "name": "recipeName",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ChefNoteResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/customer-preferences/{customerId}": {
       "put": {
         "tags": [
@@ -593,6 +770,107 @@
                   }
                 }
               }
+            }
+          }
+        }
+      }
+    },
+    "/ingredient-waste": {
+      "post": {
+        "tags": [
+          "IngredientWaste"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IngredientWasteRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/IngredientWasteRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IngredientWasteResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ingredient-waste/recipe/{recipeName}": {
+      "get": {
+        "tags": [
+          "IngredientWaste"
+        ],
+        "parameters": [
+          {
+            "name": "recipeName",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/IngredientWasteResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ingredient-waste/{wasteId}": {
+      "delete": {
+        "tags": [
+          "IngredientWaste"
+        ],
+        "parameters": [
+          {
+            "name": "wasteId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content",
+            "content": {
+              "application/json": { }
             }
           }
         }
@@ -2003,6 +2281,66 @@
           }
         }
       },
+      "ChefNoteRequest": {
+        "type": "object",
+        "properties": {
+          "recipeName": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "chefName": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "noteText": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "category": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "ChefNoteResponse": {
+        "type": "object",
+        "properties": {
+          "noteId": {
+            "type": "string"
+          },
+          "recipeName": {
+            "type": "string"
+          },
+          "chefName": {
+            "type": "string"
+          },
+          "noteText": {
+            "type": "string"
+          },
+          "category": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
+          }
+        }
+      },
       "CustomerPreferenceRequest": {
         "type": "object",
         "properties": {
@@ -2299,6 +2637,75 @@
               "string"
             ],
             "format": "int32"
+          }
+        }
+      },
+      "IngredientWasteRequest": {
+        "type": "object",
+        "properties": {
+          "ingredientName": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "quantityWasted": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "unit": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "recipeName": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "reason": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "IngredientWasteResponse": {
+        "type": "object",
+        "properties": {
+          "wasteId": {
+            "type": "string"
+          },
+          "ingredientName": {
+            "type": "string"
+          },
+          "quantityWasted": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "unit": {
+            "type": "string"
+          },
+          "recipeName": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          },
+          "recordedAt": {
+            "type": "string",
+            "format": "date-time"
           }
         }
       },
@@ -3028,6 +3435,23 @@
           }
         }
       },
+      "UpdateChefNoteRequest": {
+        "type": "object",
+        "properties": {
+          "noteText": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "category": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
       "UpdateOrderStatusRequest": {
         "type": "object",
         "properties": {
@@ -3126,6 +3550,9 @@
       "name": "AuditLog"
     },
     {
+      "name": "ChefNotes"
+    },
+    {
       "name": "CustomerPreferences"
     },
     {
@@ -3148,6 +3575,9 @@
     },
     {
       "name": "IngredientUsage"
+    },
+    {
+      "name": "IngredientWaste"
     },
     {
       "name": "Inventory"

@@ -12,11 +12,15 @@
 
   <ItemGroup>
     <None Remove="appsettings.componenttests.json" />
+    <None Remove="appsettings.componenttests.ports.json" />
     <None Remove="xunit.json" />
   </ItemGroup>
 
   <ItemGroup>
     <Content Include="appsettings.componenttests.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="appsettings.componenttests.ports.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="xunit.json">

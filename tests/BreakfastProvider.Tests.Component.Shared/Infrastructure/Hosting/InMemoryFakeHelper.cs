@@ -49,7 +49,7 @@ public static class InMemoryFakeHelper
                 $"gRPC fake at {baseUrl} responded with HTTP/{response.Version} instead of HTTP/2");
     }
 
-    private static void EnsureCorrectWorkingDirectory()
+    public static void EnsureCorrectWorkingDirectory()
     {
         // MTP (Microsoft.Testing.Platform) may launch test executables with a working directory
         // set to the repository root rather than the bin output directory. WebApplicationFactory

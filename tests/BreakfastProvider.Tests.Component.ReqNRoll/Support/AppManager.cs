@@ -150,6 +150,8 @@ public sealed class AppManager : IDisposable
     {
         if (_staticFactory != null) return;
 
+        InMemoryFakeHelper.EnsureCorrectWorkingDirectory();
+
         _staticFactory = new WebApplicationFactory<Program>().WithWebHostBuilder(builder =>
         {
             builder.ConfigureAppConfiguration((_, config) =>

@@ -221,6 +221,8 @@ public abstract class BaseFixture : DiagrammedComponentTest, IDisposable
     {
         if (_staticFactory != null) return;
 
+        InMemoryFakeHelper.EnsureCorrectWorkingDirectory();
+
         _staticFactory = new WebApplicationFactory<Program>().WithWebHostBuilder(builder =>
         {
             builder.ConfigureAppConfiguration((_, config) =>

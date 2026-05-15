@@ -221,6 +221,8 @@ public abstract class BaseFixture : DiagrammedComponentTest, IDisposable
     {
         if (_staticFactory != null) return;
 
+        InMemoryFakeHelper.EnsureCorrectWorkingDirectory();
+
         // In TUnit, [Before(Assembly)] may not guarantee execution before test
         // constructors. Eagerly initialise the Spanner server here so that
         // ConfigureTestServices never sees a null _fakeSpannerServer.

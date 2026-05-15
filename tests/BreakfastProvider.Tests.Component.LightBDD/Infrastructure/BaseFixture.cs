@@ -250,6 +250,8 @@ public abstract class BaseFixture : FeatureFixture, IDisposable, IIgnorable<Comp
     {
         if (_staticFactory != null) return;
 
+        InMemoryFakeHelper.EnsureCorrectWorkingDirectory();
+
         _staticFactory = new WebApplicationFactory<Program>().WithWebHostBuilder(builder =>
         {
             builder.ConfigureAppConfiguration((_, config) =>

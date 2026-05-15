@@ -10,6 +10,7 @@ public static class InMemoryFakeHelper
         IConfiguration? config = null)
         where TProgram : class
     {
+        EnsureCorrectWorkingDirectory();
         HttpFakesHelper.AssertPortIsNotInUse(baseUrl);
         var fixture = new WebApplicationFactoryForSpecificUrl<TProgram>(hostUrl: baseUrl, config);
         // Access Services to trigger host creation (starts Kestrel).
@@ -24,6 +25,7 @@ public static class InMemoryFakeHelper
         IConfiguration? config = null)
         where TProgram : class
     {
+        EnsureCorrectWorkingDirectory();
         HttpFakesHelper.AssertPortIsNotInUse(baseUrl);
         var fixture = new WebApplicationFactoryForSpecificUrl<TProgram>(hostUrl: baseUrl, config, HttpProtocols.Http2);
         _ = fixture.Services;
@@ -45,5 +47,17 @@ public static class InMemoryFakeHelper
         if (response.Version.Major < 2)
             throw new InvalidOperationException(
                 $"gRPC fake at {baseUrl} responded with HTTP/{response.Version} instead of HTTP/2");
+    }
+
+    private static void EnsureCorrectWorkingDirectory()
+    {
+        // MTP (Microsoft.Testing.Platform) may launch test executables with a working directory
+        // set to the repository root rather than the bin output directory. WebApplicationFactory
+        // reads MvcTestingAppManifest.json from AppContext.BaseDirectory, but the fake service's
+        // WebApplication.CreateBuilder() validates the content root using Directory.GetCurrentDirectory().
+        // Ensure CWD matches the test output so content root resolution succeeds.
+        var baseDir = AppContext.BaseDirectory;
+        if (!string.Equals(Directory.GetCurrentDirectory(), baseDir, StringComparison.OrdinalIgnoreCase))
+            Directory.SetCurrentDirectory(baseDir);
     }
 }

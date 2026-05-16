@@ -1,12 +1,8 @@
 # Breakfast Provider<a name="top"></a>
 
-Provides breakfast preparation capabilities including pancake/waffle creation, order management, topping customisation, ingredient sourcing from downstream dairy and supplier services, menu management, and recipe logging.
+An example api, providing breakfast preparation capabilities including pancake/waffle creation, order management, topping customisation, ingredient sourcing from downstream dairy and supplier services, menu management, and recipe logging.
 
 **See the output [here](https://lemonlion.github.io/BreakfastProvider/)**
-
-
-> [!NOTE]
-> Ignore the UI, it's a work in progress and completely separate from the rest of the project
 
 ## Purpose [↑](#top)<a name="purpose"></a>
 

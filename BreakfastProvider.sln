@@ -31,8 +31,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{22222222
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "fakes", "fakes", "{33333333-3333-3333-3333-333333333333}"
 EndProject
-Project("{54A90642-561A-45FC-A4FF-BA4ED9CD881C}") = "BreakfastProvider.UI", "src\BreakfastProvider.UI\BreakfastProvider.UI.esproj", "{B8C9D0E1-8888-9999-AAAA-BBBBCCCCDDDD}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BreakfastProvider.Tests.Component.TUnit", "tests\BreakfastProvider.Tests.Component.TUnit\BreakfastProvider.Tests.Component.TUnit.csproj", "{8E63B305-11D2-478F-A209-ABE5B913AF96}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dependencies.Fakes.NotificationService", "fakes\Dependencies.Fakes.NotificationService\Dependencies.Fakes.NotificationService.csproj", "{9072ADAA-2DDC-4F2C-87AF-9D1592C10B1A}"

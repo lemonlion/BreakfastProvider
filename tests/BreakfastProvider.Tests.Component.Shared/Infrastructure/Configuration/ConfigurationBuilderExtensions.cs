@@ -15,6 +15,7 @@ public static class ConfigurationBuilderExtensions
             .AddJsonFile("appsettings.json", optional: true, reloadOnChange: false)
             .AddJsonFile("appsettings.Development.json", optional: true, reloadOnChange: false)
             .AddJsonFile("appsettings.componenttests.json", optional: false, reloadOnChange: false)
+            .AddEnvironmentVariables()
             .Build();
 
         var settings = baseConfig.Get<ComponentTestSettings>()!;
@@ -24,6 +25,6 @@ public static class ConfigurationBuilderExtensions
         if (settings.RunWithAnInMemoryCowService)
             builder.AddJsonFile("appsettings.componenttests.ports.json", optional: true, reloadOnChange: false);
 
-        return builder.AddEnvironmentVariables().Build();
+        return builder.Build();
     }
 }

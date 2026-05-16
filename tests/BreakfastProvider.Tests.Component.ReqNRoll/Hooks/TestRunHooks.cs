@@ -57,6 +57,8 @@ public sealed class TestRunHooks
             });
 
         Support.AppManager.DisposeFactory();
+        SourceControlledDocsHelper.CopySpecificationsFileToDocsFolder().GetAwaiter().GetResult();
+        SourceControlledDocsHelper.CopyApiSpecificationFilesToDocsFolder().GetAwaiter().GetResult();
         DisposeKafkaConsumers();
         DisposePubSubConsumers();
         DisposeHttpFakes();

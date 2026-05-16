@@ -1,6 +1,7 @@
 using BreakfastProvider.Tests.Component.Shared.Constants;
 using BreakfastProvider.Tests.Component.Shared.Fakes.Kafka;
 using BreakfastProvider.Tests.Component.Shared.Fakes.PubSub;
+using BreakfastProvider.Tests.Component.Shared.Infrastructure;
 using BreakfastProvider.Tests.Component.Shared.Infrastructure.Configuration;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
@@ -69,24 +70,12 @@ public class GlobalTestSetup
                 ExcludedHeaders = [CustomHeaders.ComponentTestRequestId, CustomHeaders.CorrelationId]
             });
 
-        await SourceControlSpecificationsFile();
+        await SourceControlledDocsHelper.CopySpecificationsFileToDocsFolder();
+        await SourceControlledDocsHelper.CopyApiSpecificationFilesToDocsFolder();
         DisposeKafkaConsumers();
         DisposePubSubConsumers();
         DisposeHttpFakes();
         StopDockerCompose();
-    }
-
-    private static async Task SourceControlSpecificationsFile()
-    {
-        var specsPath = "Reports/Specifications.yml";
-        if (!File.Exists(specsPath)) return;
-
-        var specs = await File.ReadAllTextAsync(specsPath);
-        if (specs.Length is not 0)
-        {
-            specs = specs.Replace("\r\n", "\n");
-            await File.WriteAllTextAsync("../../../../../docs/Specifications.yml", specs);
-        }
     }
 
     private static void StartHttpFakes()

@@ -1,6 +1,7 @@
 using BreakfastProvider.Tests.Component.Shared.Constants;
 using BreakfastProvider.Tests.Component.Shared.Fakes.Kafka;
 using BreakfastProvider.Tests.Component.Shared.Fakes.PubSub;
+using BreakfastProvider.Tests.Component.Shared.Infrastructure;
 using LightBDD.Core.Configuration;
 using LightBDD.Framework.Configuration;
 using LightBDD.Framework.Notification;
@@ -19,8 +20,6 @@ namespace BreakfastProvider.Tests.Component.LightBDD.Infrastructure;
 
 public class ConfiguredLightBddScopeAttribute : LightBddScope
 {
-    private const string SpecificationsFileName = "Specifications";
-
     private WebApplicationFactoryForSpecificUrl<Dependencies.Fakes.CowService.Program>? _cowServiceFake;
     private WebApplicationFactoryForSpecificUrl<Dependencies.Fakes.GoatService.Program>? _goatServiceFake;
     private WebApplicationFactoryForSpecificUrl<Dependencies.Fakes.SupplierService.Program>? _supplierServiceFake;
@@ -60,7 +59,8 @@ public class ConfiguredLightBddScopeAttribute : LightBddScope
 
         configuration.ExecutionExtensionsConfiguration()
             .RegisterGlobalTearDown("dispose factory", BaseFixture.DisposeFactory)
-            .RegisterGlobalTearDown("process specifications file", SourceControlSpecificationsFile)
+            .RegisterGlobalTearDown("process specifications file", () => SourceControlledDocsHelper.CopySpecificationsFileToDocsFolder())
+            .RegisterGlobalTearDown("process api specification files", SourceControlledDocsHelper.CopyApiSpecificationFilesToDocsFolder)
             .RegisterGlobalSetUp("docker compose", StartDockerCompose, StopDockerCompose)
             .RegisterGlobalSetUp("http fakes", StartHttpFakes, DisposeHttpFakes)
             .RegisterGlobalSetUp("kafka consumer", StartKafkaConsumers, DisposeKafkaConsumers)
@@ -68,19 +68,6 @@ public class ConfiguredLightBddScopeAttribute : LightBddScope
             .RegisterGlobalSetUp("eventgrid queue drainer", InitEventGridQueueDrainer)
             .RegisterGlobalSetUp("clear docker queues", ClearDockerQueues)
             .RegisterGlobalSetUp("host init", BaseFixture.EnsureHostInitialized);
-    }
-
-    private async Task SourceControlSpecificationsFile()
-    {
-        var specsPath = $"Reports/{SpecificationsFileName}.yml";
-        if (!File.Exists(specsPath)) return;
-
-        var specs = await File.ReadAllTextAsync(specsPath);
-        if (specs.Length is not 0)
-        {
-            specs = specs.Replace("\r\n", "\n");
-            await File.WriteAllTextAsync($"../../../../../docs/{SpecificationsFileName}.yml", specs);
-        }
     }
 
     private void StartHttpFakes()

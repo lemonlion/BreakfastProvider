@@ -1,6 +1,7 @@
 using BreakfastProvider.Tests.Component.Shared.Constants;
 using BreakfastProvider.Tests.Component.Shared.Fakes.Kafka;
 using BreakfastProvider.Tests.Component.Shared.Fakes.PubSub;
+using BreakfastProvider.Tests.Component.Shared.Infrastructure;
 using BreakfastProvider.Tests.Component.Shared.Infrastructure.Configuration;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
@@ -61,11 +62,12 @@ public class GlobalTestSetup : IAsyncLifetime
             ExcludedHeaders = [CustomHeaders.ComponentTestRequestId, CustomHeaders.CorrelationId]
         });
 
+        await SourceControlledDocsHelper.CopySpecificationsFileToDocsFolder();
+        await SourceControlledDocsHelper.CopyApiSpecificationFilesToDocsFolder();
         DisposeKafkaConsumers();
         DisposePubSubConsumers();
         DisposeHttpFakes();
         StopDockerCompose();
-        await Task.CompletedTask;
     }
 
     private void StartHttpFakes()

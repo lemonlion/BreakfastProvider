@@ -2,7 +2,7 @@ using System.Net;
 using BreakfastProvider.Tests.Component.Shared.Constants;
 using BreakfastProvider.Tests.Component.Shared.Models.Infrastructure;
 using BreakfastProvider.Tests.Component.Shared.Util;
-using TestTrackingDiagrams.NUnit4;
+using Kronikol.NUnit4;
 
 namespace BreakfastProvider.Tests.Component.NUnit.Scenarios.Infrastructure;
 

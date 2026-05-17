@@ -3,7 +3,7 @@ using BreakfastProvider.Api.HttpClients;
 using BreakfastProvider.Tests.Component.Shared.Fakes.HttpFakes;
 using BreakfastProvider.Tests.Component.Shared.Infrastructure.Configuration;
 using Microsoft.AspNetCore.Http;
-using TestTrackingDiagrams.Tracking;
+using Kronikol.Tracking;
 
 namespace BreakfastProvider.Tests.Component.Shared.Infrastructure.Hosting;
 

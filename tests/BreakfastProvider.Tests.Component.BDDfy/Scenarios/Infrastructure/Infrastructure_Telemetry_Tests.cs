@@ -10,7 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 using TestStack.BDDfy;
-using TestTrackingDiagrams.BDDfy.xUnit3;
+using Kronikol.BDDfy.xUnit3;
 namespace BreakfastProvider.Tests.Component.BDDfy.Scenarios.Infrastructure;
 
 public class Infrastructure_Telemetry_Tests : BaseFixture

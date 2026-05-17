@@ -4,8 +4,8 @@ using System.Text.Json;
 using BreakfastProvider.Tests.Component.Shared.Constants;
 using BreakfastProvider.Tests.Component.Shared.Util;
 using BreakfastProvider.Tests.Component.TUnit.Infrastructure;
-using TestTrackingDiagrams.Tracking;
-using TestTrackingDiagrams.TUnit;
+using Kronikol.Tracking;
+using Kronikol.TUnit;
 
 namespace BreakfastProvider.Tests.Component.TUnit.Scenarios.Specifications;
 

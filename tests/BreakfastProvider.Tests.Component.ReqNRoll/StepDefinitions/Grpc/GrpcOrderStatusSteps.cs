@@ -4,7 +4,7 @@ using BreakfastProvider.Tests.Component.Shared.Common.Orders;
 using BreakfastProvider.Tests.Component.Shared.Constants;
 using Grpc.Core;
 using Reqnroll;
-using TestTrackingDiagrams.ReqNRoll;
+using Kronikol.ReqNRoll;
 
 namespace BreakfastProvider.Tests.Component.ReqNRoll.StepDefinitions.Grpc;
 

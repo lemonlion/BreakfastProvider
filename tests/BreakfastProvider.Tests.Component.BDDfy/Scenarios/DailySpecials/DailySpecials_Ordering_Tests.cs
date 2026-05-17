@@ -7,7 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
 using TestStack.BDDfy;
-using TestTrackingDiagrams.BDDfy.xUnit3;
+using Kronikol.BDDfy.xUnit3;
 namespace BreakfastProvider.Tests.Component.BDDfy.Scenarios.DailySpecials;
 
 public class DailySpecials_Ordering_Tests : BaseFixture

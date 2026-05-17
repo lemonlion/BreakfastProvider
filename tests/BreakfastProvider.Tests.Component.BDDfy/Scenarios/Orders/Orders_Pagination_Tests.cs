@@ -7,7 +7,7 @@ using BreakfastProvider.Tests.Component.Shared.Models.Orders;
 using BreakfastProvider.Tests.Component.Shared.Models.Pancakes;
 
 using TestStack.BDDfy;
-using TestTrackingDiagrams.BDDfy.xUnit3;
+using Kronikol.BDDfy.xUnit3;
 namespace BreakfastProvider.Tests.Component.BDDfy.Scenarios.Orders;
 
 public class Orders_Pagination_Tests : BaseFixture

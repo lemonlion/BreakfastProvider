@@ -6,7 +6,7 @@ using BreakfastProvider.Tests.Component.Shared.Common.Validation;
 using BreakfastProvider.Tests.Component.Shared.Constants;
 using BreakfastProvider.Tests.Component.Shared.Models.AppleCinnamonMuffins;
 using BreakfastProvider.Tests.Component.Shared.Models.Validation;
-using TestTrackingDiagrams.xUnit3;
+using Kronikol.xUnit3;
 
 namespace BreakfastProvider.Tests.Component.xUnit.Scenarios.AppleCinnamonMuffins;
 

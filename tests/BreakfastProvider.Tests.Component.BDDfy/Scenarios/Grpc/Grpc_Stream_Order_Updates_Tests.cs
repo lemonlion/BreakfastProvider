@@ -9,7 +9,7 @@ using BreakfastProvider.Tests.Component.Shared.Models.Pancakes;
 using Grpc.Core;
 
 using TestStack.BDDfy;
-using TestTrackingDiagrams.BDDfy.xUnit3;
+using Kronikol.BDDfy.xUnit3;
 namespace BreakfastProvider.Tests.Component.BDDfy.Scenarios.Grpc;
 
 public class Grpc_Stream_Order_Updates_Tests : BaseFixture

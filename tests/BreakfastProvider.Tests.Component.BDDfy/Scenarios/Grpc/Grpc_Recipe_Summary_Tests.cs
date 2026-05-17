@@ -1,7 +1,7 @@
 using BreakfastProvider.Tests.Component.Shared.Common.Grpc;
 
 using TestStack.BDDfy;
-using TestTrackingDiagrams.BDDfy.xUnit3;
+using Kronikol.BDDfy.xUnit3;
 namespace BreakfastProvider.Tests.Component.BDDfy.Scenarios.Grpc;
 
 public class Grpc_Recipe_Summary_Tests : BaseFixture

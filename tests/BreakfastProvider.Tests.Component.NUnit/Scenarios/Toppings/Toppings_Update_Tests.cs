@@ -4,7 +4,7 @@ using BreakfastProvider.Tests.Component.Shared.Common.Validation;
 using BreakfastProvider.Tests.Component.Shared.Constants;
 using BreakfastProvider.Tests.Component.Shared.Models.Toppings;
 using BreakfastProvider.Tests.Component.Shared.Models.Validation;
-using TestTrackingDiagrams.NUnit4;
+using Kronikol.NUnit4;
 
 namespace BreakfastProvider.Tests.Component.NUnit.Scenarios.Toppings;
 

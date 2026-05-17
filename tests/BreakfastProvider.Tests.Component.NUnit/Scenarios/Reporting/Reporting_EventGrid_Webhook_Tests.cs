@@ -2,7 +2,7 @@ using System.Net;
 using System.Net.Http.Json;
 using BreakfastProvider.Tests.Component.Shared.Common.Reporting;
 using BreakfastProvider.Tests.Component.Shared.Constants;
-using TestTrackingDiagrams.NUnit4;
+using Kronikol.NUnit4;
 
 namespace BreakfastProvider.Tests.Component.NUnit.Scenarios.Reporting;
 

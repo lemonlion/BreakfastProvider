@@ -5,7 +5,7 @@ using BreakfastProvider.Tests.Component.Shared.Util;
 using Microsoft.Extensions.DependencyInjection;
 
 using TestStack.BDDfy;
-using TestTrackingDiagrams.BDDfy.xUnit3;
+using Kronikol.BDDfy.xUnit3;
 namespace BreakfastProvider.Tests.Component.BDDfy.Scenarios.Infrastructure;
 
 public class Infrastructure_Degraded_Health_Check_Tests : BaseFixture

@@ -9,7 +9,7 @@ using BreakfastProvider.Tests.Component.Shared.Models.Pancakes;
 using BreakfastProvider.Tests.Component.Shared.Util;
 
 using TestStack.BDDfy;
-using TestTrackingDiagrams.BDDfy.xUnit3;
+using Kronikol.BDDfy.xUnit3;
 namespace BreakfastProvider.Tests.Component.BDDfy.Scenarios.AuditLogs;
 
 public class AuditLogs_Filtering_Tests : BaseFixture

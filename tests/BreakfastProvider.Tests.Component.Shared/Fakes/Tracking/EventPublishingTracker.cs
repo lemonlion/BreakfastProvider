@@ -2,14 +2,14 @@ using System.Text.Json;
 using BreakfastProvider.Api;
 using Microsoft.AspNetCore.Http;
 using BreakfastProvider.Tests.Component.Shared.Constants;
-using TestTrackingDiagrams.Constants;
-using TestTrackingDiagrams.Tracking;
+using Kronikol.Constants;
+using Kronikol.Tracking;
 
 namespace BreakfastProvider.Tests.Component.Shared.Fakes.Tracking;
 
 /// <summary>
 /// Reusable helper that logs event-publishing request/response pairs to the
-/// <see cref="RequestResponseLogger"/> used by TestTrackingDiagrams.
+/// <see cref="RequestResponseLogger"/> used by Kronikol.
 /// This makes published events (Kafka, EventGrid, etc.) visible in the
 /// PlantUML sequence diagrams generated in the HTML specification reports.
 /// </summary>

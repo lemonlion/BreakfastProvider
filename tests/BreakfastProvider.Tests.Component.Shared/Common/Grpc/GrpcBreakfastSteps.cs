@@ -4,7 +4,7 @@ using BreakfastProvider.Tests.Component.Shared.Constants;
 using Grpc.Core;
 using Grpc.Net.Client;
 using Microsoft.AspNetCore.Mvc.Testing;
-using TestTrackingDiagrams.Extensions.Grpc;
+using Kronikol.Extensions.Grpc;
 
 namespace BreakfastProvider.Tests.Component.Shared.Common.Grpc;
 

@@ -9,7 +9,7 @@ using BreakfastProvider.Tests.Component.Shared.Models.Pancakes;
 using Grpc.Core;
 using LightBDD.Framework;
 using BreakfastProvider.Tests.Component.LightBDD.Util;
-using TestTrackingDiagrams.LightBDD;
+using Kronikol.LightBDD;
 
 namespace BreakfastProvider.Tests.Component.LightBDD.Scenarios.Grpc;
 

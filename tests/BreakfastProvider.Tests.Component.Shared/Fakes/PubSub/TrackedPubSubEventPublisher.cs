@@ -1,5 +1,5 @@
 using BreakfastProvider.Api.Events;
-using TestTrackingDiagrams.Tracking;
+using Kronikol.Tracking;
 
 namespace BreakfastProvider.Tests.Component.Shared.Fakes.PubSub;
 

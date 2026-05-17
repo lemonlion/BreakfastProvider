@@ -1,6 +1,6 @@
-using TestTrackingDiagrams;
-using TestTrackingDiagrams.PlantUml;
-using TestTrackingDiagrams.Tracking;
+using Kronikol;
+using Kronikol.PlantUml;
+using Kronikol.Tracking;
 
 namespace BreakfastProvider.Tests.Component.LightBDD.Infrastructure.Reporting;
 

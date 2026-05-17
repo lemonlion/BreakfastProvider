@@ -1,6 +1,6 @@
 global using TUnit.Assertions.Should;
 global using TUnit.Assertions.Should.Extensions;
-global using TestTrackingDiagrams.Tracking;
+global using Kronikol.Tracking;
 global using TUnit.Core;
 global using BreakfastProvider.Tests.Component.TUnit.Infrastructure;
 global using BreakfastProvider.Tests.Component.Shared.Infrastructure.Configuration;

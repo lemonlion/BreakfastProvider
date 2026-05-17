@@ -6,7 +6,7 @@ using BreakfastProvider.Tests.Component.Shared.Models.Toppings;
 using BreakfastProvider.Tests.Component.Shared.Models.Validation;
 
 using TestStack.BDDfy;
-using TestTrackingDiagrams.BDDfy.xUnit3;
+using Kronikol.BDDfy.xUnit3;
 namespace BreakfastProvider.Tests.Component.BDDfy.Scenarios.Toppings;
 
 public class Toppings_Update_Tests : BaseFixture

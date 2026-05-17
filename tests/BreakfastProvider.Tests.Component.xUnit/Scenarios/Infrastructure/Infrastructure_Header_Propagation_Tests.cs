@@ -1,6 +1,6 @@
 using BreakfastProvider.Tests.Component.Shared.Common.Downstream;
 using BreakfastProvider.Tests.Component.Shared.Constants;
-using TestTrackingDiagrams.xUnit3;
+using Kronikol.xUnit3;
 
 namespace BreakfastProvider.Tests.Component.xUnit.Scenarios.Infrastructure;
 

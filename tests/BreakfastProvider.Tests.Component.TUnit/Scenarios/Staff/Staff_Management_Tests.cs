@@ -3,7 +3,7 @@ using BreakfastProvider.Tests.Component.Shared.Common.Staff;
 using BreakfastProvider.Tests.Component.Shared.Constants;
 using BreakfastProvider.Tests.Component.Shared.Models.Staff;
 using BreakfastProvider.Tests.Component.TUnit.Infrastructure;
-using TestTrackingDiagrams.TUnit;
+using Kronikol.TUnit;
 
 namespace BreakfastProvider.Tests.Component.TUnit.Scenarios.Staff;
 

@@ -4,7 +4,7 @@ using BreakfastProvider.Tests.Component.Shared.Models.CustomerPreferences;
 using BreakfastProvider.Tests.Component.BDDfy.Infrastructure;
 
 using TestStack.BDDfy;
-using TestTrackingDiagrams.BDDfy.xUnit3;
+using Kronikol.BDDfy.xUnit3;
 namespace BreakfastProvider.Tests.Component.BDDfy.Scenarios.CustomerPreferences;
 
 public class CustomerPreferences_Management_Tests : BaseFixture

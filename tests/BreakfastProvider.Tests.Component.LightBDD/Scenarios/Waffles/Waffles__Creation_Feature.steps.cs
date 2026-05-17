@@ -11,7 +11,7 @@ using LightBDD.Framework;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using BreakfastProvider.Tests.Component.LightBDD.Util;
-using TestTrackingDiagrams.TabularAttributes;
+using Kronikol.TabularAttributes;
 
 
 namespace BreakfastProvider.Tests.Component.LightBDD.Scenarios.Waffles;

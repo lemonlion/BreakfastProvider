@@ -2,7 +2,7 @@ using System.Net;
 using BreakfastProvider.Tests.Component.Shared.Common.CustomerPreferences;
 using BreakfastProvider.Tests.Component.Shared.Models.CustomerPreferences;
 using BreakfastProvider.Tests.Component.NUnit.Infrastructure;
-using TestTrackingDiagrams.NUnit4;
+using Kronikol.NUnit4;
 
 namespace BreakfastProvider.Tests.Component.NUnit.Scenarios.CustomerPreferences;
 

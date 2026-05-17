@@ -7,7 +7,7 @@ using BreakfastProvider.Tests.Component.Shared.Common.Validation;
 using BreakfastProvider.Tests.Component.Shared.Constants;
 using BreakfastProvider.Tests.Component.Shared.Models.AppleCinnamonMuffins;
 using BreakfastProvider.Tests.Component.Shared.Models.Validation;
-using TestTrackingDiagrams.LightBDD;
+using Kronikol.LightBDD;
 
 namespace BreakfastProvider.Tests.Component.LightBDD.Scenarios.AppleCinnamonMuffins;
 

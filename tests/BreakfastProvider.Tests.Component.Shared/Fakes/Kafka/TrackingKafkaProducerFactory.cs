@@ -1,6 +1,6 @@
 using Confluent.Kafka;
 using BreakfastProvider.Api.Events;
-using TestTrackingDiagrams.Extensions.Kafka;
+using Kronikol.Extensions.Kafka;
 
 namespace BreakfastProvider.Tests.Component.Shared.Fakes.Kafka;
 

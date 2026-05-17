@@ -10,8 +10,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using System.Reflection;
 using LightBDD.Core.ExecutionContext;
-using TestTrackingDiagrams;
-using TestTrackingDiagrams.LightBDD.xUnit3;
+using Kronikol;
+using Kronikol.LightBDD.xUnit3;
 using Xunit.v3;
 
 [assembly: TestPipelineStartup(typeof(BreakfastProvider.Tests.Component.LightBDD.Infrastructure.ConfiguredLightBddScopeAttribute))]

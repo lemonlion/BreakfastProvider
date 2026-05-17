@@ -2,7 +2,7 @@ using System.Net;
 using BreakfastProvider.Tests.Component.Shared.Common.Feedback;
 using BreakfastProvider.Tests.Component.Shared.Models.Feedback;
 using BreakfastProvider.Tests.Component.xUnit.Infrastructure;
-using TestTrackingDiagrams.xUnit3;
+using Kronikol.xUnit3;
 
 namespace BreakfastProvider.Tests.Component.xUnit.Scenarios.Feedback;
 

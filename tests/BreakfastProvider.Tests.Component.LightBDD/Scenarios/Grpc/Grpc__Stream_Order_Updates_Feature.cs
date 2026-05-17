@@ -1,7 +1,7 @@
 using LightBDD.Framework;
 using LightBDD.Framework.Scenarios;
 using LightBDD.XUnit3;
-using TestTrackingDiagrams.LightBDD;
+using Kronikol.LightBDD;
 
 namespace BreakfastProvider.Tests.Component.LightBDD.Scenarios.Grpc;
 

@@ -4,7 +4,7 @@ using BreakfastProvider.Tests.Component.Shared.Models.RecipeCosts;
 using BreakfastProvider.Tests.Component.BDDfy.Infrastructure;
 
 using TestStack.BDDfy;
-using TestTrackingDiagrams.BDDfy.xUnit3;
+using Kronikol.BDDfy.xUnit3;
 
 namespace BreakfastProvider.Tests.Component.BDDfy.Scenarios.RecipeCosts;
 

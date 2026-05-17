@@ -2,7 +2,7 @@ using System.Text.Json;
 using BreakfastProvider.Tests.Component.Shared.Fakes.Kafka;
 using BreakfastProvider.Tests.Component.Shared.Models.RecipeCosts;
 using Confluent.Kafka;
-using TestTrackingDiagrams.Tracking;
+using Kronikol.Tracking;
 
 namespace BreakfastProvider.Tests.Component.Shared.Common.RecipeCosts;
 
@@ -35,8 +35,8 @@ public class PublishRecipeCostEventSteps(
                 Value = JsonSerializer.Serialize(@event),
                 Headers = new Headers
                 {
-                    { "ttd-test-name", System.Text.Encoding.UTF8.GetBytes("RecipeCostTest") },
-                    { "ttd-test-id", System.Text.Encoding.UTF8.GetBytes(context.RequestId) }
+                    { "kronikol-test-name", System.Text.Encoding.UTF8.GetBytes("RecipeCostTest") },
+                    { "kronikol-test-id", System.Text.Encoding.UTF8.GetBytes(context.RequestId) }
                 }
             };
 

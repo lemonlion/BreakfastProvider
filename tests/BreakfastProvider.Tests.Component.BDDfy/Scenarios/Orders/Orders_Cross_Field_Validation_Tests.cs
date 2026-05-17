@@ -10,7 +10,7 @@ using BreakfastProvider.Tests.Component.Shared.Util;
 using Microsoft.AspNetCore.Mvc;
 
 using TestStack.BDDfy;
-using TestTrackingDiagrams.BDDfy.xUnit3;
+using Kronikol.BDDfy.xUnit3;
 namespace BreakfastProvider.Tests.Component.BDDfy.Scenarios.Orders;
 
 public class Orders_Cross_Field_Validation_Tests : BaseFixture

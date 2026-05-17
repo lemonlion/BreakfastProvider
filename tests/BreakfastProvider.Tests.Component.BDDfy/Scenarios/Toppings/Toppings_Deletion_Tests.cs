@@ -3,7 +3,7 @@ using BreakfastProvider.Tests.Component.Shared.Common.Toppings;
 using BreakfastProvider.Tests.Component.Shared.Constants;
 
 using TestStack.BDDfy;
-using TestTrackingDiagrams.BDDfy.xUnit3;
+using Kronikol.BDDfy.xUnit3;
 namespace BreakfastProvider.Tests.Component.BDDfy.Scenarios.Toppings;
 
 public class Toppings_Deletion_Tests : BaseFixture

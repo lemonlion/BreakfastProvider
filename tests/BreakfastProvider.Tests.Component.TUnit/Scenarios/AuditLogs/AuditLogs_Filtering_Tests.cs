@@ -7,7 +7,7 @@ using BreakfastProvider.Tests.Component.Shared.Models.AuditLogs;
 using BreakfastProvider.Tests.Component.Shared.Models.Orders;
 using BreakfastProvider.Tests.Component.Shared.Models.Pancakes;
 using BreakfastProvider.Tests.Component.Shared.Util;
-using TestTrackingDiagrams.TUnit;
+using Kronikol.TUnit;
 
 namespace BreakfastProvider.Tests.Component.TUnit.Scenarios.AuditLogs;
 

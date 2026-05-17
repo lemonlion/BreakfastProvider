@@ -1,10 +1,10 @@
 {
   "bindingAssemblies": [
     {
-      "assembly": "TestTrackingDiagrams.ReqNRoll.xUnit3"
+      "assembly": "Kronikol.ReqNRoll.xUnit3"
     },
     {
-      "assembly": "TestTrackingDiagrams.ReqNRoll.Core"
+      "assembly": "Kronikol.ReqNRoll.Core"
     }
   ],
   "formatters": {

@@ -3,7 +3,7 @@ using BreakfastProvider.Tests.Component.Shared.Common.Orders;
 using BreakfastProvider.Tests.Component.Shared.Constants;
 
 using TestStack.BDDfy;
-using TestTrackingDiagrams.BDDfy.xUnit3;
+using Kronikol.BDDfy.xUnit3;
 namespace BreakfastProvider.Tests.Component.BDDfy.Scenarios.Orders;
 
 public class Orders_Status_Update_Not_Found_Tests : BaseFixture

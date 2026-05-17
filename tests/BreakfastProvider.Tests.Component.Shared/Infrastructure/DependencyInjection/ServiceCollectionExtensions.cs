@@ -24,16 +24,16 @@ using CosmosDB.InMemoryEmulator;
 using InMemoryEmulator.MongoDB;
 using InMemoryEmulator.BigQuery;
 using Spanner.InMemoryEmulator;
-using TestTrackingDiagrams.Constants;
-using TestTrackingDiagrams.Extensions;
-using TestTrackingDiagrams.Extensions.CosmosDB;
-using TestTrackingDiagrams.Extensions.EfCore.Relational;
-using TestTrackingDiagrams.Extensions.Grpc;
-using TestTrackingDiagrams.Extensions.Kafka;
-using TestTrackingDiagrams.Extensions.MongoDB;
-using TestTrackingDiagrams.Extensions.BigQuery;
-using TestTrackingDiagrams.Extensions.Spanner;
-using TestTrackingDiagrams.Tracking;
+using Kronikol.Constants;
+using Kronikol.Extensions;
+using Kronikol.Extensions.CosmosDB;
+using Kronikol.Extensions.EfCore.Relational;
+using Kronikol.Extensions.Grpc;
+using Kronikol.Extensions.Kafka;
+using Kronikol.Extensions.MongoDB;
+using Kronikol.Extensions.BigQuery;
+using Kronikol.Extensions.Spanner;
+using Kronikol.Tracking;
 
 namespace BreakfastProvider.Tests.Component.Shared.Infrastructure.DependencyInjection;
 
@@ -362,7 +362,7 @@ public static class ServiceCollectionExtensions
     /// <summary>
     /// Wraps the existing <see cref="IProducerFactory"/> registration
     /// with a factory that produces <see cref="TrackingKafkaProducer{TKey, TValue}"/>
-    /// instances from the TestTrackingDiagrams.Extensions.Kafka package so that Kafka
+    /// instances from the Kronikol.Extensions.Kafka package so that Kafka
     /// event publications appear in the PlantUML sequence diagrams.
     /// Must be called <b>after</b> <see cref="UseInMemoryKafkaBroker"/>.
     /// </summary>
@@ -842,7 +842,7 @@ public static class ServiceCollectionExtensions
     /// <summary>
     /// Replaces the real <see cref="MongoDB.Driver.IMongoClient"/> with an in-memory
     /// MongoDB emulator backed by <c>InMemoryEmulator.MongoDB</c> and wires up
-    /// TTD tracking via <c>MongoDbTrackingSubscriber</c>.
+    /// Kronikol tracking via <c>MongoDbTrackingSubscriber</c>.
     /// </summary>
     public static IServiceCollection UseInMemoryMongoDatabase(this IServiceCollection services,
         Func<(string Name, string Id)> currentTestInfoFetcher)
@@ -935,7 +935,7 @@ public static class ServiceCollectionExtensions
     /// <summary>
     /// Replaces the real <see cref="Google.Cloud.BigQuery.V2.BigQueryClient"/> with an
     /// in-memory BigQuery emulator backed by <c>InMemoryEmulator.BigQuery</c> and wires
-    /// up TTD tracking via <c>BigQueryTrackingMessageHandler</c>.
+    /// up Kronikol tracking via <c>BigQueryTrackingMessageHandler</c>.
     /// </summary>
     public static IServiceCollection UseInMemoryBigQuery(this IServiceCollection services,
         Func<(string Name, string Id)> currentTestInfoFetcher)

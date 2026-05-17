@@ -4,7 +4,7 @@ using BreakfastProvider.Tests.Component.Shared.Common.Reporting;
 using BreakfastProvider.Tests.Component.Shared.Constants;
 
 using TestStack.BDDfy;
-using TestTrackingDiagrams.BDDfy.xUnit3;
+using Kronikol.BDDfy.xUnit3;
 namespace BreakfastProvider.Tests.Component.BDDfy.Scenarios.Reporting;
 
 public class Reporting_EventGrid_Webhook_Tests : BaseFixture

@@ -1,5 +1,5 @@
 global using AwesomeAssertions;
-global using TestTrackingDiagrams.Tracking;
+global using Kronikol.Tracking;
 global using NUnit.Framework;
 global using BreakfastProvider.Tests.Component.NUnit.Infrastructure;
 global using BreakfastProvider.Tests.Component.Shared.Infrastructure.Configuration;

@@ -12,8 +12,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Spanner.InMemoryEmulator;
-using TestTrackingDiagrams.ReqNRoll;
-using TestTrackingDiagrams.Tracking;
+using Kronikol.ReqNRoll;
+using Kronikol.Tracking;
 
 namespace BreakfastProvider.Tests.Component.ReqNRoll.Support;
 

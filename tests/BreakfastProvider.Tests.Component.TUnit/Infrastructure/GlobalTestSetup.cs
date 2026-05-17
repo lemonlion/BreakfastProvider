@@ -5,8 +5,8 @@ using BreakfastProvider.Tests.Component.Shared.Infrastructure;
 using BreakfastProvider.Tests.Component.Shared.Infrastructure.Configuration;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
-using TestTrackingDiagrams;
-using TestTrackingDiagrams.TUnit;
+using Kronikol;
+using Kronikol.TUnit;
 
 namespace BreakfastProvider.Tests.Component.TUnit.Infrastructure;
 

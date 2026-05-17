@@ -4,7 +4,7 @@ using BreakfastProvider.Tests.Component.Shared.Models.Infrastructure;
 using BreakfastProvider.Tests.Component.Shared.Util;
 
 using TestStack.BDDfy;
-using TestTrackingDiagrams.BDDfy.xUnit3;
+using Kronikol.BDDfy.xUnit3;
 namespace BreakfastProvider.Tests.Component.BDDfy.Scenarios.Infrastructure;
 
 public class Infrastructure_Health_Check_Tests : BaseFixture

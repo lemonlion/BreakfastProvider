@@ -6,8 +6,8 @@ using BreakfastProvider.Tests.Component.Shared.Infrastructure;
 using BreakfastProvider.Tests.Component.Shared.Infrastructure.Configuration;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
-using TestTrackingDiagrams;
-using TestTrackingDiagrams.NUnit4;
+using Kronikol;
+using Kronikol.NUnit4;
 
 [SetUpFixture]
 public class GlobalTestSetup : DiagrammedTestRun

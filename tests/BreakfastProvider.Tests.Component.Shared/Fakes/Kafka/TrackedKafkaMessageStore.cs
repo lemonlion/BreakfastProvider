@@ -1,5 +1,5 @@
 using System.Collections.Concurrent;
-using TestTrackingDiagrams.Tracking;
+using Kronikol.Tracking;
 
 namespace BreakfastProvider.Tests.Component.Shared.Fakes.Kafka;
 

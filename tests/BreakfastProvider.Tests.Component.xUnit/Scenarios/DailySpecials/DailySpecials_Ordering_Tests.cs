@@ -5,7 +5,7 @@ using BreakfastProvider.Tests.Component.Shared.Constants;
 using BreakfastProvider.Tests.Component.Shared.Models.DailySpecials;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using TestTrackingDiagrams.xUnit3;
+using Kronikol.xUnit3;
 
 namespace BreakfastProvider.Tests.Component.xUnit.Scenarios.DailySpecials;
 

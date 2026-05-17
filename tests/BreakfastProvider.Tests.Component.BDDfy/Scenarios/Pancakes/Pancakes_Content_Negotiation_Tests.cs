@@ -3,7 +3,7 @@ using System.Text;
 using BreakfastProvider.Tests.Component.Shared.Constants;
 
 using TestStack.BDDfy;
-using TestTrackingDiagrams.BDDfy.xUnit3;
+using Kronikol.BDDfy.xUnit3;
 namespace BreakfastProvider.Tests.Component.BDDfy.Scenarios.Pancakes;
 
 public class Pancakes_Content_Negotiation_Tests : BaseFixture

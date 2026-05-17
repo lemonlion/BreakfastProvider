@@ -40,8 +40,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Spanner.InMemoryEmulator;
-using TestTrackingDiagrams.LightBDD;
-using TestTrackingDiagrams.Tracking;
+using Kronikol.LightBDD;
+using Kronikol.Tracking;
 
 namespace BreakfastProvider.Tests.Component.LightBDD.Infrastructure;
 

@@ -2,9 +2,9 @@ using BreakfastProvider.Tests.Component.Shared.Constants;
 using BreakfastProvider.Tests.Component.Shared.Models.Validation;
 using LightBDD.Framework;
 using LightBDD.Framework.Scenarios;
-using TestTrackingDiagrams.TabularAttributes;
+using Kronikol.TabularAttributes;
 using LightBDD.XUnit3;
-using TestTrackingDiagrams.LightBDD;
+using Kronikol.LightBDD;
 
 namespace BreakfastProvider.Tests.Component.LightBDD.Scenarios.Pancakes;
 

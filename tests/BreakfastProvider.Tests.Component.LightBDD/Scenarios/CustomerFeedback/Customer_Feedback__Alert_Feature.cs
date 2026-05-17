@@ -2,7 +2,7 @@ using LightBDD.Framework;
 using LightBDD.Framework.Scenarios;
 using LightBDD.XUnit3;
 using BreakfastProvider.Tests.Component.LightBDD.Infrastructure;
-using TestTrackingDiagrams.LightBDD;
+using Kronikol.LightBDD;
 
 namespace BreakfastProvider.Tests.Component.LightBDD.Scenarios.CustomerFeedback;
 

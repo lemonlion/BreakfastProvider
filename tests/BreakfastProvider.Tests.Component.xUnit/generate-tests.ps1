@@ -36,7 +36,7 @@ foreach ($scenarioFile in $scenarioFiles) {
             $usingLine = $u.Value.Trim()
             # Skip LightBDD-specific usings
             if ($usingLine -match 'LightBDD\.' -or 
-                $usingLine -match 'TestTrackingDiagrams\.LightBDD' -or
+                $usingLine -match 'Kronikol\.LightBDD' -or
                 $usingLine -match 'BreakfastProvider\.Tests\.Component\.LightBDD\.Util') {
                 continue
             }
@@ -48,7 +48,7 @@ foreach ($scenarioFile in $scenarioFiles) {
     
     # Add TTD xUnit3 using if needed (for HappyPath attribute)
     if ($scenarioContent -match '\[HappyPath\]') {
-        $allUsings['using TestTrackingDiagrams.xUnit3;'] = $true
+        $allUsings['using Kronikol.xUnit3;'] = $true
     }
     
     # Determine feature description

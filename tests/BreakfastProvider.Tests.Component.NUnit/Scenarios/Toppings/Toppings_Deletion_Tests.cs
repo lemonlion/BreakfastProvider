@@ -1,7 +1,7 @@
 using System.Net;
 using BreakfastProvider.Tests.Component.Shared.Common.Toppings;
 using BreakfastProvider.Tests.Component.Shared.Constants;
-using TestTrackingDiagrams.NUnit4;
+using Kronikol.NUnit4;
 
 namespace BreakfastProvider.Tests.Component.NUnit.Scenarios.Toppings;
 

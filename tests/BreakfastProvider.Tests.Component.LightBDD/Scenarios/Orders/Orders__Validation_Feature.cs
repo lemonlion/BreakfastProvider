@@ -2,7 +2,7 @@ using BreakfastProvider.Tests.Component.Shared.Constants;
 using BreakfastProvider.Tests.Component.Shared.Models.Validation;
 using LightBDD.Framework;
 using LightBDD.Framework.Scenarios;
-using TestTrackingDiagrams.TabularAttributes;
+using Kronikol.TabularAttributes;
 using LightBDD.XUnit3;
 
 namespace BreakfastProvider.Tests.Component.LightBDD.Scenarios.Orders;

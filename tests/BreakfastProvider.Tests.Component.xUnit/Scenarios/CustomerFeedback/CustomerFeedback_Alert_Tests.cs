@@ -2,7 +2,7 @@ using BreakfastProvider.Tests.Component.Shared.Common.CustomerFeedback;
 using BreakfastProvider.Tests.Component.Shared.Common.Downstream;
 using BreakfastProvider.Tests.Component.Shared.Models.CustomerFeedback;
 using BreakfastProvider.Tests.Component.xUnit.Infrastructure;
-using TestTrackingDiagrams.xUnit3;
+using Kronikol.xUnit3;
 
 namespace BreakfastProvider.Tests.Component.xUnit.Scenarios.CustomerFeedback;
 

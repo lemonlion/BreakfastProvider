@@ -35,8 +35,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Spanner.InMemoryEmulator;
-using TestTrackingDiagrams.xUnit3;
-using TestTrackingDiagrams.Tracking;
+using Kronikol.xUnit3;
+using Kronikol.Tracking;
 
 namespace BreakfastProvider.Tests.Component.xUnit.Infrastructure;
 

@@ -5,8 +5,8 @@ using BreakfastProvider.Tests.Component.Shared.Infrastructure;
 using BreakfastProvider.Tests.Component.Shared.Infrastructure.Configuration;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
-using TestTrackingDiagrams;
-using TestTrackingDiagrams.xUnit3;
+using Kronikol;
+using Kronikol.xUnit3;
 
 [assembly: Xunit.AssemblyFixture(typeof(BreakfastProvider.Tests.Component.xUnit.Infrastructure.GlobalTestSetup))]
 

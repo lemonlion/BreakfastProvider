@@ -1,5 +1,5 @@
 using BreakfastProvider.Api.Events.Outbox;
-using TestTrackingDiagrams.Tracking;
+using Kronikol.Tracking;
 
 namespace BreakfastProvider.Tests.Component.Shared.Fakes.Tracking;
 
@@ -14,7 +14,7 @@ namespace BreakfastProvider.Tests.Component.Shared.Fakes.Tracking;
 /// must happen here — at the IOutboxWriter level — while the original HTTP
 /// request is still in scope and test identity headers are available.
 ///
-/// Uses <see cref="MessageTracker"/> from the core TestTrackingDiagrams package
+/// Uses <see cref="MessageTracker"/> from the core Kronikol package
 /// with <see cref="MessageTrackerOptions.UseHttpContextCorrelation"/> = true,
 /// which reads test identity from the HTTP request headers propagated by
 /// <c>TestTrackingMessageHandler</c>.

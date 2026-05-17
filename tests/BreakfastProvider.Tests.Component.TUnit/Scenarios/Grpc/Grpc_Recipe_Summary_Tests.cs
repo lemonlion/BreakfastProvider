@@ -1,5 +1,5 @@
 using BreakfastProvider.Tests.Component.Shared.Common.Grpc;
-using TestTrackingDiagrams.TUnit;
+using Kronikol.TUnit;
 
 namespace BreakfastProvider.Tests.Component.TUnit.Scenarios.Grpc;
 

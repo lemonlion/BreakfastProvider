@@ -2,7 +2,7 @@ using System.Net;
 using BreakfastProvider.Tests.Component.Shared.Common.IngredientUsage;
 using BreakfastProvider.Tests.Component.Shared.Models.IngredientUsage;
 using BreakfastProvider.Tests.Component.TUnit.Infrastructure;
-using TestTrackingDiagrams.TUnit;
+using Kronikol.TUnit;
 
 namespace BreakfastProvider.Tests.Component.TUnit.Scenarios.IngredientUsage;
 

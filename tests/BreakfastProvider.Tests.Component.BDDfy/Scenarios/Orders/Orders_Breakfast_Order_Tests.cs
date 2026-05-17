@@ -12,7 +12,7 @@ using BreakfastProvider.Tests.Component.Shared.Models.Pancakes;
 using Microsoft.Extensions.DependencyInjection;
 
 using TestStack.BDDfy;
-using TestTrackingDiagrams.BDDfy.xUnit3;
+using Kronikol.BDDfy.xUnit3;
 namespace BreakfastProvider.Tests.Component.BDDfy.Scenarios.Orders;
 
 public class Orders_Breakfast_Order_Tests : BaseFixture

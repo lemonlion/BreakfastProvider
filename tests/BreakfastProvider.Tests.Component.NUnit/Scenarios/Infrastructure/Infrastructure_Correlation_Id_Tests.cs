@@ -1,5 +1,5 @@
 using BreakfastProvider.Tests.Component.Shared.Constants;
-using TestTrackingDiagrams.NUnit4;
+using Kronikol.NUnit4;
 
 namespace BreakfastProvider.Tests.Component.NUnit.Scenarios.Infrastructure;
 

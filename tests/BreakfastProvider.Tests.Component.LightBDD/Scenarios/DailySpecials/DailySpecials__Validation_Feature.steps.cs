@@ -2,7 +2,7 @@ using BreakfastProvider.Tests.Component.Shared.Common.Validation;
 using BreakfastProvider.Tests.Component.Shared.Constants;
 using BreakfastProvider.Tests.Component.Shared.Models.DailySpecials;
 using BreakfastProvider.Tests.Component.Shared.Models.Validation;
-using TestTrackingDiagrams.TabularAttributes;
+using Kronikol.TabularAttributes;
 
 namespace BreakfastProvider.Tests.Component.LightBDD.Scenarios.DailySpecials;
 

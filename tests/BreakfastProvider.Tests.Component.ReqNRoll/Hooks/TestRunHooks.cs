@@ -4,8 +4,8 @@ using BreakfastProvider.Tests.Component.Shared.Fakes.PubSub;
 using BreakfastProvider.Tests.Component.Shared.Infrastructure;
 using Microsoft.Extensions.Hosting;
 using Reqnroll;
-using TestTrackingDiagrams;
-using TestTrackingDiagrams.ReqNRoll;
+using Kronikol;
+using Kronikol.ReqNRoll;
 
 namespace BreakfastProvider.Tests.Component.ReqNRoll.Hooks;
 

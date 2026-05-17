@@ -7,8 +7,8 @@ using BreakfastProvider.Tests.Component.Shared.Common.Pancakes;
 using BreakfastProvider.Tests.Component.Shared.Constants;
 using BreakfastProvider.Tests.Component.Shared.Models.Orders;
 using BreakfastProvider.Tests.Component.Shared.Models.Pancakes;
-using TestTrackingDiagrams.NUnit4;
-using TestTrackingDiagrams.Tracking;
+using Kronikol.NUnit4;
+using Kronikol.Tracking;
 
 namespace BreakfastProvider.Tests.Component.NUnit.Scenarios.AuditLogs;
 

@@ -2,7 +2,7 @@ using BreakfastProvider.Tests.Component.Shared.Common.Downstream;
 using BreakfastProvider.Tests.Component.Shared.Common.RecipeCosts;
 using BreakfastProvider.Tests.Component.Shared.Models.RecipeCosts;
 using BreakfastProvider.Tests.Component.TUnit.Infrastructure;
-using TestTrackingDiagrams.TUnit;
+using Kronikol.TUnit;
 
 namespace BreakfastProvider.Tests.Component.TUnit.Scenarios.RecipeCosts;
 

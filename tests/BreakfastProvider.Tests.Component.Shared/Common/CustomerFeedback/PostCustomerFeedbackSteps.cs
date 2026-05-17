@@ -1,7 +1,7 @@
 using System.Text.Json;
 using BreakfastProvider.Tests.Component.Shared.Fakes.PubSub;
 using BreakfastProvider.Tests.Component.Shared.Models.CustomerFeedback;
-using TestTrackingDiagrams.Tracking;
+using Kronikol.Tracking;
 
 namespace BreakfastProvider.Tests.Component.Shared.Common.CustomerFeedback;
 

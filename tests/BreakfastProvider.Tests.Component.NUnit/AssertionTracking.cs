@@ -1,4 +1,4 @@
-using TestTrackingDiagrams.Tracking;
+using Kronikol.Tracking;
 
 [assembly: TrackAssertions]
 [assembly: TrackSteps]

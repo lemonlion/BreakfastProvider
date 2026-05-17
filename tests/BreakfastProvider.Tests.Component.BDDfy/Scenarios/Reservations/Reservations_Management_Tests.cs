@@ -5,7 +5,7 @@ using BreakfastProvider.Tests.Component.Shared.Models.Reservations;
 using BreakfastProvider.Tests.Component.BDDfy.Infrastructure;
 
 using TestStack.BDDfy;
-using TestTrackingDiagrams.BDDfy.xUnit3;
+using Kronikol.BDDfy.xUnit3;
 namespace BreakfastProvider.Tests.Component.BDDfy.Scenarios.Reservations;
 
 public class Reservations_Management_Tests : BaseFixture

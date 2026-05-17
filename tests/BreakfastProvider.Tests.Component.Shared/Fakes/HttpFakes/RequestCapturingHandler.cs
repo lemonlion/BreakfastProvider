@@ -1,6 +1,6 @@
 using BreakfastProvider.Tests.Component.Shared.Constants;
 using Microsoft.AspNetCore.Http;
-using TestTrackingDiagrams.Tracking;
+using Kronikol.Tracking;
 
 namespace BreakfastProvider.Tests.Component.Shared.Fakes.HttpFakes;
 

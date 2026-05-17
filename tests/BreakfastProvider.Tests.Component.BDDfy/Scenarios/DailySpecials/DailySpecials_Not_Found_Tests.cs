@@ -3,7 +3,7 @@ using BreakfastProvider.Tests.Component.Shared.Common.DailySpecials;
 using BreakfastProvider.Tests.Component.Shared.Models.DailySpecials;
 
 using TestStack.BDDfy;
-using TestTrackingDiagrams.BDDfy.xUnit3;
+using Kronikol.BDDfy.xUnit3;
 namespace BreakfastProvider.Tests.Component.BDDfy.Scenarios.DailySpecials;
 
 public class DailySpecials_Not_Found_Tests : BaseFixture

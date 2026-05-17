@@ -6,7 +6,7 @@ using BreakfastProvider.Tests.Component.Shared.Models.Toppings;
 using BreakfastProvider.Tests.Component.Shared.Models.Validation;
 using LightBDD.Framework;
 using BreakfastProvider.Tests.Component.LightBDD.Util;
-using TestTrackingDiagrams.TabularAttributes;
+using Kronikol.TabularAttributes;
 
 
 namespace BreakfastProvider.Tests.Component.LightBDD.Scenarios.Toppings;

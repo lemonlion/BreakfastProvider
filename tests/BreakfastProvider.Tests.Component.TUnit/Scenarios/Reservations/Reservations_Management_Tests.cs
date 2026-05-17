@@ -3,7 +3,7 @@ using BreakfastProvider.Tests.Component.Shared.Common.Reservations;
 using BreakfastProvider.Tests.Component.Shared.Constants;
 using BreakfastProvider.Tests.Component.Shared.Models.Reservations;
 using BreakfastProvider.Tests.Component.TUnit.Infrastructure;
-using TestTrackingDiagrams.TUnit;
+using Kronikol.TUnit;
 
 namespace BreakfastProvider.Tests.Component.TUnit.Scenarios.Reservations;
 

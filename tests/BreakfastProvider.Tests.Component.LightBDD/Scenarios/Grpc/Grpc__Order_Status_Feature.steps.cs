@@ -8,7 +8,7 @@ using BreakfastProvider.Tests.Component.Shared.Models.Orders;
 using BreakfastProvider.Tests.Component.Shared.Models.Pancakes;
 using Grpc.Core;
 using LightBDD.Framework;
-using TestTrackingDiagrams.LightBDD;
+using Kronikol.LightBDD;
 using BreakfastProvider.Tests.Component.LightBDD.Util;
 
 namespace BreakfastProvider.Tests.Component.LightBDD.Scenarios.Grpc;

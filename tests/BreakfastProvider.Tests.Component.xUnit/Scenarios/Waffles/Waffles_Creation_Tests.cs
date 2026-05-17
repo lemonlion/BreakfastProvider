@@ -9,7 +9,7 @@ using BreakfastProvider.Tests.Component.Shared.Models.Validation;
 using BreakfastProvider.Tests.Component.Shared.Models.Waffles;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using TestTrackingDiagrams.xUnit3;
+using Kronikol.xUnit3;
 
 namespace BreakfastProvider.Tests.Component.xUnit.Scenarios.Waffles;
 

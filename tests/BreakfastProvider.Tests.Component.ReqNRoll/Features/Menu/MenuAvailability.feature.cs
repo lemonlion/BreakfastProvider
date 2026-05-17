@@ -137,10 +137,12 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.Menu
         [global::Xunit.TraitAttribute("FeatureTitle", "Menu Availability")]
         [global::Xunit.TraitAttribute("Description", "The menu endpoint should return all menu items with availability status")]
         [global::Xunit.TraitAttribute("Category", "happy-path")]
+        [global::Xunit.TraitAttribute("Category", "MenuAvailability")]
         public async global::System.Threading.Tasks.Task TheMenuEndpointShouldReturnAllMenuItemsWithAvailabilityStatus()
         {
             string[] tagsOfScenario = new string[] {
-                    "happy-path"};
+                    "happy-path",
+                    "MenuAvailability"};
             global::System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new global::System.Collections.Specialized.OrderedDictionary();
             string pickleIndex = "0";
             global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("The menu endpoint should return all menu items with availability status", null, tagsOfScenario, argumentsOfScenario, featureTags, pickleIndex);

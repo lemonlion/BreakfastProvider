@@ -1,7 +1,7 @@
 Feature: Menu Caching
     /menu - Menu response caching behaviour
 
-    @SkipUnlessFakesControllable
+    @SkipUnlessFakesControllable @MenuCaching
     Scenario: Menu responses should be cached and returned even when supplier becomes unavailable
         Given the menu has been requested and cached
         And the supplier service is then made unavailable

@@ -139,10 +139,12 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.Menu
         [global::Xunit.TraitAttribute("Description", "Menu responses should be cached and returned even when supplier becomes unavailab" +
             "le")]
         [global::Xunit.TraitAttribute("Category", "SkipUnlessFakesControllable")]
+        [global::Xunit.TraitAttribute("Category", "MenuCaching")]
         public async global::System.Threading.Tasks.Task MenuResponsesShouldBeCachedAndReturnedEvenWhenSupplierBecomesUnavailable()
         {
             string[] tagsOfScenario = new string[] {
-                    "SkipUnlessFakesControllable"};
+                    "SkipUnlessFakesControllable",
+                    "MenuCaching"};
             global::System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new global::System.Collections.Specialized.OrderedDictionary();
             string pickleIndex = "0";
             global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("Menu responses should be cached and returned even when supplier becomes unavailab" +

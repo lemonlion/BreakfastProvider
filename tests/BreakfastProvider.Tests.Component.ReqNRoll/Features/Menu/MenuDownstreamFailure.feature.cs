@@ -137,10 +137,12 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.Menu
         [global::Xunit.TraitAttribute("FeatureTitle", "Menu Downstream Failure")]
         [global::Xunit.TraitAttribute("Description", "All menu items should be marked unavailable when the supplier service is down")]
         [global::Xunit.TraitAttribute("Category", "SkipUnlessFakesControllable")]
+        [global::Xunit.TraitAttribute("Category", "MenuDownstreamFailure")]
         public async global::System.Threading.Tasks.Task AllMenuItemsShouldBeMarkedUnavailableWhenTheSupplierServiceIsDown()
         {
             string[] tagsOfScenario = new string[] {
-                    "SkipUnlessFakesControllable"};
+                    "SkipUnlessFakesControllable",
+                    "MenuDownstreamFailure"};
             global::System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new global::System.Collections.Specialized.OrderedDictionary();
             string pickleIndex = "0";
             global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("All menu items should be marked unavailable when the supplier service is down", null, tagsOfScenario, argumentsOfScenario, featureTags, pickleIndex);

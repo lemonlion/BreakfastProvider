@@ -876,9 +876,10 @@ public static class ServiceCollectionExtensions
 
     /// <summary>
     /// Replaces the production <see cref="MongoDB.Driver.IMongoClient"/> with a tracked
-    /// version that uses <c>MongoClientSettings.WithTestTracking()</c> to wire up
-    /// <c>MongoDbTrackingSubscriber</c> via the driver's <c>ClusterConfigurator</c>.
+    /// version that uses <c>MongoDbTrackingSubscriber</c> via the driver's <c>ClusterConfigurator</c>.
     /// Use in Docker mode where the real MongoDB container fires command events.
+    /// An <see cref="Microsoft.AspNetCore.Http.IHttpContextAccessor"/> is passed to enable
+    /// dual-resolution of test identity from both HTTP request headers and <c>TestIdentityScope.Current</c>.
     /// </summary>
     public static IServiceCollection UseTrackedMongoClient(this IServiceCollection services,
         Func<(string Name, string Id)> currentTestInfoFetcher)
@@ -898,9 +899,11 @@ public static class ServiceCollectionExtensions
             services.RemoveAll<MongoDB.Driver.IMongoClient>();
             services.AddSingleton<MongoDB.Driver.IMongoClient>(sp =>
             {
+                var httpContextAccessor = sp.GetService<Microsoft.AspNetCore.Http.IHttpContextAccessor>() ?? new HttpContextAccessor();
+                var subscriber = new MongoDbTrackingSubscriber(trackingOptions, httpContextAccessor);
                 var config = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<Api.Configuration.MongoDbConfig>>().Value;
                 var settings = MongoDB.Driver.MongoClientSettings.FromConnectionString(config.ConnectionString);
-                settings.WithTestTracking(trackingOptions);
+                settings.ClusterConfigurator = builder => subscriber.Subscribe(builder);
                 return new MongoDB.Driver.MongoClient(settings);
             });
         }

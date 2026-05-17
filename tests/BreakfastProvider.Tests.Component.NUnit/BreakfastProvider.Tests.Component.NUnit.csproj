@@ -44,9 +44,9 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="TestTrackingDiagrams.NUnit4" Version="2.37.1" />
-    <PackageReference Include="TestTrackingDiagrams.AssertionTracking" Version="2.37.1" />
-    <PackageReference Include="TestTrackingDiagrams.StepTracking" Version="2.37.1" />
+    <PackageReference Include="TestTrackingDiagrams.NUnit4" Version="2.37.2" />
+    <PackageReference Include="TestTrackingDiagrams.AssertionTracking" Version="2.37.2" />
+    <PackageReference Include="TestTrackingDiagrams.StepTracking" Version="2.37.2" />
     <PackageReference Include="coverlet.msbuild" Version="6.0.4">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>

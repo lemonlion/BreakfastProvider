@@ -1,0 +1,3 @@
+# Docs files are generated with LF by SourceControlledDocsHelper - keep them LF
+docs/*.json eol=lf
+docs/*.yml eol=lf

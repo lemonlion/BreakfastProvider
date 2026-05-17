@@ -20,7 +20,7 @@ user-invocable: false
 | **AutoFixture** | Test data generation |
 | **Microsoft.AspNetCore.Mvc.Testing** | `WebApplicationFactory` for API component tests |
 | **In-process ASP.NET Core fakes** | Standalone Minimal API projects under `fakes/` started via `InMemoryFakeHelper` |
-| **TestTrackingDiagrams.LightBDD.XUnit** | Test tracking & PlantUML dependency diagrams |
+| **Kronikol.LightBDD.XUnit** | Test tracking & PlantUML dependency diagrams |
 
 ### Global Usings
 

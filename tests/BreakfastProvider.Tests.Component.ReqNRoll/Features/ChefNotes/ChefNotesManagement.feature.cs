@@ -327,7 +327,7 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.ChefNotes
         await testRunner.WhenAsync("a non-existent note is updated", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
 #line hidden
 #line 31
-        await testRunner.ThenAsync("the update response should indicate not found", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
+        await testRunner.ThenAsync("the note update response should indicate not found", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
 #line hidden
             }
             await this.ScenarioCleanupAsync();

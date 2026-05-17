@@ -154,8 +154,8 @@ public class ChefNotesManagementSteps(
         getSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 
-    [Then("the update response should indicate not found")]
-    public void ThenTheUpdateResponseShouldIndicateNotFound()
+    [Then("the note update response should indicate not found")]
+    public void ThenTheNoteUpdateResponseShouldIndicateNotFound()
     {
         patchSteps.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }

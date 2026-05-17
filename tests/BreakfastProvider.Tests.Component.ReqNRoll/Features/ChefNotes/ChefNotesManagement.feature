@@ -28,7 +28,7 @@ Feature: Chef Notes Management
 
     Scenario: Updating a non-existent note should return not found
         When a non-existent note is updated
-        Then the update response should indicate not found
+        Then the note update response should indicate not found
 
     Scenario: Creating a note with missing recipe name should return bad request
         Given a note request with a missing recipe name

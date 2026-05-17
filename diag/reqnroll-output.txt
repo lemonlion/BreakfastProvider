@@ -1,0 +1,1 @@
+Specifying a directory for 'dotnet test' should be via '--project' or '--solution'.

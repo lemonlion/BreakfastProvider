@@ -44,9 +44,9 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Kronikol.NUnit4" Version="3.0.8" />
-    <PackageReference Include="Kronikol.AssertionTracking" Version="3.0.8" />
-    <PackageReference Include="Kronikol.StepTracking" Version="3.0.8" />
+    <PackageReference Include="Kronikol.NUnit4" Version="3.0.9" />
+    <PackageReference Include="Kronikol.AssertionTracking" Version="3.0.9" />
+    <PackageReference Include="Kronikol.StepTracking" Version="3.0.9" />
     <PackageReference Include="coverlet.msbuild" Version="6.0.4">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>

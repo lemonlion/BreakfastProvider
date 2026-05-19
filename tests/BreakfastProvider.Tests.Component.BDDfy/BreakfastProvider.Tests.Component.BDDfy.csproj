@@ -41,8 +41,8 @@
     <PackageReference Include="AutoFixture" Version="4.18.1" />
     <PackageReference Include="Spanner.InMemoryEmulator" Version="1.0.20" />
     <PackageReference Include="TestStack.BDDfy" Version="8.0.1.3" />
-    <PackageReference Include="Kronikol.BDDfy.xUnit3" Version="3.0.9" />
-    <PackageReference Include="Kronikol.AssertionTracking" Version="3.0.9" />
+    <PackageReference Include="Kronikol.BDDfy.xUnit3" Version="3.0.10" />
+    <PackageReference Include="Kronikol.AssertionTracking" Version="3.0.10" />
     <PackageReference Include="xunit.v3" Version="3.2.2" />
     <PackageReference Include="coverlet.msbuild" Version="6.0.4">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

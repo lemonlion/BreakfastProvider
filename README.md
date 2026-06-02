@@ -90,31 +90,31 @@ This project embodies a specific testing philosophy. It is deliberately opiniona
 
 ### Component Test First [↑](#top)<a name="component-test-first"></a>
 
-**95% of the time or more, component tests are preferable to unit tests.** Component tests verify that the service achieves its goal _behaviour_, regardless of the specific implementation. Unit tests lock you into an implementation, a design, and a technology — and they obfuscate the required business behaviour.
+**95% of the time or more, component tests are preferable to unit tests.** Component tests verify that the service achieves its goal _behaviour_, regardless of the specific implementation. Unit tests lock you into an implementation, a design, and a technology - and they obfuscate the required business behaviour.
 
-With modern in-process `WebApplicationFactory`, component tests execute in roughly **~50ms per scenario** — fast enough that the traditional speed argument for unit tests is now moot in the large majority of situations.
+With modern in-process `WebApplicationFactory`, component tests execute in roughly **~50ms per scenario** - fast enough that the traditional speed argument for unit tests is now moot in the large majority of situations.
 
 Component tests also catch entire categories of bugs that unit tests miss:
-- A FluentValidation validator that passes unit tests but **isn't registered in DI** — a component test catches it; a unit test doesn't.
-- Middleware ordering, serialisation quirks, content negotiation — all exercised through the HTTP layer.
-- The full pipeline — validation wiring, DI, middleware, serialisation, and behaviour — verified in a single assertion.
+- A FluentValidation validator that passes unit tests but **isn't registered in DI** - a component test catches it; a unit test doesn't.
+- Middleware ordering, serialisation quirks, content negotiation - all exercised through the HTTP layer.
+- The full pipeline - validation wiring, DI, middleware, serialisation, and behaviour - verified in a single assertion.
 
 ### Test At The External Contract Layer [↑](#top)<a name="test-at-the-external-contract-layer"></a>
 
-Always test at the **external communication layer** of the service — usually HTTP. This means your tests interact with the service exactly as a real consumer would: sending HTTP requests and asserting on HTTP responses.
+Always test at the **external communication layer** of the service - usually HTTP. This means your tests interact with the service exactly as a real consumer would: sending HTTP requests and asserting on HTTP responses.
 
 This has powerful benefits:
 - You can **refactor implementations heavily** without breaking your tests, because tests are coupled to the contract, not the internals.
-- The **same tests run across all modes** — in-process with in-memory fake dependencies, or with dependencies in Docker, or with the full service in Docker, or as post-deployment integration tests against a live environment. Write once, run everywhere.
+- The **same tests run across all modes** - in-process with in-memory fake dependencies, or with dependencies in Docker, or with the full service in Docker, or as post-deployment integration tests against a live environment. Write once, run everywhere.
 - You can **migrate your service from one technology to another** (e.g. Azure Function to Web API) and your tests still pass, because they only know about the HTTP contract.
 
 ### Test The Service's Effect On The World [↑](#top)<a name="test-the-services-effect-on-the-world"></a>
 
 Beyond HTTP responses, verify the **side effects** the service has on the world external to it:
 
-- **Queues / Event Buses / Log Syncs** — Check the service has placed a correct message on them (or the test double's version of them). In this project, EventGrid events are verified via `InMemoryEventGridPublisherStore` and Kafka messages via `ConsumedKafkaMessageStore`.
-- **External Services / Mocks** — Check the service has sent correct requests to them. Outbound HTTP requests are captured via `FakeRequestStore` and asserted on for content and headers.
-- **Databases** — If you can check the effect via behaviour (e.g. a successful `GET /orders/{id}` after a `POST /orders`), do that — it means your tests aren't coupled to your data layer. Otherwise, check the values in the database directly (e.g. outbox messages, audit logs).
+- **Queues / Event Buses / Log Syncs** - Check the service has placed a correct message on them (or the test double's version of them). In this project, EventGrid events are verified via `InMemoryEventGridPublisherStore` and Kafka messages via `ConsumedKafkaMessageStore`.
+- **External Services / Mocks** - Check the service has sent correct requests to them. Outbound HTTP requests are captured via `FakeRequestStore` and asserted on for content and headers.
+- **Databases** - If you can check the effect via behaviour (e.g. a successful `GET /orders/{id}` after a `POST /orders`), do that - it means your tests aren't coupled to your data layer. Otherwise, check the values in the database directly (e.g. outbox messages, audit logs).
 
 ### When Are Unit Tests Justified? [↑](#top)<a name="when-are-unit-tests-justified"></a>
 
@@ -125,11 +125,11 @@ Unit tests are still needed in a small number of cases:
 - **Internal logic** that genuinely cannot be triggered through any API endpoint
 
 Unit tests are **not** justified for:
-- FluentValidation validators — test via tabular validation scenarios
-- Controller action logic — test through the endpoint
-- Middleware behaviour — test via Infrastructure features
-- State machine transitions — test via parameterised scenarios
-- Service methods called by controllers — test through the controller endpoint
+- FluentValidation validators - test via tabular validation scenarios
+- Controller action logic - test through the endpoint
+- Middleware behaviour - test via Infrastructure features
+- State machine transitions - test via parameterised scenarios
+- Service methods called by controllers - test through the controller endpoint
 
 ### Configurable Test Modes [↑](#top)<a name="configurable-test-modes"></a>
 
@@ -139,11 +139,11 @@ One component test project is configurable to run as **in-memory tests**, **in-d
 
 The goal is to surface problems at the **earliest possible point**:
 
-1. First, fail tests **locally in memory** — fastest feedback, no dependencies
-2. If they pass, fail tests **locally in Docker** — validates real I/O paths
-3. If they pass, fail tests **in CI (in-memory & Docker)** — catches environmental issues
-4. If they pass, fail tests **in Dev** (post-deployment mode) — validates real deployment
-5. If they pass, fail tests **in Staging** (post-deployment mode) — final gate before production
+1. First, fail tests **locally in memory** - fastest feedback, no dependencies
+2. If they pass, fail tests **locally in Docker** - validates real I/O paths
+3. If they pass, fail tests **in CI (in-memory & Docker)** - catches environmental issues
+4. If they pass, fail tests **in Dev** (post-deployment mode) - validates real deployment
+5. If they pass, fail tests **in Staging** (post-deployment mode) - final gate before production
 
 ### Autogenerate Plain English Specifications [↑](#top)<a name="autogenerate-plain-english-specifications"></a>
 
@@ -153,7 +153,7 @@ This is achieved with **LightBDD** and **composite steps** (sub-steps). Top-leve
 
 ### Source Controlled Specifications [↑](#top)<a name="source-controlled-specifications"></a>
 
-Autogenerated specifications (`ComponentSpecifications.yml`) are automatically **source controlled** and included in PRs. The team can review specification changes at PR time — catching mistakes in behaviour, not just code. The YAML specification is deterministic: no GUIDs, timestamps, or instance-specific data.
+Autogenerated specifications (`ComponentSpecifications.yml`) are automatically **source controlled** and included in PRs. The team can review specification changes at PR time - catching mistakes in behaviour, not just code. The YAML specification is deterministic: no GUIDs, timestamps, or instance-specific data.
 
 ### Autogenerate Sequence Diagrams [↑](#top)<a name="autogenerate-sequence-diagrams"></a>
 
@@ -161,7 +161,7 @@ Tests generate **full flow diagrams** showing calls to the Service Under Test (S
 
 ### Automate Safety As Much As Possible [↑](#top)<a name="automate-safety-as-much-as-possible"></a>
 
-Tests run automatically in CI in every configuration (in-memory, in-docker, external SUT). A large subset runs automatically post-deployment in Dev & Staging environments. No manual testing gates — the pipeline catches regressions at every stage.
+Tests run automatically in CI in every configuration (in-memory, in-docker, external SUT). A large subset runs automatically post-deployment in Dev & Staging environments. No manual testing gates - the pipeline catches regressions at every stage.
 
 ### Tests Should Just Work On Pull And Build [↑](#top)<a name="tests-should-just-work-on-pull-and-build"></a>
 
@@ -177,21 +177,21 @@ dotnet test tests/BreakfastProvider.Tests.Component/BreakfastProvider.Tests.Comp
 
 ### Mock At The Lowest Level [↑](#top)<a name="mock-at-the-lowest-level"></a>
 
-Mocking happens as **low level as possible** — e.g. mock the Cosmos container class, not the abstraction layer that calls it. This allows you to test as much of your real running code as possible, as quickly as possible, in the testing cycle.
+Mocking happens as **low level as possible** - e.g. mock the Cosmos container class, not the abstraction layer that calls it. This allows you to test as much of your real running code as possible, as quickly as possible, in the testing cycle.
 
 ### HTTP Mocks Are Real Services [↑](#top)<a name="http-mocks-are-real-services"></a>
 
-All HTTP mocks are **real ASP.NET Core services** — standalone Minimal API projects under `fakes/`, not WireMock stubs or in-memory code doubles. These are spun up in-process using `WebApplicationFactory<TProgram>` via `InMemoryFakeHelper.Create<TProgram>(url)`, which creates real Kestrel servers bound to TCP ports.
+All HTTP mocks are **real ASP.NET Core services** - standalone Minimal API projects under `fakes/`, not WireMock stubs or in-memory code doubles. These are spun up in-process using `WebApplicationFactory<TProgram>` via `InMemoryFakeHelper.Create<TProgram>(url)`, which creates real Kestrel servers bound to TCP ports.
 
-In-memory code stubs are avoided because they are less realistic in terms of logs and autogenerated flow diagrams. Spinning up real services in-memory is a much better simulation of reality — the HTTP handler chain, serialisation, and network paths are all exercised.
+In-memory code stubs are avoided because they are less realistic in terms of logs and autogenerated flow diagrams. Spinning up real services in-memory is a much better simulation of reality - the HTTP handler chain, serialisation, and network paths are all exercised.
 
 ### Same Mocks Everywhere [↑](#top)<a name="same-mocks-everywhere"></a>
 
 Mocks are written **once**, as real ASP.NET Core services in the repository. The same mocks are then used:
-- **In-memory locally** — spun up in-process via `WebApplicationFactory`
-- **In Docker locally** — containerised from the same source code
-- **In CI** — both in-memory and Docker modes
-- **Deployed to Dev & Staging** — as lightweight Docker containers or Basic App plan services
+- **In-memory locally** - spun up in-process via `WebApplicationFactory`
+- **In Docker locally** - containerised from the same source code
+- **In CI** - both in-memory and Docker modes
+- **Deployed to Dev & Staging** - as lightweight Docker containers or Basic App plan services
 
 This eliminates the "works in tests but not in deployment" class of bugs.
 
@@ -199,11 +199,11 @@ This eliminates the "works in tests but not in deployment" class of bugs.
 
 Some error scenarios aren't possible to simulate with a fake that behaves correctly (e.g. 500 errors), so this project uses **request headers** to control mock responses per-request. The test sets a header (e.g. `X-Fake-CowService-Scenario: ServiceUnavailable`), the API propagates it to the fake via `FakeHeaderPropagationHandler`, and the fake reads it to return the appropriate canned response.
 
-This works identically across all modes — in-memory, Docker, and deployed.
+This works identically across all modes - in-memory, Docker, and deployed.
 
 ### Mock At The External Boundary In Deployed Environments [↑](#top)<a name="mock-at-the-external-boundary-in-deployed-environments"></a>
 
-In Dev & Staging environments, the ideal is to mock only at the **external boundary of the system** — i.e. dependencies not under direct control. In practice, this isn't always feasible (you don't always control your dependency's dependencies), so direct dependency mocks are available as a fallback. The same fake services used locally can be deployed alongside the real service.
+In Dev & Staging environments, the ideal is to mock only at the **external boundary of the system** - i.e. dependencies not under direct control. In practice, this isn't always feasible (you don't always control your dependency's dependencies), so direct dependency mocks are available as a fallback. The same fake services used locally can be deployed alongside the real service.
 
 ### Use Real Services When Possible [↑](#top)<a name="use-real-services-when-possible"></a>
 
@@ -213,8 +213,8 @@ Mocks are not always used in Dev & Staging. When real downstream dependencies ar
 
 ### Prerequisites [↑](#top)<a name="prerequisites"></a>
 
-- **.NET 10 SDK** — required for all modes
-- **(Optional) A container runtime** — required only for Docker modes. Any of the following:
+- **.NET 10 SDK** - required for all modes
+- **(Optional) A container runtime** - required only for Docker modes. Any of the following:
   - [Docker Desktop](https://www.docker.com/products/docker-desktop/) (commercial, free for small teams)
   - [Podman Desktop](https://podman-desktop.io/) (free, open source)
   - [Rancher Desktop](https://rancherdesktop.io/) (free, open source)
@@ -283,7 +283,7 @@ Before running any Docker-based test mode, you need a container runtime installe
 
 Ensure `docker compose` (v2) is available on your `PATH`. Most desktop runtimes include it by default.
 
-You will also need to generate the Kafka certificates before first use — see [Generating certificates and keystore files](#generating-certificates-and-keystore-files).
+You will also need to generate the Kafka certificates before first use - see [Generating certificates and keystore files](#generating-certificates-and-keystore-files).
 
 ### With Docker Dependencies [↑](#top)<a name="with-docker-database--dependencies"></a>
 
@@ -317,7 +317,7 @@ dotnet test tests/BreakfastProvider.Tests.Component/BreakfastProvider.Tests.Comp
     - `RunWithAnInMemoryKafkaBroker = false`
 
 In order to build Docker images for the fake services and the SUT behind a corporate proxy:
-1. Download your organisation's root CA certificate (e.g. `Root_CA.crt`) from your certificate distribution system, and copy it into the `docker` folder. (It's in .gitignore and shouldn't be committed to the repo.) This is only required for the SUT image — the fake services have no NuGet dependencies and build without it.
+1. Download your organisation's root CA certificate (e.g. `Root_CA.crt`) from your certificate distribution system, and copy it into the `docker` folder. (It's in .gitignore and shouldn't be committed to the repo.) This is only required for the SUT image - the fake services have no NuGet dependencies and build without it.
 2. Copy `nuget.config.github` to `nuget.config` (at the root of the repo), and replace the `GITHUB_NUGET_APIKEY` placeholder with your [GitHub Personal Access Token (PAT)](https://github.com/settings/tokens) that has, at least, the `read:packages` scope. (Note that `nuget.config` has been excluded in .gitignore and shouldn't be committed.)
 
 ### With external SUT in Docker [↑](#top)<a name="with-external-sut-in-docker"></a>
@@ -357,7 +357,7 @@ dotnet test tests/BreakfastProvider.Tests.Component/BreakfastProvider.Tests.Comp
   -e ExternalServiceUnderTestUrl=http://localhost:5080
 ```
 
-The API is available at `http://localhost:5080`. In this mode, tests run in post-deployment mode — infrastructure-dependent steps are skipped via `[SkipStepIf]` and scenarios requiring direct infrastructure access are ignored via `[IgnoreIf]`.
+The API is available at `http://localhost:5080`. In this mode, tests run in post-deployment mode - infrastructure-dependent steps are skipped via `[SkipStepIf]` and scenarios requiring direct infrastructure access are ignored via `[IgnoreIf]`.
 
 > **Important:** Use `switch-to-manual-docker-external-sut` (not `switch-to-docker-external-sut`) when managing Docker manually. The latter sets `EnableDockerInSetupAndTearDown=true`, which causes the test framework to manage container lifecycle and may tear down your manually started containers.
 
@@ -431,15 +431,15 @@ The solution follows a straightforward **API + Tests** layout with feature-based
 ### Source (`src`) [↑](#top)<a name="source-src"></a>
 
 - **BreakfastProvider.Api**
-  - Controllers — REST endpoints for pancakes, waffles, orders, toppings, menu, ingredients, milk, audit logs
-  - Models — Request/response DTOs and event models
-  - Services — Business logic handlers, including `Reporting/` (GraphQL queries, Kafka consumer, EF Core ingester)
-  - Storage — Cosmos DB repository layer (operational data); SQL Server via EF Core (reporting database)
-  - Events — EventGrid and Kafka event publishing, transactional outbox pattern
-  - Validation — FluentValidation validators
-  - Configuration — Strongly-typed options classes
-  - Filters — ASP.NET Core action filters
-  - HttpClients — Typed HTTP clients for downstream services
+  - Controllers - REST endpoints for pancakes, waffles, orders, toppings, menu, ingredients, milk, audit logs
+  - Models - Request/response DTOs and event models
+  - Services - Business logic handlers, including `Reporting/` (GraphQL queries, Kafka consumer, EF Core ingester)
+  - Storage - Cosmos DB repository layer (operational data); SQL Server via EF Core (reporting database)
+  - Events - EventGrid and Kafka event publishing, transactional outbox pattern
+  - Validation - FluentValidation validators
+  - Configuration - Strongly-typed options classes
+  - Filters - ASP.NET Core action filters
+  - HttpClients - Typed HTTP clients for downstream services
 
 ### Tests (`tests`) [↑](#top)<a name="tests-tests"></a>
 
@@ -453,16 +453,16 @@ The solution follows a straightforward **API + Tests** layout with feature-based
 
 ### Fakes (`fakes`) [↑](#top)<a name="fakes-fakes"></a>
 
-- **Dependencies.Fakes.CowService** — Fake Cow Service (milk provider)
-- **Dependencies.Fakes.GoatService** — Fake Goat Service (goat milk provider)
-- **Dependencies.Fakes.SupplierService** — Fake Supplier Service (ingredient availability)
-- **Dependencies.Fakes.KitchenService** — Fake Kitchen Service (preparation/cooking)
+- **Dependencies.Fakes.CowService** - Fake Cow Service (milk provider)
+- **Dependencies.Fakes.GoatService** - Fake Goat Service (goat milk provider)
+- **Dependencies.Fakes.SupplierService** - Fake Supplier Service (ingredient availability)
+- **Dependencies.Fakes.KitchenService** - Fake Kitchen Service (preparation/cooking)
 
 > Note: The fakes also run in-process during component tests via `WebApplicationFactory<TProgram>`, managed by `ConfiguredLightBddScopeAttribute` global setup/teardown. Feature flags in `appsettings.componenttests.json` control which fakes run in-memory vs Docker.
 
 ## Tech Stack [↑](#top)<a name="tech-stack"></a>
 
-- **.NET 10** (C#) — all projects target `net10.0`
+- **.NET 10** (C#) - all projects target `net10.0`
 - **ASP.NET Core Web API** with MVC controllers (not Minimal APIs)
 - **Cosmos DB** for storage (orders, recipes, audit logs, outbox messages)
 - **Azure EventGrid** for domain events (e.g. order created), dispatched via the transactional outbox
@@ -487,7 +487,7 @@ The solution follows a straightforward **API + Tests** layout with feature-based
 
 | Method | Path | Description |
 |---|---|---|
-| `GET` | `/` | Heartbeat — confirms the service is running |
+| `GET` | `/` | Heartbeat - confirms the service is running |
 | `GET` | `/health` | Health check endpoint |
 | `GET` | `/metrics` | Prometheus metrics endpoint |
 | `POST` | `/pancakes` | Create a pancake batch |
@@ -581,20 +581,20 @@ Configure the OTLP endpoint via the standard `OTEL_EXPORTER_OTLP_ENDPOINT` envir
 
 **prometheus-net** exposes metrics at `GET /metrics` for Prometheus scraping:
 
-- **HTTP request metrics** — request count, duration, and in-progress via `app.UseHttpMetrics()`
-- **HttpClient metrics** — outbound request tracking via `services.UseHttpClientMetrics()`
-- **Health check status** — `aspnetcore_healthcheck_status` gauge via `.ForwardToPrometheus()`
-- **.NET Meters adapter** — automatically publishes all `System.Diagnostics.Metrics` instruments (including all custom metrics from `DiagnosticsConfig`) as Prometheus metrics
-- **Exemplars** — automatically attached from `Activity.Current` (trace_id, span_id) when scraped by an OpenMetrics-capable client
+- **HTTP request metrics** - request count, duration, and in-progress via `app.UseHttpMetrics()`
+- **HttpClient metrics** - outbound request tracking via `services.UseHttpClientMetrics()`
+- **Health check status** - `aspnetcore_healthcheck_status` gauge via `.ForwardToPrometheus()`
+- **.NET Meters adapter** - automatically publishes all `System.Diagnostics.Metrics` instruments (including all custom metrics from `DiagnosticsConfig`) as Prometheus metrics
+- **Exemplars** - automatically attached from `Activity.Current` (trace_id, span_id) when scraped by an OpenMetrics-capable client
 
 In Docker mode, a Prometheus server runs via `docker-compose-prometheus.yml` on port `9090`, accessible at `http://localhost:9090`.
 
 ### Jaeger [↑](#top)<a name="jaeger"></a>
 
-**Jaeger** provides distributed trace visualisation — search, filter, and inspect full request traces across the API and its downstream dependencies.
+**Jaeger** provides distributed trace visualisation - search, filter, and inspect full request traces across the API and its downstream dependencies.
 
 - Jaeger v2 runs via `docker-compose-jaeger.yml`, accepting traces via **OTLP** on port `4317` (gRPC) and `4318` (HTTP)
-- No additional SDK packages or code changes are needed — the existing OpenTelemetry OTLP exporter sends traces directly to Jaeger
+- No additional SDK packages or code changes are needed - the existing OpenTelemetry OTLP exporter sends traces directly to Jaeger
 - In Docker SUT mode, `OTEL_EXPORTER_OTLP_ENDPOINT=http://jaeger.local:4317` is set automatically
 - For local development (non-Docker), set `OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:4317` to send traces to the Dockerised Jaeger instance
 - Jaeger UI accessible at `http://localhost:16686`
@@ -604,16 +604,16 @@ In Docker mode, a Prometheus server runs via `docker-compose-prometheus.yml` on 
 
 A **Grafana** instance is auto-provisioned via `docker-compose-grafana.yml` with:
 
-- **Prometheus datasource** — pre-configured to query `http://prometheus:9090`
-- **Jaeger datasource** — pre-configured to query `http://jaeger:16686` for trace exploration
-- **Breakfast Provider dashboard** — auto-loaded with panels for all application metrics:
+- **Prometheus datasource** - pre-configured to query `http://prometheus:9090`
+- **Jaeger datasource** - pre-configured to query `http://jaeger:16686` for trace exploration
+- **Breakfast Provider dashboard** - auto-loaded with panels for all application metrics:
   - HTTP request rate, duration percentiles (p50/p90/p99), in-progress, error rate
   - Orders created, order status transitions, recipes logged
   - Cache hit/miss rate and hit ratio (menu, idempotency)
   - Outbox messages dispatched/failed, Kafka publish duration percentiles
   - Downstream HttpClient request rate and duration by client
   - Health check status per dependency
-- **Anonymous admin access** — no login required for local development
+- **Anonymous admin access** - no login required for local development
 - Accessible at `http://localhost:3000`
 
 ## Build and Deploy [↑](#top)<a name="build-and-deploy"></a>
@@ -659,36 +659,36 @@ There are a number of `docker-compose-*.yml` files which can be used to spin up 
 #### docker-compose-database.yml [↑](#top)<a name="docker-compose-database-yml"></a>
 
 Spins up local database instances:
-- **Azure Cosmos DB Emulator** — Port `8081` (Data Explorer and API endpoint). Configured with 25 partitions, no data persistence between runs.
-- **SQL Server 2022** — Port `1433`. Used by the reporting database (`ReportingDbContext` via Entity Framework Core).
+- **Azure Cosmos DB Emulator** - Port `8081` (Data Explorer and API endpoint). Configured with 25 partitions, no data persistence between runs.
+- **SQL Server 2022** - Port `1433`. Used by the reporting database (`ReportingDbContext` via Entity Framework Core).
 
 #### docker-compose-storage.yml [↑](#top)<a name="docker-compose-storage-yml"></a>
 
 Spins up a local instance of **Azurite** to emulate Azure Blob Storage, Azure Queue Storage, and Azure Table Storage.
-- Port `10000` — Blob
-- Port `10001` — Queue
-- Port `10002` — Table
+- Port `10000` - Blob
+- Port `10001` - Queue
+- Port `10002` - Table
 
 #### docker-compose-fakes.yml [↑](#top)<a name="docker-compose-fakes-yml"></a>
 
-Spins up Docker containers for the four downstream service fakes. Docker images are automatically built from the fakes' source code — there's no need to build them manually.
-- **cow-service** — Port `5031`
-- **goat-service** — Port `5032`
-- **supplier-service** — Port `5033`
-- **kitchen-service** — Port `5034`
+Spins up Docker containers for the four downstream service fakes. Docker images are automatically built from the fakes' source code - there's no need to build them manually.
+- **cow-service** - Port `5031`
+- **goat-service** - Port `5032`
+- **supplier-service** - Port `5033`
+- **kitchen-service** - Port `5034`
 
 #### docker-compose-messaging.yml [↑](#top)<a name="docker-compose-messaging-yml"></a>
 
-Spins up local messaging infrastructure — **EventGrid** and **Kafka**.
-- **Azure EventGrid Simulator** — Port `60101`, configured with a topic that subscribes to a storage queue on Azurite
-- **Kafka broker** — Port `9092` (SASL_SSL)
-- **Kafka UI** — Port `9001` (web interface at `http://localhost:9001`)
+Spins up local messaging infrastructure - **EventGrid** and **Kafka**.
+- **Azure EventGrid Simulator** - Port `60101`, configured with a topic that subscribes to a storage queue on Azurite
+- **Kafka broker** - Port `9092` (SASL_SSL)
+- **Kafka UI** - Port `9001` (web interface at `http://localhost:9001`)
 - Automatically creates Kafka topics on startup: `breakfast_recipe_logs`, `breakfast_menu_updates`
 
 #### docker-compose-prometheus.yml [↑](#top)<a name="docker-compose-prometheus-yml"></a>
 
 Spins up a **Prometheus** server for scraping application metrics.
-- Port `9090` — Prometheus web UI and API
+- Port `9090` - Prometheus web UI and API
 - Scrapes the SUT at `breakfast-provider-api.local:8080/metrics` every 10 seconds
 - Configuration file: `docker/prometheus/prometheus.yml`
 - Included automatically in all Docker modes (dependency and external SUT)
@@ -696,7 +696,7 @@ Spins up a **Prometheus** server for scraping application metrics.
 #### docker-compose-grafana.yml [↑](#top)<a name="docker-compose-grafana-yml"></a>
 
 Spins up a **Grafana** instance with auto-provisioned datasources and dashboards.
-- Port `3000` — Grafana web UI at `http://localhost:3000`
+- Port `3000` - Grafana web UI at `http://localhost:3000`
 - Prometheus datasource auto-provisioned via `docker/grafana/provisioning/datasources/prometheus.yml`
 - Jaeger datasource auto-provisioned via `docker/grafana/provisioning/datasources/jaeger.yml`
 - Dashboard auto-provisioned from `docker/grafana/dashboards/breakfast-provider.json`
@@ -706,16 +706,16 @@ Spins up a **Grafana** instance with auto-provisioned datasources and dashboards
 #### docker-compose-jaeger.yml [↑](#top)<a name="docker-compose-jaeger-yml"></a>
 
 Spins up a **Jaeger** instance (v2, all-in-one) for distributed trace collection and visualisation.
-- Port `16686` — Jaeger UI at `http://localhost:16686`
-- Port `4317` — OTLP gRPC receiver (traces, metrics)
-- Port `4318` — OTLP HTTP receiver
-- Accepts traces from the existing OpenTelemetry OTLP exporter — no additional SDK packages required
+- Port `16686` - Jaeger UI at `http://localhost:16686`
+- Port `4317` - OTLP gRPC receiver (traces, metrics)
+- Port `4318` - OTLP HTTP receiver
+- Accepts traces from the existing OpenTelemetry OTLP exporter - no additional SDK packages required
 - Included automatically in all Docker modes
 
 #### docker-compose-sut.yml [↑](#top)<a name="docker-compose-sut-yml"></a>
 
 Builds and runs the **BreakfastProvider API** in a Docker container alongside all dependencies. Used for external-SUT component testing and CI validation.
-- Port `5080` — API endpoint
+- Port `5080` - API endpoint
 - Depends on Cosmos DB (health check), SQL Server (health check), Azurite, Kafka, EventGrid, and all four fake services
 - Environment variables override downstream service URLs to Docker service names (e.g. `CowServiceConfig__BaseAddress=http://cow-service:8080`)
 - `docker-entrypoint.sh` installs any certificates mounted into `/certs/` (e.g. Kafka CA) before starting the app
@@ -725,19 +725,19 @@ Builds and runs the **BreakfastProvider API** in a Docker container alongside al
 ### Convenience Scripts [↑](#top)<a name="convenience-scripts"></a>
 
 All Docker convenience scripts in `docker/` have both `.bat` (Windows) and `.sh` (Linux/macOS) equivalents:
-- `docker-compose-up.bat` / `.sh` — Start all dependencies
-- `docker-compose-external-sut-up.bat` / `.sh` — Start all dependencies + SUT
-- `docker-compose-database-up.bat` / `.sh` — Start only the database
+- `docker-compose-up.bat` / `.sh` - Start all dependencies
+- `docker-compose-external-sut-up.bat` / `.sh` - Start all dependencies + SUT
+- `docker-compose-database-up.bat` / `.sh` - Start only the database
 
-Test mode switch scripts in `tests/BreakfastProvider.Tests.Component/Configure/` also have both `.bat` and `.sh` equivalents — see [Quick Switch Scripts](#quick-switch-scripts).
+Test mode switch scripts in `tests/BreakfastProvider.Tests.Component/Configure/` also have both `.bat` and `.sh` equivalents - see [Quick Switch Scripts](#quick-switch-scripts).
 
 ### kafka-config [↑](#top)<a name="kafka-config"></a>
 
 This folder stores configuration files for the Kafka Docker Compose setup, as well as scripts to generate certificates.
 
 ##### Configuration Files [↑](#top)<a name="configuration-files"></a>
-- `client.properties` — Required by the Kafka container. Contains the username and password along with the security protocol (SASL_SSL).
-- `kafka_server_jaas.conf` — Required by the Kafka container for JAAS authentication.
+- `client.properties` - Required by the Kafka container. Contains the username and password along with the security protocol (SASL_SSL).
+- `kafka_server_jaas.conf` - Required by the Kafka container for JAAS authentication.
 
 ##### Keystore files [↑](#top)<a name="keystore-files"></a>
 Required by the Kafka container, generated using `Generate-Certificates.ps1`.
@@ -766,15 +766,15 @@ These files **must not** be committed to the repo.
 3. Locate and delete expired `ca.local` certificates.
 
 #### Scripts [↑](#top)<a name="scripts"></a>
-- `Install-Dependencies.ps1` — Installs (via `chocolatey`) the tools needed to generate certificate files.
-- `Generate-Certificates.ps1` — Uses `openssl` and OpenJDK's `keytool` to generate the required certificates.
-- `Install-Certificates.ps1` — Installs generated certificates to the local Windows Certificate Store.
-- `Update-HostFile.ps1` — Adds the Kafka Docker hostname to `C:\Windows\System32\drivers\etc\hosts`.
+- `Install-Dependencies.ps1` - Installs (via `chocolatey`) the tools needed to generate certificate files.
+- `Generate-Certificates.ps1` - Uses `openssl` and OpenJDK's `keytool` to generate the required certificates.
+- `Install-Certificates.ps1` - Installs generated certificates to the local Windows Certificate Store.
+- `Update-HostFile.ps1` - Adds the Kafka Docker hostname to `C:\Windows\System32\drivers\etc\hosts`.
 
 #### Linux Scripts [↑](#top)<a name="linux-scripts"></a>
 Used by CI pull request workflows when running component tests with dockerised Kafka:
-- `generate-certs.sh` — Generates and installs certificates and keystore files.
-- `update-hostfile.sh` — Adds the Kafka Docker hostname to `/etc/hosts`.
+- `generate-certs.sh` - Generates and installs certificates and keystore files.
+- `update-hostfile.sh` - Adds the Kafka Docker hostname to `/etc/hosts`.
 
 > **NOTE**: All config files and scripts hardcode the username and password as `kafka-user` and `kafka-user-secret`, respectively.
 
@@ -798,7 +798,7 @@ In order to build these Docker images:
 
 The project uses a **transactional outbox** to guarantee at-least-once delivery of domain events. Instead of publishing directly to EventGrid when an order is created, the `OrderService` writes the order document **and** an `OutboxMessage` atomically in a single Cosmos DB `TransactionalBatch`. A background `OutboxProcessor` polls for pending messages and dispatches them via a registered `IOutboxDispatcher`.
 
-Because the order and its outbox message share the same partition key and are written in a single transactional batch, they succeed or fail atomically — eliminating the dual-write problem entirely.
+Because the order and its outbox message share the same partition key and are written in a single transactional batch, they succeed or fail atomically - eliminating the dual-write problem entirely.
 
 ### How It Works
 

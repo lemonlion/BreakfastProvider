@@ -24,6 +24,9 @@
         <module>breakfast-provider-app</module>
         <module>tests/component-shared</module>
         <module>tests/component-junit5</module>
+        <module>tests/component-testng</module>
+        <module>tests/component-cucumber</module>
+        <module>tests/component-spock</module>
     </modules>
 
     <properties>
@@ -41,6 +44,11 @@
         <!-- Test stack (Testcontainers version is managed by the Spring Boot BOM: 1.19.8). -->
         <junit.version>5.11.4</junit.version>
         <assertj.version>3.27.3</assertj.version>
+        <!-- Framework versions matching Kronikol4J's tested baselines. -->
+        <testng.version>7.10.2</testng.version>
+        <cucumber.version>7.18.1</cucumber.version>
+        <spock.version>2.3-groovy-4.0</spock.version>
+        <groovy.version>4.0.28</groovy.version>
         <!-- docker-java client API version for Testcontainers (see surefire config). -->
         <docker.api.version>1.43</docker.api.version>
 
@@ -89,6 +97,21 @@
                 <groupId>io.kronikol</groupId>
                 <artifactId>kronikol4j-core</artifactId>
                 <version>${kronikol4j.version}</version>
+            </dependency>
+
+            <!-- TestNG (not managed by the Spring Boot BOM). -->
+            <dependency>
+                <groupId>org.testng</groupId>
+                <artifactId>testng</artifactId>
+                <version>${testng.version}</version>
+            </dependency>
+            <!-- Cucumber BOM. -->
+            <dependency>
+                <groupId>io.cucumber</groupId>
+                <artifactId>cucumber-bom</artifactId>
+                <version>${cucumber.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>org.assertj</groupId>

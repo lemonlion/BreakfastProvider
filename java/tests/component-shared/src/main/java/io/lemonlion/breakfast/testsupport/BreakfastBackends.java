@@ -18,6 +18,9 @@ public final class BreakfastBackends {
 
     private static final CosmosDBEmulatorContainer COSMOS = new CosmosDBEmulatorContainer(
             DockerImageName.parse("mcr.microsoft.com/cosmosdb/linux/azure-cosmos-emulator:latest"))
+            // The emulator defaults to ~25 partitions, which makes it heavy and slow to become fully
+            // responsive (DDL can time out). A small count is ample for the test data and far faster.
+            .withEnv("AZURE_COSMOS_EMULATOR_PARTITION_COUNT", "5")
             .withStartupTimeout(Duration.ofMinutes(5));
 
     private static final KafkaContainer KAFKA = new KafkaContainer(

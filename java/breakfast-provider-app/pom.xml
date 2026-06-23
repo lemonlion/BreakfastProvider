@@ -36,6 +36,12 @@
             <artifactId>spring-boot-starter-graphql</artifactId>
         </dependency>
 
+        <!-- OpenAPI document (C# AddOpenApi/Scalar -> springdoc). -->
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+        </dependency>
+
         <!-- Faithful per-service backends: Cosmos (persistence + outbox), EventGrid (event egress), Kafka (recipe log). -->
         <dependency>
             <groupId>com.azure</groupId>

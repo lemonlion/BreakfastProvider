@@ -21,6 +21,11 @@ grpc:
 server:
   port: 8080
 
+# OpenAPI document served at the same path as the C# SUT (openapi/v1.json); Scalar UI at /scalar/v1.
+springdoc:
+  api-docs:
+    path: /openapi/v1.json
+
 # Domain configuration (twins of the C# Configuration/* classes).
 order:
   max-items-per-order: 10

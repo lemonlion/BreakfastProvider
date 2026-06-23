@@ -1,6 +1,16 @@
 spring:
   application:
     name: breakfast-provider
+
+# Kronikol4J: the SUT's participant name in report sequence diagrams (twin of C# ServiceNames.BreakfastProvider).
+kronikol:
+  service-name: "Breakfast Provider"
+
+# gRPC server (net.devh). Twin of the C# Grpc.AspNetCore BreakfastGrpcService. Component tests
+# override this with an in-process server (see BackendsInitializer).
+grpc:
+  server:
+    port: 9090
   kafka:
     bootstrap-servers: localhost:9092
     consumer:

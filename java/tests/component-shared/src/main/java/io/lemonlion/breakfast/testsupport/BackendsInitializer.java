@@ -40,7 +40,10 @@ public class BackendsInitializer implements ApplicationContextInitializer<Config
                 // EventGrid has no emulator; the outbox still records + processes the message.
                 "event-grid.enabled=false",
                 // Fast outbox polling so processing assertions don't wait long.
-                "outbox.polling-interval-seconds=1"
+                "outbox.polling-interval-seconds=1",
+                // gRPC: run the SUT's server in-process (no TCP port) so tests reach it via a named channel.
+                "grpc.server.in-process-name=" + GrpcSupport.IN_PROCESS_NAME,
+                "grpc.server.port=-1"
         ).applyTo(context.getEnvironment());
     }
 }

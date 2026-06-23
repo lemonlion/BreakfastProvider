@@ -22,6 +22,7 @@ public class BackendsInitializer implements ApplicationContextInitializer<Config
                 "cosmos.endpoint-discovery-enabled=false",
                 "spring.kafka.bootstrap-servers=" + BreakfastBackends.kafkaBootstrapServers(),
                 "downstream.kitchen-service-url=" + BreakfastBackends.kitchenUrl(),
+                "downstream.supplier-service-url=" + BreakfastBackends.supplierUrl(),
                 // EventGrid has no emulator; the outbox still records + processes the message.
                 "event-grid.enabled=false",
                 // Fast outbox polling so processing assertions don't wait long.

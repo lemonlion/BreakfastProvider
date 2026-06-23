@@ -27,6 +27,7 @@ public final class BreakfastBackends {
             DockerImageName.parse("confluentinc/cp-kafka:7.6.1"));
 
     private static final FakeKitchen KITCHEN = new FakeKitchen();
+    private static final FakeSupplier SUPPLIER = new FakeSupplier();
 
     private static volatile boolean started;
 
@@ -41,6 +42,7 @@ public final class BreakfastBackends {
         configureCosmosTrustStore();
         KAFKA.start();
         KITCHEN.start();
+        SUPPLIER.start();
         started = true;
     }
 
@@ -78,5 +80,19 @@ public final class BreakfastBackends {
 
     public static FakeKitchen kitchen() {
         return KITCHEN;
+    }
+
+    public static String supplierUrl() {
+        return SUPPLIER.url();
+    }
+
+    public static FakeSupplier supplier() {
+        return SUPPLIER;
+    }
+
+    /** Resets all in-JVM fakes to their default behaviour (called from each test's setup). */
+    public static void resetFakes() {
+        KITCHEN.reset();
+        SUPPLIER.reset();
     }
 }

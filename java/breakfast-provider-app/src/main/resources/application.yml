@@ -1,0 +1,45 @@
+spring:
+  application:
+    name: breakfast-provider
+  kafka:
+    bootstrap-servers: localhost:9092
+
+server:
+  port: 8080
+
+# Domain configuration (twins of the C# Configuration/* classes).
+order:
+  max-items-per-order: 10
+
+outbox:
+  polling-interval-seconds: 5
+  max-retry-count: 3
+  batch-size: 25
+  enabled: true
+
+rate-limit:
+  permit-limit: 100
+  window-seconds: 60
+
+cosmos:
+  endpoint: https://localhost:8081
+  key: C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw==
+  database-name: breakfast
+
+event-grid:
+  enabled: false
+  endpoint: ""
+  key: ""
+  subject: breakfast/orders
+
+downstream:
+  kitchen-service-url: http://localhost:9081
+  cow-service-url: http://localhost:9082
+  goat-service-url: http://localhost:9083
+  supplier-service-url: http://localhost:9084
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info

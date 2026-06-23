@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>io.lemonlion.breakfast</groupId>
+    <artifactId>breakfast-provider-java-parent</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <name>Breakfast Provider (Java) — Parent</name>
+    <description>
+        Java twin of the C# BreakfastProvider reference service. Showcases Kronikol4J by running the
+        same breakfast-domain component-test scenarios through JUnit 5, TestNG, Cucumber and Spock,
+        publishing Kronikol4J HTML reports to the shared GitHub Pages site.
+    </description>
+
+    <!--
+        Multi-module reactor. Modules are added as each is created so the build stays green at every
+        step (Phase 0 starts with just the JUnit 5 component-test module).
+    -->
+    <modules>
+        <module>breakfast-provider-app</module>
+        <module>tests/component-shared</module>
+        <module>tests/component-junit5</module>
+    </modules>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.release>21</maven.compiler.release>
+
+        <!-- Kronikol4J — consumed as a SNAPSHOT from mavenLocal until it is released to Maven Central. -->
+        <kronikol4j.version>0.1.23-SNAPSHOT</kronikol4j.version>
+
+        <!-- SUT stack: Spring Boot 3.3.x is Kronikol4J's tested baseline; tests run on JDK 21. -->
+        <spring-boot.version>3.3.5</spring-boot.version>
+        <azure-cosmos.version>4.63.3</azure-cosmos.version>
+        <azure-eventgrid.version>4.27.0</azure-eventgrid.version>
+
+        <!-- Test stack (Testcontainers version is managed by the Spring Boot BOM: 1.19.8). -->
+        <junit.version>5.11.4</junit.version>
+        <assertj.version>3.27.3</assertj.version>
+        <!-- docker-java client API version for Testcontainers (see surefire config). -->
+        <docker.api.version>1.43</docker.api.version>
+
+        <!-- Plugins -->
+        <surefire.version>3.5.2</surefire.version>
+        <exec-plugin.version>3.5.0</exec-plugin.version>
+
+        <!-- Where each test module emits Kronikol4J report fragments and the merged HTML report.
+             The CI Pages deploy links to <module>/target/Reports/TestRunReport.html . -->
+        <kronikol.fragments.dir>${project.build.directory}/kronikol-fragments</kronikol.fragments.dir>
+        <kronikol.report.dir>${project.build.directory}/Reports</kronikol.report.dir>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <!-- Spring Boot dependency management (web, validation, kafka, actuator, test, ...). -->
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-dependencies</artifactId>
+                <version>${spring-boot.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <!-- Faithful per-service SDKs (C# Cosmos / EventGrid -> Azure Java SDKs). -->
+            <dependency>
+                <groupId>com.azure</groupId>
+                <artifactId>azure-cosmos</artifactId>
+                <version>${azure-cosmos.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.azure</groupId>
+                <artifactId>azure-messaging-eventgrid</artifactId>
+                <version>${azure-eventgrid.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.junit</groupId>
+                <artifactId>junit-bom</artifactId>
+                <version>${junit.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <!-- Kronikol4J core (test-identity headers/scope used by the shared test HTTP client). -->
+            <dependency>
+                <groupId>io.kronikol</groupId>
+                <artifactId>kronikol4j-core</artifactId>
+                <version>${kronikol4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.assertj</groupId>
+                <artifactId>assertj-core</artifactId>
+                <version>${assertj.version}</version>
+            </dependency>
+
+            <!-- Kronikol4J test-framework adapters -->
+            <dependency>
+                <groupId>io.kronikol</groupId>
+                <artifactId>kronikol4j-junit5</artifactId>
+                <version>${kronikol4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.kronikol</groupId>
+                <artifactId>kronikol4j-testng</artifactId>
+                <version>${kronikol4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.kronikol</groupId>
+                <artifactId>kronikol4j-cucumber</artifactId>
+                <version>${kronikol4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.kronikol</groupId>
+                <artifactId>kronikol4j-spock</artifactId>
+                <version>${kronikol4j.version}</version>
+            </dependency>
+
+            <!-- Kronikol4J assertion tracking (AssertJ) -->
+            <dependency>
+                <groupId>io.kronikol</groupId>
+                <artifactId>kronikol4j-assertj</artifactId>
+                <version>${kronikol4j.version}</version>
+            </dependency>
+
+            <!-- Kronikol4J dependency-tracking integrations (faithful per-service mapping). -->
+            <dependency>
+                <groupId>io.kronikol</groupId>
+                <artifactId>kronikol4j-spring-boot-starter</artifactId>
+                <version>${kronikol4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.kronikol</groupId>
+                <artifactId>kronikol4j-servlet</artifactId>
+                <version>${kronikol4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.kronikol</groupId>
+                <artifactId>kronikol4j-spring</artifactId>
+                <version>${kronikol4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.kronikol</groupId>
+                <artifactId>kronikol4j-http</artifactId>
+                <version>${kronikol4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.kronikol</groupId>
+                <artifactId>kronikol4j-azure</artifactId>
+                <version>${kronikol4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.kronikol</groupId>
+                <artifactId>kronikol4j-messaging</artifactId>
+                <version>${kronikol4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.kronikol</groupId>
+                <artifactId>kronikol4j-grpc</artifactId>
+                <version>${kronikol4j.version}</version>
+            </dependency>
+
+            <!-- Kronikol4J CLI — used by the merge step that builds TestRunReport.html from fragments -->
+            <dependency>
+                <groupId>io.kronikol</groupId>
+                <artifactId>kronikol4j-cli</artifactId>
+                <version>${kronikol4j.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <build>
+        <plugins>
+            <!-- Emit method parameter names so Spring can resolve @PathVariable/@RequestParam without
+                 explicit names (spring-boot-starter-parent does this; our custom parent must too). -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <parameters>true</parameters>
+                </configuration>
+            </plugin>
+        </plugins>
+
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <version>${surefire.version}</version>
+                    <configuration>
+                        <!-- Single reusable fork: the JUnit Platform launcher session closes once,
+                             so Kronikol4J's LauncherSessionListener emits exactly one fragment. -->
+                        <forkCount>1</forkCount>
+                        <reuseForks>true</reuseForks>
+                        <systemPropertyVariables>
+                            <!-- Presence of kronikol.run.dir => fragment mode (forked); the merge
+                                 step below combines fragments into the final HTML report. -->
+                            <kronikol.run.dir>${kronikol.fragments.dir}</kronikol.run.dir>
+                            <!-- docker-java (Testcontainers) advertises API 1.32 by default, which the
+                                 local Rancher daemon rejects (min 1.41). Pin a modern API version; safe
+                                 on CI's Docker too. Overridable via -Dapi.version=. -->
+                            <api.version>${docker.api.version}</api.version>
+                        </systemPropertyVariables>
+                    </configuration>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>exec-maven-plugin</artifactId>
+                    <version>${exec-plugin.version}</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
+</project>

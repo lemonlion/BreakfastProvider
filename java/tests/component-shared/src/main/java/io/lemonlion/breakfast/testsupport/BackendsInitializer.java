@@ -1,0 +1,31 @@
+package io.lemonlion.breakfast.testsupport;
+
+import org.springframework.boot.test.util.TestPropertyValues;
+import org.springframework.context.ApplicationContextInitializer;
+import org.springframework.context.ConfigurableApplicationContext;
+
+/**
+ * Starts the shared Testcontainers backends and points the SUT's configuration at them before the
+ * Spring context refreshes. Framework-agnostic: usable from JUnit 5, TestNG, Spock and Cucumber bases
+ * via {@code @ContextConfiguration(initializers = BackendsInitializer.class)}.
+ */
+public class BackendsInitializer implements ApplicationContextInitializer<ConfigurableApplicationContext> {
+
+    @Override
+    public void initialize(ConfigurableApplicationContext context) {
+        BreakfastBackends.start();
+        TestPropertyValues.of(
+                "cosmos.endpoint=" + BreakfastBackends.cosmosEndpoint(),
+                "cosmos.key=" + BreakfastBackends.cosmosKey(),
+                "cosmos.database-name=breakfast",
+                // Emulator advertises an unreachable internal IP; force the SDK to use only the gateway endpoint.
+                "cosmos.endpoint-discovery-enabled=false",
+                "spring.kafka.bootstrap-servers=" + BreakfastBackends.kafkaBootstrapServers(),
+                "downstream.kitchen-service-url=" + BreakfastBackends.kitchenUrl(),
+                // EventGrid has no emulator; the outbox still records + processes the message.
+                "event-grid.enabled=false",
+                // Fast outbox polling so processing assertions don't wait long.
+                "outbox.polling-interval-seconds=1"
+        ).applyTo(context.getEnvironment());
+    }
+}

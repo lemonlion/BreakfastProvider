@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>io.lemonlion.breakfast</groupId>
+        <artifactId>breakfast-provider-java-parent</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+
+    <artifactId>breakfast-provider-app</artifactId>
+    <name>Breakfast Provider (Java) — Service Under Test</name>
+    <description>Spring Boot twin of the C# BreakfastProvider.Api. Phase 1 implements the Orders domain.</description>
+
+    <dependencies>
+        <!-- Web + validation -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-validation</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+
+        <!-- Faithful per-service backends: Cosmos (persistence + outbox), EventGrid (event egress), Kafka (recipe log). -->
+        <dependency>
+            <groupId>com.azure</groupId>
+            <artifactId>azure-cosmos</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.azure</groupId>
+            <artifactId>azure-messaging-eventgrid</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.kafka</groupId>
+            <artifactId>spring-kafka</artifactId>
+        </dependency>
+
+        <!-- Kronikol4J: server-side identity (servlet), Spring/HTTP client tracking, Azure + messaging recorders. -->
+        <dependency>
+            <groupId>io.kronikol</groupId>
+            <artifactId>kronikol4j-spring-boot-starter</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.kronikol</groupId>
+            <artifactId>kronikol4j-http</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.kronikol</groupId>
+            <artifactId>kronikol4j-azure</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.kronikol</groupId>
+            <artifactId>kronikol4j-messaging</artifactId>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>${spring-boot.version}</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                        <configuration>
+                            <!-- Keep the plain library jar as the reactor artifact (test modules depend on
+                                 it); emit the runnable boot jar under the 'exec' classifier. -->
+                            <classifier>exec</classifier>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>

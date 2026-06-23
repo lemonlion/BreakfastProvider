@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>io.lemonlion.breakfast</groupId>
+        <artifactId>breakfast-provider-java-parent</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+        <relativePath>../../pom.xml</relativePath>
+    </parent>
+
+    <artifactId>breakfast-provider-tests-component-shared</artifactId>
+    <name>Breakfast Provider (Java) — Component Tests (Shared)</name>
+    <description>
+        Framework-agnostic component-test infrastructure: Testcontainers backends (Cosmos emulator, Kafka),
+        an in-JVM kitchen fake, a Kronikol4J-aware HTTP client, and reusable Orders step/model helpers.
+        Twin of the C# Tests.Component.Shared project.
+    </description>
+
+    <dependencies>
+        <!-- The SUT: hosted in-process by dependent test modules via @SpringBootTest. -->
+        <dependency>
+            <groupId>io.lemonlion.breakfast</groupId>
+            <artifactId>breakfast-provider-app</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <!-- Spring test + web client (compile scope so dependents inherit the base classes). -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+        </dependency>
+
+        <!-- Testcontainers backends. -->
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>testcontainers</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>azure</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>kafka</artifactId>
+        </dependency>
+
+        <!-- Kronikol4J: identity headers/scope so the test client attributes the SUT's interactions. -->
+        <dependency>
+            <groupId>io.kronikol</groupId>
+            <artifactId>kronikol4j-core</artifactId>
+        </dependency>
+    </dependencies>
+</project>

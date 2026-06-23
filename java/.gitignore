@@ -1,0 +1,12 @@
+# Maven build output
+target/
+
+# Maven wrapper downloaded distribution (only-script wrapper fetches it on demand)
+.mvn/wrapper/maven-wrapper.jar
+
+# IDE
+*.iml
+.idea/
+.classpath
+.project
+.settings/

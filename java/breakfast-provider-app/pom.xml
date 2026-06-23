@@ -74,6 +74,12 @@
             <artifactId>google-cloud-spanner-jdbc</artifactId>
         </dependency>
 
+        <!-- Google BigQuery (C# IngredientUsage/IngredientWaste analytics). -->
+        <dependency>
+            <groupId>com.google.cloud</groupId>
+            <artifactId>google-cloud-bigquery</artifactId>
+        </dependency>
+
         <!-- Kronikol4J: server-side identity (servlet), Spring/HTTP client tracking, Azure + messaging recorders. -->
         <dependency>
             <groupId>io.kronikol</groupId>

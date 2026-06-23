@@ -50,6 +50,7 @@
         <spock.version>2.3-groovy-4.0</spock.version>
         <groovy.version>4.0.28</groovy.version>
         <spanner-jdbc.version>2.19.3</spanner-jdbc.version>
+        <bigquery.version>2.42.0</bigquery.version>
         <!-- docker-java client API version for Testcontainers (see surefire config). -->
         <docker.api.version>1.43</docker.api.version>
 
@@ -199,6 +200,11 @@
                 <groupId>com.google.cloud</groupId>
                 <artifactId>google-cloud-spanner-jdbc</artifactId>
                 <version>${spanner-jdbc.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.cloud</groupId>
+                <artifactId>google-cloud-bigquery</artifactId>
+                <version>${bigquery.version}</version>
             </dependency>
 
             <!-- Kronikol4J CLI — used by the merge step that builds TestRunReport.html from fragments -->

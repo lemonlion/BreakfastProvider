@@ -7,6 +7,7 @@ import java.security.KeyStore;
 import java.time.Duration;
 import org.testcontainers.containers.CosmosDBEmulatorContainer;
 import org.testcontainers.containers.KafkaContainer;
+import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.MSSQLServerContainer;
 import org.testcontainers.containers.MongoDBContainer;
 import org.testcontainers.containers.SpannerEmulatorContainer;
@@ -38,6 +39,14 @@ public final class BreakfastBackends {
     private static final SpannerEmulatorContainer SPANNER = new SpannerEmulatorContainer(
             DockerImageName.parse("gcr.io/cloud-spanner-emulator/emulator:1.5.23"));
 
+    private static final String BIGQUERY_PROJECT = "test-project";
+    private static final int BIGQUERY_PORT = 9050;
+    @SuppressWarnings("resource")
+    private static final GenericContainer<?> BIGQUERY = new GenericContainer<>(
+            DockerImageName.parse("ghcr.io/goccy/bigquery-emulator:0.6.6"))
+            .withExposedPorts(BIGQUERY_PORT)
+            .withCommand("--project=" + BIGQUERY_PROJECT, "--dataset=breakfast_analytics");
+
     private static final FakeKitchen KITCHEN = new FakeKitchen();
     private static final FakeSupplier SUPPLIER = new FakeSupplier();
 
@@ -56,6 +65,7 @@ public final class BreakfastBackends {
         SQL_SERVER.start();
         MONGO.start();
         SPANNER.start();
+        BIGQUERY.start();
         KITCHEN.start();
         SUPPLIER.start();
         started = true;
@@ -113,6 +123,14 @@ public final class BreakfastBackends {
     public static String spannerJdbcUrl() {
         return "jdbc:cloudspanner://" + SPANNER.getEmulatorGrpcEndpoint()
                 + "/projects/test-project/instances/test-instance/databases/breakfast?autoConfigEmulator=true";
+    }
+
+    public static String bigQueryEndpoint() {
+        return "http://" + BIGQUERY.getHost() + ":" + BIGQUERY.getMappedPort(BIGQUERY_PORT);
+    }
+
+    public static String bigQueryProjectId() {
+        return BIGQUERY_PROJECT;
     }
 
     public static String kitchenUrl() {

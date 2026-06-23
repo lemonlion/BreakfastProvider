@@ -58,6 +58,16 @@
             <artifactId>kronikol4j-jdbc</artifactId>
         </dependency>
 
+        <!-- MongoDB (C# ChefNotes uses MongoDB.Driver -> mongodb-driver-sync). -->
+        <dependency>
+            <groupId>org.mongodb</groupId>
+            <artifactId>mongodb-driver-sync</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.kronikol</groupId>
+            <artifactId>kronikol4j-mongodb</artifactId>
+        </dependency>
+
         <!-- Kronikol4J: server-side identity (servlet), Spring/HTTP client tracking, Azure + messaging recorders. -->
         <dependency>
             <groupId>io.kronikol</groupId>

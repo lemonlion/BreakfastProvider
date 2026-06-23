@@ -8,6 +8,7 @@ import java.time.Duration;
 import org.testcontainers.containers.CosmosDBEmulatorContainer;
 import org.testcontainers.containers.KafkaContainer;
 import org.testcontainers.containers.MSSQLServerContainer;
+import org.testcontainers.containers.MongoDBContainer;
 import org.testcontainers.utility.DockerImageName;
 
 /**
@@ -31,6 +32,8 @@ public final class BreakfastBackends {
             DockerImageName.parse("mcr.microsoft.com/mssql/server:2022-latest"))
             .acceptLicense();
 
+    private static final MongoDBContainer MONGO = new MongoDBContainer(DockerImageName.parse("mongo:7"));
+
     private static final FakeKitchen KITCHEN = new FakeKitchen();
     private static final FakeSupplier SUPPLIER = new FakeSupplier();
 
@@ -47,6 +50,7 @@ public final class BreakfastBackends {
         configureCosmosTrustStore();
         KAFKA.start();
         SQL_SERVER.start();
+        MONGO.start();
         KITCHEN.start();
         SUPPLIER.start();
         started = true;
@@ -91,6 +95,10 @@ public final class BreakfastBackends {
 
     public static String sqlServerPassword() {
         return SQL_SERVER.getPassword();
+    }
+
+    public static String mongoConnectionString() {
+        return MONGO.getConnectionString();
     }
 
     public static String kitchenUrl() {

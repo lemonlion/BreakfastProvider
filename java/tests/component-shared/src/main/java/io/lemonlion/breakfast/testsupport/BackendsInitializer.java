@@ -27,6 +27,7 @@ public class BackendsInitializer implements ApplicationContextInitializer<Config
                 "spring.datasource.password=" + BreakfastBackends.sqlServerPassword(),
                 "spring.jpa.hibernate.ddl-auto=create-drop",
                 "mongodb.uri=" + BreakfastBackends.mongoConnectionString(),
+                "spanner.jdbc-url=" + BreakfastBackends.spannerJdbcUrl(),
                 "downstream.kitchen-service-url=" + BreakfastBackends.kitchenUrl(),
                 "downstream.supplier-service-url=" + BreakfastBackends.supplierUrl(),
                 // EventGrid has no emulator; the outbox still records + processes the message.

@@ -68,6 +68,12 @@
             <artifactId>kronikol4j-mongodb</artifactId>
         </dependency>
 
+        <!-- Google Spanner via its JDBC driver (C# CustomerPreferences/Feedback use Spanner). -->
+        <dependency>
+            <groupId>com.google.cloud</groupId>
+            <artifactId>google-cloud-spanner-jdbc</artifactId>
+        </dependency>
+
         <!-- Kronikol4J: server-side identity (servlet), Spring/HTTP client tracking, Azure + messaging recorders. -->
         <dependency>
             <groupId>io.kronikol</groupId>

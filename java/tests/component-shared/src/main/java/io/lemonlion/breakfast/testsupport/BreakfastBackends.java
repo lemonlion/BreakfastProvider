@@ -9,6 +9,7 @@ import org.testcontainers.containers.CosmosDBEmulatorContainer;
 import org.testcontainers.containers.KafkaContainer;
 import org.testcontainers.containers.MSSQLServerContainer;
 import org.testcontainers.containers.MongoDBContainer;
+import org.testcontainers.containers.SpannerEmulatorContainer;
 import org.testcontainers.utility.DockerImageName;
 
 /**
@@ -34,6 +35,9 @@ public final class BreakfastBackends {
 
     private static final MongoDBContainer MONGO = new MongoDBContainer(DockerImageName.parse("mongo:7"));
 
+    private static final SpannerEmulatorContainer SPANNER = new SpannerEmulatorContainer(
+            DockerImageName.parse("gcr.io/cloud-spanner-emulator/emulator:1.5.23"));
+
     private static final FakeKitchen KITCHEN = new FakeKitchen();
     private static final FakeSupplier SUPPLIER = new FakeSupplier();
 
@@ -51,6 +55,7 @@ public final class BreakfastBackends {
         KAFKA.start();
         SQL_SERVER.start();
         MONGO.start();
+        SPANNER.start();
         KITCHEN.start();
         SUPPLIER.start();
         started = true;
@@ -99,6 +104,15 @@ public final class BreakfastBackends {
 
     public static String mongoConnectionString() {
         return MONGO.getConnectionString();
+    }
+
+    /**
+     * Spanner JDBC URL pointed at the emulator. {@code autoConfigEmulator=true} makes the driver use
+     * plaintext and auto-create the instance + database, so no admin bootstrap is needed.
+     */
+    public static String spannerJdbcUrl() {
+        return "jdbc:cloudspanner://" + SPANNER.getEmulatorGrpcEndpoint()
+                + "/projects/test-project/instances/test-instance/databases/breakfast?autoConfigEmulator=true";
     }
 
     public static String kitchenUrl() {

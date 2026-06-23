@@ -49,6 +49,7 @@
         <cucumber.version>7.18.1</cucumber.version>
         <spock.version>2.3-groovy-4.0</spock.version>
         <groovy.version>4.0.28</groovy.version>
+        <spanner-jdbc.version>2.19.3</spanner-jdbc.version>
         <!-- docker-java client API version for Testcontainers (see surefire config). -->
         <docker.api.version>1.43</docker.api.version>
 
@@ -193,6 +194,11 @@
                 <groupId>io.kronikol</groupId>
                 <artifactId>kronikol4j-mongodb</artifactId>
                 <version>${kronikol4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.cloud</groupId>
+                <artifactId>google-cloud-spanner-jdbc</artifactId>
+                <version>${spanner-jdbc.version}</version>
             </dependency>
 
             <!-- Kronikol4J CLI — used by the merge step that builds TestRunReport.html from fragments -->

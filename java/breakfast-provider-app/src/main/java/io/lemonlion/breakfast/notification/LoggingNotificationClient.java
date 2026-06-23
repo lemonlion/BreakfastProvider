@@ -1,5 +1,6 @@
 package io.lemonlion.breakfast.notification;
 
+import java.time.Instant;
 import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,6 +21,15 @@ public class LoggingNotificationClient implements NotificationClient {
         String notificationId = UUID.randomUUID().toString();
         log.info("Order confirmation notification for {} to {} ({} items): {}",
                 orderId, customerName, itemCount, notificationId);
+        return new NotificationResult(true, notificationId);
+    }
+
+    @Override
+    public NotificationResult sendReservationReminder(String reservationId, String customerName, Instant reservedAt,
+                                                      int tableNumber) {
+        String notificationId = UUID.randomUUID().toString();
+        log.info("Reservation reminder for {} to {} (table {} at {}): {}",
+                reservationId, customerName, tableNumber, reservedAt, notificationId);
         return new NotificationResult(true, notificationId);
     }
 }

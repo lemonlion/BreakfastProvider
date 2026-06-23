@@ -184,6 +184,11 @@
                 <artifactId>kronikol4j-grpc</artifactId>
                 <version>${kronikol4j.version}</version>
             </dependency>
+            <dependency>
+                <groupId>io.kronikol</groupId>
+                <artifactId>kronikol4j-jdbc</artifactId>
+                <version>${kronikol4j.version}</version>
+            </dependency>
 
             <!-- Kronikol4J CLI — used by the merge step that builds TestRunReport.html from fragments -->
             <dependency>

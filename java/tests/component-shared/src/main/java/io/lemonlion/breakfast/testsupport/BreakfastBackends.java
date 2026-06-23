@@ -7,6 +7,7 @@ import java.security.KeyStore;
 import java.time.Duration;
 import org.testcontainers.containers.CosmosDBEmulatorContainer;
 import org.testcontainers.containers.KafkaContainer;
+import org.testcontainers.containers.MSSQLServerContainer;
 import org.testcontainers.utility.DockerImageName;
 
 /**
@@ -26,6 +27,10 @@ public final class BreakfastBackends {
     private static final KafkaContainer KAFKA = new KafkaContainer(
             DockerImageName.parse("confluentinc/cp-kafka:7.6.1"));
 
+    private static final MSSQLServerContainer<?> SQL_SERVER = new MSSQLServerContainer<>(
+            DockerImageName.parse("mcr.microsoft.com/mssql/server:2022-latest"))
+            .acceptLicense();
+
     private static final FakeKitchen KITCHEN = new FakeKitchen();
     private static final FakeSupplier SUPPLIER = new FakeSupplier();
 
@@ -41,6 +46,7 @@ public final class BreakfastBackends {
         COSMOS.start();
         configureCosmosTrustStore();
         KAFKA.start();
+        SQL_SERVER.start();
         KITCHEN.start();
         SUPPLIER.start();
         started = true;
@@ -72,6 +78,19 @@ public final class BreakfastBackends {
 
     public static String kafkaBootstrapServers() {
         return KAFKA.getBootstrapServers();
+    }
+
+    public static String sqlServerJdbcUrl() {
+        // encrypt=false keeps the mssql-jdbc 12+ default TLS off for the throwaway test container.
+        return SQL_SERVER.getJdbcUrl() + ";encrypt=false";
+    }
+
+    public static String sqlServerUsername() {
+        return SQL_SERVER.getUsername();
+    }
+
+    public static String sqlServerPassword() {
+        return SQL_SERVER.getPassword();
     }
 
     public static String kitchenUrl() {

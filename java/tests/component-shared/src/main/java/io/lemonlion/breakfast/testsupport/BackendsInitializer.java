@@ -21,6 +21,11 @@ public class BackendsInitializer implements ApplicationContextInitializer<Config
                 // Emulator advertises an unreachable internal IP; force the SDK to use only the gateway endpoint.
                 "cosmos.endpoint-discovery-enabled=false",
                 "spring.kafka.bootstrap-servers=" + BreakfastBackends.kafkaBootstrapServers(),
+                // Relational store (SQL Server) for the EF Core-backed domains; auto-create the schema.
+                "spring.datasource.url=" + BreakfastBackends.sqlServerJdbcUrl(),
+                "spring.datasource.username=" + BreakfastBackends.sqlServerUsername(),
+                "spring.datasource.password=" + BreakfastBackends.sqlServerPassword(),
+                "spring.jpa.hibernate.ddl-auto=create-drop",
                 "downstream.kitchen-service-url=" + BreakfastBackends.kitchenUrl(),
                 "downstream.supplier-service-url=" + BreakfastBackends.supplierUrl(),
                 // EventGrid has no emulator; the outbox still records + processes the message.

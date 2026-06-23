@@ -44,6 +44,20 @@
             <artifactId>spring-kafka</artifactId>
         </dependency>
 
+        <!-- Relational persistence (C# EF Core + SQL Server -> Spring Data JPA + mssql-jdbc). -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.microsoft.sqlserver</groupId>
+            <artifactId>mssql-jdbc</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.kronikol</groupId>
+            <artifactId>kronikol4j-jdbc</artifactId>
+        </dependency>
+
         <!-- Kronikol4J: server-side identity (servlet), Spring/HTTP client tracking, Azure + messaging recorders. -->
         <dependency>
             <groupId>io.kronikol</groupId>

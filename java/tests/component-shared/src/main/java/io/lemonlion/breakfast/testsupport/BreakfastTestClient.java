@@ -30,6 +30,12 @@ public final class BreakfastTestClient {
         return send(requestBuilder(path).POST(jsonBody(body)).header("Content-Type", "application/json"));
     }
 
+    public TestResponse post(String path, Object body, java.util.Map<String, String> headers) {
+        HttpRequest.Builder builder = requestBuilder(path).POST(jsonBody(body)).header("Content-Type", "application/json");
+        headers.forEach(builder::header);
+        return send(builder);
+    }
+
     public TestResponse get(String path) {
         return send(requestBuilder(path).GET());
     }

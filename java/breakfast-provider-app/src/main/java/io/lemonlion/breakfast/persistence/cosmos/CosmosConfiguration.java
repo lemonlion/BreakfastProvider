@@ -66,6 +66,12 @@ public class CosmosConfiguration {
         return new CosmosOutboxStore(ordersContainer(database));
     }
 
+    @Bean
+    public io.lemonlion.breakfast.storage.IdempotencyStore idempotencyStore(
+            CosmosDatabase database, ObjectMapper objectMapper) {
+        return new io.lemonlion.breakfast.storage.CosmosIdempotencyStore(ordersContainer(database), objectMapper);
+    }
+
     private static CosmosContainer ordersContainer(CosmosDatabase database) {
         database.createContainerIfNotExists(ORDERS_CONTAINER, PARTITION_KEY_PATH);
         return database.getContainer(ORDERS_CONTAINER);

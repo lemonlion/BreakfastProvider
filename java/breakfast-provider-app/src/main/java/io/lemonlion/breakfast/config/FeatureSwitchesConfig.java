@@ -7,6 +7,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public class FeatureSwitchesConfig {
 
     private boolean raspberryToppingEnabled = true;
+    private boolean goatMilkEnabled = true;
 
     public boolean isRaspberryToppingEnabled() {
         return raspberryToppingEnabled;
@@ -14,5 +15,13 @@ public class FeatureSwitchesConfig {
 
     public void setRaspberryToppingEnabled(boolean raspberryToppingEnabled) {
         this.raspberryToppingEnabled = raspberryToppingEnabled;
+    }
+
+    public boolean isGoatMilkEnabled() {
+        return goatMilkEnabled;
+    }
+
+    public void setGoatMilkEnabled(boolean goatMilkEnabled) {
+        this.goatMilkEnabled = goatMilkEnabled;
     }
 }

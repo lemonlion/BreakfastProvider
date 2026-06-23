@@ -29,6 +29,15 @@ public class ApiExceptionHandler {
         return problem;
     }
 
+    @ExceptionHandler(io.lemonlion.breakfast.downstream.DownstreamUnavailableException.class)
+    public ProblemDetail handleDownstreamUnavailable(
+            io.lemonlion.breakfast.downstream.DownstreamUnavailableException ex) {
+        ProblemDetail problem = ProblemDetail.forStatus(HttpStatus.BAD_GATEWAY);
+        problem.setTitle(ex.getServiceName() + " Unavailable");
+        problem.setDetail(ex.getMessage());
+        return problem;
+    }
+
     /** Thrown by the controller when {@code OrderService} reports an invalid status transition. */
     public static class InvalidStateTransitionException extends RuntimeException {
         public InvalidStateTransitionException(String message) {

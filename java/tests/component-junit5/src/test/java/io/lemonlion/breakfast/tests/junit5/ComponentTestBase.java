@@ -30,6 +30,6 @@ public abstract class ComponentTestBase {
     @BeforeEach
     void initClient() {
         client = new BreakfastTestClient("http://127.0.0.1:" + port);
-        BreakfastBackends.kitchen().reset();
+        BreakfastBackends.resetFakes();
     }
 }

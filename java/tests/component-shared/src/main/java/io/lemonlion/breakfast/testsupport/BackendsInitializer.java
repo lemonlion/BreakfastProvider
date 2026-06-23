@@ -32,6 +32,8 @@ public class BackendsInitializer implements ApplicationContextInitializer<Config
                 "bigquery.project-id=" + BreakfastBackends.bigQueryProjectId(),
                 "downstream.kitchen-service-url=" + BreakfastBackends.kitchenUrl(),
                 "downstream.supplier-service-url=" + BreakfastBackends.supplierUrl(),
+                "downstream.cow-service-url=" + BreakfastBackends.cowUrl(),
+                "downstream.goat-service-url=" + BreakfastBackends.goatUrl(),
                 // EventGrid has no emulator; the outbox still records + processes the message.
                 "event-grid.enabled=false",
                 // Fast outbox polling so processing assertions don't wait long.

@@ -49,6 +49,9 @@ public final class BreakfastBackends {
 
     private static final FakeKitchen KITCHEN = new FakeKitchen();
     private static final FakeSupplier SUPPLIER = new FakeSupplier();
+    private static final FakeMilkService COW = new FakeMilkService("/milk", "{\"milk\":\"Some_Milk\"}");
+    private static final FakeMilkService GOAT =
+            new FakeMilkService("/goat-milk", "{\"goatMilk\":\"Some_Fresh_Goat_Milk\"}");
 
     private static volatile boolean started;
 
@@ -68,6 +71,8 @@ public final class BreakfastBackends {
         BIGQUERY.start();
         KITCHEN.start();
         SUPPLIER.start();
+        COW.start();
+        GOAT.start();
         started = true;
     }
 
@@ -149,9 +154,27 @@ public final class BreakfastBackends {
         return SUPPLIER;
     }
 
+    public static String cowUrl() {
+        return COW.url();
+    }
+
+    public static FakeMilkService cow() {
+        return COW;
+    }
+
+    public static String goatUrl() {
+        return GOAT.url();
+    }
+
+    public static FakeMilkService goat() {
+        return GOAT;
+    }
+
     /** Resets all in-JVM fakes to their default behaviour (called from each test's setup). */
     public static void resetFakes() {
         KITCHEN.reset();
         SUPPLIER.reset();
+        COW.reset();
+        GOAT.reset();
     }
 }

@@ -27,6 +27,6 @@ public abstract class ComponentTestBaseNg extends AbstractTestNGSpringContextTes
     @BeforeMethod
     public void initClient() {
         client = new BreakfastTestClient("http://127.0.0.1:" + port);
-        BreakfastBackends.kitchen().reset();
+        BreakfastBackends.resetFakes();
     }
 }

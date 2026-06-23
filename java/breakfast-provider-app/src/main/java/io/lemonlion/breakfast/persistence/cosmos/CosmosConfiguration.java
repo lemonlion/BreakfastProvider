@@ -42,8 +42,31 @@ public class CosmosConfiguration {
 
     @Bean
     public CosmosDatabase breakfastDatabase(CosmosClient client, CosmosConfig config) {
-        client.createDatabaseIfNotExists(config.getDatabaseName());
+        withRetry(() -> client.createDatabaseIfNotExists(config.getDatabaseName()));
         return client.getDatabase(config.getDatabaseName());
+    }
+
+    /**
+     * Retries a Cosmos control-plane call. The emulator can momentarily time out (HTTP 408) at startup
+     * when several heavyweight Testcontainers backends compete for resources; a few retries ride that out.
+     */
+    private static void withRetry(Runnable action) {
+        RuntimeException last = null;
+        for (int attempt = 1; attempt <= 4; attempt++) {
+            try {
+                action.run();
+                return;
+            } catch (RuntimeException e) {
+                last = e;
+                try {
+                    Thread.sleep(2000L);
+                } catch (InterruptedException ie) {
+                    Thread.currentThread().interrupt();
+                    throw e;
+                }
+            }
+        }
+        throw last;
     }
 
     @Bean
@@ -73,12 +96,12 @@ public class CosmosConfiguration {
     }
 
     private static CosmosContainer ordersContainer(CosmosDatabase database) {
-        database.createContainerIfNotExists(ORDERS_CONTAINER, PARTITION_KEY_PATH);
+        withRetry(() -> database.createContainerIfNotExists(ORDERS_CONTAINER, PARTITION_KEY_PATH));
         return database.getContainer(ORDERS_CONTAINER);
     }
 
     private static CosmosContainer auditContainer(CosmosDatabase database) {
-        database.createContainerIfNotExists(AUDIT_CONTAINER, PARTITION_KEY_PATH);
+        withRetry(() -> database.createContainerIfNotExists(AUDIT_CONTAINER, PARTITION_KEY_PATH));
         return database.getContainer(AUDIT_CONTAINER);
     }
 }

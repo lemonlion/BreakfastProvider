@@ -7,9 +7,26 @@ import java.security.KeyStore;
 import java.time.Duration;
 import org.testcontainers.containers.CosmosDBEmulatorContainer;
 import org.testcontainers.containers.KafkaContainer;
+import com.google.api.gax.core.NoCredentialsProvider;
+import com.google.api.gax.grpc.GrpcTransportChannel;
+import com.google.api.gax.rpc.FixedTransportChannelProvider;
+import com.google.api.gax.rpc.TransportChannelProvider;
+import com.google.cloud.pubsub.v1.Publisher;
+import com.google.cloud.pubsub.v1.SubscriptionAdminClient;
+import com.google.cloud.pubsub.v1.SubscriptionAdminSettings;
+import com.google.cloud.pubsub.v1.TopicAdminClient;
+import com.google.cloud.pubsub.v1.TopicAdminSettings;
+import com.google.protobuf.ByteString;
+import com.google.pubsub.v1.PubsubMessage;
+import com.google.pubsub.v1.PushConfig;
+import com.google.pubsub.v1.SubscriptionName;
+import com.google.pubsub.v1.TopicName;
+import io.grpc.ManagedChannel;
+import io.grpc.ManagedChannelBuilder;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.MSSQLServerContainer;
 import org.testcontainers.containers.MongoDBContainer;
+import org.testcontainers.containers.PubSubEmulatorContainer;
 import org.testcontainers.containers.SpannerEmulatorContainer;
 import org.testcontainers.utility.DockerImageName;
 
@@ -47,6 +64,13 @@ public final class BreakfastBackends {
             .withExposedPorts(BIGQUERY_PORT)
             .withCommand("--project=" + BIGQUERY_PROJECT, "--dataset=breakfast_analytics");
 
+    private static final String PUBSUB_PROJECT = "test-project";
+    private static final String FEEDBACK_TOPIC = "customer-feedback";
+    private static final String FEEDBACK_SUBSCRIPTION = "customer-feedback-sub";
+    private static final PubSubEmulatorContainer PUBSUB = new PubSubEmulatorContainer(
+            DockerImageName.parse("gcr.io/google.com/cloudsdktool/google-cloud-cli:emulators"));
+    private static Publisher feedbackPublisher;
+
     private static final FakeKitchen KITCHEN = new FakeKitchen();
     private static final FakeSupplier SUPPLIER = new FakeSupplier();
     private static final FakeMilkService COW = new FakeMilkService("/milk", "{\"milk\":\"Some_Milk\"}");
@@ -69,6 +93,8 @@ public final class BreakfastBackends {
         MONGO.start();
         SPANNER.start();
         BIGQUERY.start();
+        PUBSUB.start();
+        configurePubSub();
         KITCHEN.start();
         SUPPLIER.start();
         COW.start();
@@ -136,6 +162,62 @@ public final class BreakfastBackends {
 
     public static String bigQueryProjectId() {
         return BIGQUERY_PROJECT;
+    }
+
+    public static String pubSubEndpoint() {
+        return PUBSUB.getEmulatorEndpoint();
+    }
+
+    public static String pubSubProjectId() {
+        return PUBSUB_PROJECT;
+    }
+
+    public static String feedbackSubscription() {
+        return FEEDBACK_SUBSCRIPTION;
+    }
+
+    /** Serializes the event and publishes it to the customer-feedback Pub/Sub topic. */
+    public static void publishCustomerFeedback(Object event) {
+        try {
+            publishCustomerFeedback(JsonMappers.instance().writeValueAsString(event));
+        } catch (Exception e) {
+            throw new IllegalStateException("Failed to serialize customer feedback event", e);
+        }
+    }
+
+    /** Publishes a customer-feedback event JSON to the Pub/Sub topic the SUT consumer subscribes to. */
+    public static void publishCustomerFeedback(String json) {
+        try {
+            feedbackPublisher.publish(PubsubMessage.newBuilder()
+                    .setData(ByteString.copyFromUtf8(json)).build()).get();
+        } catch (Exception e) {
+            throw new IllegalStateException("Failed to publish customer feedback", e);
+        }
+    }
+
+    /** Creates the customer-feedback topic + subscription on the emulator and a publisher for tests. */
+    private static void configurePubSub() {
+        try {
+            ManagedChannel channel = ManagedChannelBuilder.forTarget(PUBSUB.getEmulatorEndpoint())
+                    .usePlaintext().build();
+            TransportChannelProvider channelProvider =
+                    FixedTransportChannelProvider.create(GrpcTransportChannel.create(channel));
+            NoCredentialsProvider creds = NoCredentialsProvider.create();
+            TopicName topicName = TopicName.of(PUBSUB_PROJECT, FEEDBACK_TOPIC);
+            try (TopicAdminClient topicAdmin = TopicAdminClient.create(TopicAdminSettings.newBuilder()
+                    .setTransportChannelProvider(channelProvider).setCredentialsProvider(creds).build())) {
+                topicAdmin.createTopic(topicName);
+            }
+            try (SubscriptionAdminClient subAdmin = SubscriptionAdminClient.create(SubscriptionAdminSettings.newBuilder()
+                    .setTransportChannelProvider(channelProvider).setCredentialsProvider(creds).build())) {
+                subAdmin.createSubscription(SubscriptionName.of(PUBSUB_PROJECT, FEEDBACK_SUBSCRIPTION),
+                        topicName, PushConfig.getDefaultInstance(), 10);
+            }
+            feedbackPublisher = Publisher.newBuilder(topicName)
+                    .setChannelProvider(channelProvider).setCredentialsProvider(creds).build();
+        } catch (Exception e) {
+            throw new IllegalStateException("Failed to configure Pub/Sub emulator", e);
+        }
     }
 
     public static String kitchenUrl() {

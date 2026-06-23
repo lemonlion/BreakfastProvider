@@ -80,6 +80,16 @@
             <artifactId>google-cloud-bigquery</artifactId>
         </dependency>
 
+        <!-- Google Pub/Sub (C# event consumers: CustomerFeedback, Reporting). -->
+        <dependency>
+            <groupId>com.google.cloud</groupId>
+            <artifactId>google-cloud-pubsub</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.kronikol</groupId>
+            <artifactId>kronikol4j-gcp</artifactId>
+        </dependency>
+
         <!-- Kronikol4J: server-side identity (servlet), Spring/HTTP client tracking, Azure + messaging recorders. -->
         <dependency>
             <groupId>io.kronikol</groupId>

@@ -58,6 +58,10 @@
             <groupId>org.testcontainers</groupId>
             <artifactId>gcloud</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.google.cloud</groupId>
+            <artifactId>google-cloud-pubsub</artifactId>
+        </dependency>
 
         <!-- Kronikol4J: identity headers/scope so the test client attributes the SUT's interactions. -->
         <dependency>

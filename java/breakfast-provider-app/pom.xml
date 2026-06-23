@@ -30,6 +30,12 @@
             <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
 
+        <!-- GraphQL reporting API (C# HotChocolate ReportingQuery -> Spring for GraphQL). -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-graphql</artifactId>
+        </dependency>
+
         <!-- Faithful per-service backends: Cosmos (persistence + outbox), EventGrid (event egress), Kafka (recipe log). -->
         <dependency>
             <groupId>com.azure</groupId>

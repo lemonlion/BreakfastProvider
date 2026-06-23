@@ -1,0 +1,18 @@
+type Query {
+    orderSummaries: [OrderSummary!]!
+    popularRecipes: [RecipeTypeCount!]!
+}
+
+type OrderSummary {
+    orderId: ID!
+    customerName: String!
+    itemCount: Int!
+    tableNumber: Int
+    status: String!
+    createdAt: String!
+}
+
+type RecipeTypeCount {
+    recipeType: String!
+    count: Int!
+}

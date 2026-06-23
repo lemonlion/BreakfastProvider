@@ -38,6 +38,14 @@ public final class BreakfastTestClient {
         return send(requestBuilder(path).method("PATCH", jsonBody(body)).header("Content-Type", "application/json"));
     }
 
+    public TestResponse put(String path, Object body) {
+        return send(requestBuilder(path).PUT(jsonBody(body)).header("Content-Type", "application/json"));
+    }
+
+    public TestResponse delete(String path) {
+        return send(requestBuilder(path).DELETE());
+    }
+
     private HttpRequest.Builder requestBuilder(String path) {
         HttpRequest.Builder builder = HttpRequest.newBuilder(URI.create(baseUrl + path)).header("Accept", "application/json");
         TestInfo identity = TestIdentityScope.current();

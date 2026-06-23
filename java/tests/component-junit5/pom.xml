@@ -93,12 +93,17 @@
                         <id>kronikol-merge-report</id>
                         <phase>verify</phase>
                         <goals>
-                            <goal>java</goal>
+                            <goal>exec</goal>
                         </goals>
                         <configuration>
+                            <!-- Fork a separate JVM: the CLI calls System.exit, which under exec:java
+                                 would terminate the Maven reactor (skipping later modules). -->
+                            <executable>${java.home}/bin/java</executable>
                             <classpathScope>test</classpathScope>
-                            <mainClass>io.kronikol.cli.Main</mainClass>
                             <arguments>
+                                <argument>-classpath</argument>
+                                <classpath/>
+                                <argument>io.kronikol.cli.Main</argument>
                                 <argument>merge</argument>
                                 <argument>${kronikol.fragments.dir}</argument>
                                 <argument>-o</argument>

@@ -33,6 +33,7 @@ public final class FakeMilkService {
             throw new UncheckedIOException("Failed to start fake milk service", e);
         }
         server.createContext(path, this::handle);
+        server.createContext("/health", FakeHealth::ok);
         server.setExecutor(null);
         server.start();
     }

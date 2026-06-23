@@ -31,6 +31,7 @@ public final class FakeKitchen {
             throw new UncheckedIOException("Failed to start fake kitchen", e);
         }
         server.createContext("/prepare", this::handlePrepare);
+        server.createContext("/health", FakeHealth::ok);
         server.setExecutor(null);
         server.start();
     }

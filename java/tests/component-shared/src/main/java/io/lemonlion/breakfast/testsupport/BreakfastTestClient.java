@@ -40,6 +40,12 @@ public final class BreakfastTestClient {
         return send(requestBuilder(path).GET());
     }
 
+    public TestResponse get(String path, java.util.Map<String, String> headers) {
+        HttpRequest.Builder builder = requestBuilder(path).GET();
+        headers.forEach(builder::header);
+        return send(builder);
+    }
+
     public TestResponse patch(String path, Object body) {
         return send(requestBuilder(path).method("PATCH", jsonBody(body)).header("Content-Type", "application/json"));
     }
@@ -75,7 +81,7 @@ public final class BreakfastTestClient {
     private TestResponse send(HttpRequest.Builder builder) {
         try {
             HttpResponse<String> response = httpClient.send(builder.build(), BodyHandlers.ofString());
-            return new TestResponse(response.statusCode(), response.body());
+            return new TestResponse(response.statusCode(), response.body(), response.headers().map());
         } catch (Exception e) {
             throw new IllegalStateException("HTTP request failed", e);
         }

@@ -32,6 +32,7 @@ public final class FakeSupplier {
         }
         server.createContext("/ingredients/milk/availability", this::handleAvailability);
         server.createContext("/ingredients/feedback", this::handleFeedback);
+        server.createContext("/health", FakeHealth::ok);
         server.setExecutor(null);
         server.start();
     }

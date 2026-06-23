@@ -506,6 +506,41 @@ jobs:
       coverage-file: bddfy-external-sut.coverage.cobertura.xml
 
 
+  # ─── Java twin (Spring Boot + Kronikol4J, docker run mode) ────────────────────
+
+  java-junit5:
+    name: Java JUnit 5
+    uses: ./.github/workflows/_tests-java.yml
+    with:
+      framework: junit5
+      report-artifact: java-junit5-report
+    secrets: inherit
+
+  java-testng:
+    name: Java TestNG
+    uses: ./.github/workflows/_tests-java.yml
+    with:
+      framework: testng
+      report-artifact: java-testng-report
+    secrets: inherit
+
+  java-cucumber:
+    name: Java Cucumber
+    uses: ./.github/workflows/_tests-java.yml
+    with:
+      framework: cucumber
+      report-artifact: java-cucumber-report
+    secrets: inherit
+
+  java-spock:
+    name: Java Spock
+    uses: ./.github/workflows/_tests-java.yml
+    with:
+      framework: spock
+      report-artifact: java-spock-report
+    secrets: inherit
+
+
   # ─── Gate ───────────────────────────────────────────────────────────────────
 
   checks-complete:
@@ -530,6 +565,10 @@ jobs:
       - bddfy-in-memory
       - bddfy-in-docker
       - bddfy-external-sut
+      - java-junit5
+      - java-testng
+      - java-cucumber
+      - java-spock
     runs-on: ubuntu-24.04
     steps:
       - name: Checks complete
@@ -568,6 +607,10 @@ jobs:
       - tunit-external-sut
       - nunit-external-sut
       - bddfy-external-sut
+      - java-junit5
+      - java-testng
+      - java-cucumber
+      - java-spock
     runs-on: ubuntu-24.04
     permissions:
       pages: write
@@ -618,6 +661,32 @@ jobs:
         with:
           name: bddfy-in-memory-report
           path: site/reports/bddfy
+
+      # ─── Java reports (Spring Boot + Kronikol4J) ────────────────────────────
+
+      - name: Download Java JUnit 5 report
+        uses: actions/download-artifact@v7
+        with:
+          name: java-junit5-report
+          path: site/reports/java-junit5
+
+      - name: Download Java TestNG report
+        uses: actions/download-artifact@v7
+        with:
+          name: java-testng-report
+          path: site/reports/java-testng
+
+      - name: Download Java Cucumber report
+        uses: actions/download-artifact@v7
+        with:
+          name: java-cucumber-report
+          path: site/reports/java-cucumber
+
+      - name: Download Java Spock report
+        uses: actions/download-artifact@v7
+        with:
+          name: java-spock-report
+          path: site/reports/java-spock
 
       # ─── Docker reports ───────────────────────────────────────────────────
 
@@ -870,6 +939,30 @@ jobs:
                 </a>
               </div>
 
+              <p class="section-title">Java Test Run Reports (Kronikol4J)</p>
+              <div class="card-grid">
+                <a href="reports/java-junit5/TestRunReport.html" class="card">
+                  <div class="card-icon">☕</div>
+                  <h3>JUnit 5</h3>
+                  <p>Spring Boot component test report via Kronikol4J (JUnit 5)</p>
+                </a>
+                <a href="reports/java-testng/TestRunReport.html" class="card">
+                  <div class="card-icon">🧫</div>
+                  <h3>TestNG</h3>
+                  <p>Spring Boot component test report via Kronikol4J (TestNG)</p>
+                </a>
+                <a href="reports/java-cucumber/TestRunReport.html" class="card">
+                  <div class="card-icon">🥒</div>
+                  <h3>Cucumber</h3>
+                  <p>Gherkin-based Spring Boot component test report via Kronikol4J</p>
+                </a>
+                <a href="reports/java-spock/TestRunReport.html" class="card">
+                  <div class="card-icon">🖖</div>
+                  <h3>Spock</h3>
+                  <p>Groovy Spock Spring Boot component test report via Kronikol4J</p>
+                </a>
+              </div>
+
               <p class="section-title">API Specifications</p>
               <div class="card-grid">
                 <a href="api/openapi.html" class="card">
@@ -895,6 +988,11 @@ jobs:
                   <div class="card-icon">📊</div>
                   <h3>Kronikol</h3>
                   <p>Test reporting library with sequence diagrams</p>
+                </a>
+                <a href="https://github.com/lemonlion/Kronikol4J" target="_blank" class="card">
+                  <div class="card-icon">📈</div>
+                  <h3>Kronikol4J</h3>
+                  <p>Java port of the Kronikol test reporting library</p>
                 </a>
               </div>
             </div>

@@ -15,5 +15,8 @@ public interface CosmosRepository<T> {
     /** Returns up to {@code limit} items after {@code offset}, newest first, plus the total count. */
     PagedItems<T> queryPaged(int offset, int limit);
 
+    /** Returns all items of this repository's type (used by query/filter domains like audit logs). */
+    java.util.List<T> findAll();
+
     T upsert(T item, String partitionKey);
 }

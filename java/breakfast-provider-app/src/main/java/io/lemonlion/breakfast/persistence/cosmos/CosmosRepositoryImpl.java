@@ -64,6 +64,15 @@ public class CosmosRepositoryImpl<T> implements CosmosRepository<T> {
     }
 
     @Override
+    public List<T> findAll() {
+        String query = "SELECT * FROM c" + (docType != null ? " WHERE c.docType = '" + docType + "'" : "");
+        CosmosPagedIterable<T> results = container.queryItems(query, new CosmosQueryRequestOptions(), type);
+        List<T> all = new ArrayList<>();
+        results.forEach(all::add);
+        return all;
+    }
+
+    @Override
     public T upsert(T item, String partitionKey) {
         return container.upsertItem(item, new PartitionKey(partitionKey), new CosmosItemRequestOptions()).getItem();
     }

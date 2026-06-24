@@ -43,6 +43,34 @@ public class OrderSteps {
         createdOrder = ctx.client().post("/orders", valid()).as(OrderResponse.class);
     }
 
+    @Given("the kitchen service is failing")
+    public void theKitchenServiceIsFailing() {
+        // Touch the client first so its one-time kitchen reset happens before we force a failure.
+        ctx.client();
+        BreakfastBackends.kitchen().setNextStatus(503);
+    }
+
+    @Given("two breakfast orders have been placed")
+    public void twoOrdersHaveBeenPlaced() {
+        String customer = "Page-" + UUID.randomUUID();
+        ctx.client().post("/orders", new OrderRequest(customer, List.of(new OrderItemRequest("Pancakes", UUID.randomUUID(), 1)), 1));
+        ctx.client().post("/orders", new OrderRequest(customer, List.of(new OrderItemRequest("Pancakes", UUID.randomUUID(), 1)), 2));
+    }
+
+    @When("orders are listed with page {int} and page size {int}")
+    public void ordersAreListed(int page, int pageSize) {
+        ctx.lastResponse = ctx.client().get("/orders?page=" + page + "&pageSize=" + pageSize);
+    }
+
+    @Then("the pagination metadata reflects page {int} with page size {int}")
+    public void paginationMetadataReflects(int page, int pageSize) {
+        com.fasterxml.jackson.databind.JsonNode body = ctx.lastResponse.json();
+        assertThat(body.get("page").asInt()).isEqualTo(page);
+        assertThat(body.get("pageSize").asInt()).isEqualTo(pageSize);
+        assertThat(body.get("items").size()).isEqualTo(pageSize);
+        assertThat(body.get("totalCount").asInt()).isGreaterThanOrEqualTo(2);
+    }
+
     @When("the order is placed")
     public void theOrderIsPlaced() {
         ctx.lastResponse = ctx.client().post("/orders", request);

@@ -27,3 +27,25 @@ Feature: Orders
     When the order is placed
     Then the response status is 400
     And the error mentions "'Customer Name' is required."
+
+  Scenario: An order moves through its complete lifecycle to Completed
+    Given a placed breakfast order
+    When the order status is updated to "Preparing"
+    Then the response status is 200
+    When the order status is updated to "Ready"
+    Then the response status is 200
+    When the order status is updated to "Completed"
+    Then the response status is 200
+    And the order status is "Completed"
+
+  Scenario: An order is still created when the kitchen service fails
+    Given the kitchen service is failing
+    And a valid breakfast order
+    When the order is placed
+    Then the order is created successfully
+
+  Scenario: Orders are returned with pagination metadata
+    Given two breakfast orders have been placed
+    When orders are listed with page 1 and page size 1
+    Then the response status is 200
+    And the pagination metadata reflects page 1 with page size 1

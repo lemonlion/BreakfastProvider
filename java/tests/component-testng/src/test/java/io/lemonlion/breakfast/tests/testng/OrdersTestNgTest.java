@@ -62,4 +62,38 @@ public class OrdersTestNgTest extends ComponentTestBaseNg {
         assertThat(response.status()).isEqualTo(400);
         assertThat(response.bodyContains("'Customer Name' is required.")).isTrue();
     }
+
+    @Test
+    public void completeLifecycle() {
+        String id = client.post("/orders", validOrder()).as(OrderResponse.class).orderId().toString();
+        assertThat(client.patch("/orders/" + id + "/status", new UpdateOrderStatusRequest("Preparing")).status())
+                .isEqualTo(200);
+        assertThat(client.patch("/orders/" + id + "/status", new UpdateOrderStatusRequest("Ready")).status())
+                .isEqualTo(200);
+        TestResponse completed = client.patch("/orders/" + id + "/status", new UpdateOrderStatusRequest("Completed"));
+        assertThat(completed.status()).isEqualTo(200);
+        assertThat(completed.as(OrderResponse.class).status()).isEqualTo("Completed");
+    }
+
+    @Test
+    public void kitchenFailureStillCreatesOrder() {
+        BreakfastBackends.kitchen().setNextStatus(503);
+        TestResponse response = client.post("/orders", validOrder());
+        assertThat(response.status()).isEqualTo(201);
+        assertThat(response.as(OrderResponse.class).customerName()).isEqualTo("Alice");
+    }
+
+    @Test
+    public void pagination() {
+        String customer = "Page-" + UUID.randomUUID();
+        client.post("/orders", new OrderRequest(customer, List.of(new OrderItemRequest("Pancakes", UUID.randomUUID(), 1)), 1));
+        client.post("/orders", new OrderRequest(customer, List.of(new OrderItemRequest("Pancakes", UUID.randomUUID(), 1)), 2));
+        TestResponse page = client.get("/orders?page=1&pageSize=1");
+        assertThat(page.status()).isEqualTo(200);
+        com.fasterxml.jackson.databind.JsonNode body = page.json();
+        assertThat(body.get("page").asInt()).isEqualTo(1);
+        assertThat(body.get("pageSize").asInt()).isEqualTo(1);
+        assertThat(body.get("items").size()).isEqualTo(1);
+        assertThat(body.get("totalCount").asInt()).isGreaterThanOrEqualTo(2);
+    }
 }

@@ -80,4 +80,50 @@ class OrdersSpec extends Specification {
         response.status() == 400
         response.bodyContains("'Customer Name' is required.")
     }
+
+    def "an order moves through its complete lifecycle to Completed"() {
+        given:
+        def id = client.post("/orders", validOrder()).as(OrderResponse).orderId().toString()
+
+        expect:
+        client.patch("/orders/${id}/status", new UpdateOrderStatusRequest("Preparing")).status() == 200
+        client.patch("/orders/${id}/status", new UpdateOrderStatusRequest("Ready")).status() == 200
+
+        when:
+        def completed = client.patch("/orders/${id}/status", new UpdateOrderStatusRequest("Completed"))
+
+        then:
+        completed.status() == 200
+        completed.as(OrderResponse).status() == "Completed"
+    }
+
+    def "an order is still created when the kitchen service fails"() {
+        given:
+        BreakfastBackends.kitchen().setNextStatus(503)
+
+        when:
+        def response = client.post("/orders", validOrder())
+
+        then:
+        response.status() == 201
+        response.as(OrderResponse).customerName() == "Alice"
+    }
+
+    def "orders are returned with pagination metadata"() {
+        given:
+        def customer = "Page-${UUID.randomUUID()}"
+        client.post("/orders", new OrderRequest(customer, [new OrderItemRequest("Pancakes", UUID.randomUUID(), 1)], 1))
+        client.post("/orders", new OrderRequest(customer, [new OrderItemRequest("Pancakes", UUID.randomUUID(), 1)], 2))
+
+        when:
+        def page = client.get("/orders?page=1&pageSize=1")
+
+        then:
+        page.status() == 200
+        def body = page.json()
+        body.get("page").asInt() == 1
+        body.get("pageSize").asInt() == 1
+        body.get("items").size() == 1
+        body.get("totalCount").asInt() >= 2
+    }
 }

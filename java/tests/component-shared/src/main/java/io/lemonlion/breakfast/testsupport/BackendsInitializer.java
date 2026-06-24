@@ -41,9 +41,15 @@ public class BackendsInitializer implements ApplicationContextInitializer<Config
                 "event-grid.enabled=false",
                 // Fast outbox polling so processing assertions don't wait long.
                 "outbox.polling-interval-seconds=1",
-                // gRPC: run the SUT's server in-process (no TCP port) so tests reach it via a named channel.
-                "grpc.server.in-process-name=" + GrpcSupport.IN_PROCESS_NAME,
+                // gRPC: in-process server (no TCP port). The default in-process name lets the gRPC tests
+                // reach it via GrpcSupport; an override context (e.g. rate-limiting) can set its own name
+                // via @TestPropertySource so two live contexts don't collide on the same in-process name.
                 "grpc.server.port=-1"
         ).applyTo(context.getEnvironment());
+
+        if (context.getEnvironment().getProperty("grpc.server.in-process-name") == null) {
+            TestPropertyValues.of("grpc.server.in-process-name=" + GrpcSupport.IN_PROCESS_NAME)
+                    .applyTo(context.getEnvironment());
+        }
     }
 }

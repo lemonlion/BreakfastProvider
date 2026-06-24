@@ -49,3 +49,9 @@ Feature: Orders
     When orders are listed with page 1 and page size 1
     Then the response status is 200
     And the pagination metadata reflects page 1 with page size 1
+
+  Scenario: An order exceeding the item limit is rejected
+    Given an order request with 11 items
+    When the order is placed
+    Then the response status is 400
+    And the error mentions "cannot contain more than 10 items"

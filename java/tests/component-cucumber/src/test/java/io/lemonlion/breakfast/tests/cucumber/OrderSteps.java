@@ -38,6 +38,15 @@ public class OrderSteps {
         request = new OrderRequest(null, List.of(new OrderItemRequest("Pancakes", UUID.randomUUID(), 1)), 1);
     }
 
+    @Given("an order request with {int} items")
+    public void anOrderRequestWithItems(int count) {
+        java.util.List<OrderItemRequest> items = new java.util.ArrayList<>();
+        for (int i = 0; i < count; i++) {
+            items.add(new OrderItemRequest("Pancakes", UUID.randomUUID(), 1));
+        }
+        request = new OrderRequest("Alice", items, 1);
+    }
+
     @Given("a placed breakfast order")
     public void aPlacedBreakfastOrder() {
         createdOrder = ctx.client().post("/orders", valid()).as(OrderResponse.class);

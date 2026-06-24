@@ -128,6 +128,20 @@ class OrdersComponentTest extends ComponentTestBase {
     }
 
     @Test
+    @DisplayName("an order exceeding the item limit is rejected with 400")
+    void tooManyItemsRejected() {
+        List<OrderItemRequest> items = new java.util.ArrayList<>();
+        for (int i = 0; i < 11; i++) {
+            items.add(new OrderItemRequest("Pancakes", UUID.randomUUID(), 1));
+        }
+
+        TestResponse response = client.post("/orders", new OrderRequest("Alice", items, 1));
+
+        assertThat(response.status()).isEqualTo(400);
+        assertThat(response.bodyContains("cannot contain more than 10 items")).isTrue();
+    }
+
+    @Test
     @DisplayName("orders are returned with pagination metadata")
     void pagination() {
         String customer = "Page-" + UUID.randomUUID();

@@ -84,6 +84,17 @@ public class OrdersTestNgTest extends ComponentTestBaseNg {
     }
 
     @Test
+    public void tooManyItemsRejected() {
+        java.util.List<OrderItemRequest> items = new java.util.ArrayList<>();
+        for (int i = 0; i < 11; i++) {
+            items.add(new OrderItemRequest("Pancakes", UUID.randomUUID(), 1));
+        }
+        TestResponse response = client.post("/orders", new OrderRequest("Alice", items, 1));
+        assertThat(response.status()).isEqualTo(400);
+        assertThat(response.bodyContains("cannot contain more than 10 items")).isTrue();
+    }
+
+    @Test
     public void pagination() {
         String customer = "Page-" + UUID.randomUUID();
         client.post("/orders", new OrderRequest(customer, List.of(new OrderItemRequest("Pancakes", UUID.randomUUID(), 1)), 1));

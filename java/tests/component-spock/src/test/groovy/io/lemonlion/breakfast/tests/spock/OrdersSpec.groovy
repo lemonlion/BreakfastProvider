@@ -109,6 +109,18 @@ class OrdersSpec extends Specification {
         response.as(OrderResponse).customerName() == "Alice"
     }
 
+    def "an order exceeding the item limit is rejected with 400"() {
+        given:
+        def items = (1..11).collect { new OrderItemRequest("Pancakes", UUID.randomUUID(), 1) }
+
+        when:
+        def response = client.post("/orders", new OrderRequest("Alice", items, 1))
+
+        then:
+        response.status() == 400
+        response.bodyContains("cannot contain more than 10 items")
+    }
+
     def "orders are returned with pagination metadata"() {
         given:
         def customer = "Page-${UUID.randomUUID()}"

@@ -9,6 +9,7 @@ import io.lemonlion.breakfast.model.event.RecipeLogEvent;
 import io.lemonlion.breakfast.model.request.MuffinRequest;
 import io.lemonlion.breakfast.model.request.MuffinTopping;
 import io.lemonlion.breakfast.model.response.MuffinResponse;
+import io.lemonlion.breakfast.reporting.BatchCompletionPublisher;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
@@ -24,12 +25,15 @@ public class MuffinServiceImpl implements MuffinService {
     private final RecipeLogger recipeLogger;
     private final PubSubPublisher pubSubPublisher;
     private final EventHubPublisher eventHubPublisher;
+    private final BatchCompletionPublisher batchCompletionPublisher;
 
     public MuffinServiceImpl(RecipeLogger recipeLogger, PubSubPublisher pubSubPublisher,
-                             EventHubPublisher eventHubPublisher) {
+                             EventHubPublisher eventHubPublisher,
+                             BatchCompletionPublisher batchCompletionPublisher) {
         this.recipeLogger = recipeLogger;
         this.pubSubPublisher = pubSubPublisher;
         this.eventHubPublisher = eventHubPublisher;
+        this.batchCompletionPublisher = batchCompletionPublisher;
     }
 
     @Override
@@ -46,6 +50,7 @@ public class MuffinServiceImpl implements MuffinService {
                 batchId, ingredients, toppings, request.baking().temperature(), now));
         eventHubPublisher.publish(new EquipmentAlertEvent(
                 UUID.randomUUID(), batchId, "Muffin Oven", "UsageCycleCompleted", now));
+        batchCompletionPublisher.publish("AppleCinnamonMuffins", batchId, now);
 
         return new MuffinResponse(batchId, ingredients, toppings,
                 request.baking().temperature(), request.baking().durationMinutes(), now);

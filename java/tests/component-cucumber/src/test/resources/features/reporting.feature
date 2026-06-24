@@ -13,3 +13,7 @@ Feature: Reporting
     When an ingredient delivery is posted to the EventGrid webhook
     Then the response status is 200
     And the ingredient shipment appears in the reporting shipments
+
+  Scenario: A completed pancake batch is ingested into batch completions
+    When a pancake batch is completed
+    Then the batch appears in the batch completions

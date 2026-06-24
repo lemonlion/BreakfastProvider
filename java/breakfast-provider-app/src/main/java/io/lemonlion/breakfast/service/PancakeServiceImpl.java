@@ -3,6 +3,7 @@ package io.lemonlion.breakfast.service;
 import io.lemonlion.breakfast.events.EventHubPublisher;
 import io.lemonlion.breakfast.events.PubSubPublisher;
 import io.lemonlion.breakfast.events.RecipeLogger;
+import io.lemonlion.breakfast.reporting.BatchCompletionPublisher;
 import io.lemonlion.breakfast.model.event.EquipmentAlertEvent;
 import io.lemonlion.breakfast.model.event.PancakeBatchCompletedEvent;
 import io.lemonlion.breakfast.model.event.RecipeLogEvent;
@@ -23,12 +24,15 @@ public class PancakeServiceImpl implements PancakeService {
     private final RecipeLogger recipeLogger;
     private final PubSubPublisher pubSubPublisher;
     private final EventHubPublisher eventHubPublisher;
+    private final BatchCompletionPublisher batchCompletionPublisher;
 
     public PancakeServiceImpl(RecipeLogger recipeLogger, PubSubPublisher pubSubPublisher,
-                              EventHubPublisher eventHubPublisher) {
+                              EventHubPublisher eventHubPublisher,
+                              BatchCompletionPublisher batchCompletionPublisher) {
         this.recipeLogger = recipeLogger;
         this.pubSubPublisher = pubSubPublisher;
         this.eventHubPublisher = eventHubPublisher;
+        this.batchCompletionPublisher = batchCompletionPublisher;
     }
 
     @Override
@@ -41,6 +45,7 @@ public class PancakeServiceImpl implements PancakeService {
         pubSubPublisher.publish(new PancakeBatchCompletedEvent(batchId, ingredients, request.toppings(), now));
         eventHubPublisher.publish(new EquipmentAlertEvent(
                 UUID.randomUUID(), batchId, "Griddle", "UsageCycleCompleted", now));
+        batchCompletionPublisher.publish("Pancakes", batchId, now);
 
         return new PancakeResponse(batchId, ingredients, request.toppings(), now);
     }

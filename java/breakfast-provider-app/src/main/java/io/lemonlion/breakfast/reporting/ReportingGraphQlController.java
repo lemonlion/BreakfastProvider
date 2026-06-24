@@ -1,5 +1,6 @@
 package io.lemonlion.breakfast.reporting;
 
+import io.lemonlion.breakfast.storage.BatchCompletionRecordRepository;
 import io.lemonlion.breakfast.storage.IngredientShipmentRepository;
 import io.lemonlion.breakfast.storage.OrderSummaryRepository;
 import java.util.LinkedHashMap;
@@ -14,11 +15,14 @@ public class ReportingGraphQlController {
 
     private final OrderSummaryRepository orderSummaries;
     private final IngredientShipmentRepository ingredientShipments;
+    private final BatchCompletionRecordRepository batchCompletions;
 
     public ReportingGraphQlController(OrderSummaryRepository orderSummaries,
-                                      IngredientShipmentRepository ingredientShipments) {
+                                      IngredientShipmentRepository ingredientShipments,
+                                      BatchCompletionRecordRepository batchCompletions) {
         this.orderSummaries = orderSummaries;
         this.ingredientShipments = ingredientShipments;
+        this.batchCompletions = batchCompletions;
     }
 
     @QueryMapping
@@ -64,6 +68,19 @@ public class ReportingGraphQlController {
     /** GraphQL view of {@code IngredientShipment}. */
     public record IngredientShipmentView(String deliveryId, String ingredientName, double quantity,
                                          String deliveredAt) {
+    }
+
+    @QueryMapping
+    public List<BatchCompletionView> batchCompletions() {
+        return batchCompletions.findAll().stream()
+                .map(b -> new BatchCompletionView(
+                        b.getBatchId().toString(), b.getRecipeType(),
+                        b.getCompletedAt() == null ? null : b.getCompletedAt().toString()))
+                .toList();
+    }
+
+    /** GraphQL view of {@code BatchCompletionRecord}. */
+    public record BatchCompletionView(String batchId, String recipeType, String completedAt) {
     }
 
     /** GraphQL view of {@code OrderSummary}. */

@@ -67,6 +67,8 @@ public final class BreakfastBackends {
     private static final String PUBSUB_PROJECT = "test-project";
     private static final String FEEDBACK_TOPIC = "customer-feedback";
     private static final String FEEDBACK_SUBSCRIPTION = "customer-feedback-sub";
+    private static final String BATCH_TOPIC = "batch-completions";
+    private static final String BATCH_SUBSCRIPTION = "batch-completions-sub";
     private static final PubSubEmulatorContainer PUBSUB = new PubSubEmulatorContainer(
             DockerImageName.parse("gcr.io/google.com/cloudsdktool/google-cloud-cli:emulators"));
     private static Publisher feedbackPublisher;
@@ -204,14 +206,18 @@ public final class BreakfastBackends {
                     FixedTransportChannelProvider.create(GrpcTransportChannel.create(channel));
             NoCredentialsProvider creds = NoCredentialsProvider.create();
             TopicName topicName = TopicName.of(PUBSUB_PROJECT, FEEDBACK_TOPIC);
+            TopicName batchTopicName = TopicName.of(PUBSUB_PROJECT, BATCH_TOPIC);
             try (TopicAdminClient topicAdmin = TopicAdminClient.create(TopicAdminSettings.newBuilder()
                     .setTransportChannelProvider(channelProvider).setCredentialsProvider(creds).build())) {
                 topicAdmin.createTopic(topicName);
+                topicAdmin.createTopic(batchTopicName);
             }
             try (SubscriptionAdminClient subAdmin = SubscriptionAdminClient.create(SubscriptionAdminSettings.newBuilder()
                     .setTransportChannelProvider(channelProvider).setCredentialsProvider(creds).build())) {
                 subAdmin.createSubscription(SubscriptionName.of(PUBSUB_PROJECT, FEEDBACK_SUBSCRIPTION),
                         topicName, PushConfig.getDefaultInstance(), 10);
+                subAdmin.createSubscription(SubscriptionName.of(PUBSUB_PROJECT, BATCH_SUBSCRIPTION),
+                        batchTopicName, PushConfig.getDefaultInstance(), 10);
             }
             feedbackPublisher = Publisher.newBuilder(topicName)
                     .setChannelProvider(channelProvider).setCredentialsProvider(creds).build();

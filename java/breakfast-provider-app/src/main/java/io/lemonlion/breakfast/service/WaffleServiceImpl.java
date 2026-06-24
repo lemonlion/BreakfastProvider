@@ -4,6 +4,7 @@ import io.lemonlion.breakfast.events.PubSubPublisher;
 import io.lemonlion.breakfast.events.RecipeLogger;
 import io.lemonlion.breakfast.model.event.RecipeLogEvent;
 import io.lemonlion.breakfast.model.event.WaffleBatchCompletedEvent;
+import io.lemonlion.breakfast.reporting.BatchCompletionPublisher;
 import io.lemonlion.breakfast.model.request.WaffleRequest;
 import io.lemonlion.breakfast.model.response.WaffleResponse;
 import java.time.Instant;
@@ -17,10 +18,13 @@ public class WaffleServiceImpl implements WaffleService {
 
     private final RecipeLogger recipeLogger;
     private final PubSubPublisher pubSubPublisher;
+    private final BatchCompletionPublisher batchCompletionPublisher;
 
-    public WaffleServiceImpl(RecipeLogger recipeLogger, PubSubPublisher pubSubPublisher) {
+    public WaffleServiceImpl(RecipeLogger recipeLogger, PubSubPublisher pubSubPublisher,
+                             BatchCompletionPublisher batchCompletionPublisher) {
         this.recipeLogger = recipeLogger;
         this.pubSubPublisher = pubSubPublisher;
+        this.batchCompletionPublisher = batchCompletionPublisher;
     }
 
     @Override
@@ -31,6 +35,7 @@ public class WaffleServiceImpl implements WaffleService {
 
         recipeLogger.logRecipe(new RecipeLogEvent(batchId, "Waffles", ingredients, request.toppings(), now));
         pubSubPublisher.publish(new WaffleBatchCompletedEvent(batchId, ingredients, request.toppings(), now));
+        batchCompletionPublisher.publish("Waffles", batchId, now);
 
         return new WaffleResponse(batchId, ingredients, request.toppings(), now);
     }

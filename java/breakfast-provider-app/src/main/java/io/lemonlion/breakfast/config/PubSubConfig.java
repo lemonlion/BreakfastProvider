@@ -10,6 +10,8 @@ public class PubSubConfig {
     private String emulatorEndpoint = "";
     private String customerFeedbackTopic = "customer-feedback";
     private String customerFeedbackSubscription = "customer-feedback-sub";
+    private String batchCompletionTopic = "batch-completions";
+    private String batchCompletionSubscription = "batch-completions-sub";
 
     public boolean isEnabled() {
         return !emulatorEndpoint.isBlank() || !projectId.isBlank();
@@ -45,5 +47,21 @@ public class PubSubConfig {
 
     public void setCustomerFeedbackSubscription(String customerFeedbackSubscription) {
         this.customerFeedbackSubscription = customerFeedbackSubscription;
+    }
+
+    public String getBatchCompletionTopic() {
+        return batchCompletionTopic;
+    }
+
+    public void setBatchCompletionTopic(String batchCompletionTopic) {
+        this.batchCompletionTopic = batchCompletionTopic;
+    }
+
+    public String getBatchCompletionSubscription() {
+        return batchCompletionSubscription;
+    }
+
+    public void setBatchCompletionSubscription(String batchCompletionSubscription) {
+        this.batchCompletionSubscription = batchCompletionSubscription;
     }
 }

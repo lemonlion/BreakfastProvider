@@ -6,9 +6,13 @@ import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import io.lemonlion.breakfast.model.request.OrderItemRequest;
 import io.lemonlion.breakfast.model.request.OrderRequest;
+import io.lemonlion.breakfast.model.request.PancakeRequest;
+import io.lemonlion.breakfast.model.response.PancakeResponse;
+import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import org.awaitility.Awaitility;
 
 /** Cucumber step definitions for the Reporting (GraphQL) domain. */
 public class ReportingSteps {
@@ -16,6 +20,7 @@ public class ReportingSteps {
     private final ScenarioContext ctx;
     private String customer;
     private String deliveryId;
+    private String batchId;
 
     public ReportingSteps(ScenarioContext ctx) {
         this.ctx = ctx;
@@ -72,5 +77,23 @@ public class ReportingSteps {
                 Map.of("query", "{ ingredientShipments { deliveryId ingredientName quantity } }"));
         assertThat(gql.status()).isEqualTo(200);
         assertThat(gql.bodyContains(deliveryId)).isTrue();
+    }
+
+    @When("a pancake batch is completed")
+    public void aPancakeBatchIsCompleted() {
+        PancakeResponse batch = ctx.client()
+                .post("/pancakes", new PancakeRequest("Whole", "Plain", "Free-range", List.of("Syrup")))
+                .as(PancakeResponse.class);
+        batchId = batch.batchId().toString();
+    }
+
+    @Then("the batch appears in the batch completions")
+    public void theBatchAppearsInBatchCompletions() {
+        Awaitility.await().atMost(Duration.ofSeconds(20)).untilAsserted(() -> {
+            var gql = ctx.client().post("/graphql",
+                    Map.of("query", "{ batchCompletions { batchId recipeType } }"));
+            assertThat(gql.status()).isEqualTo(200);
+            assertThat(gql.bodyContains(batchId)).isTrue();
+        });
     }
 }

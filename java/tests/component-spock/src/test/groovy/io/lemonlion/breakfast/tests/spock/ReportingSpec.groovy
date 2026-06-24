@@ -3,7 +3,11 @@ package io.lemonlion.breakfast.tests.spock
 import io.lemonlion.breakfast.BreakfastProviderApplication
 import io.lemonlion.breakfast.model.request.OrderItemRequest
 import io.lemonlion.breakfast.model.request.OrderRequest
+import io.lemonlion.breakfast.model.request.PancakeRequest
+import io.lemonlion.breakfast.model.response.PancakeResponse
 import io.lemonlion.breakfast.testsupport.BackendsInitializer
+import org.awaitility.Awaitility
+import java.time.Duration
 import io.lemonlion.breakfast.testsupport.BreakfastBackends
 import io.lemonlion.breakfast.testsupport.BreakfastTestClient
 import org.springframework.boot.test.context.SpringBootTest
@@ -75,5 +79,19 @@ class ReportingSpec extends Specification {
         gql.status() == 200
         gql.bodyContains(deliveryId)
         gql.bodyContains("Milk")
+    }
+
+    def "a completed pancake batch is ingested into batch completions via Pub/Sub"() {
+        given:
+        def batch = client.post("/pancakes",
+                new PancakeRequest("Whole", "Plain", "Free-range", ["Syrup"])).as(PancakeResponse)
+        def batchId = batch.batchId().toString()
+
+        expect:
+        Awaitility.await().atMost(Duration.ofSeconds(20)).untilAsserted {
+            def gql = client.post("/graphql", [query: "{ batchCompletions { batchId recipeType } }"])
+            assert gql.status() == 200
+            assert gql.bodyContains(batchId)
+        }
     }
 }

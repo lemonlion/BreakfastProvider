@@ -2,6 +2,7 @@ type Query {
     orderSummaries: [OrderSummary!]!
     popularRecipes: [RecipeTypeCount!]!
     ingredientShipments: [IngredientShipment!]!
+    batchCompletions: [BatchCompletion!]!
 }
 
 type OrderSummary {
@@ -23,4 +24,10 @@ type IngredientShipment {
     ingredientName: String!
     quantity: Float!
     deliveredAt: String!
+}
+
+type BatchCompletion {
+    batchId: ID!
+    recipeType: String!
+    completedAt: String!
 }

@@ -33,6 +33,8 @@ public class BackendsInitializer implements ApplicationContextInitializer<Config
                 "pubsub.emulator-endpoint=" + BreakfastBackends.pubSubEndpoint(),
                 "pubsub.project-id=" + BreakfastBackends.pubSubProjectId(),
                 "pubsub.customer-feedback-subscription=" + BreakfastBackends.feedbackSubscription(),
+                "pubsub.batch-completion-topic=batch-completions",
+                "pubsub.batch-completion-subscription=batch-completions-sub",
                 "downstream.kitchen-service-url=" + BreakfastBackends.kitchenUrl(),
                 "downstream.supplier-service-url=" + BreakfastBackends.supplierUrl(),
                 "downstream.cow-service-url=" + BreakfastBackends.cowUrl(),

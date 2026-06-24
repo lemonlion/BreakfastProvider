@@ -9,9 +9,12 @@ Current Reporting GraphQL surface in the Java twin: `orderSummaries`, `popularRe
 and tested across all four frameworks). The C# `ReportingQuery` additionally exposes `recipeReports`,
 `batchCompletions`, `ingredientShipments`, `equipmentAlerts`.
 
-> **Status update:** #1 EventGrid_Webhook / `ingredientShipments` is now **implemented and green across
-> all four frameworks** (commit "EventGrid webhook + ingredientShipments GraphQL query"). #2 and #3 remain
-> as described below.
+> **STATUS: ALL THREE IMPLEMENTED.** #1 EventGrid_Webhook / `ingredientShipments`, #2 Batch_Completions /
+> `batchCompletions` (real Pub/Sub publish + consumer, verified on the emulator), and #3 Equipment_Alerts /
+> `equipmentAlerts` are all implemented and green across all four frameworks. The only caveat is that the
+> Azure **Event Hubs transport** for #3 has no local emulator, so the docker suite verifies its handler +
+> store + query by invoking the consumer's `ingest()` directly (Option A below); the transport itself is
+> exercised only in external-sut / Azure. The designs below are retained for reference.
 
 ## 1. EventGrid_Webhook → `ingredientShipments` (DONE — implemented + verified)
 
@@ -72,9 +75,11 @@ docker-mode suite the way Cosmos/Kafka/Pub-Sub are.
 
 | Feature | SUT build | Local e2e test | Status |
 |---|---|---|---|
-| EventGrid_Webhook / `ingredientShipments` | controller + entity + query | yes (POST + GraphQL) | buildable + verifiable |
-| Batch_Completions / `batchCompletions` | Pub/Sub consumer + entity + query | yes (Pub/Sub emulator) | buildable + verifiable |
-| Equipment_Alerts / `equipmentAlerts` | Event Hubs consumer + entity + query | no emulator — unit-test the handler (Option A) or use a profile (B) / external-sut (C) | buildable; e2e deferred |
+| EventGrid_Webhook / `ingredientShipments` | controller + entity + query | yes (POST + GraphQL) | **DONE** |
+| Batch_Completions / `batchCompletions` | Pub/Sub publisher + consumer + entity + query | yes (Pub/Sub emulator) | **DONE** |
+| Equipment_Alerts / `equipmentAlerts` | consumer handler + entity + query | handler+store+query yes; Event Hubs transport only in external-sut/Azure | **DONE** (transport caveat) |
 
-These are the only outstanding parity items; everything else (22 domains, gRPC, Infrastructure, the rest
-of Reporting, Specifications, run modes, CI) is implemented and green across all four frameworks.
+All scenario/feature parity items are now implemented and green across all four frameworks. The single
+residual is that the Azure Event Hubs *transport* for Equipment_Alerts is not exercised by the local
+docker suite (no emulator) — only its ingestion handler/store/query are, with the transport verified in
+external-sut/Azure.

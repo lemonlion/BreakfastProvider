@@ -51,4 +51,29 @@ class ReportingSpec extends Specification {
         gql.status() == 200
         gql.bodyContains("Pancakes")
     }
+
+    def "an ingredient delivery posted to the EventGrid webhook appears in ingredient shipments"() {
+        given:
+        def deliveryId = UUID.randomUUID().toString()
+        def event = [
+                id       : UUID.randomUUID().toString(),
+                eventType: "IngredientDeliveryEvent",
+                subject  : "supply-chain/deliveries",
+                data     : [deliveryId: deliveryId, ingredientName: "Milk", quantity: 50.0,
+                            deliveredAt: java.time.Instant.now().toString()]]
+
+        when:
+        def webhook = client.post("/webhooks/eventgrid", [event])
+
+        then:
+        webhook.status() == 200
+
+        when:
+        def gql = client.post("/graphql", [query: "{ ingredientShipments { deliveryId ingredientName quantity } }"])
+
+        then:
+        gql.status() == 200
+        gql.bodyContains(deliveryId)
+        gql.bodyContains("Milk")
+    }
 }

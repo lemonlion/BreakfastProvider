@@ -9,4 +9,7 @@ public interface ReportingIngester {
 
     void ingestOrderCreated(UUID orderId, String customerName, int itemCount, Integer tableNumber, Instant createdAt,
                             List<String> recipeTypes);
+
+    /** Records an ingredient delivery received via the EventGrid webhook (twin of C# IngredientShipment). */
+    void ingestIngredientShipment(UUID deliveryId, String ingredientName, double quantity, Instant deliveredAt);
 }

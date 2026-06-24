@@ -1,6 +1,7 @@
 type Query {
     orderSummaries: [OrderSummary!]!
     popularRecipes: [RecipeTypeCount!]!
+    ingredientShipments: [IngredientShipment!]!
 }
 
 type OrderSummary {
@@ -15,4 +16,11 @@ type OrderSummary {
 type RecipeTypeCount {
     recipeType: String!
     count: Int!
+}
+
+type IngredientShipment {
+    deliveryId: ID!
+    ingredientName: String!
+    quantity: Float!
+    deliveredAt: String!
 }

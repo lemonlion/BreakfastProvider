@@ -15,6 +15,7 @@ public class ReportingSteps {
 
     private final ScenarioContext ctx;
     private String customer;
+    private String deliveryId;
 
     public ReportingSteps(ScenarioContext ctx) {
         this.ctx = ctx;
@@ -48,5 +49,28 @@ public class ReportingSteps {
     public void thePopularRecipesInclude(String recipe) {
         assertThat(ctx.lastResponse.status()).isEqualTo(200);
         assertThat(ctx.lastResponse.bodyContains(recipe)).isTrue();
+    }
+
+    @When("an ingredient delivery is posted to the EventGrid webhook")
+    public void anIngredientDeliveryIsPosted() {
+        deliveryId = UUID.randomUUID().toString();
+        Map<String, Object> event = Map.of(
+                "id", UUID.randomUUID().toString(),
+                "eventType", "IngredientDeliveryEvent",
+                "subject", "supply-chain/deliveries",
+                "data", Map.of(
+                        "deliveryId", deliveryId,
+                        "ingredientName", "Milk",
+                        "quantity", 50.0,
+                        "deliveredAt", java.time.Instant.now().toString()));
+        ctx.lastResponse = ctx.client().post("/webhooks/eventgrid", List.of(event));
+    }
+
+    @Then("the ingredient shipment appears in the reporting shipments")
+    public void theIngredientShipmentAppears() {
+        var gql = ctx.client().post("/graphql",
+                Map.of("query", "{ ingredientShipments { deliveryId ingredientName quantity } }"));
+        assertThat(gql.status()).isEqualTo(200);
+        assertThat(gql.bodyContains(deliveryId)).isTrue();
     }
 }

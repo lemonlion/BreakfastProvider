@@ -1,5 +1,6 @@
 package io.lemonlion.breakfast.reporting;
 
+import io.lemonlion.breakfast.storage.IngredientShipmentRepository;
 import io.lemonlion.breakfast.storage.OrderSummaryRepository;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -12,9 +13,12 @@ import org.springframework.stereotype.Controller;
 public class ReportingGraphQlController {
 
     private final OrderSummaryRepository orderSummaries;
+    private final IngredientShipmentRepository ingredientShipments;
 
-    public ReportingGraphQlController(OrderSummaryRepository orderSummaries) {
+    public ReportingGraphQlController(OrderSummaryRepository orderSummaries,
+                                      IngredientShipmentRepository ingredientShipments) {
         this.orderSummaries = orderSummaries;
+        this.ingredientShipments = ingredientShipments;
     }
 
     @QueryMapping
@@ -46,6 +50,20 @@ public class ReportingGraphQlController {
                 .sorted(Map.Entry.<String, Integer>comparingByValue().reversed())
                 .map(e -> new RecipeTypeCount(e.getKey(), e.getValue()))
                 .toList();
+    }
+
+    @QueryMapping
+    public List<IngredientShipmentView> ingredientShipments() {
+        return ingredientShipments.findAll().stream()
+                .map(s -> new IngredientShipmentView(
+                        s.getDeliveryId().toString(), s.getIngredientName(), s.getQuantity(),
+                        s.getDeliveredAt() == null ? null : s.getDeliveredAt().toString()))
+                .toList();
+    }
+
+    /** GraphQL view of {@code IngredientShipment}. */
+    public record IngredientShipmentView(String deliveryId, String ingredientName, double quantity,
+                                         String deliveredAt) {
     }
 
     /** GraphQL view of {@code OrderSummary}. */

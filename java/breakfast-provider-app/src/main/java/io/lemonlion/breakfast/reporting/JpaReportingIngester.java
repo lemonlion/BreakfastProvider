@@ -1,5 +1,7 @@
 package io.lemonlion.breakfast.reporting;
 
+import io.lemonlion.breakfast.storage.IngredientShipmentEntity;
+import io.lemonlion.breakfast.storage.IngredientShipmentRepository;
 import io.lemonlion.breakfast.storage.OrderSummaryEntity;
 import io.lemonlion.breakfast.storage.OrderSummaryRepository;
 import java.time.Instant;
@@ -16,9 +18,12 @@ import org.springframework.transaction.annotation.Transactional;
 public class JpaReportingIngester implements ReportingIngester {
 
     private final OrderSummaryRepository orderSummaries;
+    private final IngredientShipmentRepository ingredientShipments;
 
-    public JpaReportingIngester(OrderSummaryRepository orderSummaries) {
+    public JpaReportingIngester(OrderSummaryRepository orderSummaries,
+                                IngredientShipmentRepository ingredientShipments) {
         this.orderSummaries = orderSummaries;
+        this.ingredientShipments = ingredientShipments;
     }
 
     @Override
@@ -37,5 +42,16 @@ public class JpaReportingIngester implements ReportingIngester {
         summary.setCreatedAt(createdAt);
         summary.setRecipeTypes(recipeTypes == null ? "" : String.join(",", recipeTypes));
         orderSummaries.save(summary);
+    }
+
+    @Override
+    @Transactional
+    public void ingestIngredientShipment(UUID deliveryId, String ingredientName, double quantity, Instant deliveredAt) {
+        IngredientShipmentEntity shipment = new IngredientShipmentEntity();
+        shipment.setDeliveryId(deliveryId);
+        shipment.setIngredientName(ingredientName);
+        shipment.setQuantity(quantity);
+        shipment.setDeliveredAt(deliveredAt);
+        ingredientShipments.save(shipment);
     }
 }

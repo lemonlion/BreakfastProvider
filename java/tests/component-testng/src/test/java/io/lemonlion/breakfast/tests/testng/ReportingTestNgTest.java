@@ -38,4 +38,28 @@ public class ReportingTestNgTest extends ComponentTestBaseNg {
         assertThat(gql.status()).isEqualTo(200);
         assertThat(gql.bodyContains("Pancakes")).isTrue();
     }
+
+    @Test
+    public void eventGridWebhookIngestsIngredientShipment() {
+        String deliveryId = UUID.randomUUID().toString();
+        Map<String, Object> event = Map.of(
+                "id", UUID.randomUUID().toString(),
+                "eventType", "IngredientDeliveryEvent",
+                "subject", "supply-chain/deliveries",
+                "data", Map.of(
+                        "deliveryId", deliveryId,
+                        "ingredientName", "Milk",
+                        "quantity", 50.0,
+                        "deliveredAt", java.time.Instant.now().toString()));
+
+        TestResponse webhook = client.post("/webhooks/eventgrid", List.of(event));
+        assertThat(webhook.status()).isEqualTo(200);
+
+        TestResponse gql = client.post("/graphql",
+                Map.of("query", "{ ingredientShipments { deliveryId ingredientName quantity } }"));
+
+        assertThat(gql.status()).isEqualTo(200);
+        assertThat(gql.bodyContains(deliveryId)).isTrue();
+        assertThat(gql.bodyContains("Milk")).isTrue();
+    }
 }

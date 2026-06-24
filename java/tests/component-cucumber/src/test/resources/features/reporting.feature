@@ -8,3 +8,8 @@ Feature: Reporting
   Scenario: Popular recipes reflects the ordered recipe types
     When an order is placed and popular recipes are queried via GraphQL
     Then the popular recipes include "Pancakes"
+
+  Scenario: An ingredient delivery posted to the EventGrid webhook appears in ingredient shipments
+    When an ingredient delivery is posted to the EventGrid webhook
+    Then the response status is 200
+    And the ingredient shipment appears in the reporting shipments

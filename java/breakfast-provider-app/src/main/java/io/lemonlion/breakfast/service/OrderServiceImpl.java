@@ -86,6 +86,9 @@ public class OrderServiceImpl implements OrderService {
         // Atomic: order document + outbox message in one transactional batch.
         outboxWriter.write(document, event, partitionKey, OutboxDestinations.EVENT_GRID);
 
+        log.info("Order {} created for customer {} with {} items at table {}",
+                orderId, request.customerName(), request.items().size(), request.tableNumber());
+
         writeAuditLog("Created", orderId,
                 "Order created for " + request.customerName() + " with " + request.items().size() + " items");
 
@@ -130,6 +133,7 @@ public class OrderServiceImpl implements OrderService {
         }
         document.setStatus(newStatus);
         orderRepository.upsert(document, document.getPartitionKey());
+        log.info("Order {} status changed from {} to {}", orderId, previous, newStatus);
         writeAuditLog("StatusChanged", orderId,
                 "Order status changed from " + previous + " to " + newStatus);
         return StatusUpdateResult.ok(mapToResponse(document));

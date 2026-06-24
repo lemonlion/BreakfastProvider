@@ -19,6 +19,7 @@ public final class FakeKitchen {
 
     private HttpServer server;
     private volatile int nextStatus = 200;
+    private final FakeHealth health = new FakeHealth();
     private final List<String> preparations = new CopyOnWriteArrayList<>();
 
     public synchronized void start() {
@@ -31,7 +32,7 @@ public final class FakeKitchen {
             throw new UncheckedIOException("Failed to start fake kitchen", e);
         }
         server.createContext("/prepare", this::handlePrepare);
-        server.createContext("/health", FakeHealth::ok);
+        server.createContext("/health", health::handle);
         server.setExecutor(null);
         server.start();
     }
@@ -54,9 +55,15 @@ public final class FakeKitchen {
         this.nextStatus = status;
     }
 
+    /** Controls the status returned by {@code GET /health} (200 by default). */
+    public void setHealthStatus(int status) {
+        health.setStatus(status);
+    }
+
     public void reset() {
         this.nextStatus = 200;
         this.preparations.clear();
+        health.reset();
     }
 
     public boolean receivedPreparation() {

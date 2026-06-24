@@ -1,9 +1,15 @@
 package io.lemonlion.breakfast.tests.spock
 
+import ch.qos.logback.classic.Logger
+import ch.qos.logback.classic.spi.ILoggingEvent
+import ch.qos.logback.core.read.ListAppender
 import io.lemonlion.breakfast.BreakfastProviderApplication
+import io.lemonlion.breakfast.model.request.OrderItemRequest
+import io.lemonlion.breakfast.model.request.OrderRequest
 import io.lemonlion.breakfast.testsupport.BackendsInitializer
 import io.lemonlion.breakfast.testsupport.BreakfastBackends
 import io.lemonlion.breakfast.testsupport.BreakfastTestClient
+import org.slf4j.LoggerFactory
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.server.LocalServerPort
 import org.springframework.test.context.ContextConfiguration
@@ -86,5 +92,52 @@ class InfrastructureSpec extends Specification {
 
         then:
         BreakfastBackends.cow().lastCorrelationId() == correlationId
+    }
+
+    def "a structured log entry is captured for order creation"() {
+        given:
+        Logger root = (Logger) LoggerFactory.getLogger(org.slf4j.Logger.ROOT_LOGGER_NAME)
+        ListAppender<ILoggingEvent> appender = new ListAppender<>()
+        appender.start()
+        root.addAppender(appender)
+        def customer = "Telemetry-${UUID.randomUUID()}"
+
+        when:
+        client.post("/orders", new OrderRequest(customer, [new OrderItemRequest("Pancakes", UUID.randomUUID(), 1)], 1))
+
+        then:
+        appender.list.any { e ->
+            def msg = e.formattedMessage
+            msg.contains("created for customer") && msg.contains(customer) && msg.contains("1 items")
+        }
+
+        cleanup:
+        root.detachAppender(appender)
+    }
+
+    def "the health check reports degraded when downstream services are unreachable"() {
+        given:
+        BreakfastBackends.cow().setHealthStatus(503)
+        BreakfastBackends.supplier().setHealthStatus(503)
+
+        when:
+        def body = client.get("/health").json()
+
+        then:
+        body.get("status").asText() == "Degraded"
+        body.get("results").get("CowService").get("status").asText() == "Degraded"
+        body.get("results").get("SupplierService").get("status").asText() == "Degraded"
+    }
+
+    def "the health check reports degraded when a downstream health endpoint errors"() {
+        given:
+        BreakfastBackends.kitchen().setHealthStatus(503)
+
+        when:
+        def body = client.get("/health").json()
+
+        then:
+        body.get("status").asText() == "Degraded"
+        body.get("results").get("KitchenService").get("status").asText() == "Degraded"
     }
 }

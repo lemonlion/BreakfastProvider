@@ -27,3 +27,20 @@ Feature: Infrastructure
   Scenario: A correlation id is propagated to downstream services
     When milk is requested with correlation id "99999999-8888-7777-6666-555555555555"
     Then the cow service received correlation id "99999999-8888-7777-6666-555555555555"
+
+  Scenario: A structured log entry is captured for order creation
+    When an order is placed for telemetry capture
+    Then a structured order-creation log entry is captured
+
+  Scenario: Health check reports degraded when downstream services are unreachable
+    Given the cow and supplier services are unreachable
+    When the health check endpoint is called
+    Then the overall health status is "Degraded"
+    And the "CowService" health entry is "Degraded"
+    And the "SupplierService" health entry is "Degraded"
+
+  Scenario: Health check reports degraded when a downstream health endpoint errors
+    Given the kitchen health endpoint is failing
+    When the health check endpoint is called
+    Then the overall health status is "Degraded"
+    And the "KitchenService" health entry is "Degraded"

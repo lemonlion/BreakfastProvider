@@ -19,6 +19,7 @@ public final class FakeSupplier {
 
     private HttpServer server;
     private volatile int availabilityStatus = 200;
+    private final FakeHealth health = new FakeHealth();
     private final List<String> feedback = new CopyOnWriteArrayList<>();
 
     public synchronized void start() {
@@ -32,7 +33,7 @@ public final class FakeSupplier {
         }
         server.createContext("/ingredients/milk/availability", this::handleAvailability);
         server.createContext("/ingredients/feedback", this::handleFeedback);
-        server.createContext("/health", FakeHealth::ok);
+        server.createContext("/health", health::handle);
         server.setExecutor(null);
         server.start();
     }
@@ -67,8 +68,14 @@ public final class FakeSupplier {
         return List.copyOf(feedback);
     }
 
+    /** Controls the status returned by {@code GET /health} (200 by default). */
+    public void setHealthStatus(int status) {
+        health.setStatus(status);
+    }
+
     public void reset() {
         this.availabilityStatus = 200;
         this.feedback.clear();
+        health.reset();
     }
 }

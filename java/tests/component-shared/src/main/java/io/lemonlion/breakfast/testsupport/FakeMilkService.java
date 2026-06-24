@@ -18,6 +18,7 @@ public final class FakeMilkService {
     private HttpServer server;
     private volatile int status = 200;
     private volatile String lastCorrelationId;
+    private final FakeHealth health = new FakeHealth();
 
     public FakeMilkService(String path, String jsonBody) {
         this.path = path;
@@ -34,7 +35,7 @@ public final class FakeMilkService {
             throw new UncheckedIOException("Failed to start fake milk service", e);
         }
         server.createContext(path, this::handle);
-        server.createContext("/health", FakeHealth::ok);
+        server.createContext("/health", health::handle);
         server.setExecutor(null);
         server.start();
     }
@@ -66,8 +67,14 @@ public final class FakeMilkService {
         return lastCorrelationId;
     }
 
+    /** Controls the status returned by {@code GET /health} (200 by default). */
+    public void setHealthStatus(int status) {
+        health.setStatus(status);
+    }
+
     public void reset() {
         this.status = 200;
         this.lastCorrelationId = null;
+        health.reset();
     }
 }

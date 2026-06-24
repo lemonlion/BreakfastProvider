@@ -61,6 +61,11 @@
         <!-- docker-java client API version for Testcontainers (see surefire config). -->
         <docker.api.version>1.43</docker.api.version>
 
+        <!-- Run-mode targets. Empty by default (docker mode: in-process SUT + Testcontainers).
+             Overridden by the external-sut profile to drive an already-deployed SUT. -->
+        <external.sut.url></external.sut.url>
+        <external.grpc.target></external.grpc.target>
+
         <!-- Plugins -->
         <surefire.version>3.5.2</surefire.version>
         <exec-plugin.version>3.5.0</exec-plugin.version>
@@ -292,6 +297,10 @@
                                  local Rancher daemon rejects (min 1.41). Pin a modern API version; safe
                                  on CI's Docker too. Overridable via -Dapi.version=. -->
                             <api.version>${docker.api.version}</api.version>
+                            <!-- Run mode: empty => docker (in-process SUT + Testcontainers, the default).
+                                 The external-sut profile sets these to target an already-deployed SUT. -->
+                            <external.sut.url>${external.sut.url}</external.sut.url>
+                            <external.grpc.target>${external.grpc.target}</external.grpc.target>
                         </systemPropertyVariables>
                     </configuration>
                 </plugin>
@@ -304,4 +313,27 @@
             </plugins>
         </pluginManagement>
     </build>
+
+    <profiles>
+        <!--
+            Run modes (twin of the C# memory/docker/external-sut lanes). The Java twin has no in-memory
+            backend equivalents, so it ships two modes:
+              * docker (default, no profile): the component tests start the SUT in-process via
+                @SpringBootTest and provision every backend with Testcontainers.
+              * external-sut: the component tests drive an already-running SUT (real deployment) over
+                HTTP/gRPC instead of starting it in-process. Activate with -Pexternal-sut and point it
+                at the deployment, e.g.:
+                  ./mvnw -Pexternal-sut -Dexternal.sut.url=https://sut.example.com \
+                         -Dexternal.grpc.target=sut.example.com:9090 \
+                         -pl tests/component-junit5 test
+                See docs/RUN_MODES.md for the full design and verification steps.
+        -->
+        <profile>
+            <id>external-sut</id>
+            <properties>
+                <external.sut.url>http://localhost:8080</external.sut.url>
+                <external.grpc.target>localhost:9090</external.grpc.target>
+            </properties>
+        </profile>
+    </profiles>
 </project>

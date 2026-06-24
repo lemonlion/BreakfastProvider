@@ -76,4 +76,15 @@ class InfrastructureSpec extends Specification {
         then:
         response.header("X-Correlation-Id")
     }
+
+    def "the correlation id is propagated to downstream services"() {
+        given:
+        def correlationId = UUID.randomUUID().toString()
+
+        when:
+        client.get("/milk", ["X-Correlation-Id": correlationId])
+
+        then:
+        BreakfastBackends.cow().lastCorrelationId() == correlationId
+    }
 }

@@ -3,6 +3,7 @@ package io.lemonlion.breakfast.tests.junit5;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import io.lemonlion.breakfast.testsupport.BreakfastBackends;
 import io.lemonlion.breakfast.testsupport.TestResponse;
 import java.util.List;
 import java.util.Map;
@@ -72,5 +73,15 @@ class InfrastructureComponentTest extends ComponentTestBase {
         TestResponse response = client.get("/menu");
 
         assertThat(response.header("X-Correlation-Id")).isNotBlank();
+    }
+
+    @Test
+    @DisplayName("the correlation id is propagated to downstream services")
+    void correlationIdPropagatedDownstream() {
+        String correlationId = UUID.randomUUID().toString();
+
+        client.get("/milk", Map.of("X-Correlation-Id", correlationId));
+
+        assertThat(BreakfastBackends.cow().lastCorrelationId()).isEqualTo(correlationId);
     }
 }

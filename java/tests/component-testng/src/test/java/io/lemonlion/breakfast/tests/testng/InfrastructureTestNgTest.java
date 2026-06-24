@@ -3,6 +3,7 @@ package io.lemonlion.breakfast.tests.testng;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import io.lemonlion.breakfast.testsupport.BreakfastBackends;
 import io.lemonlion.breakfast.testsupport.TestResponse;
 import java.util.List;
 import java.util.Map;
@@ -65,5 +66,14 @@ public class InfrastructureTestNgTest extends ComponentTestBaseNg {
         TestResponse response = client.get("/menu");
 
         assertThat(response.header("X-Correlation-Id")).isNotBlank();
+    }
+
+    @Test
+    public void correlationIdPropagatedDownstream() {
+        String correlationId = UUID.randomUUID().toString();
+
+        client.get("/milk", Map.of("X-Correlation-Id", correlationId));
+
+        assertThat(BreakfastBackends.cow().lastCorrelationId()).isEqualTo(correlationId);
     }
 }

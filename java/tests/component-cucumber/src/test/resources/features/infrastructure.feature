@@ -23,3 +23,7 @@ Feature: Infrastructure
   Scenario: A correlation id is generated when none is supplied
     When the menu is requested without a correlation id
     Then the response contains a generated correlation id
+
+  Scenario: A correlation id is propagated to downstream services
+    When milk is requested with correlation id "99999999-8888-7777-6666-555555555555"
+    Then the cow service received correlation id "99999999-8888-7777-6666-555555555555"

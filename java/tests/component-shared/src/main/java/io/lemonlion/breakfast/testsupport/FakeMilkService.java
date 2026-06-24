@@ -17,6 +17,7 @@ public final class FakeMilkService {
     private final String jsonBody;
     private HttpServer server;
     private volatile int status = 200;
+    private volatile String lastCorrelationId;
 
     public FakeMilkService(String path, String jsonBody) {
         this.path = path;
@@ -39,6 +40,7 @@ public final class FakeMilkService {
     }
 
     private void handle(HttpExchange exchange) throws IOException {
+        lastCorrelationId = exchange.getRequestHeaders().getFirst("X-Correlation-Id");
         if (status != 200) {
             exchange.sendResponseHeaders(status, -1);
             exchange.close();
@@ -59,7 +61,13 @@ public final class FakeMilkService {
         this.status = status;
     }
 
+    /** The {@code X-Correlation-Id} header value the SUT forwarded on its last call, or {@code null}. */
+    public String lastCorrelationId() {
+        return lastCorrelationId;
+    }
+
     public void reset() {
         this.status = 200;
+        this.lastCorrelationId = null;
     }
 }

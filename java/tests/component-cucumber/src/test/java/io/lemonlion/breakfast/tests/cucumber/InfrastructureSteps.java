@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.fasterxml.jackson.databind.JsonNode;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+import io.lemonlion.breakfast.testsupport.BreakfastBackends;
 import io.lemonlion.breakfast.testsupport.TestResponse;
 import java.util.List;
 import java.util.Map;
@@ -42,6 +43,11 @@ public class InfrastructureSteps {
     @When("the menu is requested without a correlation id")
     public void menuWithoutCorrelationId() {
         response = ctx.client().get("/menu");
+    }
+
+    @When("milk is requested with correlation id {string}")
+    public void milkWithCorrelationId(String correlationId) {
+        response = ctx.client().get("/milk", Map.of("X-Correlation-Id", correlationId));
     }
 
     @Then("the heartbeat status is {string}")
@@ -88,5 +94,10 @@ public class InfrastructureSteps {
     @Then("the response contains a generated correlation id")
     public void responseContainsGeneratedCorrelationId() {
         assertThat(response.header("X-Correlation-Id")).isNotBlank();
+    }
+
+    @Then("the cow service received correlation id {string}")
+    public void cowReceivedCorrelationId(String correlationId) {
+        assertThat(BreakfastBackends.cow().lastCorrelationId()).isEqualTo(correlationId);
     }
 }

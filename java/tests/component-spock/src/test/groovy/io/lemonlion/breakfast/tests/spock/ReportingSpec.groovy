@@ -3,11 +3,15 @@ package io.lemonlion.breakfast.tests.spock
 import io.lemonlion.breakfast.BreakfastProviderApplication
 import io.lemonlion.breakfast.model.request.OrderItemRequest
 import io.lemonlion.breakfast.model.request.OrderRequest
+import io.lemonlion.breakfast.model.event.EquipmentAlertEvent
 import io.lemonlion.breakfast.model.request.PancakeRequest
 import io.lemonlion.breakfast.model.response.PancakeResponse
+import io.lemonlion.breakfast.reporting.EquipmentAlertConsumer
 import io.lemonlion.breakfast.testsupport.BackendsInitializer
 import org.awaitility.Awaitility
+import org.springframework.beans.factory.annotation.Autowired
 import java.time.Duration
+import java.time.Instant
 import io.lemonlion.breakfast.testsupport.BreakfastBackends
 import io.lemonlion.breakfast.testsupport.BreakfastTestClient
 import org.springframework.boot.test.context.SpringBootTest
@@ -22,6 +26,9 @@ class ReportingSpec extends Specification {
 
     @LocalServerPort
     int port
+
+    @Autowired
+    EquipmentAlertConsumer equipmentAlertConsumer
 
     BreakfastTestClient client
 
@@ -93,5 +100,19 @@ class ReportingSpec extends Specification {
             assert gql.status() == 200
             assert gql.bodyContains(batchId)
         }
+    }
+
+    def "an equipment alert is ingested and surfaced via the GraphQL query"() {
+        given:
+        def alertId = UUID.randomUUID()
+        equipmentAlertConsumer.ingest(new EquipmentAlertEvent(
+                alertId, UUID.randomUUID(), "Griddle", "UsageCycleCompleted", Instant.now()))
+
+        when:
+        def gql = client.post("/graphql", [query: "{ equipmentAlerts { alertId equipmentName alertType } }"])
+
+        then:
+        gql.status() == 200
+        gql.bodyContains(alertId.toString())
     }
 }

@@ -4,11 +4,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+import io.lemonlion.breakfast.model.event.EquipmentAlertEvent;
 import io.lemonlion.breakfast.model.request.OrderItemRequest;
 import io.lemonlion.breakfast.model.request.OrderRequest;
 import io.lemonlion.breakfast.model.request.PancakeRequest;
 import io.lemonlion.breakfast.model.response.PancakeResponse;
+import io.lemonlion.breakfast.reporting.EquipmentAlertConsumer;
 import java.time.Duration;
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -18,12 +21,15 @@ import org.awaitility.Awaitility;
 public class ReportingSteps {
 
     private final ScenarioContext ctx;
+    private final EquipmentAlertConsumer equipmentAlertConsumer;
     private String customer;
     private String deliveryId;
     private String batchId;
+    private String alertId;
 
-    public ReportingSteps(ScenarioContext ctx) {
+    public ReportingSteps(ScenarioContext ctx, EquipmentAlertConsumer equipmentAlertConsumer) {
         this.ctx = ctx;
+        this.equipmentAlertConsumer = equipmentAlertConsumer;
     }
 
     @When("an order is placed and the order summaries are queried via GraphQL")
@@ -95,5 +101,20 @@ public class ReportingSteps {
             assertThat(gql.status()).isEqualTo(200);
             assertThat(gql.bodyContains(batchId)).isTrue();
         });
+    }
+
+    @When("an equipment alert is ingested")
+    public void anEquipmentAlertIsIngested() {
+        alertId = UUID.randomUUID().toString();
+        equipmentAlertConsumer.ingest(new EquipmentAlertEvent(
+                UUID.fromString(alertId), UUID.randomUUID(), "Griddle", "UsageCycleCompleted", Instant.now()));
+    }
+
+    @Then("the equipment alert appears in the equipment alerts")
+    public void theEquipmentAlertAppears() {
+        var gql = ctx.client().post("/graphql",
+                Map.of("query", "{ equipmentAlerts { alertId equipmentName alertType } }"));
+        assertThat(gql.status()).isEqualTo(200);
+        assertThat(gql.bodyContains(alertId)).isTrue();
     }
 }

@@ -3,6 +3,7 @@ type Query {
     popularRecipes: [RecipeTypeCount!]!
     ingredientShipments: [IngredientShipment!]!
     batchCompletions: [BatchCompletion!]!
+    equipmentAlerts: [EquipmentAlert!]!
 }
 
 type OrderSummary {
@@ -30,4 +31,12 @@ type BatchCompletion {
     batchId: ID!
     recipeType: String!
     completedAt: String!
+}
+
+type EquipmentAlert {
+    alertId: ID!
+    batchId: ID!
+    equipmentName: String!
+    alertType: String!
+    alertedAt: String!
 }

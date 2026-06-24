@@ -1,6 +1,7 @@
 package io.lemonlion.breakfast.reporting;
 
 import io.lemonlion.breakfast.storage.BatchCompletionRecordRepository;
+import io.lemonlion.breakfast.storage.EquipmentAlertRepository;
 import io.lemonlion.breakfast.storage.IngredientShipmentRepository;
 import io.lemonlion.breakfast.storage.OrderSummaryRepository;
 import java.util.LinkedHashMap;
@@ -16,13 +17,16 @@ public class ReportingGraphQlController {
     private final OrderSummaryRepository orderSummaries;
     private final IngredientShipmentRepository ingredientShipments;
     private final BatchCompletionRecordRepository batchCompletions;
+    private final EquipmentAlertRepository equipmentAlerts;
 
     public ReportingGraphQlController(OrderSummaryRepository orderSummaries,
                                       IngredientShipmentRepository ingredientShipments,
-                                      BatchCompletionRecordRepository batchCompletions) {
+                                      BatchCompletionRecordRepository batchCompletions,
+                                      EquipmentAlertRepository equipmentAlerts) {
         this.orderSummaries = orderSummaries;
         this.ingredientShipments = ingredientShipments;
         this.batchCompletions = batchCompletions;
+        this.equipmentAlerts = equipmentAlerts;
     }
 
     @QueryMapping
@@ -81,6 +85,20 @@ public class ReportingGraphQlController {
 
     /** GraphQL view of {@code BatchCompletionRecord}. */
     public record BatchCompletionView(String batchId, String recipeType, String completedAt) {
+    }
+
+    @QueryMapping
+    public List<EquipmentAlertView> equipmentAlerts() {
+        return equipmentAlerts.findAll().stream()
+                .map(a -> new EquipmentAlertView(
+                        a.getAlertId().toString(), a.getBatchId().toString(), a.getEquipmentName(),
+                        a.getAlertType(), a.getAlertedAt() == null ? null : a.getAlertedAt().toString()))
+                .toList();
+    }
+
+    /** GraphQL view of {@code EquipmentAlert}. */
+    public record EquipmentAlertView(String alertId, String batchId, String equipmentName, String alertType,
+                                     String alertedAt) {
     }
 
     /** GraphQL view of {@code OrderSummary}. */

@@ -17,3 +17,7 @@ Feature: Reporting
   Scenario: A completed pancake batch is ingested into batch completions
     When a pancake batch is completed
     Then the batch appears in the batch completions
+
+  Scenario: An equipment alert is ingested and surfaced via the GraphQL query
+    When an equipment alert is ingested
+    Then the equipment alert appears in the equipment alerts

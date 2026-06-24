@@ -2,20 +2,27 @@ package io.lemonlion.breakfast.tests.testng;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import io.lemonlion.breakfast.model.event.EquipmentAlertEvent;
 import io.lemonlion.breakfast.model.request.OrderItemRequest;
 import io.lemonlion.breakfast.model.request.OrderRequest;
 import io.lemonlion.breakfast.model.request.PancakeRequest;
 import io.lemonlion.breakfast.model.response.PancakeResponse;
+import io.lemonlion.breakfast.reporting.EquipmentAlertConsumer;
 import io.lemonlion.breakfast.testsupport.TestResponse;
 import java.time.Duration;
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import org.awaitility.Awaitility;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.testng.annotations.Test;
 
 /** Reporting domain component tests (TestNG) — GraphQL order summaries. */
 public class ReportingTestNgTest extends ComponentTestBaseNg {
+
+    @Autowired
+    EquipmentAlertConsumer equipmentAlertConsumer;
 
     @Test
     public void orderAppearsInSummaries() {
@@ -79,5 +86,18 @@ public class ReportingTestNgTest extends ComponentTestBaseNg {
             assertThat(gql.status()).isEqualTo(200);
             assertThat(gql.bodyContains(batchId)).isTrue();
         });
+    }
+
+    @Test
+    public void equipmentAlertIngested() {
+        UUID alertId = UUID.randomUUID();
+        equipmentAlertConsumer.ingest(new EquipmentAlertEvent(
+                alertId, UUID.randomUUID(), "Griddle", "UsageCycleCompleted", Instant.now()));
+
+        TestResponse gql = client.post("/graphql",
+                Map.of("query", "{ equipmentAlerts { alertId equipmentName alertType } }"));
+
+        assertThat(gql.status()).isEqualTo(200);
+        assertThat(gql.bodyContains(alertId.toString())).isTrue();
     }
 }

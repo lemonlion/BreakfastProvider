@@ -3,6 +3,7 @@ package io.lemonlion.breakfast.reporting;
 import io.lemonlion.breakfast.storage.OrderSummaryEntity;
 import io.lemonlion.breakfast.storage.OrderSummaryRepository;
 import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,7 +24,7 @@ public class JpaReportingIngester implements ReportingIngester {
     @Override
     @Transactional
     public void ingestOrderCreated(UUID orderId, String customerName, int itemCount, Integer tableNumber,
-                                   Instant createdAt) {
+                                   Instant createdAt, List<String> recipeTypes) {
         if (orderSummaries.findByOrderId(orderId).isPresent()) {
             return;
         }
@@ -34,6 +35,7 @@ public class JpaReportingIngester implements ReportingIngester {
         summary.setTableNumber(tableNumber);
         summary.setStatus("Created");
         summary.setCreatedAt(createdAt);
+        summary.setRecipeTypes(recipeTypes == null ? "" : String.join(",", recipeTypes));
         orderSummaries.save(summary);
     }
 }

@@ -34,4 +34,19 @@ public class ReportingSteps {
         assertThat(ctx.lastResponse.status()).isEqualTo(200);
         assertThat(ctx.lastResponse.bodyContains(customer)).isTrue();
     }
+
+    @When("an order is placed and popular recipes are queried via GraphQL")
+    public void anOrderIsPlacedAndPopularRecipesQueried() {
+        ctx.client().post("/orders",
+                new OrderRequest("Recipe-" + UUID.randomUUID(),
+                        List.of(new OrderItemRequest("Pancakes", UUID.randomUUID(), 2)), 4));
+        ctx.lastResponse = ctx.client().post("/graphql",
+                Map.of("query", "{ popularRecipes { recipeType count } }"));
+    }
+
+    @Then("the popular recipes include {string}")
+    public void thePopularRecipesInclude(String recipe) {
+        assertThat(ctx.lastResponse.status()).isEqualTo(200);
+        assertThat(ctx.lastResponse.bodyContains(recipe)).isTrue();
+    }
 }

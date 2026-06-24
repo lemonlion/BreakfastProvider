@@ -4,3 +4,7 @@ Feature: Reporting
   Scenario: A created order appears in the GraphQL order summaries
     When an order is placed and the order summaries are queried via GraphQL
     Then the order appears in the reporting summaries
+
+  Scenario: Popular recipes reflects the ordered recipe types
+    When an order is placed and popular recipes are queried via GraphQL
+    Then the popular recipes include "Pancakes"

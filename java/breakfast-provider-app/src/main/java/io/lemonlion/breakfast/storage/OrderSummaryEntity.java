@@ -1,5 +1,6 @@
 package io.lemonlion.breakfast.storage;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -23,6 +24,10 @@ public class OrderSummaryEntity {
     private Integer tableNumber;
     private String status = "Created";
     private Instant createdAt;
+
+    /** Comma-separated recipe/item types from the order, used to aggregate popular recipes. */
+    @Column(length = 2000)
+    private String recipeTypes = "";
 
     public int getId() {
         return id;
@@ -78,5 +83,13 @@ public class OrderSummaryEntity {
 
     public void setCreatedAt(Instant createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public String getRecipeTypes() {
+        return recipeTypes;
+    }
+
+    public void setRecipeTypes(String recipeTypes) {
+        this.recipeTypes = recipeTypes;
     }
 }

@@ -28,4 +28,18 @@ class ReportingComponentTest extends ComponentTestBase {
         assertThat(gql.status()).isEqualTo(200);
         assertThat(gql.bodyContains(customer)).isTrue();
     }
+
+    @Test
+    @DisplayName("popular recipes reflects the ordered recipe types")
+    void popularRecipesReflectsOrderedTypes() {
+        client.post("/orders",
+                new OrderRequest("Recipe-" + UUID.randomUUID(),
+                        List.of(new OrderItemRequest("Pancakes", UUID.randomUUID(), 2)), 4));
+
+        TestResponse gql = client.post("/graphql",
+                Map.of("query", "{ popularRecipes { recipeType count } }"));
+
+        assertThat(gql.status()).isEqualTo(200);
+        assertThat(gql.bodyContains("Pancakes")).isTrue();
+    }
 }

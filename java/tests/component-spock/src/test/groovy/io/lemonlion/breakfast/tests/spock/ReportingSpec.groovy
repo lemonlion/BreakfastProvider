@@ -38,4 +38,17 @@ class ReportingSpec extends Specification {
         gql.status() == 200
         gql.bodyContains(customer)
     }
+
+    def "popular recipes reflects the ordered recipe types"() {
+        given:
+        client.post("/orders", new OrderRequest("Recipe-${UUID.randomUUID()}",
+                [new OrderItemRequest("Pancakes", UUID.randomUUID(), 2)], 4))
+
+        when:
+        def gql = client.post("/graphql", [query: "{ popularRecipes { recipeType count } }"])
+
+        then:
+        gql.status() == 200
+        gql.bodyContains("Pancakes")
+    }
 }

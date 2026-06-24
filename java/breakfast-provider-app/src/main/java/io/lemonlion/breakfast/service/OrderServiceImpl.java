@@ -100,7 +100,8 @@ public class OrderServiceImpl implements OrderService {
                 () -> recipeLogPublisher.publishOrderRecipeLog(orderId, request.customerName(), request.items().size()));
         safely("reporting ingest", orderId,
                 () -> reportingIngester.ingestOrderCreated(orderId, request.customerName(),
-                        request.items().size(), request.tableNumber(), now));
+                        request.items().size(), request.tableNumber(), now,
+                        request.items().stream().map(i -> i.itemType() == null ? "" : i.itemType()).toList()));
 
         return mapToResponse(document);
     }

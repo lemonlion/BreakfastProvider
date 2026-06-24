@@ -9,7 +9,11 @@ Current Reporting GraphQL surface in the Java twin: `orderSummaries`, `popularRe
 and tested across all four frameworks). The C# `ReportingQuery` additionally exposes `recipeReports`,
 `batchCompletions`, `ingredientShipments`, `equipmentAlerts`.
 
-## 1. EventGrid_Webhook → `ingredientShipments` (VERIFIABLE locally)
+> **Status update:** #1 EventGrid_Webhook / `ingredientShipments` is now **implemented and green across
+> all four frameworks** (commit "EventGrid webhook + ingredientShipments GraphQL query"). #2 and #3 remain
+> as described below.
+
+## 1. EventGrid_Webhook → `ingredientShipments` (DONE — implemented + verified)
 
 **C# behaviour:** `POST /reporting/eventgrid` (see `Endpoints.EventGridWebhook`) receives an EventGrid
 webhook payload (array of events) describing an ingredient delivery; the SUT ingests an

@@ -53,4 +53,26 @@ public class ReservationSteps {
         assertThat(ctx.lastResponse.status()).isEqualTo(201);
         assertThat(reservation.status()).isEqualTo("Confirmed");
     }
+
+    @When("the reservation is retrieved")
+    public void theReservationIsRetrieved() {
+        ctx.lastResponse = ctx.client().get("/reservations/" + reservation.id());
+    }
+
+    @Then("the retrieved reservation is for {string}")
+    public void theRetrievedReservationIsFor(String customerName) {
+        assertThat(ctx.lastResponse.status()).isEqualTo(200);
+        assertThat(ctx.lastResponse.as(ReservationResponse.class).customerName()).isEqualTo(customerName);
+    }
+
+    @Then("the reservation status is {string}")
+    public void theReservationStatusIs(String status) {
+        assertThat(ctx.lastResponse.status()).isEqualTo(200);
+        assertThat(ctx.lastResponse.as(ReservationResponse.class).status()).isEqualTo(status);
+    }
+
+    @When("the reservation is deleted")
+    public void theReservationIsDeleted() {
+        ctx.lastResponse = ctx.client().delete("/reservations/" + reservation.id());
+    }
 }

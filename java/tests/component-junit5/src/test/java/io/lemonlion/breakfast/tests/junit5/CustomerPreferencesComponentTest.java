@@ -32,6 +32,31 @@ class CustomerPreferencesComponentTest extends ComponentTestBase {
     }
 
     @Test
+    @DisplayName("saving preferences returns the saved preferences")
+    void saveReturnsSaved() {
+        String customerId = "cust-" + UUID.randomUUID();
+        TestResponse saved = client.put("/customer-preferences/" + customerId,
+                new CustomerPreferenceRequest(null, "Alice", "oat", true, "Pancakes"));
+        assertThat(saved.status()).isEqualTo(200);
+        CustomerPreferenceResponse pref = saved.as(CustomerPreferenceResponse.class);
+        assertThat(pref.customerId()).isEqualTo(customerId);
+        assertThat(pref.preferredMilkType()).isEqualTo("oat");
+    }
+
+    @Test
+    @DisplayName("updating preferences returns the updated preferences")
+    void updateReturnsUpdated() {
+        String customerId = "cust-" + UUID.randomUUID();
+        client.put("/customer-preferences/" + customerId,
+                new CustomerPreferenceRequest(null, "Alice", "oat", true, "Pancakes"));
+
+        TestResponse updated = client.put("/customer-preferences/" + customerId,
+                new CustomerPreferenceRequest(null, "Alice", "almond", false, "Waffles"));
+        assertThat(updated.status()).isEqualTo(200);
+        assertThat(updated.as(CustomerPreferenceResponse.class).preferredMilkType()).isEqualTo("almond");
+    }
+
+    @Test
     @DisplayName("retrieving an unknown customer returns 404")
     void getMissing() {
         assertThat(client.get("/customer-preferences/unknown-" + UUID.randomUUID()).status()).isEqualTo(404);

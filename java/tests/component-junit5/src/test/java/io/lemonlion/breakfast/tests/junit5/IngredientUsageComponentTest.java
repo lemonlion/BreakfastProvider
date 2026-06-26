@@ -21,19 +21,35 @@ class IngredientUsageComponentTest extends ComponentTestBase {
     private static final TypeReference<List<IngredientUsageResponse>> USAGES = new TypeReference<>() { };
 
     @Test
-    @DisplayName("usage is recorded and queryable by ingredient")
-    void recordAndQuery() {
-        String ingredient = "Flour-" + UUID.randomUUID();
+    @DisplayName("recording usage returns the created record")
+    void recordReturnsCreated() {
         TestResponse recorded = client.post("/ingredient-usage",
-                new IngredientUsageRequest(ingredient, new BigDecimal("2.5"), "kg", "Classic Pancakes"));
+                new IngredientUsageRequest("Flour", new BigDecimal("2.5"), "kg", "Classic Pancakes"));
         assertThat(recorded.status()).isEqualTo(201);
         assertThat(recorded.as(IngredientUsageResponse.class).usageId()).isNotBlank();
+    }
+
+    @Test
+    @DisplayName("usage is queryable by ingredient")
+    void listByIngredient() {
+        String ingredient = "Flour-" + UUID.randomUUID();
+        client.post("/ingredient-usage",
+                new IngredientUsageRequest(ingredient, new BigDecimal("2.5"), "kg", "Classic Pancakes"));
 
         Awaitility.await().atMost(Duration.ofSeconds(20)).untilAsserted(() -> {
             TestResponse listed = client.get("/ingredient-usage/ingredient/" + ingredient);
             assertThat(listed.status()).isEqualTo(200);
             assertThat(listed.as(USAGES)).anyMatch(u -> u.ingredientName().equals(ingredient));
         });
+    }
+
+    @Test
+    @DisplayName("a missing ingredient name is rejected")
+    void rejectsMissingIngredientName() {
+        TestResponse response = client.post("/ingredient-usage",
+                new IngredientUsageRequest(null, new BigDecimal("2.5"), "kg", "Pancakes"));
+        assertThat(response.status()).isEqualTo(400);
+        assertThat(response.bodyContains("'Ingredient Name' must not be empty.")).isTrue();
     }
 
     @Test

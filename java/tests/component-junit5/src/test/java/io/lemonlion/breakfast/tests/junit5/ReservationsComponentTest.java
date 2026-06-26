@@ -55,4 +55,11 @@ class ReservationsComponentTest extends ComponentTestBase {
         assertThat(response.status()).isEqualTo(400);
         assertThat(response.bodyContains("'Party Size' must be between 1 and 20.")).isTrue();
     }
+
+    @Test
+    @DisplayName("deleting a reservation returns 204")
+    void deleteReturns204() {
+        ReservationResponse reservation = client.post("/reservations", valid()).as(ReservationResponse.class);
+        assertThat(client.delete("/reservations/" + reservation.id()).status()).isEqualTo(204);
+    }
 }

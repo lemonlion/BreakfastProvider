@@ -68,4 +68,12 @@ class ReservationsSpec extends Specification {
         response.status() == 400
         response.bodyContains("'Party Size' must be between 1 and 20.")
     }
+
+    def "deleting a reservation returns 204"() {
+        given:
+        def reservation = client.post("/reservations", valid()).as(ReservationResponse)
+
+        expect:
+        client.delete("/reservations/${reservation.id()}").status() == 204
+    }
 }

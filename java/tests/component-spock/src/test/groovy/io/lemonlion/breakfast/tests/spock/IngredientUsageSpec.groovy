@@ -30,21 +30,37 @@ class IngredientUsageSpec extends Specification {
         BreakfastBackends.resetFakes()
     }
 
-    def "usage is recorded and queryable by ingredient"() {
-        given:
-        def ingredient = "Flour-${UUID.randomUUID()}"
-
+    def "recording usage returns the created record"() {
         when:
         def recorded = client.post("/ingredient-usage",
-                new IngredientUsageRequest(ingredient, new BigDecimal("2.5"), "kg", "Classic Pancakes"))
+                new IngredientUsageRequest("Flour", new BigDecimal("2.5"), "kg", "Classic Pancakes"))
 
         then:
         recorded.status() == 201
+        recorded.as(IngredientUsageResponse).usageId()
+    }
+
+    def "usage is queryable by ingredient"() {
+        given:
+        def ingredient = "Flour-${UUID.randomUUID()}"
+        client.post("/ingredient-usage",
+                new IngredientUsageRequest(ingredient, new BigDecimal("2.5"), "kg", "Classic Pancakes"))
+
+        expect:
         Awaitility.await().atMost(Duration.ofSeconds(20)).untilAsserted {
             def listed = client.get("/ingredient-usage/ingredient/${ingredient}")
             assert listed.status() == 200
             assert listed.as(new TypeReference<List<IngredientUsageResponse>>() {}).any { it.ingredientName() == ingredient }
         }
+    }
+
+    def "the usage summary is available"() {
+        given:
+        client.post("/ingredient-usage",
+                new IngredientUsageRequest("Sugar-${UUID.randomUUID()}", new BigDecimal("1"), "kg", "Waffles"))
+
+        expect:
+        client.get("/ingredient-usage/summary").status() == 200
     }
 
     def "a non-positive quantity is rejected"() {
@@ -55,5 +71,15 @@ class IngredientUsageSpec extends Specification {
         then:
         response.status() == 400
         response.bodyContains("'Quantity Used' must be greater than zero.")
+    }
+
+    def "a missing ingredient name is rejected"() {
+        when:
+        def response = client.post("/ingredient-usage",
+                new IngredientUsageRequest(null, new BigDecimal("2.5"), "kg", "Pancakes"))
+
+        then:
+        response.status() == 400
+        response.bodyContains("'Ingredient Name' must not be empty.")
     }
 }

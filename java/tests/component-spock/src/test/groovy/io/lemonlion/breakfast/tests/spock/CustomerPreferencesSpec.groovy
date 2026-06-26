@@ -40,6 +40,36 @@ class CustomerPreferencesSpec extends Specification {
         client.get("/customer-preferences/${customerId}").status() == 200
     }
 
+    def "saving preferences returns the saved preferences"() {
+        given:
+        def customerId = "cust-${UUID.randomUUID()}"
+
+        when:
+        def saved = client.put("/customer-preferences/${customerId}",
+                new CustomerPreferenceRequest(null, "Alice", "oat", true, "Pancakes"))
+
+        then:
+        saved.status() == 200
+        def pref = saved.as(CustomerPreferenceResponse)
+        pref.customerId() == customerId
+        pref.preferredMilkType() == "oat"
+    }
+
+    def "updating preferences returns the updated preferences"() {
+        given:
+        def customerId = "cust-${UUID.randomUUID()}"
+        client.put("/customer-preferences/${customerId}",
+                new CustomerPreferenceRequest(null, "Alice", "oat", true, "Pancakes"))
+
+        when:
+        def updated = client.put("/customer-preferences/${customerId}",
+                new CustomerPreferenceRequest(null, "Alice", "almond", false, "Waffles"))
+
+        then:
+        updated.status() == 200
+        updated.as(CustomerPreferenceResponse).preferredMilkType() == "almond"
+    }
+
     def "retrieving an unknown customer returns 404"() {
         expect:
         client.get("/customer-preferences/unknown-${UUID.randomUUID()}").status() == 404

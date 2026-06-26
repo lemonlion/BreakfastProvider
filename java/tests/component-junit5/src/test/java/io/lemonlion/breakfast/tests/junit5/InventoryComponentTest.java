@@ -2,10 +2,12 @@ package io.lemonlion.breakfast.tests.junit5;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import io.lemonlion.breakfast.model.request.InventoryItemRequest;
 import io.lemonlion.breakfast.model.response.InventoryItemResponse;
 import io.lemonlion.breakfast.testsupport.TestResponse;
 import java.math.BigDecimal;
+import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -47,5 +49,28 @@ class InventoryComponentTest extends ComponentTestBase {
         TestResponse response = client.put("/inventory/" + item.id(), update);
         assertThat(response.status()).isEqualTo(200);
         assertThat(response.as(InventoryItemResponse.class).quantity()).isEqualByComparingTo(new BigDecimal("10"));
+    }
+
+    @Test
+    @DisplayName("listing inventory returns the created items")
+    void listAll() {
+        InventoryItemResponse item = client.post("/inventory", valid()).as(InventoryItemResponse.class);
+        TestResponse list = client.get("/inventory");
+        assertThat(list.status()).isEqualTo(200);
+        assertThat(list.as(new TypeReference<List<InventoryItemResponse>>() { }))
+                .anyMatch(i -> i.id() == item.id());
+    }
+
+    @Test
+    @DisplayName("deleting an inventory item returns 204")
+    void deleteReturns204() {
+        InventoryItemResponse item = client.post("/inventory", valid()).as(InventoryItemResponse.class);
+        assertThat(client.delete("/inventory/" + item.id()).status()).isEqualTo(204);
+    }
+
+    @Test
+    @DisplayName("retrieving a non-existent inventory item returns 404")
+    void getMissing() {
+        assertThat(client.get("/inventory/999999999").status()).isEqualTo(404);
     }
 }

@@ -19,11 +19,18 @@ public class IngredientWasteTestNgTest extends ComponentTestBaseNg {
     private static final TypeReference<List<IngredientWasteResponse>> WASTES = new TypeReference<>() { };
 
     @Test
-    public void recordAndQuery() {
-        String recipe = "Pancakes-" + UUID.randomUUID();
+    public void recordReturnsCreated() {
         TestResponse recorded = client.post("/ingredient-waste",
-                new IngredientWasteRequest("Flour", new BigDecimal("0.5"), "kg", recipe, "Burnt batch"));
+                new IngredientWasteRequest("Flour", new BigDecimal("0.5"), "kg", "Pancakes", "Burnt batch"));
         assertThat(recorded.status()).isEqualTo(201);
+        assertThat(recorded.as(IngredientWasteResponse.class).wasteId()).isNotBlank();
+    }
+
+    @Test
+    public void listByRecipe() {
+        String recipe = "Pancakes-" + UUID.randomUUID();
+        client.post("/ingredient-waste",
+                new IngredientWasteRequest("Flour", new BigDecimal("0.5"), "kg", recipe, "Burnt batch"));
 
         Awaitility.await().atMost(Duration.ofSeconds(20)).untilAsserted(() -> {
             TestResponse listed = client.get("/ingredient-waste/recipe/" + recipe);
@@ -38,5 +45,29 @@ public class IngredientWasteTestNgTest extends ComponentTestBaseNg {
                 new IngredientWasteRequest("Flour", new BigDecimal("0.5"), "kg", "Pancakes", null));
         assertThat(response.status()).isEqualTo(400);
         assertThat(response.bodyContains("'Reason' must not be empty.")).isTrue();
+    }
+
+    @Test
+    public void rejectsMissingIngredientName() {
+        TestResponse response = client.post("/ingredient-waste",
+                new IngredientWasteRequest(null, new BigDecimal("0.5"), "kg", "Pancakes", "Spill"));
+        assertThat(response.status()).isEqualTo(400);
+        assertThat(response.bodyContains("'Ingredient Name' must not be empty.")).isTrue();
+    }
+
+    @Test
+    public void rejectsZeroQuantity() {
+        TestResponse response = client.post("/ingredient-waste",
+                new IngredientWasteRequest("Flour", BigDecimal.ZERO, "kg", "Pancakes", "Spill"));
+        assertThat(response.status()).isEqualTo(400);
+        assertThat(response.bodyContains("'Quantity Wasted' must be greater than zero.")).isTrue();
+    }
+
+    @Test
+    public void deleteReturns204() {
+        IngredientWasteResponse waste = client.post("/ingredient-waste",
+                        new IngredientWasteRequest("Flour", new BigDecimal("0.5"), "kg", "Pancakes", "Spill"))
+                .as(IngredientWasteResponse.class);
+        assertThat(client.delete("/ingredient-waste/" + waste.wasteId()).status()).isEqualTo(204);
     }
 }

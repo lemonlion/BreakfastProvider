@@ -1,5 +1,6 @@
 package io.lemonlion.breakfast.tests.spock
 
+import com.fasterxml.jackson.core.type.TypeReference
 import io.lemonlion.breakfast.BreakfastProviderApplication
 import io.lemonlion.breakfast.model.request.InventoryItemRequest
 import io.lemonlion.breakfast.model.response.InventoryItemResponse
@@ -49,5 +50,43 @@ class InventorySpec extends Specification {
         then:
         response.status() == 400
         response.bodyContains("'Quantity' must be greater than or equal to zero.")
+    }
+
+    def "updating the quantity succeeds"() {
+        given:
+        def item = client.post("/inventory", valid()).as(InventoryItemResponse)
+
+        when:
+        def response = client.put("/inventory/${item.id()}",
+                new InventoryItemRequest("Flour", "Dry Goods", new BigDecimal("10"), "kg", new BigDecimal("5")))
+
+        then:
+        response.status() == 200
+        response.as(InventoryItemResponse).quantity() == new BigDecimal("10")
+    }
+
+    def "listing inventory returns the created items"() {
+        given:
+        def item = client.post("/inventory", valid()).as(InventoryItemResponse)
+
+        when:
+        def list = client.get("/inventory")
+
+        then:
+        list.status() == 200
+        list.as(new TypeReference<List<InventoryItemResponse>>() {}).any { it.id() == item.id() }
+    }
+
+    def "deleting an inventory item returns 204"() {
+        given:
+        def item = client.post("/inventory", valid()).as(InventoryItemResponse)
+
+        expect:
+        client.delete("/inventory/${item.id()}").status() == 204
+    }
+
+    def "retrieving a non-existent inventory item returns 404"() {
+        expect:
+        client.get("/inventory/999999999").status() == 404
     }
 }

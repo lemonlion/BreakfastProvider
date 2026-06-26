@@ -30,16 +30,23 @@ class IngredientWasteSpec extends Specification {
         BreakfastBackends.resetFakes()
     }
 
-    def "waste is recorded and queryable by recipe"() {
-        given:
-        def recipe = "Pancakes-${UUID.randomUUID()}"
-
+    def "recording waste returns the created record"() {
         when:
         def recorded = client.post("/ingredient-waste",
-                new IngredientWasteRequest("Flour", new BigDecimal("0.5"), "kg", recipe, "Burnt batch"))
+                new IngredientWasteRequest("Flour", new BigDecimal("0.5"), "kg", "Pancakes", "Burnt batch"))
 
         then:
         recorded.status() == 201
+        recorded.as(IngredientWasteResponse).wasteId()
+    }
+
+    def "waste is queryable by recipe"() {
+        given:
+        def recipe = "Pancakes-${UUID.randomUUID()}"
+        client.post("/ingredient-waste",
+                new IngredientWasteRequest("Flour", new BigDecimal("0.5"), "kg", recipe, "Burnt batch"))
+
+        expect:
         Awaitility.await().atMost(Duration.ofSeconds(20)).untilAsserted {
             def listed = client.get("/ingredient-waste/recipe/${recipe}")
             assert listed.status() == 200
@@ -55,5 +62,34 @@ class IngredientWasteSpec extends Specification {
         then:
         response.status() == 400
         response.bodyContains("'Reason' must not be empty.")
+    }
+
+    def "a missing ingredient name is rejected"() {
+        when:
+        def response = client.post("/ingredient-waste",
+                new IngredientWasteRequest(null, new BigDecimal("0.5"), "kg", "Pancakes", "Spill"))
+
+        then:
+        response.status() == 400
+        response.bodyContains("'Ingredient Name' must not be empty.")
+    }
+
+    def "a zero quantity is rejected"() {
+        when:
+        def response = client.post("/ingredient-waste",
+                new IngredientWasteRequest("Flour", BigDecimal.ZERO, "kg", "Pancakes", "Spill"))
+
+        then:
+        response.status() == 400
+        response.bodyContains("'Quantity Wasted' must be greater than zero.")
+    }
+
+    def "deleting a waste record returns 204"() {
+        given:
+        def waste = client.post("/ingredient-waste",
+                new IngredientWasteRequest("Flour", new BigDecimal("0.5"), "kg", "Pancakes", "Spill")).as(IngredientWasteResponse)
+
+        expect:
+        client.delete("/ingredient-waste/${waste.wasteId()}").status() == 204
     }
 }

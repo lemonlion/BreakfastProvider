@@ -2,10 +2,12 @@ package io.lemonlion.breakfast.tests.testng;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import io.lemonlion.breakfast.model.request.InventoryItemRequest;
 import io.lemonlion.breakfast.model.response.InventoryItemResponse;
 import io.lemonlion.breakfast.testsupport.TestResponse;
 import java.math.BigDecimal;
+import java.util.List;
 import org.testng.annotations.Test;
 
 /** Inventory domain component tests (TestNG). */
@@ -40,5 +42,24 @@ public class InventoryTestNgTest extends ComponentTestBaseNg {
                 new BigDecimal("5"));
         TestResponse response = client.put("/inventory/" + item.id(), update);
         assertThat(response.status()).isEqualTo(200);
+    }
+
+    @Test
+    public void listAll() {
+        InventoryItemResponse item = client.post("/inventory", valid()).as(InventoryItemResponse.class);
+        TestResponse list = client.get("/inventory");
+        assertThat(list.status()).isEqualTo(200);
+        assertThat(list.as(new TypeReference<List<InventoryItemResponse>>() { })).anyMatch(i -> i.id() == item.id());
+    }
+
+    @Test
+    public void deleteReturns204() {
+        InventoryItemResponse item = client.post("/inventory", valid()).as(InventoryItemResponse.class);
+        assertThat(client.delete("/inventory/" + item.id()).status()).isEqualTo(204);
+    }
+
+    @Test
+    public void getMissing() {
+        assertThat(client.get("/inventory/999999999").status()).isEqualTo(404);
     }
 }

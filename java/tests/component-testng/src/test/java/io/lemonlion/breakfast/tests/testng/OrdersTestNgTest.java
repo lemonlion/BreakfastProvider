@@ -2,18 +2,26 @@ package io.lemonlion.breakfast.tests.testng;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import io.lemonlion.breakfast.events.outbox.OutboxStore;
 import io.lemonlion.breakfast.model.request.OrderItemRequest;
 import io.lemonlion.breakfast.model.request.OrderRequest;
 import io.lemonlion.breakfast.model.request.UpdateOrderStatusRequest;
 import io.lemonlion.breakfast.model.response.OrderResponse;
+import io.lemonlion.breakfast.storage.OutboxMessage;
 import io.lemonlion.breakfast.testsupport.BreakfastBackends;
 import io.lemonlion.breakfast.testsupport.TestResponse;
+import java.time.Duration;
 import java.util.List;
 import java.util.UUID;
+import org.awaitility.Awaitility;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.testng.annotations.Test;
 
 /** Orders domain component tests (TestNG) — same behaviour as the JUnit 5 suite, different framework. */
 public class OrdersTestNgTest extends ComponentTestBaseNg {
+
+    @Autowired
+    OutboxStore outboxStore;
 
     private static OrderRequest validOrder() {
         return new OrderRequest("Alice", List.of(new OrderItemRequest("Pancakes", UUID.randomUUID(), 2)), 5);
@@ -155,6 +163,23 @@ public class OrdersTestNgTest extends ComponentTestBaseNg {
         assertThat(audit.status()).isEqualTo(200);
         assertThat(audit.bodyContains("Created")).isTrue();
         assertThat(audit.bodyContains(order.orderId().toString())).isTrue();
+    }
+
+    @Test
+    public void outboxMessageFailsAfterExhaustingRetries() {
+        OutboxMessage poison = new OutboxMessage();
+        poison.setPartitionKey("poison-" + UUID.randomUUID());
+        poison.setEventType("PoisonEvent");
+        poison.setDestination("no-such-destination");
+        poison.setPayload("{}");
+        String id = poison.getId(); // id is assigned at construction; add() persists it
+        outboxStore.add(poison);
+
+        Awaitility.await().atMost(Duration.ofSeconds(60)).untilAsserted(() -> {
+            OutboxMessage found = outboxStore.findAll().stream()
+                    .filter(m -> id.equals(m.getId())).findFirst().orElseThrow();
+            assertThat(found.getStatus()).isEqualTo("Failed");
+        });
     }
 
     @Test

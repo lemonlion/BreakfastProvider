@@ -259,6 +259,24 @@ class OrdersComponentTest extends ComponentTestBase {
     }
 
     @Test
+    @DisplayName("an outbox message transitions to Failed after exhausting retries")
+    void outboxMessageFailsAfterExhaustingRetries() {
+        OutboxMessage poison = new OutboxMessage();
+        poison.setPartitionKey("poison-" + UUID.randomUUID());
+        poison.setEventType("PoisonEvent");
+        poison.setDestination("no-such-destination"); // no dispatcher -> dispatch always throws -> retries
+        poison.setPayload("{}");
+        String id = poison.getId(); // id is assigned at construction; add() persists it
+        outboxStore.add(poison);
+
+        Awaitility.await().atMost(Duration.ofSeconds(60)).untilAsserted(() -> {
+            OutboxMessage found = outboxStore.findAll().stream()
+                    .filter(m -> id.equals(m.getId())).findFirst().orElseThrow();
+            assertThat(found.getStatus()).isEqualTo("Failed");
+        });
+    }
+
+    @Test
     @DisplayName("creating an order writes a Created audit log entry")
     void auditLogWrittenOnCreate() {
         OrderResponse order = client.post("/orders", validOrder()).as(OrderResponse.class);

@@ -1,94 +1,74 @@
-# Remaining parity — Reporting event-ingestion features
+# Parity status — Java twin vs C# BreakfastProvider
 
-Everything in the C# scenario inventory is mirrored in the Java twin **except** three Reporting features
-that ingest events from secondary channels and expose them via additional GraphQL queries. They are a
-distinct build-out (new JPA stores + GraphQL queries + event consumers); this is the design and the
-verification plan for each, split by what can be exercised by the local docker-mode suite.
+The Java twin mirrors the C# component-test scenario inventory **per domain, across all four frameworks**
+(JUnit 5, TestNG, Cucumber, Spock). The C# canonical inventory is
+`tests/BreakfastProvider.Tests.Component.LightBDD/Scenarios`.
 
-Current Reporting GraphQL surface in the Java twin: `orderSummaries`, `popularRecipes` (both implemented
-and tested across all four frameworks). The C# `ReportingQuery` additionally exposes `recipeReports`,
-`batchCompletions`, `ingredientShipments`, `equipmentAlerts`.
+## Per-domain scenario parity (Java JUnit 5 vs C# LightBDD)
 
-> **STATUS — ALL DONE.** #1 EventGrid_Webhook / `ingredientShipments`, #2 Batch_Completions /
-> `batchCompletions` (real Pub/Sub publish + consumer), and #3 Equipment_Alerts / `equipmentAlerts`
-> (real Azure Event Hubs transport, verified end-to-end on the eventhubs-emulator + Azurite) are all
-> implemented and green across all four frameworks.
->
-> **CORRECTION (was wrong earlier):** Azure Event Hubs *does* have a maintained local emulator —
-> `mcr.microsoft.com/azure-messaging/eventhubs-emulator` (it needs an Azurite container for blob/metadata
-> storage + a config JSON; AMQP on port 5672). The C# project uses it in docker mode
-> (`docker/docker-compose-eventhub.yml` + `docker/eventhub-emulator-config.json`) and an in-process
-> `UseInMemoryEventHub` in memory mode. So Equipment_Alerts **is** locally verifiable end-to-end; the
-> earlier "no emulator, handler-only" note was my mistake and is being fixed by wiring the emulator via
-> Testcontainers (Azurite + eventhubs-emulator) with a real EventHub producer + EventProcessorClient
-> consumer. The C# emulator config: namespace `emulatorNs1`, hub `breakfast-equipment-alerts`,
-> 2 partitions; connection string
-> `Endpoint=sb://localhost;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=SAS_KEY_VALUE;UseDevelopmentEmulator=true;`.
-
-## 1. EventGrid_Webhook → `ingredientShipments` (DONE — implemented + verified)
-
-**C# behaviour:** `POST /reporting/eventgrid` (see `Endpoints.EventGridWebhook`) receives an EventGrid
-webhook payload (array of events) describing an ingredient delivery; the SUT ingests an
-`IngredientShipment` reporting row; the GraphQL `ingredientShipments` query returns it.
-
-**Java design:**
-- `EventGridWebhookController` `@PostMapping("/reporting/eventgrid")` accepting `List<Map<String,Object>>`
-  (the EventGrid envelope), handling the subscription-validation handshake event and the
-  ingredient-delivery event.
-- `IngredientShipmentEntity` (JPA) + repository in the reporting store.
-- `ingredientShipments` `@QueryMapping` + a `IngredientShipment` type in `schema.graphqls`.
-
-**Verification (local, docker mode):** a component test posts an EventGrid payload to the webhook, asserts
-2xx, then queries `{ ingredientShipments { ... } }` and asserts the delivery appears. Add across all four
-frameworks.
-
-## 2. Batch_Completions → `batchCompletions` (VERIFIABLE locally — Pub/Sub emulator)
-
-**C# behaviour:** creating a pancake/waffle batch publishes a batch-completion event to Pub/Sub; a
-consumer ingests a `BatchCompletionRecord`; the GraphQL `batchCompletions` query returns it.
-
-**Java state:** the SUT already publishes `PancakeBatchCompletedEvent` / `WaffleBatchCompletedEvent`
-(currently via `LoggingPubSubPublisher`). To complete this feature:
-- Publish those events to the real Pub/Sub topic (the Pub/Sub emulator is already wired for customer
-  feedback, so this is consistent and verifiable).
-- `BatchCompletionConsumer` (Pub/Sub subscriber, like `CustomerFeedbackConsumer`) → `BatchCompletionRecord`
-  JPA store.
-- `batchCompletions` `@QueryMapping` + schema type.
-
-**Verification (local, docker mode):** create a batch, await the consumer, query `{ batchCompletions }`
-and assert the batch appears (Awaitility, like the Orders outbox test). Add across all four frameworks.
-
-## 3. Equipment_Alerts → `equipmentAlerts` (NOT locally verifiable — needs an Event Hubs emulator)
-
-**C# behaviour:** creating a batch publishes an `EquipmentAlertEvent` to **Azure Event Hubs**; an Event
-Hubs consumer ingests an `EquipmentAlert`; the GraphQL `equipmentAlerts` query returns it.
-
-**Java state:** the SUT publishes `EquipmentAlertEvent` via `LoggingEventHubPublisher`. The blocker is that
-**Azure Event Hubs has no maintained local emulator** (noted in the original plan's Risks). So while the
-SUT-side consumer + store + query can be built, the end-to-end flow cannot be driven by the in-process
-docker-mode suite the way Cosmos/Kafka/Pub-Sub are.
-
-**Design (build the SUT side, defer the e2e test):**
-- `EquipmentAlertEntity` + repository; `equipmentAlerts` `@QueryMapping` + schema type.
-- An Event Hubs consumer (`azure-messaging-eventhubs` processor) writing alerts to the store.
-
-**Verification plan (cannot run in the local docker suite):**
-- Option A (recommended): unit-test the ingestion path directly — invoke the consumer's handler with a
-  synthetic `EquipmentAlertEvent` and assert an `EquipmentAlert` row is written and surfaced by the query.
-  This verifies everything except the Event Hubs transport.
-- Option B: run the newer Azure Event Hubs emulator container (preview) in a dedicated profile and wire a
-  Testcontainers `GenericContainer` for it; gate the e2e scenario behind that profile.
-- Option C: in `external-sut` mode against a real Azure Event Hubs namespace, run the full e2e scenario.
-
-## Summary
-
-| Feature | SUT build | Local e2e test | Status |
+| Domain | C# | Java | Notes |
 |---|---|---|---|
-| EventGrid_Webhook / `ingredientShipments` | controller + entity + query | yes (POST + GraphQL) | **DONE** |
-| Batch_Completions / `batchCompletions` | Pub/Sub publisher + consumer + entity + query | yes (Pub/Sub emulator) | **DONE** |
-| Equipment_Alerts / `equipmentAlerts` | consumer handler + entity + query | handler+store+query yes; Event Hubs transport only in external-sut/Azure | **DONE** (transport caveat) |
+| Orders | 20 | 20 | incl. outbox-processed + outbox-failed-after-retries; rate-limit lives in the Overrides context |
+| Infrastructure | 11 | 11 | health/correlation/telemetry; forward-to-supplier clears the `/menu` cache first |
+| Toppings | 10 | 10 | update/delete on a seeded id (service is stateless over its seed); raspberry-flag in Overrides |
+| Ingredients (→ MilkSourcing) | 8 | 8 | incl. cow-timeout → 502; goat-milk-disabled flag in Overrides |
+| Reporting | 8 | **7** | see "Single residual" below |
+| ChefNotes | 8 | 8 | |
+| DailySpecials | 8 | 8 | |
+| Grpc | 7 | 7 | |
+| Feedback / IngredientWaste / Inventory / RecipeReviews | 6 | 6 | |
+| AuditLogs / CustomerPreferences / IngredientUsage / Reservations | 5 | 5 | |
+| Pancakes / Waffles / Staff | 4 | 4 | |
+| Menu / Specifications / AppleCinnamonMuffins (→ Muffins) | 3 | 3 | |
+| RecipeCosts / CustomerFeedback | 1 | 1 | |
 
-All scenario/feature parity items are now implemented and green across all four frameworks. The single
-residual is that the Azure Event Hubs *transport* for Equipment_Alerts is not exercised by the local
-docker suite (no emulator) — only its ingestion handler/store/query are, with the transport verified in
-external-sut/Azure.
+Configuration-override scenarios (C# recreates the app with different config) live in one consolidated
+extra Spring context per framework — `OverridesComponentTest` / `…TestNgTest` / `…Spec` and the Cucumber
+`features-ratelimit` suite — covering Rate_Limiting (permit-limit=1), Toppings Feature_Flag (raspberry off)
+and Ingredients Goat_Milk_Feature_Flag (off). Kept in one context to bound the number of heavyweight
+backend-bearing Spring contexts per JVM.
+
+All Reporting event-ingestion channels are implemented and verified end-to-end in the local docker suite:
+`orderSummaries`, `popularRecipes`, `ingredientShipments` (EventGrid webhook), `batchCompletions`
+(real Pub/Sub publish + consumer), `equipmentAlerts` (real Azure Event Hubs via the
+`mcr.microsoft.com/azure-messaging/eventhubs-emulator` + Azurite, Testcontainers), and `recipeReports` +
+`ingredientUsage` (recipe-log Kafka consumer → reporting projection).
+
+## Single residual — `Order_Summaries_Should_Return_An_Empty_List_When_No_Orders_Exist`
+
+This is the only C# scenario not reproduced as a local component test. It asserts the `orderSummaries`
+GraphQL query returns an **empty** list when no orders exist.
+
+**Why it can't run in the shared docker suite:** the reporting store is the shared MSSQL Testcontainer,
+and every framework module creates orders across its scenarios in one JVM, so `order_summaries` is never
+empty when the test would run. Emptiness can't be asserted without isolating or truncating the store,
+which would corrupt the other scenarios' data.
+
+**Verification plan (pick one):**
+- **Isolated context (recommended):** a dedicated `@SpringBootTest` context with its own empty reporting
+  schema (e.g. a per-test H2 datasource bound only for this test, or `@Sql` truncation of `order_summaries`
+  in a `@DirtiesContext` context) that creates no orders, then asserts `{ orderSummaries }` is `[]`.
+- **external-sut lane:** against a freshly-provisioned reporting database (empty at start), assert the
+  query returns `[]` before any order is created.
+- **Contract unit test:** call the `ReportingGraphQlController.orderSummaries()` resolver with an empty
+  `OrderSummaryRepository` (mock/empty) and assert it returns an empty list (verifies the resolver's
+  empty-collection contract, minus the GraphQL transport).
+
+## Push-to-verify items (cannot run on this workstation)
+
+- **GitHub Actions CI lanes** (`_tests-java.yml` + the `java-*` jobs in `ci-main.yml`) and the GitHub
+  Pages publication of the four Java framework reports are verified only by pushing the branch and
+  observing the Actions run + the published site. They are wired but not exercised locally.
+- **external-sut run mode:** the non-`@SpringBootTest` external-SUT bases (driving a separately-started
+  SUT over HTTP/gRPC) are a run-mode variant; they are exercised in CI/external environments, not the
+  local docker suite which uses in-process `@SpringBootTest` + Testcontainers.
+
+## Resilience notes (added for suite stability)
+
+- `CosmosRetry`: bounded retry (503/408/449 + "Connection refused") around all Cosmos data-plane ops
+  (repository, outbox writer/store, idempotency store). The emulator gateway intermittently refuses
+  connections under the full suite's write load; production Cosmos likewise expects throttling retries.
+- Cosmos `buildClient()` is retried (eager DatabaseAccount read can 408 at reactor-tail saturation).
+- `recipe-logs` / `recipe-cost-calculated` Kafka topics are pre-declared as `NewTopic` beans so consumers
+  bind at startup (no metadata-discovery lag on the first message).
+- The milk-sourcing `RestTemplate` has a 2s read timeout so a slow cow downstream surfaces as 502.

@@ -1,17 +1,23 @@
 package io.lemonlion.breakfast.tests.spock
 
 import io.lemonlion.breakfast.BreakfastProviderApplication
+import io.lemonlion.breakfast.events.outbox.OutboxStore
 import io.lemonlion.breakfast.model.request.OrderItemRequest
 import io.lemonlion.breakfast.model.request.OrderRequest
 import io.lemonlion.breakfast.model.request.UpdateOrderStatusRequest
 import io.lemonlion.breakfast.model.response.OrderResponse
+import io.lemonlion.breakfast.storage.OutboxMessage
 import io.lemonlion.breakfast.testsupport.BackendsInitializer
 import io.lemonlion.breakfast.testsupport.BreakfastBackends
 import io.lemonlion.breakfast.testsupport.BreakfastTestClient
+import org.awaitility.Awaitility
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.server.LocalServerPort
 import org.springframework.test.context.ContextConfiguration
 import spock.lang.Specification
+
+import java.time.Duration
 
 /** Orders domain component spec (Spock) — same behaviour as the other framework suites. */
 @SpringBootTest(classes = BreakfastProviderApplication, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -20,6 +26,9 @@ class OrdersSpec extends Specification {
 
     @LocalServerPort
     int port
+
+    @Autowired
+    OutboxStore outboxStore
 
     BreakfastTestClient client
 
@@ -251,5 +260,23 @@ class OrdersSpec extends Specification {
         then:
         response.status() == 400
         response.bodyContains("'Status' is required.")
+    }
+
+    def "an outbox message transitions to Failed after exhausting retries"() {
+        given:
+        def poison = new OutboxMessage()
+        poison.partitionKey = "poison-${UUID.randomUUID()}"
+        poison.eventType = "PoisonEvent"
+        poison.destination = "no-such-destination"
+        poison.payload = "{}"
+        def id = poison.getId() // id is assigned at construction; add() persists it
+        outboxStore.add(poison)
+
+        expect:
+        Awaitility.await().atMost(Duration.ofSeconds(60)).untilAsserted {
+            def found = outboxStore.findAll().find { it.getId() == id }
+            assert found != null
+            assert found.getStatus() == "Failed"
+        }
     }
 }

@@ -35,19 +35,22 @@ public class CosmosRepositoryImpl<T> implements CosmosRepository<T> {
 
     @Override
     public T create(T item, String partitionKey) {
-        return container.createItem(item, new PartitionKey(partitionKey), new CosmosItemRequestOptions()).getItem();
+        return CosmosRetry.onTransient(() ->
+                container.createItem(item, new PartitionKey(partitionKey), new CosmosItemRequestOptions()).getItem());
     }
 
     @Override
     public Optional<T> findById(String id, String partitionKey) {
-        try {
-            return Optional.ofNullable(container.readItem(id, new PartitionKey(partitionKey), type).getItem());
-        } catch (CosmosException e) {
-            if (e.getStatusCode() == NOT_FOUND) {
-                return Optional.empty();
+        return CosmosRetry.onTransient(() -> {
+            try {
+                return Optional.ofNullable(container.readItem(id, new PartitionKey(partitionKey), type).getItem());
+            } catch (CosmosException e) {
+                if (e.getStatusCode() == NOT_FOUND) {
+                    return Optional.empty();
+                }
+                throw e;
             }
-            throw e;
-        }
+        });
     }
 
     @Override
@@ -55,25 +58,30 @@ public class CosmosRepositoryImpl<T> implements CosmosRepository<T> {
         String query = "SELECT * FROM c"
                 + (docType != null ? " WHERE c.docType = '" + docType + "'" : "")
                 + (orderByField != null ? " ORDER BY c." + orderByField + " DESC" : "");
-        CosmosPagedIterable<T> results = container.queryItems(query, new CosmosQueryRequestOptions(), type);
-        List<T> all = new ArrayList<>();
-        results.forEach(all::add);
-        int from = Math.min(Math.max(offset, 0), all.size());
-        int to = Math.min(from + Math.max(limit, 0), all.size());
-        return new PagedItems<>(new ArrayList<>(all.subList(from, to)), all.size());
+        return CosmosRetry.onTransient(() -> {
+            CosmosPagedIterable<T> results = container.queryItems(query, new CosmosQueryRequestOptions(), type);
+            List<T> all = new ArrayList<>();
+            results.forEach(all::add);
+            int from = Math.min(Math.max(offset, 0), all.size());
+            int to = Math.min(from + Math.max(limit, 0), all.size());
+            return new PagedItems<>(new ArrayList<>(all.subList(from, to)), all.size());
+        });
     }
 
     @Override
     public List<T> findAll() {
         String query = "SELECT * FROM c" + (docType != null ? " WHERE c.docType = '" + docType + "'" : "");
-        CosmosPagedIterable<T> results = container.queryItems(query, new CosmosQueryRequestOptions(), type);
-        List<T> all = new ArrayList<>();
-        results.forEach(all::add);
-        return all;
+        return CosmosRetry.onTransient(() -> {
+            CosmosPagedIterable<T> results = container.queryItems(query, new CosmosQueryRequestOptions(), type);
+            List<T> all = new ArrayList<>();
+            results.forEach(all::add);
+            return all;
+        });
     }
 
     @Override
     public T upsert(T item, String partitionKey) {
-        return container.upsertItem(item, new PartitionKey(partitionKey), new CosmosItemRequestOptions()).getItem();
+        return CosmosRetry.onTransient(() ->
+                container.upsertItem(item, new PartitionKey(partitionKey), new CosmosItemRequestOptions()).getItem());
     }
 }

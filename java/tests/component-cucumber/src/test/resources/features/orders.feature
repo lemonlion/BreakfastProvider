@@ -83,3 +83,28 @@ Feature: Orders
     Given a valid breakfast order
     When the order is placed
     Then a Created audit log entry exists for the order
+
+  Scenario: A previously created order is retrievable by id
+    Given a placed breakfast order
+    When the placed order is retrieved by id
+    Then the retrieved order matches the placed order
+
+  Scenario: A small page size limits the number of results
+    Given two breakfast orders have been placed
+    When orders are listed with page 1 and page size 1
+    Then the response status is 200
+    And the page contains 1 item
+
+  Scenario: Listing a page beyond the data returns an empty page
+    When orders are listed with page 999999 and page size 10
+    Then the page of orders is empty
+
+  Scenario: Updating the status of a non-existent order returns not found
+    When the status of a missing order is updated to "Preparing"
+    Then the response status is 404
+
+  Scenario: A status update with an invalid field is rejected
+    Given a placed breakfast order
+    When the order status is updated to ""
+    Then the response status is 400
+    And the error mentions "'Status' is required."

@@ -19,6 +19,7 @@ public final class FakeSupplier {
 
     private HttpServer server;
     private volatile int availabilityStatus = 200;
+    private volatile String lastCorrelationId;
     private final FakeHealth health = new FakeHealth();
     private final List<String> feedback = new CopyOnWriteArrayList<>();
 
@@ -39,6 +40,7 @@ public final class FakeSupplier {
     }
 
     private void handleAvailability(HttpExchange exchange) throws IOException {
+        lastCorrelationId = exchange.getRequestHeaders().getFirst("X-Correlation-Id");
         exchange.sendResponseHeaders(availabilityStatus, -1);
         exchange.close();
     }
@@ -60,6 +62,11 @@ public final class FakeSupplier {
         this.availabilityStatus = status;
     }
 
+    /** The {@code X-Correlation-Id} header value the SUT forwarded on its last availability call. */
+    public String lastCorrelationId() {
+        return lastCorrelationId;
+    }
+
     public boolean receivedFeedback() {
         return !feedback.isEmpty();
     }
@@ -75,6 +82,7 @@ public final class FakeSupplier {
 
     public void reset() {
         this.availabilityStatus = 200;
+        this.lastCorrelationId = null;
         this.feedback.clear();
         health.reset();
     }

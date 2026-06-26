@@ -22,3 +22,24 @@ Feature: Toppings
     When a topping named "<script>alert(1)</script>" in category "Syrup" is added
     Then the response status is 400
     And the error mentions "must not contain HTML or script content."
+
+  Scenario: An existing topping is updated
+    When an existing topping is updated
+    Then the updated topping is named "Golden Syrup"
+
+  Scenario: Updating a non-existent topping returns not found
+    When a non-existent topping is updated
+    Then the response status is 404
+
+  Scenario: An existing topping is deleted
+    When an existing topping is deleted
+    Then the response status is 204
+
+  Scenario: Deleting a non-existent topping returns not found
+    When a non-existent topping is deleted
+    Then the response status is 404
+
+  Scenario: Updating a topping with HTML or script content is rejected
+    When an existing topping is updated with HTML or script content
+    Then the response status is 400
+    And the error mentions "must not contain HTML or script content."

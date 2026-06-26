@@ -135,4 +135,28 @@ class InfrastructureComponentTest extends ComponentTestBase {
         assertThat(body.get("status").asText()).isEqualTo("Degraded");
         assertThat(body.get("results").get("KitchenService").get("status").asText()).isEqualTo("Degraded");
     }
+
+    @Test
+    @DisplayName("the health check reports degraded when only the cow service is unavailable")
+    void degradedHealthWhenCowUnavailable() {
+        BreakfastBackends.cow().setHealthStatus(503);
+
+        JsonNode body = client.get("/health").json();
+
+        assertThat(body.get("status").asText()).isEqualTo("Degraded");
+        assertThat(body.get("results").get("CowService").get("status").asText()).isEqualTo("Degraded");
+    }
+
+    @Test
+    @DisplayName("the correlation id is forwarded to the supplier service")
+    void correlationIdForwardedToSupplier() {
+        String correlationId = UUID.randomUUID().toString();
+
+        // The menu caches the supplier availability check; clear it so this request actually calls the
+        // supplier (mirrors the C# DELETE /menu/cache step before GET /menu).
+        client.delete("/menu/cache");
+        client.get("/menu", Map.of("X-Correlation-Id", correlationId));
+
+        assertThat(BreakfastBackends.supplier().lastCorrelationId()).isEqualTo(correlationId);
+    }
 }

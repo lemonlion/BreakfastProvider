@@ -58,16 +58,37 @@ class ToppingsSpec extends Specification {
         response.bodyContains("'Name' is required.")
     }
 
-    def "updating a missing topping returns 404 and a seeded one 200"() {
+    def "updating an existing topping returns the updated topping"() {
+        when:
+        def updated = client.put("/toppings/${SEEDED}", new UpdateToppingRequest("Golden Syrup", "Syrup"))
+
+        then:
+        updated.status() == 200
+        updated.as(ToppingResponse).name() == "Golden Syrup"
+    }
+
+    def "updating a non-existent topping returns 404"() {
         expect:
-        client.put("/toppings/${SEEDED}", new UpdateToppingRequest("Golden Syrup", "Syrup")).status() == 200
         client.put("/toppings/${UUID.randomUUID()}", new UpdateToppingRequest("X", "Y")).status() == 404
     }
 
-    def "deleting a seeded topping is 204 and a missing one 404"() {
+    def "deleting an existing topping returns 204"() {
         expect:
         client.delete("/toppings/${SEEDED}").status() == 204
+    }
+
+    def "deleting a non-existent topping returns 404"() {
+        expect:
         client.delete("/toppings/${UUID.randomUUID()}").status() == 404
+    }
+
+    def "updating a topping with HTML/script content is rejected"() {
+        when:
+        def response = client.put("/toppings/${SEEDED}", new UpdateToppingRequest("<script>alert(1)</script>", "Syrup"))
+
+        then:
+        response.status() == 400
+        response.bodyContains("must not contain HTML or script content.")
     }
 
     def "raspberries are included when the feature flag is enabled"() {

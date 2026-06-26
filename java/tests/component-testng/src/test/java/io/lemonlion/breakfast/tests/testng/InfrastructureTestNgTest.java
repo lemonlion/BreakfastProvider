@@ -124,4 +124,24 @@ public class InfrastructureTestNgTest extends ComponentTestBaseNg {
         assertThat(body.get("status").asText()).isEqualTo("Degraded");
         assertThat(body.get("results").get("KitchenService").get("status").asText()).isEqualTo("Degraded");
     }
+
+    @Test
+    public void degradedHealthWhenCowUnavailable() {
+        BreakfastBackends.cow().setHealthStatus(503);
+
+        JsonNode body = client.get("/health").json();
+
+        assertThat(body.get("status").asText()).isEqualTo("Degraded");
+        assertThat(body.get("results").get("CowService").get("status").asText()).isEqualTo("Degraded");
+    }
+
+    @Test
+    public void correlationIdForwardedToSupplier() {
+        String correlationId = UUID.randomUUID().toString();
+
+        client.delete("/menu/cache");
+        client.get("/menu", Map.of("X-Correlation-Id", correlationId));
+
+        assertThat(BreakfastBackends.supplier().lastCorrelationId()).isEqualTo(correlationId);
+    }
 }

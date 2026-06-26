@@ -6,6 +6,7 @@ import com.azure.cosmos.models.CosmosBatchResponse;
 import com.azure.cosmos.models.PartitionKey;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.lemonlion.breakfast.persistence.cosmos.CosmosRetry;
 import io.lemonlion.breakfast.storage.OutboxMessage;
 import io.lemonlion.breakfast.storage.OutboxMessageStatus;
 import java.time.Instant;
@@ -41,12 +42,16 @@ public class CosmosOutboxWriter implements OutboxWriter {
         message.setStatus(OutboxMessageStatus.PENDING);
         message.setCreatedAt(Instant.now());
 
-        CosmosBatch batch = CosmosBatch.createCosmosBatch(new PartitionKey(partitionKey));
-        batch.createItemOperation(document);
-        batch.createItemOperation(message);
-        CosmosBatchResponse response = container.executeCosmosBatch(batch);
-        if (!response.isSuccessStatusCode()) {
-            throw new IllegalStateException("Outbox transactional batch failed with status " + response.getStatusCode());
-        }
+        CosmosRetry.onTransient(() -> {
+            CosmosBatch batch = CosmosBatch.createCosmosBatch(new PartitionKey(partitionKey));
+            batch.createItemOperation(document);
+            batch.createItemOperation(message);
+            CosmosBatchResponse response = container.executeCosmosBatch(batch);
+            if (!response.isSuccessStatusCode()) {
+                throw new IllegalStateException(
+                        "Outbox transactional batch failed with status " + response.getStatusCode());
+            }
+            return null;
+        });
     }
 }

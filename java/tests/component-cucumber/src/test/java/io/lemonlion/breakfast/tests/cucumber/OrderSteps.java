@@ -93,6 +93,34 @@ public class OrderSteps {
         ctx.lastResponse = ctx.client().get("/orders/" + UUID.randomUUID());
     }
 
+    @When("the placed order is retrieved by id")
+    public void thePlacedOrderIsRetrievedById() {
+        ctx.lastResponse = ctx.client().get("/orders/" + createdOrder.orderId());
+    }
+
+    @Then("the retrieved order matches the placed order")
+    public void theRetrievedOrderMatchesThePlacedOrder() {
+        assertThat(ctx.lastResponse.status()).isEqualTo(200);
+        assertThat(ctx.lastResponse.as(OrderResponse.class).orderId()).isEqualTo(createdOrder.orderId());
+    }
+
+    @Then("the page contains {int} item")
+    public void thePageContainsItem(int count) {
+        assertThat(ctx.lastResponse.json().get("items").size()).isEqualTo(count);
+    }
+
+    @Then("the page of orders is empty")
+    public void thePageOfOrdersIsEmpty() {
+        assertThat(ctx.lastResponse.status()).isEqualTo(200);
+        assertThat(ctx.lastResponse.json().get("items").size()).isZero();
+    }
+
+    @When("the status of a missing order is updated to {string}")
+    public void theStatusOfAMissingOrderIsUpdatedTo(String status) {
+        ctx.lastResponse = ctx.client().patch("/orders/" + UUID.randomUUID() + "/status",
+                new UpdateOrderStatusRequest(status));
+    }
+
     @When("the order status is updated to {string}")
     public void theOrderStatusIsUpdatedTo(String status) {
         ctx.lastResponse = ctx.client().patch("/orders/" + createdOrder.orderId() + "/status",

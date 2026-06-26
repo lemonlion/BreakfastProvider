@@ -140,4 +140,28 @@ class InfrastructureSpec extends Specification {
         body.get("status").asText() == "Degraded"
         body.get("results").get("KitchenService").get("status").asText() == "Degraded"
     }
+
+    def "the health check reports degraded when only the cow service is unavailable"() {
+        given:
+        BreakfastBackends.cow().setHealthStatus(503)
+
+        when:
+        def body = client.get("/health").json()
+
+        then:
+        body.get("status").asText() == "Degraded"
+        body.get("results").get("CowService").get("status").asText() == "Degraded"
+    }
+
+    def "the correlation id is forwarded to the supplier service"() {
+        given:
+        def correlationId = UUID.randomUUID().toString()
+
+        when:
+        client.delete("/menu/cache")
+        client.get("/menu", ["X-Correlation-Id": correlationId])
+
+        then:
+        BreakfastBackends.supplier().lastCorrelationId() == correlationId
+    }
 }

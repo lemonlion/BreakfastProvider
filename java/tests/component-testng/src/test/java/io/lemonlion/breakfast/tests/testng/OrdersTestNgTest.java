@@ -156,4 +156,45 @@ public class OrdersTestNgTest extends ComponentTestBaseNg {
         assertThat(audit.bodyContains("Created")).isTrue();
         assertThat(audit.bodyContains(order.orderId().toString())).isTrue();
     }
+
+    @Test
+    public void retrieveById() {
+        OrderResponse order = client.post("/orders", validOrder()).as(OrderResponse.class);
+        TestResponse fetched = client.get("/orders/" + order.orderId());
+        assertThat(fetched.status()).isEqualTo(200);
+        assertThat(fetched.as(OrderResponse.class).orderId()).isEqualTo(order.orderId());
+    }
+
+    @Test
+    public void smallPageSizeLimitsResults() {
+        String customer = "Small-" + UUID.randomUUID();
+        client.post("/orders", new OrderRequest(customer, List.of(new OrderItemRequest("Pancakes", UUID.randomUUID(), 1)), 1));
+        client.post("/orders", new OrderRequest(customer, List.of(new OrderItemRequest("Pancakes", UUID.randomUUID(), 1)), 2));
+        com.fasterxml.jackson.databind.JsonNode body = client.get("/orders?page=1&pageSize=1").json();
+        assertThat(body.get("pageSize").asInt()).isEqualTo(1);
+        assertThat(body.get("items").size()).isEqualTo(1);
+    }
+
+    @Test
+    public void emptyPageBeyondData() {
+        TestResponse response = client.get("/orders?page=999999&pageSize=10");
+        assertThat(response.status()).isEqualTo(200);
+        assertThat(response.json().get("items").size()).isZero();
+    }
+
+    @Test
+    public void updateStatusNotFound() {
+        TestResponse response = client.patch("/orders/" + UUID.randomUUID() + "/status",
+                new UpdateOrderStatusRequest("Preparing"));
+        assertThat(response.status()).isEqualTo(404);
+    }
+
+    @Test
+    public void statusUpdateInvalidFields() {
+        OrderResponse order = client.post("/orders", validOrder()).as(OrderResponse.class);
+        TestResponse response = client.patch("/orders/" + order.orderId() + "/status",
+                new UpdateOrderStatusRequest(""));
+        assertThat(response.status()).isEqualTo(400);
+        assertThat(response.bodyContains("'Status' is required.")).isTrue();
+    }
 }

@@ -49,6 +49,23 @@ public class InfrastructureSteps {
         BreakfastBackends.kitchen().setHealthStatus(503);
     }
 
+    @Given("the cow service is unreachable")
+    public void cowUnreachable() {
+        ctx.client();
+        BreakfastBackends.cow().setHealthStatus(503);
+    }
+
+    @When("the menu cache is cleared and the menu is requested with correlation id {string}")
+    public void menuCacheClearedAndMenuRequested(String correlationId) {
+        ctx.client().delete("/menu/cache");
+        response = ctx.client().get("/menu", Map.of("X-Correlation-Id", correlationId));
+    }
+
+    @Then("the supplier service received correlation id {string}")
+    public void supplierReceivedCorrelationId(String correlationId) {
+        assertThat(BreakfastBackends.supplier().lastCorrelationId()).isEqualTo(correlationId);
+    }
+
     @When("an order is placed for telemetry capture")
     public void orderPlacedForTelemetry() {
         telemetryRoot = (Logger) LoggerFactory.getLogger(org.slf4j.Logger.ROOT_LOGGER_NAME);

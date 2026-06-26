@@ -39,17 +39,34 @@ public class ToppingsTestNgTest extends ComponentTestBaseNg {
     }
 
     @Test
-    public void updateExistingAndMissing() {
-        assertThat(client.put("/toppings/" + SEEDED, new UpdateToppingRequest("Golden Syrup", "Syrup")).status())
-                .isEqualTo(200);
+    public void updateExisting() {
+        TestResponse updated = client.put("/toppings/" + SEEDED, new UpdateToppingRequest("Golden Syrup", "Syrup"));
+        assertThat(updated.status()).isEqualTo(200);
+        assertThat(updated.as(ToppingResponse.class).name()).isEqualTo("Golden Syrup");
+    }
+
+    @Test
+    public void updateMissing() {
         assertThat(client.put("/toppings/" + UUID.randomUUID(), new UpdateToppingRequest("X", "Y")).status())
                 .isEqualTo(404);
     }
 
     @Test
-    public void deleteExistingAndMissing() {
+    public void deleteExisting() {
         assertThat(client.delete("/toppings/" + SEEDED).status()).isEqualTo(204);
+    }
+
+    @Test
+    public void deleteMissing() {
         assertThat(client.delete("/toppings/" + UUID.randomUUID()).status()).isEqualTo(404);
+    }
+
+    @Test
+    public void updateXssRejected() {
+        TestResponse response = client.put("/toppings/" + SEEDED,
+                new UpdateToppingRequest("<script>alert(1)</script>", "Syrup"));
+        assertThat(response.status()).isEqualTo(400);
+        assertThat(response.bodyContains("must not contain HTML or script content.")).isTrue();
     }
 
     @Test

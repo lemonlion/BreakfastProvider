@@ -200,4 +200,56 @@ class OrdersSpec extends Specification {
         audit.bodyContains("Created")
         audit.bodyContains(order.orderId().toString())
     }
+
+    def "a previously created order is retrievable by id"() {
+        given:
+        def order = client.post("/orders", validOrder()).as(OrderResponse)
+
+        when:
+        def fetched = client.get("/orders/${order.orderId()}")
+
+        then:
+        fetched.status() == 200
+        fetched.as(OrderResponse).orderId() == order.orderId()
+    }
+
+    def "a small page size limits the number of results"() {
+        given:
+        def customer = "Small-${UUID.randomUUID()}"
+        client.post("/orders", new OrderRequest(customer, [new OrderItemRequest("Pancakes", UUID.randomUUID(), 1)], 1))
+        client.post("/orders", new OrderRequest(customer, [new OrderItemRequest("Pancakes", UUID.randomUUID(), 1)], 2))
+
+        when:
+        def body = client.get("/orders?page=1&pageSize=1").json()
+
+        then:
+        body.get("pageSize").asInt() == 1
+        body.get("items").size() == 1
+    }
+
+    def "listing a page beyond the data returns an empty page"() {
+        when:
+        def response = client.get("/orders?page=999999&pageSize=10")
+
+        then:
+        response.status() == 200
+        response.json().get("items").size() == 0
+    }
+
+    def "updating the status of a non-existent order returns 404"() {
+        expect:
+        client.patch("/orders/${UUID.randomUUID()}/status", new UpdateOrderStatusRequest("Preparing")).status() == 404
+    }
+
+    def "a status update with an invalid field is rejected with 400"() {
+        given:
+        def order = client.post("/orders", validOrder()).as(OrderResponse)
+
+        when:
+        def response = client.patch("/orders/${order.orderId()}/status", new UpdateOrderStatusRequest(""))
+
+        then:
+        response.status() == 400
+        response.bodyContains("'Status' is required.")
+    }
 }

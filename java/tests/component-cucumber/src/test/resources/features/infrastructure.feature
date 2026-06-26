@@ -44,3 +44,13 @@ Feature: Infrastructure
     When the health check endpoint is called
     Then the overall health status is "Degraded"
     And the "KitchenService" health entry is "Degraded"
+
+  Scenario: Health check reports degraded when only the cow service is unavailable
+    Given the cow service is unreachable
+    When the health check endpoint is called
+    Then the overall health status is "Degraded"
+    And the "CowService" health entry is "Degraded"
+
+  Scenario: A correlation id is forwarded to the supplier service
+    When the menu cache is cleared and the menu is requested with correlation id "abcdef00-1111-2222-3333-444455556666"
+    Then the supplier service received correlation id "abcdef00-1111-2222-3333-444455556666"

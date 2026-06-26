@@ -16,7 +16,9 @@ import org.junit.jupiter.api.Test;
 @DisplayName("Toppings")
 class ToppingsComponentTest extends ComponentTestBase {
 
-    private static final UUID SEEDED = UUID.fromString("11111111-0000-0000-0000-000000000003"); // Maple Syrup
+    // A seeded topping (Maple Syrup). update/delete are stateless over the seed, so reusing it across
+    // tests is safe — neither mutates the catalogue.
+    private static final UUID SEEDED = UUID.fromString("11111111-0000-0000-0000-000000000003");
 
     @Test
     @DisplayName("the topping catalogue is returned")
@@ -46,19 +48,39 @@ class ToppingsComponentTest extends ComponentTestBase {
     }
 
     @Test
-    @DisplayName("updating a seeded topping succeeds; a missing one is 404")
-    void updateExistingAndMissing() {
-        assertThat(client.put("/toppings/" + SEEDED, new UpdateToppingRequest("Golden Syrup", "Syrup")).status())
-                .isEqualTo(200);
+    @DisplayName("updating an existing topping returns the updated topping")
+    void updateExisting() {
+        TestResponse updated = client.put("/toppings/" + SEEDED, new UpdateToppingRequest("Golden Syrup", "Syrup"));
+        assertThat(updated.status()).isEqualTo(200);
+        assertThat(updated.as(ToppingResponse.class).name()).isEqualTo("Golden Syrup");
+    }
+
+    @Test
+    @DisplayName("updating a non-existent topping returns 404")
+    void updateMissing() {
         assertThat(client.put("/toppings/" + UUID.randomUUID(), new UpdateToppingRequest("X", "Y")).status())
                 .isEqualTo(404);
     }
 
     @Test
-    @DisplayName("deleting a seeded topping is 204; a missing one is 404")
-    void deleteExistingAndMissing() {
+    @DisplayName("deleting an existing topping returns 204")
+    void deleteExisting() {
         assertThat(client.delete("/toppings/" + SEEDED).status()).isEqualTo(204);
+    }
+
+    @Test
+    @DisplayName("deleting a non-existent topping returns 404")
+    void deleteMissing() {
         assertThat(client.delete("/toppings/" + UUID.randomUUID()).status()).isEqualTo(404);
+    }
+
+    @Test
+    @DisplayName("updating a topping with HTML/script content is rejected")
+    void updateXssRejected() {
+        TestResponse response = client.put("/toppings/" + SEEDED,
+                new UpdateToppingRequest("<script>alert(1)</script>", "Syrup"));
+        assertThat(response.status()).isEqualTo(400);
+        assertThat(response.bodyContains("must not contain HTML or script content.")).isTrue();
     }
 
     @Test

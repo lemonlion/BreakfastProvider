@@ -5,6 +5,7 @@ import com.azure.cosmos.models.CosmosItemRequestOptions;
 import com.azure.cosmos.models.CosmosQueryRequestOptions;
 import com.azure.cosmos.models.PartitionKey;
 import com.azure.cosmos.util.CosmosPagedIterable;
+import io.lemonlion.breakfast.persistence.cosmos.CosmosRetry;
 import io.lemonlion.breakfast.storage.OutboxMessage;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,21 +32,23 @@ public class CosmosOutboxStore implements OutboxStore {
 
     @Override
     public OutboxMessage update(OutboxMessage message) {
-        return container.upsertItem(message, new PartitionKey(message.getPartitionKey()),
-                new CosmosItemRequestOptions()).getItem();
+        return CosmosRetry.onTransient(() -> container.upsertItem(message,
+                new PartitionKey(message.getPartitionKey()), new CosmosItemRequestOptions()).getItem());
     }
 
     @Override
     public OutboxMessage add(OutboxMessage message) {
-        return container.createItem(message, new PartitionKey(message.getPartitionKey()),
-                new CosmosItemRequestOptions()).getItem();
+        return CosmosRetry.onTransient(() -> container.createItem(message,
+                new PartitionKey(message.getPartitionKey()), new CosmosItemRequestOptions()).getItem());
     }
 
     private List<OutboxMessage> collect(String query) {
-        CosmosPagedIterable<OutboxMessage> results =
-                container.queryItems(query, new CosmosQueryRequestOptions(), OutboxMessage.class);
-        List<OutboxMessage> all = new ArrayList<>();
-        results.forEach(all::add);
-        return all;
+        return CosmosRetry.onTransient(() -> {
+            CosmosPagedIterable<OutboxMessage> results =
+                    container.queryItems(query, new CosmosQueryRequestOptions(), OutboxMessage.class);
+            List<OutboxMessage> all = new ArrayList<>();
+            results.forEach(all::add);
+            return all;
+        });
     }
 }

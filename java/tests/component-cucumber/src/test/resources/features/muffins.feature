@@ -11,3 +11,9 @@ Feature: Muffins
     When the muffins are made
     Then the response status is 400
     And the error mentions "Baking temperature must be between 150 and 220 degrees."
+
+  Scenario: A muffin request without apples is rejected
+    Given a muffin request without apples
+    When the muffins are made
+    Then the response status is 400
+    And the error mentions "'Apples' is required."

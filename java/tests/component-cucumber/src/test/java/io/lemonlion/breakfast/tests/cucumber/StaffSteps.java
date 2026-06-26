@@ -11,6 +11,7 @@ import io.lemonlion.breakfast.model.response.StaffMemberResponse;
 public class StaffSteps {
 
     private final ScenarioContext ctx;
+    private long createdId;
 
     public StaffSteps(ScenarioContext ctx) {
         this.ctx = ctx;
@@ -26,5 +27,27 @@ public class StaffSteps {
     public void theStaffMemberIsCreated(String role) {
         assertThat(ctx.lastResponse.status()).isEqualTo(201);
         assertThat(ctx.lastResponse.as(StaffMemberResponse.class).role()).isEqualTo(role);
+    }
+
+    @When("a staff member is added and retrieved by id")
+    public void aStaffMemberIsAddedAndRetrievedById() {
+        createdId = ctx.client().post("/staff",
+                        new StaffMemberRequest("Sam Cook", "Chef", "sam@example.com", true, null))
+                .as(StaffMemberResponse.class).id();
+        ctx.lastResponse = ctx.client().get("/staff/" + createdId);
+    }
+
+    @Then("the retrieved staff member has id matching the created one")
+    public void theRetrievedStaffMemberMatches() {
+        assertThat(ctx.lastResponse.status()).isEqualTo(200);
+        assertThat(ctx.lastResponse.as(StaffMemberResponse.class).id()).isEqualTo(createdId);
+    }
+
+    @When("a staff member is added and deleted")
+    public void aStaffMemberIsAddedAndDeleted() {
+        createdId = ctx.client().post("/staff",
+                        new StaffMemberRequest("Sam Cook", "Chef", "sam@example.com", true, null))
+                .as(StaffMemberResponse.class).id();
+        ctx.lastResponse = ctx.client().delete("/staff/" + createdId);
     }
 }

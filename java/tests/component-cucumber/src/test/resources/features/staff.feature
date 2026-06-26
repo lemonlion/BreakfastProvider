@@ -9,3 +9,11 @@ Feature: Staff
     When a staff member "Sam Cook" with role "Astronaut" is added
     Then the response status is 400
     And the error mentions "'Role' must be one of:"
+
+  Scenario: An existing staff member is retrievable by id
+    When a staff member is added and retrieved by id
+    Then the retrieved staff member has id matching the created one
+
+  Scenario: A staff member is deleted
+    When a staff member is added and deleted
+    Then the response status is 204

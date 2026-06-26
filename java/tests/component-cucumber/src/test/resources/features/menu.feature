@@ -10,3 +10,11 @@ Feature: Menu
     Given the supplier is unavailable
     When the menu is requested
     Then every menu item is unavailable
+
+  Scenario: The menu returns cached results on subsequent requests
+    Given the supplier confirms ingredient availability
+    When the menu is requested
+    Then every menu item is available
+    Given the supplier goes unavailable without clearing the cache
+    When the menu is requested
+    Then every menu item is available

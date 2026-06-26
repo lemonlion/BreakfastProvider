@@ -36,6 +36,11 @@ public class MenuSteps {
         ctx.lastResponse = ctx.client().get("/menu");
     }
 
+    @Given("the supplier goes unavailable without clearing the cache")
+    public void theSupplierGoesUnavailableWithoutClearingCache() {
+        BreakfastBackends.supplier().setAvailabilityStatus(503);
+    }
+
     @Then("every menu item is available")
     public void everyMenuItemIsAvailable() {
         assertThat(ctx.lastResponse.status()).isEqualTo(200);

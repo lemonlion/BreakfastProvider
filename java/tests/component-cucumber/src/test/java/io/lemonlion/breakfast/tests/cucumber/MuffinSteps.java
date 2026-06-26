@@ -33,6 +33,12 @@ public class MuffinSteps {
                 new BakingProfile(300, 25, "Silicone"), List.of());
     }
 
+    @Given("a muffin request without apples")
+    public void aMuffinRequestWithoutApples() {
+        request = new MuffinRequest("Whole", "Plain", "Free-range", null, "Ceylon",
+                new BakingProfile(180, 25, "Silicone"), List.of());
+    }
+
     @When("the muffins are made")
     public void theMuffinsAreMade() {
         ctx.lastResponse = ctx.client().post("/muffins", request);

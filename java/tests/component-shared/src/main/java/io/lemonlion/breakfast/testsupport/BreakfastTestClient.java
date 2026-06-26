@@ -36,6 +36,16 @@ public final class BreakfastTestClient {
         return send(builder);
     }
 
+    /**
+     * POSTs a raw string body with an explicit {@code Content-Type}, for the unsupported-media-type
+     * scenarios (e.g. text/plain against a JSON-only endpoint -> 415).
+     */
+    public TestResponse postRaw(String path, String body, String contentType) {
+        return send(requestBuilder(path)
+                .POST(BodyPublishers.ofString(body, StandardCharsets.UTF_8))
+                .header("Content-Type", contentType));
+    }
+
     public TestResponse get(String path) {
         return send(requestBuilder(path).GET());
     }

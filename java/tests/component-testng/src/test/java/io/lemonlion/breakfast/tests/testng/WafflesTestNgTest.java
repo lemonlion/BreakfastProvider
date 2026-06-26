@@ -29,4 +29,19 @@ public class WafflesTestNgTest extends ComponentTestBaseNg {
         assertThat(response.status()).isEqualTo(400);
         assertThat(response.bodyContains("'Butter' is required.")).isTrue();
     }
+
+    @Test
+    public void rejectsTooManyToppings() {
+        WaffleRequest request = new WaffleRequest("Whole", "Plain", "Free-range", "Salted",
+                List.of("a", "b", "c", "d", "e", "f"));
+        TestResponse response = client.post("/waffles", request);
+        assertThat(response.status()).isEqualTo(400);
+        assertThat(response.bodyContains("Maximum toppings exceeded. Limit is 5.")).isTrue();
+    }
+
+    @Test
+    public void rejectsUnsupportedContentType() {
+        TestResponse response = client.postRaw("/waffles", "Whole Plain Free-range Salted", "text/plain");
+        assertThat(response.status()).isEqualTo(415);
+    }
 }

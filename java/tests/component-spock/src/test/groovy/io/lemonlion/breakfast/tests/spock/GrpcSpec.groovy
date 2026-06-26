@@ -96,4 +96,15 @@ class GrpcSpec extends Specification {
         replies[0].orderId == order.orderId().toString()
         replies[0].status == "Created"
     }
+
+    def "stream order updates for a non-existent order is a NOT_FOUND error"() {
+        when:
+        GrpcSupport.blockingStub()
+                .streamOrderUpdates(OrderStatusRequest.newBuilder().setOrderId(UUID.randomUUID().toString()).build())
+                .forEachRemaining { }
+
+        then:
+        def ex = thrown(StatusRuntimeException)
+        ex.status.code == Status.Code.NOT_FOUND
+    }
 }

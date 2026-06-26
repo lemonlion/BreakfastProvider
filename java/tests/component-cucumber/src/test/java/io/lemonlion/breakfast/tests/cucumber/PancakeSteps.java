@@ -39,6 +39,11 @@ public class PancakeSteps {
         ctx.lastResponse = ctx.client().post("/pancakes", request);
     }
 
+    @When("a pancake request is sent with an unsupported content type")
+    public void aPancakeRequestWithUnsupportedContentType() {
+        ctx.lastResponse = ctx.client().postRaw("/pancakes", "Whole Plain Free-range", "text/plain");
+    }
+
     @Then("a pancake batch is returned with the ingredients")
     public void aPancakeBatchIsReturned() {
         assertThat(ctx.lastResponse.status()).isEqualTo(201);

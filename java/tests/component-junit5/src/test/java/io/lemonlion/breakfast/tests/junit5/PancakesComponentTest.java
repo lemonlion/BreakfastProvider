@@ -44,4 +44,11 @@ class PancakesComponentTest extends ComponentTestBase {
         assertThat(response.status()).isEqualTo(400);
         assertThat(response.bodyContains("Maximum toppings exceeded. Limit is 5.")).isTrue();
     }
+
+    @Test
+    @DisplayName("an unsupported content type is rejected with 415")
+    void rejectsUnsupportedContentType() {
+        TestResponse response = client.postRaw("/pancakes", "Whole Plain Free-range", "text/plain");
+        assertThat(response.status()).isEqualTo(415);
+    }
 }

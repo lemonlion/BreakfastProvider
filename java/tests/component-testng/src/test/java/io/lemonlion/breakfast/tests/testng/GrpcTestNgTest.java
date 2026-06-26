@@ -92,4 +92,14 @@ public class GrpcTestNgTest extends ComponentTestBaseNg {
         assertThat(replies.get(0).getOrderId()).isEqualTo(order.orderId().toString());
         assertThat(replies.get(0).getStatus()).isEqualTo("Created");
     }
+
+    @Test
+    public void streamOrderUpdatesNotFound() {
+        assertThatThrownBy(() -> GrpcSupport.blockingStub()
+                .streamOrderUpdates(OrderStatusRequest.newBuilder().setOrderId(UUID.randomUUID().toString()).build())
+                .forEachRemaining(reply -> { }))
+                .isInstanceOf(StatusRuntimeException.class)
+                .satisfies(ex -> assertThat(((StatusRuntimeException) ex).getStatus().getCode())
+                        .isEqualTo(Status.Code.NOT_FOUND));
+    }
 }

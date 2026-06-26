@@ -63,6 +63,17 @@ public class GrpcSteps {
                 .forEachRemaining(streamedReplies::add);
     }
 
+    @When("the updates of a non-existent order are streamed via grpc")
+    public void nonExistentOrderStreamed() {
+        try {
+            GrpcSupport.blockingStub()
+                    .streamOrderUpdates(OrderStatusRequest.newBuilder().setOrderId(UUID.randomUUID().toString()).build())
+                    .forEachRemaining(streamedReplies::add);
+        } catch (StatusRuntimeException ex) {
+            rpcException = ex;
+        }
+    }
+
     @Then("the recipe summary has {int} total batches")
     public void recipeSummaryBatches(int expected) {
         assertThat(recipeReply.getTotalBatches()).isEqualTo(expected);

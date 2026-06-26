@@ -54,4 +54,9 @@ class PancakesSpec extends Specification {
         response.status() == 400
         response.bodyContains("Maximum toppings exceeded. Limit is 5.")
     }
+
+    def "an unsupported content type is rejected with 415"() {
+        expect:
+        client.postRaw("/pancakes", "Whole Plain Free-range", "text/plain").status() == 415
+    }
 }

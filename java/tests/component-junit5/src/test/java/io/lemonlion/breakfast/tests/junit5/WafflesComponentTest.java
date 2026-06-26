@@ -34,4 +34,21 @@ class WafflesComponentTest extends ComponentTestBase {
         assertThat(response.status()).isEqualTo(400);
         assertThat(response.bodyContains("'Butter' is required.")).isTrue();
     }
+
+    @Test
+    @DisplayName("exceeding the topping limit is rejected")
+    void rejectsTooManyToppings() {
+        WaffleRequest request = new WaffleRequest("Whole", "Plain", "Free-range", "Salted",
+                List.of("a", "b", "c", "d", "e", "f"));
+        TestResponse response = client.post("/waffles", request);
+        assertThat(response.status()).isEqualTo(400);
+        assertThat(response.bodyContains("Maximum toppings exceeded. Limit is 5.")).isTrue();
+    }
+
+    @Test
+    @DisplayName("an unsupported content type is rejected with 415")
+    void rejectsUnsupportedContentType() {
+        TestResponse response = client.postRaw("/waffles", "Whole Plain Free-range Salted", "text/plain");
+        assertThat(response.status()).isEqualTo(415);
+    }
 }

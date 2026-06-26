@@ -99,4 +99,15 @@ class GrpcComponentTest extends ComponentTestBase {
         assertThat(replies.get(0).getOrderId()).isEqualTo(order.orderId().toString());
         assertThat(replies.get(0).getStatus()).isEqualTo("Created");
     }
+
+    @Test
+    @DisplayName("stream order updates for a non-existent order is a NOT_FOUND error")
+    void streamOrderUpdatesNotFound() {
+        assertThatThrownBy(() -> GrpcSupport.blockingStub()
+                .streamOrderUpdates(OrderStatusRequest.newBuilder().setOrderId(UUID.randomUUID().toString()).build())
+                .forEachRemaining(reply -> { }))
+                .isInstanceOf(StatusRuntimeException.class)
+                .satisfies(ex -> assertThat(((StatusRuntimeException) ex).getStatus().getCode())
+                        .isEqualTo(Status.Code.NOT_FOUND));
+    }
 }

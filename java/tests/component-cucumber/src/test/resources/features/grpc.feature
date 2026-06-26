@@ -27,3 +27,7 @@ Feature: Grpc
   Scenario: Stream order updates for a created order
     When an order is placed and its updates are streamed via grpc
     Then the streamed order status is "Created"
+
+  Scenario: Stream order updates for a non-existent order
+    When the updates of a non-existent order are streamed via grpc
+    Then the grpc response is a not found error

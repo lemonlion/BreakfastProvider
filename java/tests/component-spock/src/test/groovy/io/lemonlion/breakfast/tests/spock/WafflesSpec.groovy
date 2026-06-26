@@ -45,4 +45,19 @@ class WafflesSpec extends Specification {
         response.status() == 400
         response.bodyContains("'Butter' is required.")
     }
+
+    def "exceeding the topping limit is rejected"() {
+        when:
+        def response = client.post("/waffles",
+                new WaffleRequest("Whole", "Plain", "Free-range", "Salted", ["a", "b", "c", "d", "e", "f"]))
+
+        then:
+        response.status() == 400
+        response.bodyContains("Maximum toppings exceeded. Limit is 5.")
+    }
+
+    def "an unsupported content type is rejected with 415"() {
+        expect:
+        client.postRaw("/waffles", "Whole Plain Free-range Salted", "text/plain").status() == 415
+    }
 }

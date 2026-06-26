@@ -37,4 +37,10 @@ public class PancakesTestNgTest extends ComponentTestBaseNg {
         assertThat(response.status()).isEqualTo(400);
         assertThat(response.bodyContains("Maximum toppings exceeded. Limit is 5.")).isTrue();
     }
+
+    @Test
+    public void rejectsUnsupportedContentType() {
+        TestResponse response = client.postRaw("/pancakes", "Whole Plain Free-range", "text/plain");
+        assertThat(response.status()).isEqualTo(415);
+    }
 }

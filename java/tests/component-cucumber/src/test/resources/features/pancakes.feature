@@ -17,3 +17,7 @@ Feature: Pancakes
     When the pancakes are made
     Then the response status is 400
     And the error mentions "Maximum toppings exceeded. Limit is 5."
+
+  Scenario: An unsupported content type is rejected
+    When a pancake request is sent with an unsupported content type
+    Then the response status is 415

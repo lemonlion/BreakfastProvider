@@ -29,9 +29,20 @@ public class WaffleSteps {
         request = new WaffleRequest("Whole", "Plain", "Free-range", null, List.of());
     }
 
+    @Given("a waffle request with six toppings")
+    public void aWaffleRequestWithSixToppings() {
+        request = new WaffleRequest("Whole", "Plain", "Free-range", "Salted",
+                List.of("a", "b", "c", "d", "e", "f"));
+    }
+
     @When("the waffles are made")
     public void theWafflesAreMade() {
         ctx.lastResponse = ctx.client().post("/waffles", request);
+    }
+
+    @When("a waffle request is sent with an unsupported content type")
+    public void aWaffleRequestWithUnsupportedContentType() {
+        ctx.lastResponse = ctx.client().postRaw("/waffles", "Whole Plain Free-range Salted", "text/plain");
     }
 
     @Then("a waffle batch is returned with butter")

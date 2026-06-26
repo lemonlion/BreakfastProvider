@@ -11,3 +11,13 @@ Feature: Waffles
     When the waffles are made
     Then the response status is 400
     And the error mentions "'Butter' is required."
+
+  Scenario: Exceeding the topping limit is rejected
+    Given a waffle request with six toppings
+    When the waffles are made
+    Then the response status is 400
+    And the error mentions "Maximum toppings exceeded. Limit is 5."
+
+  Scenario: An unsupported content type is rejected
+    When a waffle request is sent with an unsupported content type
+    Then the response status is 415

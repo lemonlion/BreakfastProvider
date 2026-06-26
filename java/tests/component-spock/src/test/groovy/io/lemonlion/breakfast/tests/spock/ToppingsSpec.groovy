@@ -69,4 +69,21 @@ class ToppingsSpec extends Specification {
         client.delete("/toppings/${SEEDED}").status() == 204
         client.delete("/toppings/${UUID.randomUUID()}").status() == 404
     }
+
+    def "raspberries are included when the feature flag is enabled"() {
+        when:
+        def toppings = client.get("/toppings").as(new TypeReference<List<ToppingResponse>>() {})
+
+        then:
+        toppings*.name().contains("Raspberries")
+    }
+
+    def "a topping name with HTML/script content is rejected"() {
+        when:
+        def response = client.post("/toppings", new ToppingRequest("<script>alert(1)</script>", "Syrup"))
+
+        then:
+        response.status() == 400
+        response.bodyContains("must not contain HTML or script content.")
+    }
 }

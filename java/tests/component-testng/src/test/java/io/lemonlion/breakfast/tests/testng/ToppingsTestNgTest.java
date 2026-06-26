@@ -51,4 +51,18 @@ public class ToppingsTestNgTest extends ComponentTestBaseNg {
         assertThat(client.delete("/toppings/" + SEEDED).status()).isEqualTo(204);
         assertThat(client.delete("/toppings/" + UUID.randomUUID()).status()).isEqualTo(404);
     }
+
+    @Test
+    public void raspberriesIncludedWhenEnabled() {
+        List<ToppingResponse> toppings = client.get("/toppings")
+                .as(new TypeReference<List<ToppingResponse>>() { });
+        assertThat(toppings).extracting(ToppingResponse::name).contains("Raspberries");
+    }
+
+    @Test
+    public void xssNameRejected() {
+        TestResponse response = client.post("/toppings", new ToppingRequest("<script>alert(1)</script>", "Syrup"));
+        assertThat(response.status()).isEqualTo(400);
+        assertThat(response.bodyContains("must not contain HTML or script content.")).isTrue();
+    }
 }

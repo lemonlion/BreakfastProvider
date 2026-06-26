@@ -60,4 +60,20 @@ class ToppingsComponentTest extends ComponentTestBase {
         assertThat(client.delete("/toppings/" + SEEDED).status()).isEqualTo(204);
         assertThat(client.delete("/toppings/" + UUID.randomUUID()).status()).isEqualTo(404);
     }
+
+    @Test
+    @DisplayName("raspberries are included when the feature flag is enabled")
+    void raspberriesIncludedWhenEnabled() {
+        List<ToppingResponse> toppings = client.get("/toppings")
+                .as(new TypeReference<List<ToppingResponse>>() { });
+        assertThat(toppings).extracting(ToppingResponse::name).contains("Raspberries");
+    }
+
+    @Test
+    @DisplayName("a topping name with HTML/script content is rejected")
+    void xssNameRejected() {
+        TestResponse response = client.post("/toppings", new ToppingRequest("<script>alert(1)</script>", "Syrup"));
+        assertThat(response.status()).isEqualTo(400);
+        assertThat(response.bodyContains("must not contain HTML or script content.")).isTrue();
+    }
 }

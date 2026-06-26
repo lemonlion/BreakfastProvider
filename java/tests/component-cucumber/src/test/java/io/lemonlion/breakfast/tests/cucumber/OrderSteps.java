@@ -114,4 +114,12 @@ public class OrderSteps {
     public void theOrderStatusIs(String status) {
         assertThat(ctx.lastResponse.as(OrderResponse.class).status()).isEqualTo(status);
     }
+
+    @Then("a Created audit log entry exists for the order")
+    public void aCreatedAuditLogEntryExists() {
+        var audit = ctx.client().get("/audit-logs?entityType=Order&entityId=" + createdOrder.orderId());
+        assertThat(audit.status()).isEqualTo(200);
+        assertThat(audit.bodyContains("Created")).isTrue();
+        assertThat(audit.bodyContains(createdOrder.orderId().toString())).isTrue();
+    }
 }

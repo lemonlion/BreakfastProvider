@@ -157,4 +157,67 @@ class OrdersComponentTest extends ComponentTestBase {
         assertThat(body.get("items").size()).isEqualTo(1);
         assertThat(body.get("totalCount").asInt()).isGreaterThanOrEqualTo(2);
     }
+
+    @Test
+    @DisplayName("a created order can be cancelled")
+    void cancelTransition() {
+        OrderResponse order = client.post("/orders", validOrder()).as(OrderResponse.class);
+
+        TestResponse cancelled = client.patch("/orders/" + order.orderId() + "/status",
+                new UpdateOrderStatusRequest("Cancelled"));
+
+        assertThat(cancelled.status()).isEqualTo(200);
+        assertThat(cancelled.as(OrderResponse.class).status()).isEqualTo("Cancelled");
+    }
+
+    @Test
+    @DisplayName("an order at the maximum item limit is accepted")
+    void atMaxItemsAccepted() {
+        List<OrderItemRequest> items = new java.util.ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            items.add(new OrderItemRequest("Pancakes", UUID.randomUUID(), 1));
+        }
+
+        TestResponse response = client.post("/orders", new OrderRequest("Alice", items, 1));
+
+        assertThat(response.status()).isEqualTo(201);
+        assertThat(response.as(OrderResponse.class).items()).hasSize(10);
+    }
+
+    @Test
+    @DisplayName("the second page of orders returns different results")
+    void paginationSecondPage() {
+        String customer = "Page2-" + UUID.randomUUID();
+        client.post("/orders", new OrderRequest(customer, List.of(new OrderItemRequest("Pancakes", UUID.randomUUID(), 1)), 1));
+        client.post("/orders", new OrderRequest(customer, List.of(new OrderItemRequest("Pancakes", UUID.randomUUID(), 1)), 2));
+
+        com.fasterxml.jackson.databind.JsonNode page1 = client.get("/orders?page=1&pageSize=1").json();
+        com.fasterxml.jackson.databind.JsonNode page2 = client.get("/orders?page=2&pageSize=1").json();
+
+        assertThat(page2.get("page").asInt()).isEqualTo(2);
+        assertThat(page2.get("items").size()).isEqualTo(1);
+        assertThat(page2.get("items").get(0).get("orderId").asText())
+                .isNotEqualTo(page1.get("items").get(0).get("orderId").asText());
+    }
+
+    @Test
+    @DisplayName("an order without items is rejected with 400")
+    void validationRejectsMissingItems() {
+        TestResponse response = client.post("/orders", new OrderRequest("Alice", List.of(), 1));
+
+        assertThat(response.status()).isEqualTo(400);
+        assertThat(response.bodyContains("The Items field is required.")).isTrue();
+    }
+
+    @Test
+    @DisplayName("creating an order writes a Created audit log entry")
+    void auditLogWrittenOnCreate() {
+        OrderResponse order = client.post("/orders", validOrder()).as(OrderResponse.class);
+
+        TestResponse audit = client.get("/audit-logs?entityType=Order&entityId=" + order.orderId());
+
+        assertThat(audit.status()).isEqualTo(200);
+        assertThat(audit.bodyContains("Created")).isTrue();
+        assertThat(audit.bodyContains(order.orderId().toString())).isTrue();
+    }
 }

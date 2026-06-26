@@ -55,3 +55,31 @@ Feature: Orders
     When the order is placed
     Then the response status is 400
     And the error mentions "cannot contain more than 10 items"
+
+  Scenario: A created order can be cancelled
+    Given a placed breakfast order
+    When the order status is updated to "Cancelled"
+    Then the response status is 200
+    And the order status is "Cancelled"
+
+  Scenario: An order at the maximum item limit is accepted
+    Given an order request with 10 items
+    When the order is placed
+    Then the order is created successfully
+
+  Scenario: The second page of orders returns different results
+    Given two breakfast orders have been placed
+    When orders are listed with page 2 and page size 1
+    Then the response status is 200
+    And the pagination metadata reflects page 2 with page size 1
+
+  Scenario: An order without items is rejected
+    Given an order request with 0 items
+    When the order is placed
+    Then the response status is 400
+    And the error mentions "The Items field is required."
+
+  Scenario: Creating an order writes a Created audit log entry
+    Given a valid breakfast order
+    When the order is placed
+    Then a Created audit log entry exists for the order

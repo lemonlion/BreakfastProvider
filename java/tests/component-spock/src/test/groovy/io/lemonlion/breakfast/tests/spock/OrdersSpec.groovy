@@ -138,4 +138,66 @@ class OrdersSpec extends Specification {
         body.get("items").size() == 1
         body.get("totalCount").asInt() >= 2
     }
+
+    def "a created order can be cancelled"() {
+        given:
+        def order = client.post("/orders", validOrder()).as(OrderResponse)
+
+        when:
+        def cancelled = client.patch("/orders/${order.orderId()}/status", new UpdateOrderStatusRequest("Cancelled"))
+
+        then:
+        cancelled.status() == 200
+        cancelled.as(OrderResponse).status() == "Cancelled"
+    }
+
+    def "an order at the maximum item limit is accepted"() {
+        given:
+        def items = (1..10).collect { new OrderItemRequest("Pancakes", UUID.randomUUID(), 1) }
+
+        when:
+        def response = client.post("/orders", new OrderRequest("Alice", items, 1))
+
+        then:
+        response.status() == 201
+        response.as(OrderResponse).items().size() == 10
+    }
+
+    def "the second page of orders returns different results"() {
+        given:
+        def customer = "Page2-${UUID.randomUUID()}"
+        client.post("/orders", new OrderRequest(customer, [new OrderItemRequest("Pancakes", UUID.randomUUID(), 1)], 1))
+        client.post("/orders", new OrderRequest(customer, [new OrderItemRequest("Pancakes", UUID.randomUUID(), 1)], 2))
+
+        when:
+        def page1 = client.get("/orders?page=1&pageSize=1").json()
+        def page2 = client.get("/orders?page=2&pageSize=1").json()
+
+        then:
+        page2.get("page").asInt() == 2
+        page2.get("items").size() == 1
+        page2.get("items").get(0).get("orderId").asText() != page1.get("items").get(0).get("orderId").asText()
+    }
+
+    def "an order without items is rejected"() {
+        when:
+        def response = client.post("/orders", new OrderRequest("Alice", [], 1))
+
+        then:
+        response.status() == 400
+        response.bodyContains("The Items field is required.")
+    }
+
+    def "creating an order writes a Created audit log entry"() {
+        given:
+        def order = client.post("/orders", validOrder()).as(OrderResponse)
+
+        when:
+        def audit = client.get("/audit-logs?entityType=Order&entityId=${order.orderId()}")
+
+        then:
+        audit.status() == 200
+        audit.bodyContains("Created")
+        audit.bodyContains(order.orderId().toString())
+    }
 }

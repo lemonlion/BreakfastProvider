@@ -6,6 +6,7 @@ import io.lemonlion.breakfast.model.request.ChefNoteRequest;
 import io.lemonlion.breakfast.model.request.UpdateChefNoteRequest;
 import io.lemonlion.breakfast.model.response.ChefNoteResponse;
 import io.lemonlion.breakfast.testsupport.TestResponse;
+import java.util.UUID;
 import org.testng.annotations.Test;
 
 /** ChefNotes domain component tests (TestNG). */
@@ -43,5 +44,29 @@ public class ChefNotesTestNgTest extends ComponentTestBaseNg {
                 new ChefNoteRequest("", "Chef Remy", "Some note", "Technique"));
         assertThat(response.status()).isEqualTo(400);
         assertThat(response.bodyContains("'Recipe Name' must not be empty.")).isTrue();
+    }
+
+    @Test
+    public void listByRecipe() {
+        String recipe = "ChefRecipe" + UUID.randomUUID().toString().replace("-", "");
+        client.post("/chef-notes", new ChefNoteRequest(recipe, "Chef Remy", "Use a hot pan.", "Technique"));
+        TestResponse byRecipe = client.get("/chef-notes/recipe/" + recipe);
+        assertThat(byRecipe.status()).isEqualTo(200);
+        assertThat(byRecipe.bodyContains("Use a hot pan.")).isTrue();
+    }
+
+    @Test
+    public void updateMissing() {
+        TestResponse response = client.patch("/chef-notes/does-not-exist",
+                new UpdateChefNoteRequest("Updated", "Technique"));
+        assertThat(response.status()).isEqualTo(404);
+    }
+
+    @Test
+    public void rejectsEmptyNoteText() {
+        TestResponse response = client.post("/chef-notes",
+                new ChefNoteRequest("Classic Pancakes", "Chef Remy", "", "Technique"));
+        assertThat(response.status()).isEqualTo(400);
+        assertThat(response.bodyContains("'Note Text' must not be empty.")).isTrue();
     }
 }

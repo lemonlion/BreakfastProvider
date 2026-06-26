@@ -62,4 +62,31 @@ class ChefNotesSpec extends Specification {
         response.status() == 400
         response.bodyContains("'Recipe Name' must not be empty.")
     }
+
+    def "notes are listed by recipe"() {
+        given:
+        def recipe = "ChefRecipe" + UUID.randomUUID().toString().replace("-", "")
+        client.post("/chef-notes", new ChefNoteRequest(recipe, "Chef Remy", "Use a hot pan.", "Technique"))
+
+        when:
+        def byRecipe = client.get("/chef-notes/recipe/${recipe}")
+
+        then:
+        byRecipe.status() == 200
+        byRecipe.bodyContains("Use a hot pan.")
+    }
+
+    def "updating a non-existent note returns 404"() {
+        expect:
+        client.patch("/chef-notes/does-not-exist", new UpdateChefNoteRequest("Updated", "Technique")).status() == 404
+    }
+
+    def "a note without text is rejected"() {
+        when:
+        def response = client.post("/chef-notes", new ChefNoteRequest("Classic Pancakes", "Chef Remy", "", "Technique"))
+
+        then:
+        response.status() == 400
+        response.bodyContains("'Note Text' must not be empty.")
+    }
 }

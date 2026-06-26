@@ -1,8 +1,10 @@
 package io.lemonlion.breakfast.tests.spock
 
+import com.fasterxml.jackson.core.type.TypeReference
 import io.lemonlion.breakfast.BreakfastProviderApplication
 import io.lemonlion.breakfast.model.request.OrderItemRequest
 import io.lemonlion.breakfast.model.request.OrderRequest
+import io.lemonlion.breakfast.model.response.ToppingResponse
 import io.lemonlion.breakfast.testsupport.BackendsInitializer
 import io.lemonlion.breakfast.testsupport.BreakfastBackends
 import io.lemonlion.breakfast.testsupport.BreakfastTestClient
@@ -13,17 +15,20 @@ import org.springframework.test.context.TestPropertySource
 import spock.lang.Specification
 
 /**
- * Orders rate-limiting (Spock). Own Spring context with the permit limit overridden to 1 (twin of the
- * C# Rate_Limiting scenario) so the second order within the window is rejected with 429. A unique
- * in-process gRPC name keeps this extra context from colliding with the shared one.
+ * Configuration-override scenarios (Spock), consolidated into a single extra Spring context to keep the
+ * number of heavyweight backend-bearing contexts small. Covers the C# Rate_Limiting, Toppings Feature_Flag
+ * (disabled) and Ingredients Goat_Milk_Feature_Flag (disabled) scenarios; only the rate-limit feature
+ * creates orders, so the overrides don't interfere.
  */
 @SpringBootTest(classes = BreakfastProviderApplication, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ContextConfiguration(initializers = BackendsInitializer)
 @TestPropertySource(properties = [
         "rate-limit.permit-limit=1",
         "rate-limit.window-seconds=60",
-        "grpc.server.in-process-name=breakfast-grpc-ratelimit-spock"])
-class OrdersRateLimitSpec extends Specification {
+        "feature-switches.raspberry-topping-enabled=false",
+        "feature-switches.goat-milk-enabled=false",
+        "grpc.server.in-process-name=breakfast-grpc-overrides-spock"])
+class OverridesSpec extends Specification {
 
     @LocalServerPort
     int port
@@ -43,5 +48,18 @@ class OrdersRateLimitSpec extends Specification {
         expect:
         client.post("/orders", order).status() == 201
         client.post("/orders", order).status() == 429
+    }
+
+    def "raspberries are excluded when the feature flag is disabled"() {
+        when:
+        def toppings = client.get("/toppings").as(new TypeReference<List<ToppingResponse>>() {})
+
+        then:
+        !toppings*.name().contains("Raspberries")
+    }
+
+    def "the goat-milk endpoint returns 404 when the feature is disabled"() {
+        expect:
+        client.get("/goat-milk").status() == 404
     }
 }

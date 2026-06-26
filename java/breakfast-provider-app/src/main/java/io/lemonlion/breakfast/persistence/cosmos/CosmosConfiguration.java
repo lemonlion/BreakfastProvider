@@ -31,13 +31,17 @@ public class CosmosConfiguration {
 
     @Bean(destroyMethod = "close")
     public CosmosClient cosmosClient(CosmosConfig config) {
-        return new CosmosClientBuilder()
+        // buildClient() eagerly reads the DatabaseAccount to initialise; against the emulator that read can
+        // momentarily time out (HTTP 408) when several heavyweight Testcontainers backends compete for the
+        // host at the tail of a multi-module reactor build. Retry the build itself so a transient init
+        // timeout doesn't fail the whole Spring context.
+        return withRetry(() -> new CosmosClientBuilder()
                 .endpoint(config.getEndpoint())
                 .key(config.getKey())
                 .gatewayMode()
                 .endpointDiscoveryEnabled(config.isEndpointDiscoveryEnabled())
                 .consistencyLevel(ConsistencyLevel.SESSION)
-                .buildClient();
+                .buildClient());
     }
 
     @Bean
@@ -51,11 +55,17 @@ public class CosmosConfiguration {
      * when several heavyweight Testcontainers backends compete for resources; a few retries ride that out.
      */
     private static void withRetry(Runnable action) {
+        withRetry(() -> {
+            action.run();
+            return null;
+        });
+    }
+
+    private static <T> T withRetry(java.util.function.Supplier<T> action) {
         RuntimeException last = null;
-        for (int attempt = 1; attempt <= 4; attempt++) {
+        for (int attempt = 1; attempt <= 5; attempt++) {
             try {
-                action.run();
-                return;
+                return action.get();
             } catch (RuntimeException e) {
                 last = e;
                 try {

@@ -6,6 +6,7 @@ import io.lemonlion.breakfast.model.request.ChefNoteRequest;
 import io.lemonlion.breakfast.model.request.UpdateChefNoteRequest;
 import io.lemonlion.breakfast.model.response.ChefNoteResponse;
 import io.lemonlion.breakfast.testsupport.TestResponse;
+import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -53,5 +54,34 @@ class ChefNotesComponentTest extends ComponentTestBase {
                 new ChefNoteRequest("", "Chef Remy", "Some note", "Technique"));
         assertThat(response.status()).isEqualTo(400);
         assertThat(response.bodyContains("'Recipe Name' must not be empty.")).isTrue();
+    }
+
+    @Test
+    @DisplayName("notes are listed by recipe")
+    void listByRecipe() {
+        String recipe = "ChefRecipe" + UUID.randomUUID().toString().replace("-", "");
+        client.post("/chef-notes", new ChefNoteRequest(recipe, "Chef Remy", "Use a hot pan.", "Technique"));
+
+        TestResponse byRecipe = client.get("/chef-notes/recipe/" + recipe);
+
+        assertThat(byRecipe.status()).isEqualTo(200);
+        assertThat(byRecipe.bodyContains("Use a hot pan.")).isTrue();
+    }
+
+    @Test
+    @DisplayName("updating a non-existent note returns 404")
+    void updateMissing() {
+        TestResponse response = client.patch("/chef-notes/does-not-exist",
+                new UpdateChefNoteRequest("Updated", "Technique"));
+        assertThat(response.status()).isEqualTo(404);
+    }
+
+    @Test
+    @DisplayName("a note without text is rejected")
+    void rejectsEmptyNoteText() {
+        TestResponse response = client.post("/chef-notes",
+                new ChefNoteRequest("Classic Pancakes", "Chef Remy", "", "Technique"));
+        assertThat(response.status()).isEqualTo(400);
+        assertThat(response.bodyContains("'Note Text' must not be empty.")).isTrue();
     }
 }

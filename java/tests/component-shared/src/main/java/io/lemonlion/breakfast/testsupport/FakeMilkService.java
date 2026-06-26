@@ -17,6 +17,7 @@ public final class FakeMilkService {
     private final String jsonBody;
     private HttpServer server;
     private volatile int status = 200;
+    private volatile boolean invalidResponse;
     private volatile String lastCorrelationId;
     private final FakeHealth health = new FakeHealth();
 
@@ -47,6 +48,12 @@ public final class FakeMilkService {
             exchange.close();
             return;
         }
+        if (invalidResponse) {
+            // 200 with an empty body — the SUT deserializes null and treats it as a 502 (invalid response).
+            exchange.sendResponseHeaders(200, -1);
+            exchange.close();
+            return;
+        }
         byte[] body = jsonBody.getBytes(StandardCharsets.UTF_8);
         exchange.getResponseHeaders().add("Content-Type", "application/json");
         exchange.sendResponseHeaders(200, body.length);
@@ -62,6 +69,11 @@ public final class FakeMilkService {
         this.status = status;
     }
 
+    /** When true, responds 200 with an empty body so the SUT treats it as an invalid downstream response. */
+    public void setInvalidResponse(boolean invalidResponse) {
+        this.invalidResponse = invalidResponse;
+    }
+
     /** The {@code X-Correlation-Id} header value the SUT forwarded on its last call, or {@code null}. */
     public String lastCorrelationId() {
         return lastCorrelationId;
@@ -74,6 +86,7 @@ public final class FakeMilkService {
 
     public void reset() {
         this.status = 200;
+        this.invalidResponse = false;
         this.lastCorrelationId = null;
         health.reset();
     }

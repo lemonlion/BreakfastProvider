@@ -22,6 +22,7 @@ import org.springframework.test.context.TestPropertySource;
         "rate-limit.permit-limit=1",
         "rate-limit.window-seconds=60",
         "feature-switches.raspberry-topping-enabled=false",
+        "feature-switches.goat-milk-enabled=false",
         "grpc.server.in-process-name=breakfast-grpc-ratelimit-cuke"})
 public class RateLimitCucumberConfiguration {
 }

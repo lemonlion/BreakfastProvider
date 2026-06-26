@@ -36,4 +36,25 @@ class MilkSourcingComponentTest extends ComponentTestBase {
         TestResponse response = client.get("/milk");
         assertThat(response.status()).isEqualTo(502);
     }
+
+    @Test
+    @DisplayName("a cow invalid response returns 502 Bad Gateway")
+    void cowInvalidResponseReturns502() {
+        BreakfastBackends.cow().setInvalidResponse(true);
+        assertThat(client.get("/milk").status()).isEqualTo(502);
+    }
+
+    @Test
+    @DisplayName("a goat service failure returns 502 Bad Gateway")
+    void goatFailureReturns502() {
+        BreakfastBackends.goat().setStatus(503);
+        assertThat(client.get("/goat-milk").status()).isEqualTo(502);
+    }
+
+    @Test
+    @DisplayName("a goat invalid response returns 502 Bad Gateway")
+    void goatInvalidResponseReturns502() {
+        BreakfastBackends.goat().setInvalidResponse(true);
+        assertThat(client.get("/goat-milk").status()).isEqualTo(502);
+    }
 }

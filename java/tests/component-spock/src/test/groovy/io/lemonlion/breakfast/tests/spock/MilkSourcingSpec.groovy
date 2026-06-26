@@ -51,4 +51,28 @@ class MilkSourcingSpec extends Specification {
         expect:
         client.get("/milk").status() == 502
     }
+
+    def "a cow invalid response returns 502"() {
+        given:
+        BreakfastBackends.cow().setInvalidResponse(true)
+
+        expect:
+        client.get("/milk").status() == 502
+    }
+
+    def "a goat service failure returns 502"() {
+        given:
+        BreakfastBackends.goat().setStatus(503)
+
+        expect:
+        client.get("/goat-milk").status() == 502
+    }
+
+    def "a goat invalid response returns 502"() {
+        given:
+        BreakfastBackends.goat().setInvalidResponse(true)
+
+        expect:
+        client.get("/goat-milk").status() == 502
+    }
 }

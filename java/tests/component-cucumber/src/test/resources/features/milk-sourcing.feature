@@ -9,3 +9,22 @@ Feature: Milk Sourcing
     Given the cow service is unavailable
     When milk is sourced
     Then the response status is 502
+
+  Scenario: A cow invalid response surfaces as a bad gateway
+    Given the cow service returns an invalid response
+    When milk is sourced
+    Then the response status is 502
+
+  Scenario: Goat milk is sourced from the goat service
+    When goat milk is sourced
+    Then fresh goat milk is returned
+
+  Scenario: A goat service failure surfaces as a bad gateway
+    Given the goat service is unavailable
+    When goat milk is sourced
+    Then the response status is 502
+
+  Scenario: A goat invalid response surfaces as a bad gateway
+    Given the goat service returns an invalid response
+    When goat milk is sourced
+    Then the response status is 502

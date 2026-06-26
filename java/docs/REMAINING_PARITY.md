@@ -9,9 +9,10 @@ Current Reporting GraphQL surface in the Java twin: `orderSummaries`, `popularRe
 and tested across all four frameworks). The C# `ReportingQuery` additionally exposes `recipeReports`,
 `batchCompletions`, `ingredientShipments`, `equipmentAlerts`.
 
-> **STATUS:** #1 EventGrid_Webhook / `ingredientShipments` and #2 Batch_Completions / `batchCompletions`
-> (real Pub/Sub publish + consumer) are implemented and green across all four frameworks. #3
-> Equipment_Alerts / `equipmentAlerts` is being upgraded to the **real Azure Event Hubs transport**.
+> **STATUS — ALL DONE.** #1 EventGrid_Webhook / `ingredientShipments`, #2 Batch_Completions /
+> `batchCompletions` (real Pub/Sub publish + consumer), and #3 Equipment_Alerts / `equipmentAlerts`
+> (real Azure Event Hubs transport, verified end-to-end on the eventhubs-emulator + Azurite) are all
+> implemented and green across all four frameworks.
 >
 > **CORRECTION (was wrong earlier):** Azure Event Hubs *does* have a maintained local emulator —
 > `mcr.microsoft.com/azure-messaging/eventhubs-emulator` (it needs an Azurite container for blob/metadata

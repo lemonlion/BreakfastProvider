@@ -44,15 +44,20 @@ and every framework module creates orders across its scenarios in one JVM, so `o
 empty when the test would run. Emptiness can't be asserted without isolating or truncating the store,
 which would corrupt the other scenarios' data.
 
-**Verification plan (pick one):**
-- **Isolated context (recommended):** a dedicated `@SpringBootTest` context with its own empty reporting
-  schema (e.g. a per-test H2 datasource bound only for this test, or `@Sql` truncation of `order_summaries`
-  in a `@DirtiesContext` context) that creates no orders, then asserts `{ orderSummaries }` is `[]`.
+**Locally verified now (contract):** `ReportingResolverContractTest` (component-junit5, plain no-Spring
+test) constructs `ReportingGraphQlController` with an empty `OrderSummaryRepository` and asserts
+`orderSummaries()` returns an empty (non-null) list — the exact contract the C# scenario asserts, minus the
+GraphQL HTTP transport. So the behaviour is auto-verified locally; only the end-to-end-through-GraphQL form
+remains environment-constrained.
+
+**Full-transport verification plan (pick one):**
+- **Isolated context:** a dedicated `@SpringBootTest` context with its own empty reporting schema (a
+  per-test H2 datasource, or `@Sql` truncation of `order_summaries` in a `@DirtiesContext` context) that
+  creates no orders, then asserts `{ orderSummaries }` is `[]`. Not adopted here because it would add a
+  heavyweight isolated-DB Spring context per framework, regressing the context-count consolidation that
+  removed the Cosmos-pressure flakiness.
 - **external-sut lane:** against a freshly-provisioned reporting database (empty at start), assert the
   query returns `[]` before any order is created.
-- **Contract unit test:** call the `ReportingGraphQlController.orderSummaries()` resolver with an empty
-  `OrderSummaryRepository` (mock/empty) and assert it returns an empty list (verifies the resolver's
-  empty-collection contract, minus the GraphQL transport).
 
 ## Push-to-verify items (cannot run on this workstation)
 

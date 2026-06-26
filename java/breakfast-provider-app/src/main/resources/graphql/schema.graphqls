@@ -4,6 +4,8 @@ type Query {
     ingredientShipments: [IngredientShipment!]!
     batchCompletions: [BatchCompletion!]!
     equipmentAlerts: [EquipmentAlert!]!
+    recipeReports: [RecipeReport!]!
+    ingredientUsage: [IngredientUsage!]!
 }
 
 type OrderSummary {
@@ -39,4 +41,17 @@ type EquipmentAlert {
     equipmentName: String!
     alertType: String!
     alertedAt: String!
+}
+
+type RecipeReport {
+    orderId: ID!
+    recipeType: String!
+    ingredients: String!
+    toppings: String!
+    loggedAt: String!
+}
+
+type IngredientUsage {
+    ingredient: String!
+    count: Int!
 }

@@ -93,6 +93,36 @@ class ReportingComponentTest extends ComponentTestBase {
     }
 
     @Test
+    @DisplayName("a logged recipe is ingested into recipeReports via Kafka")
+    void recipeReportIngestedViaKafka() {
+        String marker = "Milk-" + UUID.randomUUID();
+        client.post("/pancakes", new PancakeRequest(marker, "Plain", "Free-range", List.of("Syrup")));
+
+        // 40s: the recipe-log Kafka consumer group can be slow to deliver the first message (cold start).
+        Awaitility.await().atMost(Duration.ofSeconds(40)).untilAsserted(() -> {
+            TestResponse gql = client.post("/graphql",
+                    Map.of("query", "{ recipeReports { orderId recipeType ingredients toppings } }"));
+            assertThat(gql.status()).isEqualTo(200);
+            assertThat(gql.bodyContains("Pancakes")).isTrue();
+            assertThat(gql.bodyContains(marker)).isTrue();
+        });
+    }
+
+    @Test
+    @DisplayName("ingredient usage aggregates across logged recipes")
+    void ingredientUsageAggregatesAcrossRecipes() {
+        String marker = "Flour-" + UUID.randomUUID();
+        client.post("/pancakes", new PancakeRequest("Whole", marker, "Free-range", List.of("Syrup")));
+
+        Awaitility.await().atMost(Duration.ofSeconds(40)).untilAsserted(() -> {
+            TestResponse gql = client.post("/graphql",
+                    Map.of("query", "{ ingredientUsage { ingredient count } }"));
+            assertThat(gql.status()).isEqualTo(200);
+            assertThat(gql.bodyContains(marker)).isTrue();
+        });
+    }
+
+    @Test
     @DisplayName("a batch's equipment alert flows through Event Hubs into equipmentAlerts")
     void equipmentAlertFlowsThroughEventHub() {
         PancakeResponse batch = client.post("/pancakes",

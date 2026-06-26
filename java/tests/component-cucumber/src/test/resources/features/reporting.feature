@@ -21,3 +21,11 @@ Feature: Reporting
   Scenario: A batch's equipment alert flows through Event Hubs into equipment alerts
     When a pancake batch generates an equipment alert
     Then the equipment alert appears in the equipment alerts
+
+  Scenario: A logged recipe is ingested into recipe reports via Kafka
+    When a pancake recipe is logged for reporting
+    Then the recipe report appears in the recipe reports
+
+  Scenario: Ingredient usage aggregates across logged recipes
+    When a pancake recipe is logged for ingredient usage
+    Then the ingredient usage includes the logged ingredient

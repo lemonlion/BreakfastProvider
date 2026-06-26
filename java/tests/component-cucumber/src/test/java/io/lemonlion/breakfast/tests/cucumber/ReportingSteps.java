@@ -22,6 +22,7 @@ public class ReportingSteps {
     private String deliveryId;
     private String batchId;
     private String alertBatchId;
+    private String recipeMarker;
 
     public ReportingSteps(ScenarioContext ctx) {
         this.ctx = ctx;
@@ -119,6 +120,38 @@ public class ReportingSteps {
                     Map.of("query", "{ equipmentAlerts { alertId batchId equipmentName alertType } }"));
             assertThat(gql.status()).isEqualTo(200);
             assertThat(gql.bodyContains(alertBatchId)).isTrue();
+        });
+    }
+
+    @When("a pancake recipe is logged for reporting")
+    public void aPancakeRecipeIsLoggedForReporting() {
+        recipeMarker = "Milk-" + UUID.randomUUID();
+        ctx.client().post("/pancakes", new PancakeRequest(recipeMarker, "Plain", "Free-range", List.of("Syrup")));
+    }
+
+    @Then("the recipe report appears in the recipe reports")
+    public void theRecipeReportAppears() {
+        Awaitility.await().atMost(Duration.ofSeconds(40)).untilAsserted(() -> {
+            var gql = ctx.client().post("/graphql",
+                    Map.of("query", "{ recipeReports { orderId recipeType ingredients toppings } }"));
+            assertThat(gql.status()).isEqualTo(200);
+            assertThat(gql.bodyContains("Pancakes")).isTrue();
+            assertThat(gql.bodyContains(recipeMarker)).isTrue();
+        });
+    }
+
+    @When("a pancake recipe is logged for ingredient usage")
+    public void aPancakeRecipeIsLoggedForIngredientUsage() {
+        recipeMarker = "Flour-" + UUID.randomUUID();
+        ctx.client().post("/pancakes", new PancakeRequest("Whole", recipeMarker, "Free-range", List.of("Syrup")));
+    }
+
+    @Then("the ingredient usage includes the logged ingredient")
+    public void theIngredientUsageIncludesTheLoggedIngredient() {
+        Awaitility.await().atMost(Duration.ofSeconds(40)).untilAsserted(() -> {
+            var gql = ctx.client().post("/graphql", Map.of("query", "{ ingredientUsage { ingredient count } }"));
+            assertThat(gql.status()).isEqualTo(200);
+            assertThat(gql.bodyContains(recipeMarker)).isTrue();
         });
     }
 }

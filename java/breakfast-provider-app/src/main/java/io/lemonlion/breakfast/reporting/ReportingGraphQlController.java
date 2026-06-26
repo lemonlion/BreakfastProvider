@@ -4,8 +4,10 @@ import io.lemonlion.breakfast.storage.BatchCompletionRecordRepository;
 import io.lemonlion.breakfast.storage.EquipmentAlertRepository;
 import io.lemonlion.breakfast.storage.IngredientShipmentRepository;
 import io.lemonlion.breakfast.storage.OrderSummaryRepository;
+import io.lemonlion.breakfast.storage.RecipeReportRepository;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.stereotype.Controller;
@@ -18,15 +20,18 @@ public class ReportingGraphQlController {
     private final IngredientShipmentRepository ingredientShipments;
     private final BatchCompletionRecordRepository batchCompletions;
     private final EquipmentAlertRepository equipmentAlerts;
+    private final RecipeReportRepository recipeReports;
 
     public ReportingGraphQlController(OrderSummaryRepository orderSummaries,
                                       IngredientShipmentRepository ingredientShipments,
                                       BatchCompletionRecordRepository batchCompletions,
-                                      EquipmentAlertRepository equipmentAlerts) {
+                                      EquipmentAlertRepository equipmentAlerts,
+                                      RecipeReportRepository recipeReports) {
         this.orderSummaries = orderSummaries;
         this.ingredientShipments = ingredientShipments;
         this.batchCompletions = batchCompletions;
         this.equipmentAlerts = equipmentAlerts;
+        this.recipeReports = recipeReports;
     }
 
     @QueryMapping
@@ -99,6 +104,51 @@ public class ReportingGraphQlController {
     /** GraphQL view of {@code EquipmentAlert}. */
     public record EquipmentAlertView(String alertId, String batchId, String equipmentName, String alertType,
                                      String alertedAt) {
+    }
+
+    @QueryMapping
+    public List<RecipeReportView> recipeReports() {
+        return recipeReports.findAll().stream()
+                .map(r -> new RecipeReportView(
+                        r.getOrderId().toString(), r.getRecipeType(), r.getIngredients(), r.getToppings(),
+                        r.getLoggedAt() == null ? null : r.getLoggedAt().toString()))
+                .toList();
+    }
+
+    /** GraphQL view of {@code RecipeReport}. */
+    public record RecipeReportView(String orderId, String recipeType, String ingredients, String toppings,
+                                   String loggedAt) {
+    }
+
+    @QueryMapping
+    public List<IngredientUsageCount> ingredientUsage() {
+        // Aggregate ingredient occurrences across all recipe reports, grouped case-insensitively and
+        // ordered by descending count (twin of the C# ReportingQuery.GetIngredientUsage).
+        Map<String, int[]> counts = new LinkedHashMap<>();
+        Map<String, String> display = new LinkedHashMap<>();
+        for (var report : recipeReports.findAll()) {
+            String ingredients = report.getIngredients();
+            if (ingredients == null || ingredients.isBlank()) {
+                continue;
+            }
+            for (String raw : ingredients.split(",")) {
+                String trimmed = raw.trim();
+                if (trimmed.isEmpty()) {
+                    continue;
+                }
+                String key = trimmed.toLowerCase(Locale.ROOT);
+                counts.computeIfAbsent(key, k -> new int[1])[0]++;
+                display.putIfAbsent(key, trimmed);
+            }
+        }
+        return counts.entrySet().stream()
+                .sorted(Map.Entry.comparingByValue((a, b) -> Integer.compare(b[0], a[0])))
+                .map(e -> new IngredientUsageCount(display.get(e.getKey()), e.getValue()[0]))
+                .toList();
+    }
+
+    /** GraphQL view of an aggregated ingredient-usage count. */
+    public record IngredientUsageCount(String ingredient, int count) {
     }
 
     /** GraphQL view of {@code OrderSummary}. */

@@ -12,4 +12,8 @@ public interface ReportingIngester {
 
     /** Records an ingredient delivery received via the EventGrid webhook (twin of C# IngredientShipment). */
     void ingestIngredientShipment(UUID deliveryId, String ingredientName, double quantity, Instant deliveredAt);
+
+    /** Records a logged recipe (twin of C# {@code IngestRecipeLogAsync}); feeds recipeReports + ingredientUsage. */
+    void ingestRecipeLog(UUID orderId, String recipeType, List<String> ingredients, List<String> toppings,
+                         Instant loggedAt);
 }

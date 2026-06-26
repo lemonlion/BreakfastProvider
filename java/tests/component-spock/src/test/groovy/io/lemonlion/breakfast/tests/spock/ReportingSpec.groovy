@@ -97,6 +97,34 @@ class ReportingSpec extends Specification {
         }
     }
 
+    def "a logged recipe is ingested into recipeReports via Kafka"() {
+        given:
+        def marker = "Milk-${UUID.randomUUID()}"
+        client.post("/pancakes", new PancakeRequest(marker, "Plain", "Free-range", ["Syrup"]))
+
+        expect:
+        // 40s: the recipe-log Kafka consumer group can be slow to deliver the first message (cold start).
+        Awaitility.await().atMost(Duration.ofSeconds(40)).untilAsserted {
+            def gql = client.post("/graphql", [query: "{ recipeReports { orderId recipeType ingredients toppings } }"])
+            assert gql.status() == 200
+            assert gql.bodyContains("Pancakes")
+            assert gql.bodyContains(marker)
+        }
+    }
+
+    def "ingredient usage aggregates across logged recipes"() {
+        given:
+        def marker = "Flour-${UUID.randomUUID()}"
+        client.post("/pancakes", new PancakeRequest("Whole", marker, "Free-range", ["Syrup"]))
+
+        expect:
+        Awaitility.await().atMost(Duration.ofSeconds(40)).untilAsserted {
+            def gql = client.post("/graphql", [query: "{ ingredientUsage { ingredient count } }"])
+            assert gql.status() == 200
+            assert gql.bodyContains(marker)
+        }
+    }
+
     def "a batch's equipment alert flows through Event Hubs into equipmentAlerts"() {
         given:
         def batch = client.post("/pancakes",

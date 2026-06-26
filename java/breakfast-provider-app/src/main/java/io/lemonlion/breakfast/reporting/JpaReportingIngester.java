@@ -4,6 +4,8 @@ import io.lemonlion.breakfast.storage.IngredientShipmentEntity;
 import io.lemonlion.breakfast.storage.IngredientShipmentRepository;
 import io.lemonlion.breakfast.storage.OrderSummaryEntity;
 import io.lemonlion.breakfast.storage.OrderSummaryRepository;
+import io.lemonlion.breakfast.storage.RecipeReportEntity;
+import io.lemonlion.breakfast.storage.RecipeReportRepository;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
@@ -19,11 +21,14 @@ public class JpaReportingIngester implements ReportingIngester {
 
     private final OrderSummaryRepository orderSummaries;
     private final IngredientShipmentRepository ingredientShipments;
+    private final RecipeReportRepository recipeReports;
 
     public JpaReportingIngester(OrderSummaryRepository orderSummaries,
-                                IngredientShipmentRepository ingredientShipments) {
+                                IngredientShipmentRepository ingredientShipments,
+                                RecipeReportRepository recipeReports) {
         this.orderSummaries = orderSummaries;
         this.ingredientShipments = ingredientShipments;
+        this.recipeReports = recipeReports;
     }
 
     @Override
@@ -53,5 +58,20 @@ public class JpaReportingIngester implements ReportingIngester {
         shipment.setQuantity(quantity);
         shipment.setDeliveredAt(deliveredAt);
         ingredientShipments.save(shipment);
+    }
+
+    @Override
+    @Transactional
+    public void ingestRecipeLog(UUID orderId, String recipeType, List<String> ingredients, List<String> toppings,
+                                Instant loggedAt) {
+        RecipeReportEntity report = new RecipeReportEntity();
+        report.setOrderId(orderId);
+        // recipeType is exposed as a non-null GraphQL field; default a missing value to "" so the
+        // recipeReports query never fails serialization on a null.
+        report.setRecipeType(recipeType == null ? "" : recipeType);
+        report.setIngredients(ingredients == null ? "" : String.join(",", ingredients));
+        report.setToppings(toppings == null ? "" : String.join(",", toppings));
+        report.setLoggedAt(loggedAt);
+        recipeReports.save(report);
     }
 }

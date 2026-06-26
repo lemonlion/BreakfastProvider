@@ -87,6 +87,34 @@ public class ReportingTestNgTest extends ComponentTestBaseNg {
     }
 
     @Test
+    public void recipeReportIngestedViaKafka() {
+        String marker = "Milk-" + UUID.randomUUID();
+        client.post("/pancakes", new PancakeRequest(marker, "Plain", "Free-range", List.of("Syrup")));
+
+        // 40s: the recipe-log Kafka consumer group can be slow to deliver the first message (cold start).
+        Awaitility.await().atMost(Duration.ofSeconds(40)).untilAsserted(() -> {
+            TestResponse gql = client.post("/graphql",
+                    Map.of("query", "{ recipeReports { orderId recipeType ingredients toppings } }"));
+            assertThat(gql.status()).isEqualTo(200);
+            assertThat(gql.bodyContains("Pancakes")).isTrue();
+            assertThat(gql.bodyContains(marker)).isTrue();
+        });
+    }
+
+    @Test
+    public void ingredientUsageAggregatesAcrossRecipes() {
+        String marker = "Flour-" + UUID.randomUUID();
+        client.post("/pancakes", new PancakeRequest("Whole", marker, "Free-range", List.of("Syrup")));
+
+        Awaitility.await().atMost(Duration.ofSeconds(40)).untilAsserted(() -> {
+            TestResponse gql = client.post("/graphql",
+                    Map.of("query", "{ ingredientUsage { ingredient count } }"));
+            assertThat(gql.status()).isEqualTo(200);
+            assertThat(gql.bodyContains(marker)).isTrue();
+        });
+    }
+
+    @Test
     public void equipmentAlertFlowsThroughEventHub() {
         PancakeResponse batch = client.post("/pancakes",
                 new PancakeRequest("Whole", "Plain", "Free-range", List.of("Syrup"))).as(PancakeResponse.class);

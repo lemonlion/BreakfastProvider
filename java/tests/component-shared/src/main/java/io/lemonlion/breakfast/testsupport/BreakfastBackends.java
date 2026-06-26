@@ -21,14 +21,20 @@ import com.google.pubsub.v1.PubsubMessage;
 import com.google.pubsub.v1.PushConfig;
 import com.google.pubsub.v1.SubscriptionName;
 import com.google.pubsub.v1.TopicName;
+import com.github.dockerjava.api.model.ExposedPort;
+import com.github.dockerjava.api.model.PortBinding;
+import com.github.dockerjava.api.model.Ports;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.MSSQLServerContainer;
 import org.testcontainers.containers.MongoDBContainer;
+import org.testcontainers.containers.Network;
 import org.testcontainers.containers.PubSubEmulatorContainer;
 import org.testcontainers.containers.SpannerEmulatorContainer;
+import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.utility.DockerImageName;
+import org.testcontainers.utility.MountableFile;
 
 /**
  * Singleton Testcontainers backends shared across the whole component-test run (started once, reused by
@@ -73,6 +79,43 @@ public final class BreakfastBackends {
             DockerImageName.parse("gcr.io/google.com/cloudsdktool/google-cloud-cli:emulators"));
     private static Publisher feedbackPublisher;
 
+    // Azure Event Hubs emulator (equipment alerts) + Azurite (its blob/metadata store + the consumer's
+    // checkpoint store), on a shared network. Mirrors the C# docker-compose-eventhub.yml.
+    private static final Network EH_NETWORK = Network.newNetwork();
+    private static final String AZURITE_KEY =
+            "Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==";
+    private static final int AZURITE_BLOB_PORT = 10000;
+    @SuppressWarnings("resource")
+    private static final GenericContainer<?> AZURITE = new GenericContainer<>(
+            DockerImageName.parse("mcr.microsoft.com/azure-storage/azurite:latest"))
+            .withNetwork(EH_NETWORK)
+            .withNetworkAliases("azurite")
+            .withExposedPorts(AZURITE_BLOB_PORT, 10001, 10002)
+            // Bind all hosts so the Event Hubs emulator container can reach Azurite over the network.
+            .withCommand("azurite", "-l", "/data", "--blobHost", "0.0.0.0",
+                    "--queueHost", "0.0.0.0", "--tableHost", "0.0.0.0");
+
+    private static final String EVENTHUB_NAME = "breakfast-equipment-alerts";
+    private static final int EVENTHUB_AMQP_PORT = 5672;
+    @SuppressWarnings("resource")
+    private static final GenericContainer<?> EVENTHUB = new GenericContainer<>(
+            DockerImageName.parse("mcr.microsoft.com/azure-messaging/eventhubs-emulator:latest"))
+            .withNetwork(EH_NETWORK)
+            .withNetworkAliases("eventhub-emulator")
+            .withExposedPorts(EVENTHUB_AMQP_PORT)
+            .withEnv("ACCEPT_EULA", "Y")
+            .withEnv("BLOB_SERVER", "azurite")
+            .withEnv("METADATA_SERVER", "azurite")
+            .withCopyToContainer(MountableFile.forClasspathResource("eventhub-emulator-config.json"),
+                    "/Eventhubs_Emulator/ConfigFiles/Config.json")
+            // Pin the host AMQP port to 5672 so the UseDevelopmentEmulator connection string (which assumes
+            // the default port) works regardless of Testcontainers' random mapping.
+            .withCreateContainerCmdModifier(cmd -> cmd.withHostConfig(cmd.getHostConfig()
+                    .withPortBindings(new PortBinding(Ports.Binding.bindPort(EVENTHUB_AMQP_PORT),
+                            new ExposedPort(EVENTHUB_AMQP_PORT)))))
+            .waitingFor(Wait.forLogMessage(".*Emulator Service is Successfully Up.*", 1)
+                    .withStartupTimeout(Duration.ofMinutes(3)));
+
     private static final FakeKitchen KITCHEN = new FakeKitchen();
     private static final FakeSupplier SUPPLIER = new FakeSupplier();
     private static final FakeMilkService COW = new FakeMilkService("/milk", "{\"milk\":\"Some_Milk\"}");
@@ -97,6 +140,8 @@ public final class BreakfastBackends {
         BIGQUERY.start();
         PUBSUB.start();
         configurePubSub();
+        AZURITE.start();
+        EVENTHUB.start();
         KITCHEN.start();
         SUPPLIER.start();
         COW.start();
@@ -156,6 +201,23 @@ public final class BreakfastBackends {
     public static String spannerJdbcUrl() {
         return "jdbc:cloudspanner://" + SPANNER.getEmulatorGrpcEndpoint()
                 + "/projects/test-project/instances/test-instance/databases/breakfast?autoConfigEmulator=true";
+    }
+
+    public static String eventHubName() {
+        return EVENTHUB_NAME;
+    }
+
+    /** Emulator connection string; the AMQP port is pinned to 5672 so UseDevelopmentEmulator works. */
+    public static String eventHubConnectionString() {
+        return "Endpoint=sb://localhost;SharedAccessKeyName=RootManageSharedAccessKey;"
+                + "SharedAccessKey=SAS_KEY_VALUE;UseDevelopmentEmulator=true;";
+    }
+
+    /** Azurite blob connection string for the Event Hubs consumer's checkpoint store. */
+    public static String eventHubBlobConnectionString() {
+        return "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=" + AZURITE_KEY
+                + ";BlobEndpoint=http://" + AZURITE.getHost() + ":" + AZURITE.getMappedPort(AZURITE_BLOB_PORT)
+                + "/devstoreaccount1;";
     }
 
     public static String bigQueryEndpoint() {

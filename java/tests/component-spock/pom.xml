@@ -131,7 +131,14 @@
                             <classpathScope>test</classpathScope>
                             <arguments>
                                 <argument>-classpath</argument>
-                                <classpath/>
+                                <!-- Scope to the CLI's own dependency tree so the forked java command line
+                                     stays under the Windows length limit (the full test classpath is huge). -->
+                                <classpath>
+                                    <dependency>io.kronikol:kronikol4j-cli</dependency>
+                                    <dependency>io.kronikol:kronikol4j-report</dependency>
+                                    <dependency>io.kronikol:kronikol4j-diagram</dependency>
+                                    <dependency>io.kronikol:kronikol4j-core</dependency>
+                                </classpath>
                                 <argument>io.kronikol.cli.Main</argument>
                                 <argument>merge</argument>
                                 <argument>${kronikol.fragments.dir}</argument>

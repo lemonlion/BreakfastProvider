@@ -18,6 +18,6 @@ Feature: Reporting
     When a pancake batch is completed
     Then the batch appears in the batch completions
 
-  Scenario: An equipment alert is ingested and surfaced via the GraphQL query
-    When an equipment alert is ingested
+  Scenario: A batch's equipment alert flows through Event Hubs into equipment alerts
+    When a pancake batch generates an equipment alert
     Then the equipment alert appears in the equipment alerts

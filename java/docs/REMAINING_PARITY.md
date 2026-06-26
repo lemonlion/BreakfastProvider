@@ -9,12 +9,20 @@ Current Reporting GraphQL surface in the Java twin: `orderSummaries`, `popularRe
 and tested across all four frameworks). The C# `ReportingQuery` additionally exposes `recipeReports`,
 `batchCompletions`, `ingredientShipments`, `equipmentAlerts`.
 
-> **STATUS: ALL THREE IMPLEMENTED.** #1 EventGrid_Webhook / `ingredientShipments`, #2 Batch_Completions /
-> `batchCompletions` (real Pub/Sub publish + consumer, verified on the emulator), and #3 Equipment_Alerts /
-> `equipmentAlerts` are all implemented and green across all four frameworks. The only caveat is that the
-> Azure **Event Hubs transport** for #3 has no local emulator, so the docker suite verifies its handler +
-> store + query by invoking the consumer's `ingest()` directly (Option A below); the transport itself is
-> exercised only in external-sut / Azure. The designs below are retained for reference.
+> **STATUS:** #1 EventGrid_Webhook / `ingredientShipments` and #2 Batch_Completions / `batchCompletions`
+> (real Pub/Sub publish + consumer) are implemented and green across all four frameworks. #3
+> Equipment_Alerts / `equipmentAlerts` is being upgraded to the **real Azure Event Hubs transport**.
+>
+> **CORRECTION (was wrong earlier):** Azure Event Hubs *does* have a maintained local emulator —
+> `mcr.microsoft.com/azure-messaging/eventhubs-emulator` (it needs an Azurite container for blob/metadata
+> storage + a config JSON; AMQP on port 5672). The C# project uses it in docker mode
+> (`docker/docker-compose-eventhub.yml` + `docker/eventhub-emulator-config.json`) and an in-process
+> `UseInMemoryEventHub` in memory mode. So Equipment_Alerts **is** locally verifiable end-to-end; the
+> earlier "no emulator, handler-only" note was my mistake and is being fixed by wiring the emulator via
+> Testcontainers (Azurite + eventhubs-emulator) with a real EventHub producer + EventProcessorClient
+> consumer. The C# emulator config: namespace `emulatorNs1`, hub `breakfast-equipment-alerts`,
+> 2 partitions; connection string
+> `Endpoint=sb://localhost;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=SAS_KEY_VALUE;UseDevelopmentEmulator=true;`.
 
 ## 1. EventGrid_Webhook → `ingredientShipments` (DONE — implemented + verified)
 

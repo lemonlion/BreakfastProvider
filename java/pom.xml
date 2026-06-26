@@ -40,6 +40,8 @@
         <spring-boot.version>3.3.5</spring-boot.version>
         <azure-cosmos.version>4.63.3</azure-cosmos.version>
         <azure-eventgrid.version>4.27.0</azure-eventgrid.version>
+        <azure-eventhubs.version>5.19.2</azure-eventhubs.version>
+        <azure-eventhubs-checkpoint.version>1.20.2</azure-eventhubs-checkpoint.version>
 
         <!-- Test stack (Testcontainers version is managed by the Spring Boot BOM: 1.19.8). -->
         <junit.version>5.11.4</junit.version>
@@ -97,6 +99,16 @@
                 <groupId>com.azure</groupId>
                 <artifactId>azure-messaging-eventgrid</artifactId>
                 <version>${azure-eventgrid.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.azure</groupId>
+                <artifactId>azure-messaging-eventhubs</artifactId>
+                <version>${azure-eventhubs.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.azure</groupId>
+                <artifactId>azure-messaging-eventhubs-checkpointstore-blob</artifactId>
+                <version>${azure-eventhubs-checkpoint.version}</version>
             </dependency>
 
             <dependency>

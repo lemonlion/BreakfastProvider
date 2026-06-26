@@ -35,6 +35,12 @@ public class BackendsInitializer implements ApplicationContextInitializer<Config
                 "pubsub.customer-feedback-subscription=" + BreakfastBackends.feedbackSubscription(),
                 "pubsub.batch-completion-topic=batch-completions",
                 "pubsub.batch-completion-subscription=batch-completions-sub",
+                // Azure Event Hubs emulator (equipment alerts) + Azurite checkpoint store.
+                "event-hub.connection-string=" + BreakfastBackends.eventHubConnectionString(),
+                "event-hub.event-hub-name=" + BreakfastBackends.eventHubName(),
+                "event-hub.blob-connection-string=" + BreakfastBackends.eventHubBlobConnectionString(),
+                "event-hub.consumer-group=$Default",
+                "event-hub.checkpoint-container=equipment-alerts-checkpoints",
                 "downstream.kitchen-service-url=" + BreakfastBackends.kitchenUrl(),
                 "downstream.supplier-service-url=" + BreakfastBackends.supplierUrl(),
                 "downstream.cow-service-url=" + BreakfastBackends.cowUrl(),

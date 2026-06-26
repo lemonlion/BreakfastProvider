@@ -75,4 +75,21 @@ class MilkSourcingSpec extends Specification {
         expect:
         client.get("/goat-milk").status() == 502
     }
+
+    def "the goat-milk endpoint returns fresh goat milk from the goat service"() {
+        when:
+        def response = client.get("/goat-milk")
+
+        then:
+        response.status() == 200
+        response.as(GoatMilkResponse).goatMilk().contains("Goat_Milk")
+    }
+
+    def "a cow service timeout returns 502"() {
+        given:
+        BreakfastBackends.cow().setDelayMillis(3000)
+
+        expect:
+        client.get("/milk").status() == 502
+    }
 }

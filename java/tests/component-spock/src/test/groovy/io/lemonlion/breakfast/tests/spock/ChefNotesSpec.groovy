@@ -31,7 +31,7 @@ class ChefNotesSpec extends Specification {
         new ChefNoteRequest("Classic Pancakes", "Chef Remy", "Rest the batter for 10 minutes.", "Technique")
     }
 
-    def "a chef note is created and retrievable by id"() {
+    def "creating a chef note returns the created note"() {
         when:
         def created = client.post("/chef-notes", valid())
 
@@ -39,7 +39,24 @@ class ChefNotesSpec extends Specification {
         created.status() == 201
         def note = created.as(ChefNoteResponse)
         note.noteId()
-        client.get("/chef-notes/${note.noteId()}").status() == 200
+        note.chefName() == "Chef Remy"
+    }
+
+    def "an existing chef note is retrievable by id"() {
+        given:
+        def note = client.post("/chef-notes", valid()).as(ChefNoteResponse)
+
+        when:
+        def fetched = client.get("/chef-notes/${note.noteId()}")
+
+        then:
+        fetched.status() == 200
+        fetched.as(ChefNoteResponse).chefName() == "Chef Remy"
+    }
+
+    def "retrieving a non-existent note returns 404"() {
+        expect:
+        client.get("/chef-notes/does-not-exist").status() == 404
     }
 
     def "a chef note can be updated"() {

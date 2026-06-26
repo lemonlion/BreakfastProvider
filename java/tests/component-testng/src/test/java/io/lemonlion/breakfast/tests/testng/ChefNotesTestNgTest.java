@@ -17,12 +17,20 @@ public class ChefNotesTestNgTest extends ComponentTestBaseNg {
     }
 
     @Test
-    public void createAndRetrieve() {
+    public void createReturnsNote() {
         TestResponse created = client.post("/chef-notes", valid());
         assertThat(created.status()).isEqualTo(201);
         ChefNoteResponse note = created.as(ChefNoteResponse.class);
         assertThat(note.noteId()).isNotBlank();
-        assertThat(client.get("/chef-notes/" + note.noteId()).status()).isEqualTo(200);
+        assertThat(note.chefName()).isEqualTo("Chef Remy");
+    }
+
+    @Test
+    public void retrieveById() {
+        ChefNoteResponse note = client.post("/chef-notes", valid()).as(ChefNoteResponse.class);
+        TestResponse fetched = client.get("/chef-notes/" + note.noteId());
+        assertThat(fetched.status()).isEqualTo(200);
+        assertThat(fetched.as(ChefNoteResponse.class).chefName()).isEqualTo("Chef Remy");
     }
 
     @Test

@@ -38,6 +38,11 @@ public class MilkSourcingSteps {
         BreakfastBackends.goat().setInvalidResponse(true);
     }
 
+    @Given("the cow service is slow to respond")
+    public void theCowServiceIsSlow() {
+        BreakfastBackends.cow().setDelayMillis(3000);
+    }
+
     @When("milk is sourced")
     public void milkIsSourced() {
         ctx.lastResponse = ctx.client().get("/milk");
@@ -58,5 +63,11 @@ public class MilkSourcingSteps {
     public void freshGoatMilkIsReturned() {
         assertThat(ctx.lastResponse.status()).isEqualTo(200);
         assertThat(ctx.lastResponse.as(GoatMilkResponse.class).goatMilk()).isEqualTo("Some_Fresh_Goat_Milk");
+    }
+
+    @Then("fresh goat milk comes from the goat service")
+    public void freshGoatMilkComesFromTheGoatService() {
+        assertThat(ctx.lastResponse.status()).isEqualTo(200);
+        assertThat(ctx.lastResponse.as(GoatMilkResponse.class).goatMilk()).contains("Goat_Milk");
     }
 }

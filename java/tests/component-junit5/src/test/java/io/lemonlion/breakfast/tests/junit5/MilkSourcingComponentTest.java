@@ -57,4 +57,19 @@ class MilkSourcingComponentTest extends ComponentTestBase {
         BreakfastBackends.goat().setInvalidResponse(true);
         assertThat(client.get("/goat-milk").status()).isEqualTo(502);
     }
+
+    @Test
+    @DisplayName("the goat-milk endpoint returns fresh goat milk from the goat service")
+    void goatMilkComesFromGoatService() {
+        TestResponse response = client.get("/goat-milk");
+        assertThat(response.status()).isEqualTo(200);
+        assertThat(response.as(GoatMilkResponse.class).goatMilk()).isNotBlank().contains("Goat_Milk");
+    }
+
+    @Test
+    @DisplayName("a cow service timeout returns 502 Bad Gateway")
+    void cowTimeoutReturns502() {
+        BreakfastBackends.cow().setDelayMillis(3000);
+        assertThat(client.get("/milk").status()).isEqualTo(502);
+    }
 }

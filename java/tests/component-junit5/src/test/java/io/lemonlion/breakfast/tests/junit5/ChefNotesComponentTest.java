@@ -19,12 +19,19 @@ class ChefNotesComponentTest extends ComponentTestBase {
     }
 
     @Test
-    @DisplayName("a chef note is created and retrievable by id")
-    void createAndRetrieve() {
+    @DisplayName("creating a chef note returns the created note")
+    void createReturnsNote() {
         TestResponse created = client.post("/chef-notes", valid());
         assertThat(created.status()).isEqualTo(201);
         ChefNoteResponse note = created.as(ChefNoteResponse.class);
         assertThat(note.noteId()).isNotBlank();
+        assertThat(note.chefName()).isEqualTo("Chef Remy");
+    }
+
+    @Test
+    @DisplayName("an existing chef note is retrievable by id")
+    void retrieveById() {
+        ChefNoteResponse note = client.post("/chef-notes", valid()).as(ChefNoteResponse.class);
 
         TestResponse fetched = client.get("/chef-notes/" + note.noteId());
         assertThat(fetched.status()).isEqualTo(200);

@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
+import java.util.concurrent.Executors;
 
 /**
  * In-JVM stand-in for the C# Cow/Goat downstream services. Serves a single GET path returning a fixed
@@ -18,6 +19,7 @@ public final class FakeMilkService {
     private HttpServer server;
     private volatile int status = 200;
     private volatile boolean invalidResponse;
+    private volatile long delayMillis;
     private volatile String lastCorrelationId;
     private final FakeHealth health = new FakeHealth();
 
@@ -37,12 +39,22 @@ public final class FakeMilkService {
         }
         server.createContext(path, this::handle);
         server.createContext("/health", health::handle);
-        server.setExecutor(null);
+        // A small thread pool so a deliberately-delayed handler (cow-timeout scenario) doesn't block
+        // subsequent requests to this fake.
+        server.setExecutor(Executors.newCachedThreadPool());
         server.start();
     }
 
     private void handle(HttpExchange exchange) throws IOException {
         lastCorrelationId = exchange.getRequestHeaders().getFirst("X-Correlation-Id");
+        long delay = delayMillis;
+        if (delay > 0) {
+            try {
+                Thread.sleep(delay);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        }
         if (status != 200) {
             exchange.sendResponseHeaders(status, -1);
             exchange.close();
@@ -74,6 +86,11 @@ public final class FakeMilkService {
         this.invalidResponse = invalidResponse;
     }
 
+    /** Delays each response by the given milliseconds, to drive the downstream read-timeout scenario. */
+    public void setDelayMillis(long delayMillis) {
+        this.delayMillis = delayMillis;
+    }
+
     /** The {@code X-Correlation-Id} header value the SUT forwarded on its last call, or {@code null}. */
     public String lastCorrelationId() {
         return lastCorrelationId;
@@ -87,6 +104,7 @@ public final class FakeMilkService {
     public void reset() {
         this.status = 200;
         this.invalidResponse = false;
+        this.delayMillis = 0;
         this.lastCorrelationId = null;
         health.reset();
     }

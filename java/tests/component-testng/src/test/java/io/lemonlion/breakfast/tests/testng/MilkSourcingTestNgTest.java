@@ -48,4 +48,17 @@ public class MilkSourcingTestNgTest extends ComponentTestBaseNg {
         BreakfastBackends.goat().setInvalidResponse(true);
         assertThat(client.get("/goat-milk").status()).isEqualTo(502);
     }
+
+    @Test
+    public void goatMilkComesFromGoatService() {
+        TestResponse response = client.get("/goat-milk");
+        assertThat(response.status()).isEqualTo(200);
+        assertThat(response.as(GoatMilkResponse.class).goatMilk()).isNotBlank().contains("Goat_Milk");
+    }
+
+    @Test
+    public void cowTimeoutReturns502() {
+        BreakfastBackends.cow().setDelayMillis(3000);
+        assertThat(client.get("/milk").status()).isEqualTo(502);
+    }
 }

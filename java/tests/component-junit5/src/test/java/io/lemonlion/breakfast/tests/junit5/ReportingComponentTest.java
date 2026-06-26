@@ -26,11 +26,14 @@ class ReportingComponentTest extends ComponentTestBase {
         client.post("/orders",
                 new OrderRequest(customer, List.of(new OrderItemRequest("Pancakes", UUID.randomUUID(), 2)), 4));
 
-        TestResponse gql = client.post("/graphql",
-                Map.of("query", "{ orderSummaries { orderId customerName itemCount } }"));
-
-        assertThat(gql.status()).isEqualTo(200);
-        assertThat(gql.bodyContains(customer)).isTrue();
+        // Query path reads through a separate request/session; poll so a Cosmos cross-request
+        // read-after-write lag under host load doesn't flake the single assert.
+        Awaitility.await().atMost(Duration.ofSeconds(20)).untilAsserted(() -> {
+            TestResponse gql = client.post("/graphql",
+                    Map.of("query", "{ orderSummaries { orderId customerName itemCount } }"));
+            assertThat(gql.status()).isEqualTo(200);
+            assertThat(gql.bodyContains(customer)).isTrue();
+        });
     }
 
     @Test
@@ -40,11 +43,12 @@ class ReportingComponentTest extends ComponentTestBase {
                 new OrderRequest("Recipe-" + UUID.randomUUID(),
                         List.of(new OrderItemRequest("Pancakes", UUID.randomUUID(), 2)), 4));
 
-        TestResponse gql = client.post("/graphql",
-                Map.of("query", "{ popularRecipes { recipeType count } }"));
-
-        assertThat(gql.status()).isEqualTo(200);
-        assertThat(gql.bodyContains("Pancakes")).isTrue();
+        Awaitility.await().atMost(Duration.ofSeconds(20)).untilAsserted(() -> {
+            TestResponse gql = client.post("/graphql",
+                    Map.of("query", "{ popularRecipes { recipeType count } }"));
+            assertThat(gql.status()).isEqualTo(200);
+            assertThat(gql.bodyContains("Pancakes")).isTrue();
+        });
     }
 
     @Test
@@ -64,12 +68,13 @@ class ReportingComponentTest extends ComponentTestBase {
         TestResponse webhook = client.post("/webhooks/eventgrid", List.of(event));
         assertThat(webhook.status()).isEqualTo(200);
 
-        TestResponse gql = client.post("/graphql",
-                Map.of("query", "{ ingredientShipments { deliveryId ingredientName quantity } }"));
-
-        assertThat(gql.status()).isEqualTo(200);
-        assertThat(gql.bodyContains(deliveryId)).isTrue();
-        assertThat(gql.bodyContains("Milk")).isTrue();
+        Awaitility.await().atMost(Duration.ofSeconds(20)).untilAsserted(() -> {
+            TestResponse gql = client.post("/graphql",
+                    Map.of("query", "{ ingredientShipments { deliveryId ingredientName quantity } }"));
+            assertThat(gql.status()).isEqualTo(200);
+            assertThat(gql.bodyContains(deliveryId)).isTrue();
+            assertThat(gql.bodyContains("Milk")).isTrue();
+        });
     }
 
     @Test

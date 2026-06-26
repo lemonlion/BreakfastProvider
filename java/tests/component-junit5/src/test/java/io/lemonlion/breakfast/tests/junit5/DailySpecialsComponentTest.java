@@ -18,6 +18,8 @@ import org.junit.jupiter.api.Test;
 class DailySpecialsComponentTest extends ComponentTestBase {
 
     private static final UUID SPECIAL = UUID.fromString("aaaa0000-0000-0000-0000-000000000001");
+    private static final UUID LEMON_RICOTTA = UUID.fromString("aaaa0000-0000-0000-0000-000000000003");
+    private static final int MAX_PER_SPECIAL = 100;
 
     @Test
     @DisplayName("the available daily specials are listed")
@@ -26,6 +28,48 @@ class DailySpecialsComponentTest extends ComponentTestBase {
         assertThat(response.status()).isEqualTo(200);
         List<DailySpecialResponse> specials = response.as(new TypeReference<List<DailySpecialResponse>>() { });
         assertThat(specials).extracting(DailySpecialResponse::name).contains("Matcha Waffles");
+    }
+
+    @Test
+    @DisplayName("a valid daily special order returns a confirmation")
+    void validOrderReturnsConfirmation() {
+        client.delete("/daily-specials/orders");
+        TestResponse response = client.post("/daily-specials/orders", new DailySpecialOrderRequest(SPECIAL, 1));
+        assertThat(response.status()).isEqualTo(201);
+        DailySpecialOrderResponse body = response.as(DailySpecialOrderResponse.class);
+        assertThat(body.specialId()).isEqualTo(SPECIAL);
+        assertThat(body.orderConfirmationId()).isNotNull();
+    }
+
+    @Test
+    @DisplayName("the same order with two different idempotency keys returns different confirmations")
+    void differentKeysReturnDifferentConfirmations() {
+        client.delete("/daily-specials/orders");
+        DailySpecialOrderRequest request = new DailySpecialOrderRequest(SPECIAL, 1);
+
+        TestResponse first = client.post("/daily-specials/orders", request,
+                Map.of("Idempotency-Key", UUID.randomUUID().toString()));
+        TestResponse second = client.post("/daily-specials/orders", request,
+                Map.of("Idempotency-Key", UUID.randomUUID().toString()));
+
+        assertThat(first.status()).isEqualTo(201);
+        assertThat(second.status()).isEqualTo(201);
+        assertThat(second.as(DailySpecialOrderResponse.class).orderConfirmationId())
+                .isNotEqualTo(first.as(DailySpecialOrderResponse.class).orderConfirmationId());
+    }
+
+    @Test
+    @DisplayName("the remaining quantity decreases after an order")
+    void remainingQuantityDecreases() {
+        client.delete("/daily-specials/orders");
+        assertThat(client.post("/daily-specials/orders", new DailySpecialOrderRequest(LEMON_RICOTTA, 1)).status())
+                .isEqualTo(201);
+
+        List<DailySpecialResponse> specials = client.get("/daily-specials")
+                .as(new TypeReference<List<DailySpecialResponse>>() { });
+        DailySpecialResponse lemonRicotta = specials.stream()
+                .filter(s -> s.specialId().equals(LEMON_RICOTTA)).findFirst().orElseThrow();
+        assertThat(lemonRicotta.remainingQuantity()).isEqualTo(MAX_PER_SPECIAL - 1);
     }
 
     @Test

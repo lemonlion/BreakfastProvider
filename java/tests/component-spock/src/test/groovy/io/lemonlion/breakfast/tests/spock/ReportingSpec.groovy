@@ -35,12 +35,14 @@ class ReportingSpec extends Specification {
         def customer = "Cust-${UUID.randomUUID()}"
         client.post("/orders", new OrderRequest(customer, [new OrderItemRequest("Pancakes", UUID.randomUUID(), 2)], 4))
 
-        when:
-        def gql = client.post("/graphql", [query: "{ orderSummaries { orderId customerName itemCount } }"])
-
-        then:
-        gql.status() == 200
-        gql.bodyContains(customer)
+        expect:
+        // Query path reads through a separate request/session; poll so a Cosmos cross-request
+        // read-after-write lag under host load doesn't flake the single assert.
+        Awaitility.await().atMost(Duration.ofSeconds(20)).untilAsserted {
+            def gql = client.post("/graphql", [query: "{ orderSummaries { orderId customerName itemCount } }"])
+            assert gql.status() == 200
+            assert gql.bodyContains(customer)
+        }
     }
 
     def "popular recipes reflects the ordered recipe types"() {
@@ -48,12 +50,12 @@ class ReportingSpec extends Specification {
         client.post("/orders", new OrderRequest("Recipe-${UUID.randomUUID()}",
                 [new OrderItemRequest("Pancakes", UUID.randomUUID(), 2)], 4))
 
-        when:
-        def gql = client.post("/graphql", [query: "{ popularRecipes { recipeType count } }"])
-
-        then:
-        gql.status() == 200
-        gql.bodyContains("Pancakes")
+        expect:
+        Awaitility.await().atMost(Duration.ofSeconds(20)).untilAsserted {
+            def gql = client.post("/graphql", [query: "{ popularRecipes { recipeType count } }"])
+            assert gql.status() == 200
+            assert gql.bodyContains("Pancakes")
+        }
     }
 
     def "an ingredient delivery posted to the EventGrid webhook appears in ingredient shipments"() {
@@ -66,19 +68,19 @@ class ReportingSpec extends Specification {
                 data     : [deliveryId: deliveryId, ingredientName: "Milk", quantity: 50.0,
                             deliveredAt: java.time.Instant.now().toString()]]
 
-        when:
+        and:
         def webhook = client.post("/webhooks/eventgrid", [event])
 
-        then:
+        expect:
         webhook.status() == 200
 
-        when:
-        def gql = client.post("/graphql", [query: "{ ingredientShipments { deliveryId ingredientName quantity } }"])
-
-        then:
-        gql.status() == 200
-        gql.bodyContains(deliveryId)
-        gql.bodyContains("Milk")
+        and:
+        Awaitility.await().atMost(Duration.ofSeconds(20)).untilAsserted {
+            def gql = client.post("/graphql", [query: "{ ingredientShipments { deliveryId ingredientName quantity } }"])
+            assert gql.status() == 200
+            assert gql.bodyContains(deliveryId)
+            assert gql.bodyContains("Milk")
+        }
     }
 
     def "a completed pancake batch is ingested into batch completions via Pub/Sub"() {

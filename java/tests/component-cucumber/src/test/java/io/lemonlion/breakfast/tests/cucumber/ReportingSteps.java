@@ -32,14 +32,18 @@ public class ReportingSteps {
         customer = "Cust-" + UUID.randomUUID();
         ctx.client().post("/orders",
                 new OrderRequest(customer, List.of(new OrderItemRequest("Pancakes", UUID.randomUUID(), 2)), 4));
-        ctx.lastResponse = ctx.client().post("/graphql",
-                Map.of("query", "{ orderSummaries { orderId customerName } }"));
     }
 
     @Then("the order appears in the reporting summaries")
     public void theOrderAppearsInSummaries() {
-        assertThat(ctx.lastResponse.status()).isEqualTo(200);
-        assertThat(ctx.lastResponse.bodyContains(customer)).isTrue();
+        // The GraphQL summaries are an eventually-consistent projection of the order write; poll until it
+        // catches up rather than asserting on a single immediate query (which flakes under host load).
+        Awaitility.await().atMost(Duration.ofSeconds(20)).untilAsserted(() -> {
+            var gql = ctx.client().post("/graphql",
+                    Map.of("query", "{ orderSummaries { orderId customerName } }"));
+            assertThat(gql.status()).isEqualTo(200);
+            assertThat(gql.bodyContains(customer)).isTrue();
+        });
     }
 
     @When("an order is placed and popular recipes are queried via GraphQL")
@@ -47,14 +51,16 @@ public class ReportingSteps {
         ctx.client().post("/orders",
                 new OrderRequest("Recipe-" + UUID.randomUUID(),
                         List.of(new OrderItemRequest("Pancakes", UUID.randomUUID(), 2)), 4));
-        ctx.lastResponse = ctx.client().post("/graphql",
-                Map.of("query", "{ popularRecipes { recipeType count } }"));
     }
 
     @Then("the popular recipes include {string}")
     public void thePopularRecipesInclude(String recipe) {
-        assertThat(ctx.lastResponse.status()).isEqualTo(200);
-        assertThat(ctx.lastResponse.bodyContains(recipe)).isTrue();
+        Awaitility.await().atMost(Duration.ofSeconds(20)).untilAsserted(() -> {
+            var gql = ctx.client().post("/graphql",
+                    Map.of("query", "{ popularRecipes { recipeType count } }"));
+            assertThat(gql.status()).isEqualTo(200);
+            assertThat(gql.bodyContains(recipe)).isTrue();
+        });
     }
 
     @When("an ingredient delivery is posted to the EventGrid webhook")

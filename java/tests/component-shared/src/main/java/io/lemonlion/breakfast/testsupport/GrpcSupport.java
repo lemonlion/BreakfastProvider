@@ -6,6 +6,7 @@ import io.grpc.ClientCall;
 import io.grpc.ClientInterceptor;
 import io.grpc.ForwardingClientCall.SimpleForwardingClientCall;
 import io.grpc.ManagedChannel;
+import io.grpc.ManagedChannelBuilder;
 import io.grpc.Metadata;
 import io.grpc.MethodDescriptor;
 import io.grpc.inprocess.InProcessChannelBuilder;
@@ -53,7 +54,12 @@ public final class GrpcSupport {
                 if (local == null) {
                     GrpcTrackingOptions options =
                             new GrpcTrackingOptions(SERVICE_NAME, "Test", TestIdentityScope::current);
-                    local = InProcessChannelBuilder.forName(IN_PROCESS_NAME)
+                    // external-sut mode: dial the deployed gRPC endpoint over TCP. Otherwise (docker mode)
+                    // use the in-process channel shared with the in-JVM SUT.
+                    var builder = RunMode.isExternalSut() && RunMode.externalGrpcTarget() != null
+                            ? ManagedChannelBuilder.forTarget(RunMode.externalGrpcTarget()).usePlaintext()
+                            : InProcessChannelBuilder.forName(IN_PROCESS_NAME);
+                    local = builder
                             .intercept(new IdentityInterceptor(), new KronikolClientInterceptor(options))
                             .build();
                     channel = local;

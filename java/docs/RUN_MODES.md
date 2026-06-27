@@ -41,17 +41,26 @@ Activated by the `external-sut` Maven profile, which sets two system properties 
 
 **Remaining work for full external-sut support (not done — design + verification plan):**
 
-The current component-test bases use `@SpringBootTest`, which always boots the SUT in-process. To drive
-an external deployment instead, add a parallel, non-`@SpringBootTest` base per framework that:
+**Foundation — built and docker-verified:**
 
-1. Skips `@SpringBootTest`/`BackendsInitializer` entirely (no Testcontainers, no in-process server).
-2. Builds `new BreakfastTestClient(RunMode.externalSutUrl())` and a gRPC channel from
-   `RunMode.externalGrpcTarget()` (instead of the in-process channel in `GrpcSupport`).
-3. Skips the in-JVM-fake assertions that reach into `BreakfastBackends` (kitchen/cow received-X checks)
-   or routes them through deployed fakes, since those objects don't exist when the SUT is remote.
-4. Selects the base at runtime: have `ComponentTestBase` (and the TestNG/Spock/Cucumber equivalents)
-   branch on `RunMode.isExternalSut()` — in docker mode keep the in-process path; in external mode point
-   the client/channel at the deployment and no-op the local-fake assertions.
+1. `GrpcSupport` is RunMode-aware: in external-sut mode it dials a TCP channel at
+   `RunMode.externalGrpcTarget()` (with the same Kronikol4J + identity interceptors); in docker mode it
+   keeps the in-process channel. Verified green in docker mode.
+2. `ExternalSutComponentTestBase` (JUnit5, **no** `@SpringBootTest`, no Testcontainers) builds
+   `new BreakfastTestClient(RunMode.externalSutUrl())`. It is `@EnabledIfSystemProperty(external.sut.url)`
+   so it is a no-op in the default docker run and activates only under the `external-sut` profile.
+3. `ExternalSutSmokeTest` extends it: a representative HTTP/gRPC suite (health, menu, order create +
+   retrieve, gRPC recipe summary) that asserts only on the SUT's own responses — no in-JVM-fake checks —
+   proving the external transport path end-to-end against a deployment.
+
+**Remaining (incremental) work — bring the *full* scenario suite to external mode:**
+
+The ~150 docker-mode scenarios extend the `@SpringBootTest` bases and many assert on in-JVM fakes
+(`BreakfastBackends.kitchen()`/`cow()`/…), which don't exist against a remote SUT. To run them all in
+external mode, migrate each framework's scenarios onto an external base (like the JUnit5 one above) and,
+for the fake-dependent assertions, either drop them in external mode or have the deployed fakes expose
+query endpoints. This is a mechanical per-scenario migration; the transport foundation it builds on is in
+place. It can only be validated against a real deployment (below), not on a workstation.
 
 **How to verify external-sut locally** (end-to-end, before relying on CI):
 

@@ -11,13 +11,8 @@ See the implementation plan and decisions in the repo's plan notes; this module 
 ## Prerequisites
 
 - **JDK 17+** (validated on JDK 25).
-- **Kronikol4J in `mavenLocal`.** It is consumed as `io.kronikol:kronikol4j-*:0.1.23-SNAPSHOT` until it
-  is released to Maven Central. Install it from the sibling checkout:
-
-  ```bash
-  cd ../../Kronikol4J        # i.e. C:\Code\Kronikol4J
-  ./gradlew publishToMavenLocal
-  ```
+- **Kronikol4J** is consumed from **Maven Central** as `io.github.lemonlion:kronikol4j-*:0.1.24` — no
+  local checkout or `publishToMavenLocal` is needed; `./mvnw` resolves it automatically.
 
 ## Build & test
 

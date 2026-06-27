@@ -73,10 +73,10 @@ on GitHub-hosted Ubuntu runners and publish each framework's `TestRunReport.html
 site. This cannot be exercised from this machine. To verify:
 
 1. **Push the `java-twin` branch** (and merge to `main`, since `ci-main.yml` triggers on push to `main`).
-2. Confirm the workflow clones `lemonlion/Kronikol4J@main` (needs the `ORGANISATION_PAT` secret, as the
-   .NET lanes use) and `./gradlew publishToMavenLocal` succeeds — i.e. Kronikol4J's published SNAPSHOT
-   version matches `<kronikol4j.version>` in `java/pom.xml` (currently `0.1.23-SNAPSHOT`). If it has
-   moved, bump that property.
+2. Kronikol4J is resolved from **Maven Central** (`io.github.lemonlion:kronikol4j-*`, pinned by
+   `<kronikol4j.version>` in `java/pom.xml`, currently `0.1.24`) — the `_tests-java.yml` workflow no
+   longer clones Kronikol4J or runs `publishToMavenLocal`, and no `ORGANISATION_PAT` secret is needed for
+   the Java lanes. To move to a newer Kronikol4J, bump that one property.
 3. Confirm each `java-<fw>` job is green. **Risk:** the docker-mode suite needs eight backend containers
    incl. the heavy Cosmos emulator (~ multi-GB). Standard GitHub-hosted runners may be memory/time
    constrained; if a job flakes, options are a larger runner, container reuse, or splitting the suite.

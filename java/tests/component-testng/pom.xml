@@ -30,12 +30,12 @@
 
         <!-- Kronikol4J: TestNG adapter (identity scoping + report finalization via ServiceLoader). -->
         <dependency>
-            <groupId>io.kronikol</groupId>
+            <groupId>io.github.lemonlion</groupId>
             <artifactId>kronikol4j-testng</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>io.kronikol</groupId>
+            <groupId>io.github.lemonlion</groupId>
             <artifactId>kronikol4j-cli</artifactId>
             <scope>test</scope>
         </dependency>
@@ -97,10 +97,10 @@
                                 <!-- Scope to the CLI's own dependency tree so the forked java command line
                                      stays under the Windows length limit (the full test classpath is huge). -->
                                 <classpath>
-                                    <dependency>io.kronikol:kronikol4j-cli</dependency>
-                                    <dependency>io.kronikol:kronikol4j-report</dependency>
-                                    <dependency>io.kronikol:kronikol4j-diagram</dependency>
-                                    <dependency>io.kronikol:kronikol4j-core</dependency>
+                                    <dependency>io.github.lemonlion:kronikol4j-cli</dependency>
+                                    <dependency>io.github.lemonlion:kronikol4j-report</dependency>
+                                    <dependency>io.github.lemonlion:kronikol4j-diagram</dependency>
+                                    <dependency>io.github.lemonlion:kronikol4j-core</dependency>
                                 </classpath>
                                 <argument>io.kronikol.cli.Main</argument>
                                 <argument>merge</argument>

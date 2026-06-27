@@ -514,7 +514,6 @@ jobs:
     with:
       framework: junit5
       report-artifact: java-junit5-report
-    secrets: inherit
 
   java-testng:
     name: Java TestNG
@@ -522,7 +521,6 @@ jobs:
     with:
       framework: testng
       report-artifact: java-testng-report
-    secrets: inherit
 
   java-cucumber:
     name: Java Cucumber
@@ -530,7 +528,6 @@ jobs:
     with:
       framework: cucumber
       report-artifact: java-cucumber-report
-    secrets: inherit
 
   java-spock:
     name: Java Spock
@@ -538,7 +535,6 @@ jobs:
     with:
       framework: spock
       report-artifact: java-spock-report
-    secrets: inherit
 
 
   # ─── Gate ───────────────────────────────────────────────────────────────────

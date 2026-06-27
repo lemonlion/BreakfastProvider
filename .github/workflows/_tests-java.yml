@@ -2,7 +2,8 @@ name: 'Tests (Java)'
 
 # Reusable workflow: runs one Java component-test framework module against the Dockerized
 # Testcontainers backends and uploads its Kronikol4J HTML report. Twin of _tests.yml for the
-# Spring Boot Java port under java/.
+# Spring Boot Java port under java/. Kronikol4J is consumed from Maven Central
+# (io.github.lemonlion:kronikol4j-*), so no local build of it is needed.
 
 on:
   workflow_call:
@@ -15,10 +16,6 @@ on:
         description: 'Name of the uploaded report artifact'
         required: true
         type: string
-    secrets:
-      ORGANISATION_PAT:
-        description: 'PAT used to check out the Kronikol4J repository'
-        required: true
 
 jobs:
   test:
@@ -31,23 +28,11 @@ jobs:
       - name: Checkout Breakfast Provider
         uses: actions/checkout@v5
 
-      - name: Checkout Kronikol4J
-        uses: actions/checkout@v5
-        with:
-          repository: lemonlion/Kronikol4J
-          ref: main
-          token: ${{ secrets.ORGANISATION_PAT }}
-          path: kronikol4j
-
       - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '21'
-
-      - name: Publish Kronikol4J to mavenLocal
-        working-directory: kronikol4j
-        run: ./gradlew publishToMavenLocal -x test --no-daemon
 
       - name: Run ${{ inputs.framework }} component tests
         working-directory: java

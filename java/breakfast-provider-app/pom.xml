@@ -74,7 +74,7 @@
             <artifactId>mssql-jdbc</artifactId>
         </dependency>
         <dependency>
-            <groupId>io.kronikol</groupId>
+            <groupId>io.github.lemonlion</groupId>
             <artifactId>kronikol4j-jdbc</artifactId>
         </dependency>
 
@@ -84,7 +84,7 @@
             <artifactId>mongodb-driver-sync</artifactId>
         </dependency>
         <dependency>
-            <groupId>io.kronikol</groupId>
+            <groupId>io.github.lemonlion</groupId>
             <artifactId>kronikol4j-mongodb</artifactId>
         </dependency>
 
@@ -132,25 +132,25 @@
             <artifactId>grpc-server-spring-boot-starter</artifactId>
         </dependency>
         <dependency>
-            <groupId>io.kronikol</groupId>
+            <groupId>io.github.lemonlion</groupId>
             <artifactId>kronikol4j-gcp</artifactId>
         </dependency>
 
         <!-- Kronikol4J: server-side identity (servlet), Spring/HTTP client tracking, Azure + messaging recorders. -->
         <dependency>
-            <groupId>io.kronikol</groupId>
+            <groupId>io.github.lemonlion</groupId>
             <artifactId>kronikol4j-spring-boot-starter</artifactId>
         </dependency>
         <dependency>
-            <groupId>io.kronikol</groupId>
+            <groupId>io.github.lemonlion</groupId>
             <artifactId>kronikol4j-http</artifactId>
         </dependency>
         <dependency>
-            <groupId>io.kronikol</groupId>
+            <groupId>io.github.lemonlion</groupId>
             <artifactId>kronikol4j-azure</artifactId>
         </dependency>
         <dependency>
-            <groupId>io.kronikol</groupId>
+            <groupId>io.github.lemonlion</groupId>
             <artifactId>kronikol4j-messaging</artifactId>
         </dependency>
     </dependencies>

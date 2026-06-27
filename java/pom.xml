@@ -33,8 +33,8 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.release>21</maven.compiler.release>
 
-        <!-- Kronikol4J — consumed as a SNAPSHOT from mavenLocal until it is released to Maven Central. -->
-        <kronikol4j.version>0.1.23-SNAPSHOT</kronikol4j.version>
+        <!-- Kronikol4J — released on Maven Central under io.github.lemonlion. -->
+        <kronikol4j.version>0.1.24</kronikol4j.version>
 
         <!-- SUT stack: Spring Boot 3.3.x is Kronikol4J's tested baseline; tests run on JDK 21. -->
         <spring-boot.version>3.3.5</spring-boot.version>
@@ -120,7 +120,7 @@
             </dependency>
             <!-- Kronikol4J core (test-identity headers/scope used by the shared test HTTP client). -->
             <dependency>
-                <groupId>io.kronikol</groupId>
+                <groupId>io.github.lemonlion</groupId>
                 <artifactId>kronikol4j-core</artifactId>
                 <version>${kronikol4j.version}</version>
             </dependency>
@@ -147,81 +147,81 @@
 
             <!-- Kronikol4J test-framework adapters -->
             <dependency>
-                <groupId>io.kronikol</groupId>
+                <groupId>io.github.lemonlion</groupId>
                 <artifactId>kronikol4j-junit5</artifactId>
                 <version>${kronikol4j.version}</version>
             </dependency>
             <dependency>
-                <groupId>io.kronikol</groupId>
+                <groupId>io.github.lemonlion</groupId>
                 <artifactId>kronikol4j-testng</artifactId>
                 <version>${kronikol4j.version}</version>
             </dependency>
             <dependency>
-                <groupId>io.kronikol</groupId>
+                <groupId>io.github.lemonlion</groupId>
                 <artifactId>kronikol4j-cucumber</artifactId>
                 <version>${kronikol4j.version}</version>
             </dependency>
             <dependency>
-                <groupId>io.kronikol</groupId>
+                <groupId>io.github.lemonlion</groupId>
                 <artifactId>kronikol4j-spock</artifactId>
                 <version>${kronikol4j.version}</version>
             </dependency>
 
             <!-- Kronikol4J assertion tracking (AssertJ) -->
             <dependency>
-                <groupId>io.kronikol</groupId>
+                <groupId>io.github.lemonlion</groupId>
                 <artifactId>kronikol4j-assertj</artifactId>
                 <version>${kronikol4j.version}</version>
             </dependency>
 
             <!-- Kronikol4J dependency-tracking integrations (faithful per-service mapping). -->
             <dependency>
-                <groupId>io.kronikol</groupId>
+                <groupId>io.github.lemonlion</groupId>
                 <artifactId>kronikol4j-spring-boot-starter</artifactId>
                 <version>${kronikol4j.version}</version>
             </dependency>
             <dependency>
-                <groupId>io.kronikol</groupId>
+                <groupId>io.github.lemonlion</groupId>
                 <artifactId>kronikol4j-servlet</artifactId>
                 <version>${kronikol4j.version}</version>
             </dependency>
             <dependency>
-                <groupId>io.kronikol</groupId>
+                <groupId>io.github.lemonlion</groupId>
                 <artifactId>kronikol4j-spring</artifactId>
                 <version>${kronikol4j.version}</version>
             </dependency>
             <dependency>
-                <groupId>io.kronikol</groupId>
+                <groupId>io.github.lemonlion</groupId>
                 <artifactId>kronikol4j-http</artifactId>
                 <version>${kronikol4j.version}</version>
             </dependency>
             <dependency>
-                <groupId>io.kronikol</groupId>
+                <groupId>io.github.lemonlion</groupId>
                 <artifactId>kronikol4j-azure</artifactId>
                 <version>${kronikol4j.version}</version>
             </dependency>
             <dependency>
-                <groupId>io.kronikol</groupId>
+                <groupId>io.github.lemonlion</groupId>
                 <artifactId>kronikol4j-messaging</artifactId>
                 <version>${kronikol4j.version}</version>
             </dependency>
             <dependency>
-                <groupId>io.kronikol</groupId>
+                <groupId>io.github.lemonlion</groupId>
                 <artifactId>kronikol4j-grpc</artifactId>
                 <version>${kronikol4j.version}</version>
             </dependency>
             <dependency>
-                <groupId>io.kronikol</groupId>
+                <groupId>io.github.lemonlion</groupId>
                 <artifactId>kronikol4j-jdbc</artifactId>
                 <version>${kronikol4j.version}</version>
             </dependency>
             <dependency>
-                <groupId>io.kronikol</groupId>
+                <groupId>io.github.lemonlion</groupId>
                 <artifactId>kronikol4j-mongodb</artifactId>
                 <version>${kronikol4j.version}</version>
             </dependency>
             <dependency>
-                <groupId>io.kronikol</groupId>
+                <groupId>io.github.lemonlion</groupId>
                 <artifactId>kronikol4j-gcp</artifactId>
                 <version>${kronikol4j.version}</version>
             </dependency>
@@ -270,7 +270,7 @@
 
             <!-- Kronikol4J CLI — used by the merge step that builds TestRunReport.html from fragments -->
             <dependency>
-                <groupId>io.kronikol</groupId>
+                <groupId>io.github.lemonlion</groupId>
                 <artifactId>kronikol4j-cli</artifactId>
                 <version>${kronikol4j.version}</version>
             </dependency>

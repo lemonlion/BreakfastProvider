@@ -43,13 +43,13 @@
 
         <!-- Kronikol4J: JUnit 5 adapter (identity scoping + report finalization). -->
         <dependency>
-            <groupId>io.kronikol</groupId>
+            <groupId>io.github.lemonlion</groupId>
             <artifactId>kronikol4j-junit5</artifactId>
             <scope>test</scope>
         </dependency>
         <!-- Kronikol4J CLI (+ transitive report/diagram/jackson) for the merge step. -->
         <dependency>
-            <groupId>io.kronikol</groupId>
+            <groupId>io.github.lemonlion</groupId>
             <artifactId>kronikol4j-cli</artifactId>
             <scope>test</scope>
         </dependency>
@@ -105,10 +105,10 @@
                                 <!-- Scope to the CLI's own dependency tree so the forked java command line
                                      stays under the Windows length limit (the full test classpath is huge). -->
                                 <classpath>
-                                    <dependency>io.kronikol:kronikol4j-cli</dependency>
-                                    <dependency>io.kronikol:kronikol4j-report</dependency>
-                                    <dependency>io.kronikol:kronikol4j-diagram</dependency>
-                                    <dependency>io.kronikol:kronikol4j-core</dependency>
+                                    <dependency>io.github.lemonlion:kronikol4j-cli</dependency>
+                                    <dependency>io.github.lemonlion:kronikol4j-report</dependency>
+                                    <dependency>io.github.lemonlion:kronikol4j-diagram</dependency>
+                                    <dependency>io.github.lemonlion:kronikol4j-core</dependency>
                                 </classpath>
                                 <argument>io.kronikol.cli.Main</argument>
                                 <argument>merge</argument>

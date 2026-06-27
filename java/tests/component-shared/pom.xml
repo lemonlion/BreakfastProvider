@@ -65,7 +65,7 @@
 
         <!-- Kronikol4J: identity headers/scope so the test client attributes the SUT's interactions. -->
         <dependency>
-            <groupId>io.kronikol</groupId>
+            <groupId>io.github.lemonlion</groupId>
             <artifactId>kronikol4j-core</artifactId>
         </dependency>
 
@@ -87,7 +87,7 @@
             <artifactId>protobuf-java</artifactId>
         </dependency>
         <dependency>
-            <groupId>io.kronikol</groupId>
+            <groupId>io.github.lemonlion</groupId>
             <artifactId>kronikol4j-grpc</artifactId>
         </dependency>
     </dependencies>

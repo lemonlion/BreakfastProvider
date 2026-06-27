@@ -51,17 +51,17 @@
         <!-- Kronikol4J: Spock global extension (identity scoping) + the JUnit Platform listener that
              finalizes the report fragment at session close (Spock runs on the JUnit Platform) + CLI. -->
         <dependency>
-            <groupId>io.kronikol</groupId>
+            <groupId>io.github.lemonlion</groupId>
             <artifactId>kronikol4j-spock</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>io.kronikol</groupId>
+            <groupId>io.github.lemonlion</groupId>
             <artifactId>kronikol4j-junit5</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>io.kronikol</groupId>
+            <groupId>io.github.lemonlion</groupId>
             <artifactId>kronikol4j-cli</artifactId>
             <scope>test</scope>
         </dependency>
@@ -134,10 +134,10 @@
                                 <!-- Scope to the CLI's own dependency tree so the forked java command line
                                      stays under the Windows length limit (the full test classpath is huge). -->
                                 <classpath>
-                                    <dependency>io.kronikol:kronikol4j-cli</dependency>
-                                    <dependency>io.kronikol:kronikol4j-report</dependency>
-                                    <dependency>io.kronikol:kronikol4j-diagram</dependency>
-                                    <dependency>io.kronikol:kronikol4j-core</dependency>
+                                    <dependency>io.github.lemonlion:kronikol4j-cli</dependency>
+                                    <dependency>io.github.lemonlion:kronikol4j-report</dependency>
+                                    <dependency>io.github.lemonlion:kronikol4j-diagram</dependency>
+                                    <dependency>io.github.lemonlion:kronikol4j-core</dependency>
                                 </classpath>
                                 <argument>io.kronikol.cli.Main</argument>
                                 <argument>merge</argument>

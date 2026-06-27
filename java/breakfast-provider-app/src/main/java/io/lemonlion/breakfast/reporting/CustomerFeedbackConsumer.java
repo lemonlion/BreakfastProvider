@@ -10,6 +10,7 @@ import io.lemonlion.breakfast.model.event.CustomerFeedbackReceivedEvent;
 import io.lemonlion.breakfast.persistence.pubsub.PubSubSupport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.SmartLifecycle;
 import org.springframework.stereotype.Component;
 
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Component;
  * {@code CustomerFeedbackReceivedEvent} messages and hands them to {@link CustomerFeedbackAlertService}.
  */
 @Component
+@ConditionalOnProperty(name = "breakfast.background-consumers.enabled", matchIfMissing = true)
 public class CustomerFeedbackConsumer implements SmartLifecycle {
 
     private static final Logger log = LoggerFactory.getLogger(CustomerFeedbackConsumer.class);

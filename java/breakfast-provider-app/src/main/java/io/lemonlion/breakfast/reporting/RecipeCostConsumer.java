@@ -4,11 +4,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.lemonlion.breakfast.model.event.RecipeCostCalculatedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
 /** Twin of C# {@code KafkaRecipeCostConsumerService}: consumes recipe-cost events from Kafka. */
 @Component
+@ConditionalOnProperty(name = "breakfast.background-consumers.enabled", matchIfMissing = true)
 public class RecipeCostConsumer {
 
     /** The Kafka topic carrying {@code RecipeCostCalculatedEvent} messages. */

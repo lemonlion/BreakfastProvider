@@ -10,6 +10,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Component;
  * messages to their destination, retrying up to {@code maxRetryCount} before marking them failed.
  */
 @Component
+@ConditionalOnProperty(name = "breakfast.background-consumers.enabled", matchIfMissing = true)
 public class OutboxProcessor {
 
     private static final Logger log = LoggerFactory.getLogger(OutboxProcessor.class);

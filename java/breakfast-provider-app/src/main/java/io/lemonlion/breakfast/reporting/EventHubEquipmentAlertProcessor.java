@@ -12,6 +12,7 @@ import io.lemonlion.breakfast.config.EventHubConfig;
 import io.lemonlion.breakfast.model.event.EquipmentAlertEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.SmartLifecycle;
 import org.springframework.stereotype.Component;
 
@@ -22,6 +23,7 @@ import org.springframework.stereotype.Component;
  * connection string is configured.
  */
 @Component
+@ConditionalOnProperty(name = "breakfast.background-consumers.enabled", matchIfMissing = true)
 public class EventHubEquipmentAlertProcessor implements SmartLifecycle {
 
     private static final Logger log = LoggerFactory.getLogger(EventHubEquipmentAlertProcessor.class);

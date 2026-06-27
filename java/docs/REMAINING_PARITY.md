@@ -34,30 +34,29 @@ All Reporting event-ingestion channels are implemented and verified end-to-end i
 `mcr.microsoft.com/azure-messaging/eventhubs-emulator` + Azurite, Testcontainers), and `recipeReports` +
 `ingredientUsage` (recipe-log Kafka consumer → reporting projection).
 
-## Single residual — `Order_Summaries_Should_Return_An_Empty_List_When_No_Orders_Exist`
+## `Order_Summaries_Should_Return_An_Empty_List_When_No_Orders_Exist` — now a full component test
 
-This is the only C# scenario not reproduced as a local component test. It asserts the `orderSummaries`
-GraphQL query returns an **empty** list when no orders exist.
+This C# scenario asserts the `orderSummaries` GraphQL query returns an **empty** list when no orders exist.
+It can't share the docker suite's reporting store (the shared MSSQL Testcontainer accumulates orders across
+the whole JVM, so `order_summaries` is never empty mid-suite). It is now reproduced as a real component
+test in **all four frameworks** via an isolated store:
 
-**Why it can't run in the shared docker suite:** the reporting store is the shared MSSQL Testcontainer,
-and every framework module creates orders across its scenarios in one JVM, so `order_summaries` is never
-empty when the test would run. Emptiness can't be asserted without isolating or truncating the store,
-which would corrupt the other scenarios' data.
+- `EmptyReportingBackendsInitializer` runs the normal `BackendsInitializer` then overrides only the
+  relational datasource to a fresh in-memory **H2** (`jdbc:h2:mem:empty-reporting`, `ddl-auto=create-drop`)
+  and sets `breakfast.background-consumers.enabled=false`. The context creates no orders, so the query
+  genuinely returns `[]`.
+- The `breakfast.background-consumers.enabled` flag (prod-default ON via `matchIfMissing=true`) gates the
+  six background consumers (BatchCompletion/CustomerFeedback/EventHub processor + the two Kafka listeners +
+  OutboxProcessor). The isolated query-only context turns them OFF so it doesn't join the shared Kafka
+  groups / Pub-Sub subscriptions / Event Hubs group and steal messages from the main context's reporting
+  tests.
+- Tests: `ReportingEmptyComponentTest` (JUnit5), `ReportingEmptyTestNgTest` (TestNG), `ReportingEmptySpec`
+  (Spock), and the isolated Cucumber suite `RunCucumberEmptyReportingTest` (glue + `features-emptyreporting`).
+  `ReportingResolverContractTest` (plain no-Spring) additionally pins the resolver's empty-collection
+  contract.
 
-**Locally verified now (contract):** `ReportingResolverContractTest` (component-junit5, plain no-Spring
-test) constructs `ReportingGraphQlController` with an empty `OrderSummaryRepository` and asserts
-`orderSummaries()` returns an empty (non-null) list — the exact contract the C# scenario asserts, minus the
-GraphQL HTTP transport. So the behaviour is auto-verified locally; only the end-to-end-through-GraphQL form
-remains environment-constrained.
-
-**Full-transport verification plan (pick one):**
-- **Isolated context:** a dedicated `@SpringBootTest` context with its own empty reporting schema (a
-  per-test H2 datasource, or `@Sql` truncation of `order_summaries` in a `@DirtiesContext` context) that
-  creates no orders, then asserts `{ orderSummaries }` is `[]`. Not adopted here because it would add a
-  heavyweight isolated-DB Spring context per framework, regressing the context-count consolidation that
-  removed the Cosmos-pressure flakiness.
-- **external-sut lane:** against a freshly-provisioned reporting database (empty at start), assert the
-  query returns `[]` before any order is created.
+**Reporting is therefore 8/8 in every framework** — every C# domain now has Java scenario count ≥ C# in all
+four frameworks, with no residual scenario.
 
 ## Push-to-verify items (cannot run on this workstation)
 

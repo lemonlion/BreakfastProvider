@@ -5,6 +5,7 @@ import io.lemonlion.breakfast.events.kafka.KafkaRecipeLogger;
 import io.lemonlion.breakfast.model.event.RecipeLogEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Component;
  * {@code recipeReports} and {@code ingredientUsage} GraphQL queries.
  */
 @Component
+@ConditionalOnProperty(name = "breakfast.background-consumers.enabled", matchIfMissing = true)
 public class RecipeLogConsumer {
 
     private static final Logger log = LoggerFactory.getLogger(RecipeLogConsumer.class);

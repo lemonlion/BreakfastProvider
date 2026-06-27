@@ -33,6 +33,14 @@
             <artifactId>spring-boot-starter-test</artifactId>
         </dependency>
 
+        <!-- H2: an isolated, empty relational store for the order-summaries-empty reporting scenario
+             (EmptyReportingBackendsInitializer points the SUT's datasource at a fresh in-memory H2). -->
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+
         <!-- Testcontainers backends. -->
         <dependency>
             <groupId>org.testcontainers</groupId>

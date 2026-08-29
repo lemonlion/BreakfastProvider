@@ -48,8 +48,8 @@
     <PackageReference Include="NSubstitute" Version="5.3.0" />
     <PackageReference Include="AutoFixture" Version="4.18.1" />
     <PackageReference Include="Spanner.InMemoryEmulator" Version="1.0.20" />
-    <PackageReference Include="Kronikol.LightBDD.xUnit3" Version="3.0.63" />
-    <PackageReference Include="Kronikol.AssertionTracking" Version="3.0.63" />
+    <PackageReference Include="Kronikol.LightBDD.xUnit3" Version="3.0.64" />
+    <PackageReference Include="Kronikol.AssertionTracking" Version="3.0.64" />
     <PackageReference Include="xunit.v3" Version="3.2.2" />
     <PackageReference Include="coverlet.msbuild" Version="6.0.4">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

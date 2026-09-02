@@ -13,6 +13,9 @@ using BreakfastProvider.Tests.Component.Shared.Common.AppleCinnamonMuffins;
 using BreakfastProvider.Tests.Component.Shared.Common.Pancakes;
 using BreakfastProvider.Tests.Component.Shared.Common.CustomerFeedback;
 using BreakfastProvider.Tests.Component.Shared.Common.RecipeCosts;
+using BreakfastProvider.Tests.Component.Shared.Common.OrderTimings;
+using BreakfastProvider.Tests.Component.Shared.Common.EquipmentReadings;
+using BreakfastProvider.Tests.Component.Shared.Common.ServiceTimes;
 using BreakfastProvider.Tests.Component.Shared.Common.RecipeReviews;
 using BreakfastProvider.Tests.Component.Shared.Common.IngredientWaste;
 using BreakfastProvider.Tests.Component.Shared.Common.ChefNotes;
@@ -95,6 +98,12 @@ public class DependencyInjectionSetup
         services.AddScoped<PatchChefNoteSteps>();
         services.AddScoped<PublishCustomerFeedbackEventSteps>();
         services.AddScoped<PublishRecipeCostEventSteps>();
+        services.AddScoped<PostOrderTimingSteps>();
+        services.AddScoped<GetOrderTimingSteps>();
+        services.AddScoped<PostEquipmentReadingSteps>();
+        services.AddScoped<GetEquipmentReadingSteps>();
+        services.AddScoped<DeleteEquipmentReadingSteps>();
+        services.AddScoped<PublishOrderServedEventSteps>();
         services.AddSingleton(AppManager.ConsumedKafkaMessageStore);
         services.AddSingleton(AppManager.ConsumedPubSubMessageStore);
 

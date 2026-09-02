@@ -30,6 +30,8 @@ public static class Endpoints
     public const string ChefNotes = "chef-notes";
     public const string CustomerFeedback = "customer-feedback";
     public const string RecipeCosts = "recipe-costs";
+    public const string OrderTimings = "order-timings";
+    public const string EquipmentReadings = "equipment-readings";
     public const string EventGridWebhook = "webhooks/eventgrid";
 
     public static class Swagger

@@ -40,6 +40,8 @@ services:
         condition: service_healthy
       bigquery-init:
         condition: service_completed_successfully
+      clickhouse:
+        condition: service_healthy
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - Kestrel__Endpoints__Http__Url=http://+:8080
@@ -63,12 +65,18 @@ services:
       - KafkaConfig__ProducerConfigurations__RecipeCostCalculatedEvent__TopicName=breakfast_recipe_costs
       - KafkaConfig__ProducerConfigurations__RecipeCostCalculatedEvent__ApiKey=kafka-user
       - KafkaConfig__ProducerConfigurations__RecipeCostCalculatedEvent__ApiSecret=kafka-user-secret
+      - KafkaConfig__ProducerConfigurations__OrderServedEvent__TopicName=breakfast_orders_served
+      - KafkaConfig__ProducerConfigurations__OrderServedEvent__ApiKey=kafka-user
+      - KafkaConfig__ProducerConfigurations__OrderServedEvent__ApiSecret=kafka-user-secret
       - KafkaConfig__ConsumerConfigurations__RecipeLogEvent__TopicName=breakfast_recipe_logs
       - KafkaConfig__ConsumerConfigurations__RecipeLogEvent__ApiKey=kafka-user
       - KafkaConfig__ConsumerConfigurations__RecipeLogEvent__ApiSecret=kafka-user-secret
       - KafkaConfig__ConsumerConfigurations__RecipeCostCalculatedEvent__TopicName=breakfast_recipe_costs
       - KafkaConfig__ConsumerConfigurations__RecipeCostCalculatedEvent__ApiKey=kafka-user
       - KafkaConfig__ConsumerConfigurations__RecipeCostCalculatedEvent__ApiSecret=kafka-user-secret
+      - KafkaConfig__ConsumerConfigurations__OrderServedEvent__TopicName=breakfast_orders_served
+      - KafkaConfig__ConsumerConfigurations__OrderServedEvent__ApiKey=kafka-user
+      - KafkaConfig__ConsumerConfigurations__OrderServedEvent__ApiSecret=kafka-user-secret
       - KafkaConfig__SslCaLocation=/certs/kafka-ca.crt
       - FeatureSwitchesConfig__IsGoatMilkEnabled=true
       - ReportingConfig__ConnectionString=Server=sqlserver-database.local,1433;Database=BreakfastReporting;User Id=sa;Password=YourStr0ngP@ssword;TrustServerCertificate=True
@@ -94,6 +102,7 @@ services:
       - BigQueryConfig__ProjectId=breakfast-provider-project
       - BigQueryConfig__DatasetId=breakfast_analytics
       - BigQueryConfig__EmulatorEndpoint=http://bigquery-emulator.local:9050/bigquery/v2/
+      - ClickHouseConfig__ConnectionString=Host=clickhouse.local;Port=8123;Database=kitchen_analytics
     volumes:
       - ./kafka-config/certificates/ca.crt:/certs/kafka-ca.crt:ro
       - ./docker-entrypoint.sh:/app/docker-entrypoint.sh:ro

@@ -16,6 +16,8 @@
     <Content Include="appsettings.componenttests.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <!-- The same DDL that seeds the ClickHouse Docker container: one source of truth for the schema. -->
+    <Content Include="..\..\docker\clickhouse\init\001-kitchen-analytics.sql" Link="Fakes\ClickHouse\001-kitchen-analytics.sql" CopyToOutputDirectory="Always" />
   </ItemGroup>
 
   <ItemGroup>
@@ -37,6 +39,8 @@
     <PackageReference Include="Kronikol.Extensions.Spanner" Version="3.0.72" />
     <PackageReference Include="Kronikol.Extensions.MongoDB" Version="3.0.72" />
     <PackageReference Include="Kronikol.Extensions.BigQuery" Version="3.0.72" />
+    <PackageReference Include="Kronikol.Extensions.ClickHouse" Version="3.0.72" />
+    <PackageReference Include="ClickHouse.Client" Version="7.14.0" />
     <PackageReference Include="Spanner.InMemoryEmulator" Version="1.0.20" />
     <PackageReference Include="InMemoryEmulator.MongoDB" Version="1.1.1" />
     <PackageReference Include="InMemoryEmulator.BigQuery" Version="1.0.104" />
@@ -45,6 +49,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\BreakfastProvider.Api\BreakfastProvider.Api.csproj" />
+    <ProjectReference Include="..\InMemoryEmulator.ClickHouse\InMemoryEmulator.ClickHouse.csproj" />
     <ProjectReference Include="..\..\fakes\Dependencies.Fakes.CowService\Dependencies.Fakes.CowService.csproj" />
     <ProjectReference Include="..\..\fakes\Dependencies.Fakes.GoatService\Dependencies.Fakes.GoatService.csproj" />
     <ProjectReference Include="..\..\fakes\Dependencies.Fakes.SupplierService\Dependencies.Fakes.SupplierService.csproj" />

@@ -19,6 +19,9 @@ using BreakfastProvider.Tests.Component.Shared.Common.AppleCinnamonMuffins;
 using BreakfastProvider.Tests.Component.Shared.Common.Pancakes;
 using BreakfastProvider.Tests.Component.Shared.Common.CustomerFeedback;
 using BreakfastProvider.Tests.Component.Shared.Common.RecipeCosts;
+using BreakfastProvider.Tests.Component.Shared.Common.OrderTimings;
+using BreakfastProvider.Tests.Component.Shared.Common.EquipmentReadings;
+using BreakfastProvider.Tests.Component.Shared.Common.ServiceTimes;
 using BreakfastProvider.Tests.Component.Shared.Common.RecipeReviews;
 using BreakfastProvider.Tests.Component.Shared.Common.IngredientWaste;
 using BreakfastProvider.Tests.Component.Shared.Common.ChefNotes;
@@ -154,6 +157,12 @@ public abstract class BaseFixture : DiagrammedComponentTest, IDisposable
         services.AddTransient<PatchChefNoteSteps>();
         services.AddTransient<PublishCustomerFeedbackEventSteps>();
         services.AddTransient<PublishRecipeCostEventSteps>();
+        services.AddTransient<PostOrderTimingSteps>();
+        services.AddTransient<GetOrderTimingSteps>();
+        services.AddTransient<PostEquipmentReadingSteps>();
+        services.AddTransient<GetEquipmentReadingSteps>();
+        services.AddTransient<DeleteEquipmentReadingSteps>();
+        services.AddTransient<PublishOrderServedEventSteps>();
         services.AddTransient<GrpcBreakfastSteps>();
         services.AddSingleton(ConsumedKafkaMessageStore);
         services.AddSingleton(ConsumedPubSubMessageStore);
@@ -409,6 +418,20 @@ public abstract class BaseFixture : DiagrammedComponentTest, IDisposable
         {
             services.UseTrackedBigQueryClient(CurrentTestInfo.Fetcher);
         }
+
+        if (Settings.RunWithAnInMemoryClickHouse)
+        {
+            services.UseInMemoryClickHouse(CurrentTestInfo.Fetcher);
+            services.ReplaceClickHouseHealthCheckWithNoOp();
+        }
+        else
+        {
+            services.UseTrackedClickHouse(CurrentTestInfo.Fetcher);
+        }
+
+        // As with the recipe-cost consumer: event tests publish straight into ConsumedKafkaMessageStore,
+        // so the in-memory order-served consumer is needed in every lane, including Docker.
+        services.UseInMemoryOrderServedKafkaConsumer();
 
         // Always replace the real recipe cost Kafka consumer and customer feedback
         // Pub/Sub consumer with in-memory variants. Event-driven tests publish directly

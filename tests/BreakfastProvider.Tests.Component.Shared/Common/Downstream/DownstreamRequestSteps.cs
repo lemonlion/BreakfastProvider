@@ -33,6 +33,13 @@ public class DownstreamRequestSteps(FakeRequestStore fakeRequestStore, RequestCo
             && r.Method == HttpMethod.Post);
     }
 
+    public void AssertKitchenServiceReceivedStatusRequest(Guid orderId)
+    {
+        var requests = fakeRequestStore.GetRequests(context.RequestId, ServiceNames.KitchenService);
+        requests.Should().Contain(r => r.RequestUri!.AbsolutePath == $"/status/{orderId}"
+            && r.Method == HttpMethod.Get);
+    }
+
     public void AssertSupplierServiceReceivedFeedbackRequest()
     {
         var requests = fakeRequestStore.GetRequests(context.RequestId, ServiceNames.SupplierService);

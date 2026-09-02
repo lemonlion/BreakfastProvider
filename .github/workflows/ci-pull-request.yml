@@ -532,7 +532,34 @@ jobs:
       - bddfy-in-memory
       - bddfy-in-docker
       - bddfy-external-sut
+      - unit-tests
+      - unit-tests-in-docker
     runs-on: ubuntu-24.04
     steps:
       - name: Checks complete
         run: echo "Checks complete"
+
+  # ─── Unit (emulator + conformance) ──────────────────────────────────────────
+
+  unit-tests:
+    name: Unit tests
+    uses: ./.github/workflows/_tests.yml
+    with:
+      test-type: unit
+      test-run-type: memory
+      test-run-description: unit-tests
+      csproj-path: ./tests/BreakfastProvider.Tests.Unit/BreakfastProvider.Tests.Unit.csproj
+    secrets: inherit
+
+  unit-tests-in-docker:
+    # Runs the ClickHouse conformance suite against the real container as well as the emulator
+    # (the docker lane exports CLICKHOUSE_CONFORMANCE_CONNECTION_STRING).
+    name: Unit tests in docker
+    uses: ./.github/workflows/_tests.yml
+    with:
+      test-type: unit
+      test-run-type: docker
+      test-run-description: unit-tests-in-docker
+      csproj-path: ./tests/BreakfastProvider.Tests.Unit/BreakfastProvider.Tests.Unit.csproj
+    secrets: inherit
+

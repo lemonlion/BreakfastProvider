@@ -19,4 +19,5 @@ public static class HealthCheckNames
     public const string Kafka = SrcHealthCheckNames.Kafka;
     public const string PubSub = SrcHealthCheckNames.PubSub;
     public const string Spanner = SrcHealthCheckNames.Spanner;
+    public const string ClickHouse = SrcHealthCheckNames.ClickHouse;
 }

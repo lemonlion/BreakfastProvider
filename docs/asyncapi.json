@@ -13,6 +13,15 @@
     }
   },
   "channels": {
+    "breakfast_orders_served": {
+      "address": "breakfast_orders_served",
+      "messages": {
+        "orderServedMessage": {
+          "$ref": "#/components/messages/orderServedMessage"
+        }
+      },
+      "description": "Consumed when an order is served to a customer."
+    },
     "breakfast_recipe_costs": {
       "address": "breakfast_recipe_costs",
       "messages": {
@@ -159,6 +168,20 @@
     }
   },
   "operations": {
+    "OrderServed": {
+      "action": "send",
+      "channel": {
+        "$ref": "#/channels/breakfast_orders_served"
+      },
+      "title": "OrderServed",
+      "summary": "Order Served",
+      "description": "Consumed when an order is served to a customer.",
+      "messages": [
+        {
+          "$ref": "#/channels/breakfast_orders_served/messages/orderServedMessage"
+        }
+      ]
+    },
     "RecipeCostCalculated": {
       "action": "send",
       "channel": {
@@ -667,6 +690,36 @@
         },
         "additionalProperties": false
       },
+      "orderServedEvent": {
+        "type": "object",
+        "description": "Consumed when an order is served to a customer.",
+        "properties": {
+          "serviceId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Unique service identifier."
+          },
+          "orderId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Identifier of the order that was served."
+          },
+          "itemType": {
+            "type": "string",
+            "description": "Type of item served (e.g. Pancakes, Waffles)."
+          },
+          "waitSeconds": {
+            "type": "number",
+            "description": "Seconds the customer waited between ordering and being served."
+          },
+          "servedAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp when the order was served (ISO 8601 format)."
+          }
+        },
+        "additionalProperties": false
+      },
       "pancakeBatchCompletedEvent": {
         "type": "object",
         "description": "Published when a pancake batch is completed.",
@@ -908,6 +961,17 @@
       }
     },
     "messages": {
+      "orderServedMessage": {
+        "headers": {
+          "$ref": "#/components/schemas/messageHeaders"
+        },
+        "payload": {
+          "$ref": "#/components/schemas/orderServedEvent"
+        },
+        "name": "orderServedMessage",
+        "title": "Order Served Message",
+        "summary": "Consumed when an order is served to a customer."
+      },
       "recipeCostCalculatedMessage": {
         "headers": {
           "$ref": "#/components/schemas/messageHeaders"

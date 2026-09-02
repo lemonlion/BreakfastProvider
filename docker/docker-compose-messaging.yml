@@ -105,6 +105,7 @@ services:
         # Create Kafka topics (--if-not-exists avoids errors on restart)
         /opt/bitnami/kafka/bin/kafka-topics.sh --create --if-not-exists --bootstrap-server kafka.local:9092 --replication-factor 1 --partitions 1 --topic breakfast_recipe_logs --command-config /opt/bitnami/kafka/config/client.properties;
         /opt/bitnami/kafka/bin/kafka-topics.sh --create --if-not-exists --bootstrap-server kafka.local:9092 --replication-factor 1 --partitions 1 --topic breakfast_recipe_costs --command-config /opt/bitnami/kafka/config/client.properties;
+        /opt/bitnami/kafka/bin/kafka-topics.sh --create --if-not-exists --bootstrap-server kafka.local:9092 --replication-factor 1 --partitions 1 --topic breakfast_orders_served --command-config /opt/bitnami/kafka/config/client.properties;
         /opt/bitnami/kafka/bin/kafka-topics.sh --create --if-not-exists --bootstrap-server kafka.local:9092 --replication-factor 1 --partitions 1 --topic breakfast_menu_updates --command-config /opt/bitnami/kafka/config/client.properties;
         # Wait for Kafka server process to exit
         wait $KAFKA_PID

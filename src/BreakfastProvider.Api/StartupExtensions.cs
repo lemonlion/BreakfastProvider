@@ -1,12 +1,14 @@
 using Azure.Messaging.EventHubs.Producer;
 using BreakfastProvider.Api.Configuration;
 using BreakfastProvider.Api.Data;
+using BreakfastProvider.Api.Data.ClickHouse;
 using BreakfastProvider.Api.Data.Spanner;
 using BreakfastProvider.Api.Events;
 using BreakfastProvider.Api.Filters;
 using BreakfastProvider.Api.Models.Events;
 using BreakfastProvider.Api.Reporting;
 using BreakfastProvider.Api.Services;
+using BreakfastProvider.Api.Services.HealthChecks;
 using BreakfastProvider.Api.Validators;
 using Bielu.AspNetCore.AsyncApi.Extensions;
 using ByteBard.AsyncAPI;
@@ -299,6 +301,34 @@ public static class StartupExtensions
 
         return services;
     }
+
+    public static IServiceCollection AddClickHouse(this IServiceCollection services, IConfiguration configuration)
+    {
+        var clickHouseConfig = configuration.GetSection(nameof(ClickHouseConfig)).Get<ClickHouseConfig>()
+            ?? new ClickHouseConfig();
+
+        services.AddOptions<ClickHouseConfig>()
+            .Bind(configuration.GetSection(nameof(ClickHouseConfig)));
+
+        if (string.IsNullOrWhiteSpace(clickHouseConfig.ConnectionString))
+        {
+            // ClickHouse disabled — any service call fails fast with a clear message and
+            // the health check falls back to "not configured".
+            services.AddSingleton<IClickHouseConnectionFactory>(new NoOpClickHouseConnectionFactory());
+        }
+        else
+        {
+            services.AddSingleton<IClickHouseConnectionFactory>(new ClickHouseConnectionFactory(clickHouseConfig.ConnectionString));
+            services.AddSingleton<ClickHouseHealthCheck>();
+        }
+
+        services.AddScoped<IOrderTimingService, OrderTimingService>();
+        services.AddScoped<IEquipmentReadingService, EquipmentReadingService>();
+        services.AddScoped<IServiceTimeAnalysisService, ServiceTimeAnalysisService>();
+        services.AddHostedService<KafkaOrderServedConsumerService>();
+
+        return services;
+    }
 }
 
 public static class Documentation
@@ -320,5 +350,6 @@ public static class Documentation
         public const string NotificationService = "Notification Service (gRPC)";
         public const string MongoDB = "MongoDB";
         public const string BigQuery = "BigQuery";
+        public const string ClickHouse = "ClickHouse";
     }
 }

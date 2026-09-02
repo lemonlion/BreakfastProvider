@@ -1,3 +1,6 @@
 # Docs files are generated with LF by SourceControlledDocsHelper - keep them LF
 docs/*.json eol=lf
 docs/*.yml eol=lf
+
+# ClickHouse init DDL is fed to the container's clickhouse-client - keep it LF on every checkout
+docker/clickhouse/init/*.sql text eol=lf

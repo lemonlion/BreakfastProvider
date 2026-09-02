@@ -34,6 +34,7 @@ Tests run in **four modes**, controlled by `ComponentTestSettings` flags:
 | EventGrid | `InMemoryFakeEventGridPublisher` | EventGrid simulator → Azurite storage queue | EventGrid simulator → Azurite storage queue | Production EventGrid (no access) |
 | Kafka | `TrackedKafkaProducer` (in-memory) | Docker Kafka broker (`:9092`) | Docker Kafka broker (`:9092`) | Production Kafka (no access) |
 | Database | In-memory fake | Cosmos DB emulator | Cosmos DB emulator | Production database (no direct access) |
+| ClickHouse | `InMemoryEmulator.ClickHouse` (DuckDB-backed, shared via `SharedInMemoryClickHouse.Server`) | ClickHouse container (`:8123`) | ClickHouse container (`:8123`) | Production ClickHouse (no access) |
 | API | In-process `WebApplicationFactory` | In-process `WebApplicationFactory` | Docker container (`:5080`) | Deployed service |
 | Downstream request inspection | `FakeRequestStore` | `FakeRequestStore` | Unavailable | Unavailable |
 | Config overrides | `delayAppCreation` pattern | `delayAppCreation` pattern | Not possible | Not possible |
@@ -47,6 +48,9 @@ Tests run in **four modes**, controlled by `ComponentTestSettings` flags:
 | `RunWithAnInMemoryGoatService` | `true` | `false` |
 | `RunWithAnInMemorySupplierService` | `true` | `false` |
 | `RunWithAnInMemoryKitchenService` | `true` | `false` |
+| `RunWithAnInMemoryClickHouse` | `true` | `false` |
+
+`RunWithAnInMemoryClickHouse` selects `UseInMemoryClickHouse` (the process-wide `SharedInMemoryClickHouse.Server`, seeded from `docker/clickhouse/init/001-kitchen-analytics.sql`, plus `ReplaceClickHouseHealthCheckWithNoOp`) or `UseTrackedClickHouse` (the real container via `ClickHouseConfig.ConnectionString`). Both wrap the connection with `Kronikol.Extensions.ClickHouse` so ClickHouse statements appear in diagrams. The ClickHouse endpoints are `Endpoints.OrderTimings` and `Endpoints.EquipmentReadings`; the Kafka-driven flow uses `PublishOrderServedEventSteps`.
 
 Additional URL settings:
 
@@ -678,11 +682,13 @@ The API implements ASP.NET Core health checks with custom `IHealthCheck` impleme
 | KitchenService | Downstream API | `downstream`, `api` | Degraded | `DownstreamServiceHealthCheck` |
 | CosmosDb | Infrastructure | `infrastructure`, `database` | Unhealthy | `CosmosDbHealthCheck` (or `NoOpHealthCheck` in-memory) |
 | Kafka | Infrastructure | `infrastructure`, `messaging` | Unhealthy | `KafkaHealthCheck` (or `NoOpHealthCheck` in-memory) |
+| ClickHouse | Infrastructure | `infrastructure`, `database` | Unhealthy | `ClickHouseHealthCheck` (`SELECT 1`; registered whenever `ClickHouseConfig.ConnectionString` is set — or `NoOpHealthCheck` in-memory) |
 
 ### In-Memory Mode Handling
 
 - **CosmosDb**: When `RunWithAnInMemoryDatabase` is `true`, `UseInMemoryDatabase()` removes `CosmosClient` from DI. The production health check factory would report **Unhealthy** ("CosmosDb not configured."). `ReplaceCosmosDbHealthCheckWithNoOp()` is called in `ConfigureTestServices` to replace it with a `NoOpHealthCheck` that reports Healthy.
 - **Kafka**: When `RunWithAnInMemoryKafkaBroker` is `true`, `ReplaceKafkaHealthCheckWithNoOp()` is called in `ConfigureTestServices` to replace the real Kafka check with `NoOpHealthCheck`.
+- **ClickHouse**: When `RunWithAnInMemoryClickHouse` is `true`, `ReplaceClickHouseHealthCheckWithNoOp()` replaces the real check. In Docker mode the real `ClickHouseHealthCheck` runs through the tracked connection, so health-check scenarios gain a `SELECT 1` ClickHouse arrow in their diagrams — that is correct, not a leak.
 - **Downstream services**: All 4 fake services expose `GET /health` endpoints, so downstream health checks pass in both in-memory and Docker modes.
 
 ### JSON Response Format

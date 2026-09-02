@@ -18,6 +18,7 @@ This is the **Breakfast Provider** platform service, owned by **Team Griddle**. 
 - **Bielu.AspNetCore.AsyncApi** (backed by **ByteBard.AsyncAPI.NET**) for AsyncAPI documentation
 - **HotChocolate** for GraphQL reporting endpoints (business intelligence queries)
 - **Entity Framework Core** with SQL Server (Docker/production) and SQLite (in-memory tests) for the reporting database
+- **ClickHouse** (`ClickHouse.Client` over HTTP, ADO.NET abstractions only in services) for kitchen analytics (`/order-timings`, `/equipment-readings`, and the `OrderServedEvent` Kafka flow); `tests/InMemoryEmulator.ClickHouse` is a DuckDB-backed in-process emulator for in-memory tests, tracked by `Kronikol.Extensions.ClickHouse`
 
 ## Architecture
 
@@ -57,6 +58,7 @@ Feature areas are organised by endpoint concern (e.g. `Pancakes/`, `Waffles/`, `
 ### Configuration
 
 - **Cosmos DB** for storage (orders, recipes, audit logs, outbox messages); transactional outbox uses `TransactionalBatch` for atomic writes
+- **ClickHouse** via `ClickHouseConfig.ConnectionString` (`Host=localhost;Port=8123;Database=kitchen_analytics`); empty disables it (`NoOpClickHouseConnectionFactory`). Services take `IClickHouseConnectionFactory` and code against `DbConnection`/`DbCommand`/`DbDataReader` only, with `{name:Type}` parameters, `Float64` numbers, UTC `DateTime`s and lightweight `DELETE FROM`
 - Strongly-typed options via `IOptions<T>` / `IOptionsMonitor<T>`
 - Feature-specific config classes use `{Feature}Config` suffix (e.g. `PancakeConfig`, `OrderConfig`, `ToppingConfig`)
 - `BaseConfig` base class for external service configs (`BaseAddress`)
@@ -145,7 +147,7 @@ Comprehensive testing conventions, patterns, and infrastructure are documented i
 - **Health checks** conform to ASP.NET Core health check standards with custom JSON response writer:
   - Endpoint: `GET /health` returns JSON with overall status and per-dependency entries
   - Downstream service checks: Cow, Goat, Supplier, Kitchen (tagged `downstream`, `api`; failure → `Degraded`)
-  - Infrastructure checks: Cosmos DB (tagged `infrastructure`, `database`), Kafka (tagged `infrastructure`, `messaging`)
+  - Infrastructure checks: Cosmos DB (tagged `infrastructure`, `database`), Kafka (tagged `infrastructure`, `messaging`), ClickHouse (`SELECT 1`, tagged `infrastructure`, `database`; replaced with a no-op via `ReplaceClickHouseHealthCheckWithNoOp()` in in-memory mode)
   - Custom `IHealthCheck` implementations in `Services/HealthChecks/`
   - `NoOpHealthCheck` supports both `Healthy` (string description) and custom `HealthCheckResult` constructors; production code returns `Unhealthy` when a dependency is genuinely missing
   - Test infrastructure replaces CosmosDb health check with no-op via `ReplaceCosmosDbHealthCheckWithNoOp()` when `RunWithAnInMemoryDatabase` is true

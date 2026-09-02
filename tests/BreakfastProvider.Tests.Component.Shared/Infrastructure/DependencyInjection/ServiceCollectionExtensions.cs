@@ -1,4 +1,6 @@
+using System.Data.Common;
 using BreakfastProvider.Api.Data;
+using BreakfastProvider.Api.Data.ClickHouse;
 using BreakfastProvider.Api.Data.Spanner;
 using BreakfastProvider.Api.Reporting;
 using BreakfastProvider.Api.Services;
@@ -8,6 +10,7 @@ using BreakfastProvider.Api;
 using BreakfastProvider.Api.Events;
 using BreakfastProvider.Api.Events.Outbox;
 using BreakfastProvider.Api.Models.Events;
+using BreakfastProvider.Tests.Component.Shared.Fakes.ClickHouse;
 using BreakfastProvider.Tests.Component.Shared.Fakes.Cosmos;
 using BreakfastProvider.Tests.Component.Shared.Fakes.EventGrid;
 using BreakfastProvider.Tests.Component.Shared.Fakes.EventHub;
@@ -32,6 +35,7 @@ using Kronikol.Extensions.Grpc;
 using Kronikol.Extensions.Kafka;
 using Kronikol.Extensions.MongoDB;
 using Kronikol.Extensions.BigQuery;
+using Kronikol.Extensions.ClickHouse;
 using Kronikol.Extensions.Spanner;
 using Kronikol.Tracking;
 
@@ -1149,5 +1153,110 @@ public static class ServiceCollectionExtensions
             typeof(Fakes.EventHub.TrackedEventHubEventPublisher<>));
 
         return services;
+    }
+
+    private static ClickHouseTrackingOptions NewClickHouseTrackingOptions(Func<(string Name, string Id)> currentTestInfoFetcher) => new()
+    {
+        ServiceName = Documentation.ServiceNames.ClickHouse,
+        CallerName = Documentation.ServiceNames.BreakfastProvider,
+        Verbosity = Kronikol.Sql.SqlTrackingVerbosityLevel.Detailed,
+        LogParameters = true,
+        // The target property is Func<(string, string)?> (nullable tuple); there is no delegate
+        // variance for value types, so a bare assignment of the fetcher would not compile.
+        CurrentTestInfoFetcher = () => currentTestInfoFetcher()
+    };
+
+    /// <summary>
+    /// Replaces the real <see cref="IClickHouseConnectionFactory"/> with one that creates
+    /// <c>ClickHouse.Client</c> connections routed through the process-wide in-memory emulator
+    /// (<see cref="SharedInMemoryClickHouse"/>) and wrapped with Kronikol's
+    /// <c>TrackingClickHouseConnection</c>, so every ClickHouse statement appears in the diagrams.
+    /// The services only see a <see cref="DbConnection"/>, so nothing in <c>src</c> changes.
+    /// </summary>
+    public static IServiceCollection UseInMemoryClickHouse(this IServiceCollection services,
+        Func<(string Name, string Id)> currentTestInfoFetcher)
+    {
+        var options = NewClickHouseTrackingOptions(currentTestInfoFetcher);
+        var server = SharedInMemoryClickHouse.Server;
+
+        services.RemoveAll<IClickHouseConnectionFactory>();
+        services.AddSingleton<IClickHouseConnectionFactory>(sp =>
+        {
+            // Resolve IHttpContextAccessor from DI in both modes so that HTTP-driven flows are
+            // attributed by request header and event-driven flows fall back to TestIdentityScope.
+            options.HttpContextAccessor ??= sp.GetService<IHttpContextAccessor>() ?? new HttpContextAccessor();
+            return new TrackedClickHouseConnectionFactory(server.CreateConnection, options);
+        });
+
+        return services;
+    }
+
+    /// <summary>
+    /// Replaces the production <see cref="IClickHouseConnectionFactory"/> with a tracked version
+    /// that connects to the real ClickHouse (Docker) using the connection string from
+    /// <see cref="Api.Configuration.ClickHouseConfig"/> and wraps it with Kronikol tracking.
+    /// </summary>
+    public static IServiceCollection UseTrackedClickHouse(this IServiceCollection services,
+        Func<(string Name, string Id)> currentTestInfoFetcher)
+    {
+        var options = NewClickHouseTrackingOptions(currentTestInfoFetcher);
+
+        if (services.All(d => d.ServiceType != typeof(IClickHouseConnectionFactory)))
+            return services;
+
+        services.RemoveAll<IClickHouseConnectionFactory>();
+        services.AddSingleton<IClickHouseConnectionFactory>(sp =>
+        {
+            options.HttpContextAccessor ??= sp.GetService<IHttpContextAccessor>() ?? new HttpContextAccessor();
+            var config = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<Api.Configuration.ClickHouseConfig>>().Value;
+            return new TrackedClickHouseConnectionFactory(
+                () => new global::ClickHouse.Client.ADO.ClickHouseConnection(config.ConnectionString), options);
+        });
+
+        return services;
+    }
+
+    /// <summary>
+    /// Replaces the ClickHouse health check with a no-op that always returns Healthy.
+    /// Used in in-memory test mode where <c>UseInMemoryClickHouse()</c> replaces the real connection.
+    /// </summary>
+    public static IServiceCollection ReplaceClickHouseHealthCheckWithNoOp(this IServiceCollection services)
+    {
+        services.Configure<Microsoft.Extensions.Diagnostics.HealthChecks.HealthCheckServiceOptions>(options =>
+        {
+            var chReg = options.Registrations.FirstOrDefault(r => r.Name == Api.Services.HealthChecks.HealthCheckNames.ClickHouse);
+            if (chReg is not null)
+            {
+                options.Registrations.Remove(chReg);
+                options.Registrations.Add(new Microsoft.Extensions.Diagnostics.HealthChecks.HealthCheckRegistration(
+                    Api.Services.HealthChecks.HealthCheckNames.ClickHouse,
+                    _ => new Api.Services.HealthChecks.NoOpHealthCheck("ClickHouse replaced with in-memory emulator."),
+                    failureStatus: Microsoft.Extensions.Diagnostics.HealthChecks.HealthStatus.Healthy,
+                    tags: [Api.Services.HealthChecks.HealthCheckTags.Infrastructure, Api.Services.HealthChecks.HealthCheckTags.Database]));
+            }
+        });
+        return services;
+    }
+
+    /// <summary>
+    /// Replaces the real <see cref="KafkaOrderServedConsumerService"/> (which needs a broker) with an
+    /// in-memory variant that subscribes to <see cref="ConsumedKafkaMessageStore"/>. Event tests publish
+    /// straight into that store, so this is needed in every lane, including Docker.
+    /// </summary>
+    public static IServiceCollection UseInMemoryOrderServedKafkaConsumer(this IServiceCollection services)
+    {
+        var realConsumer = services.FirstOrDefault(d => d.ImplementationType == typeof(KafkaOrderServedConsumerService));
+        if (realConsumer is not null)
+            services.Remove(realConsumer);
+
+        services.AddHostedService<InMemoryOrderServedConsumerService>();
+
+        return services;
+    }
+
+    private sealed class TrackedClickHouseConnectionFactory(Func<DbConnection> inner, ClickHouseTrackingOptions options)
+        : IClickHouseConnectionFactory
+    {
+        public DbConnection CreateConnection() => inner().WithClickHouseTestTracking(options);
     }
 }

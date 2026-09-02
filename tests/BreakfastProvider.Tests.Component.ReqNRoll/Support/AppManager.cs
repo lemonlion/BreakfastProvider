@@ -350,6 +350,20 @@ public sealed class AppManager : IDisposable
             services.UseTrackedBigQueryClient(CurrentTestInfo.Fetcher);
         }
 
+        if (Settings.RunWithAnInMemoryClickHouse)
+        {
+            services.UseInMemoryClickHouse(CurrentTestInfo.Fetcher);
+            services.ReplaceClickHouseHealthCheckWithNoOp();
+        }
+        else
+        {
+            services.UseTrackedClickHouse(CurrentTestInfo.Fetcher);
+        }
+
+        // As with the recipe-cost consumer: event tests publish straight into ConsumedKafkaMessageStore,
+        // so the in-memory order-served consumer is needed in every lane, including Docker.
+        services.UseInMemoryOrderServedKafkaConsumer();
+
         // Always replace the real recipe cost Kafka consumer and customer feedback
         // Pub/Sub consumer with in-memory variants. Event-driven tests publish directly
         // to the in-memory stores (ConsumedKafkaMessageStore / ConsumedPubSubMessageStore),

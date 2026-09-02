@@ -237,6 +237,9 @@ public class Program
         // Google BigQuery (Ingredient Usage Analytics)
         builder.Services.AddBigQuery(builder.Configuration);
 
+        // ClickHouse (Kitchen Analytics)
+        builder.Services.AddClickHouse(builder.Configuration);
+
         // gRPC
         builder.Services.AddGrpc();
         builder.Services.AddNotificationGrpcClient(builder.Configuration);

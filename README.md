@@ -418,6 +418,7 @@ The component tests can be configured in several ways. All modes except post-dep
 | Kafka | In-memory tracked producer | Docker Kafka broker | Docker Kafka broker | Production Kafka |
 | Database (Cosmos) | In-memory Cosmos fake | Cosmos DB emulator | Cosmos DB emulator | Production Cosmos DB |
 | Database (Reporting) | SQLite (in-memory) | SQL Server (Docker) | SQL Server (Docker) | Production SQL Server |
+| Database (ClickHouse) | In-memory DuckDB-backed emulator (`InMemoryEmulator.ClickHouse`) | ClickHouse (Docker) | ClickHouse (Docker) | Production ClickHouse |
 | API | In-process `WebApplicationFactory` | In-process `WebApplicationFactory` | Docker container (`:5080`) | Deployed service |
 | Downstream request inspection | `FakeRequestStore` | `FakeRequestStore` | Unavailable | Unavailable |
 | Config overrides | `delayAppCreation` pattern | `delayAppCreation` pattern | Not possible | Not possible |
@@ -469,6 +470,7 @@ The solution follows a straightforward **API + Tests** layout with feature-based
 - **Apache Kafka** for recipe logging events
 - **HotChocolate** for GraphQL reporting endpoints (business intelligence queries)
 - **Entity Framework Core** with SQL Server (Docker/production) and SQLite (in-memory tests) for the reporting database
+- **ClickHouse** (via `ClickHouse.Client` over HTTP) for kitchen analytics — order timings, equipment readings and service times; a DuckDB-backed in-process emulator (`tests/InMemoryEmulator.ClickHouse`) stands in for it in in-memory tests, tracked in diagrams by `Kronikol.Extensions.ClickHouse`
 - **Serilog** for structured logging
 - **OpenTelemetry** for distributed traces, metrics, and log correlation (OTLP exporter)
 - **prometheus-net** for Prometheus metrics exposition (`/metrics` endpoint), ASP.NET Core HTTP metrics, HttpClient metrics, and health check status metrics
@@ -506,6 +508,12 @@ The solution follows a straightforward **API + Tests** layout with feature-based
 | `DELETE` | `/menu/cache` | Clear menu cache |
 | `GET` | `/audit-logs` | Query audit logs (filterable by entityType, entityId) |
 | `POST` | `/graphql` | GraphQL endpoint for reporting queries (order summaries, recipe reports, ingredient usage, popular recipes) |
+| `POST` | `/order-timings` | Record a kitchen order timing (ClickHouse) |
+| `GET` | `/order-timings/summary` | Per-station average, p95 and count of prep times (ClickHouse) |
+| `GET` | `/order-timings/station/{station}` | List timings for a station (ClickHouse) |
+| `POST` | `/equipment-readings` | Record an equipment reading (ClickHouse) |
+| `GET` | `/equipment-readings/equipment/{equipmentId}` | List readings for a piece of equipment (ClickHouse) |
+| `DELETE` | `/equipment-readings/{readingId}` | Delete a reading (ClickHouse lightweight delete) |
 
 - Swagger/OpenAPI available at `/swagger` in Development
 - Validation returns `400 Bad Request` with `ProblemDetails`
@@ -540,6 +548,7 @@ Configuration is managed via `appsettings.json` with strongly-typed options usin
 | `KitchenServiceConfig` | Kitchen Service base address |
 | `OutboxConfig` | Outbox polling interval, batch size, max retries, enable/disable |
 | `ReportingConfig` | SQL Server connection string for the reporting database |
+| `ClickHouseConfig` | `ClickHouse.Client` connection string for the kitchen analytics database (`Host=localhost;Port=8123;Database=kitchen_analytics`); empty disables ClickHouse |
 
 Feature-specific config classes follow the `{Feature}Config` naming convention and inherit from `BaseConfig` (for `BaseAddress`).
 
@@ -661,6 +670,7 @@ There are a number of `docker-compose-*.yml` files which can be used to spin up 
 Spins up local database instances:
 - **Azure Cosmos DB Emulator** - Port `8081` (Data Explorer and API endpoint). Configured with 25 partitions, no data persistence between runs.
 - **SQL Server 2022** - Port `1433`. Used by the reporting database (`ReportingDbContext` via Entity Framework Core).
+- **ClickHouse 25.8** - Ports `8123` (HTTP, used by the API) and `9000` (native). The `kitchen_analytics` schema is created by `docker/clickhouse/init/001-kitchen-analytics.sql`, which the image's entrypoint runs before the server accepts connections; the same file seeds the in-memory emulator, so the schema cannot drift between lanes. No named volume — every `up` starts from a clean data directory.
 
 #### docker-compose-storage.yml [↑](#top)<a name="docker-compose-storage-yml"></a>
 
@@ -683,7 +693,7 @@ Spins up local messaging infrastructure - **EventGrid** and **Kafka**.
 - **Azure EventGrid Simulator** - Port `60101`, configured with a topic that subscribes to a storage queue on Azurite
 - **Kafka broker** - Port `9092` (SASL_SSL)
 - **Kafka UI** - Port `9001` (web interface at `http://localhost:9001`)
-- Automatically creates Kafka topics on startup: `breakfast_recipe_logs`, `breakfast_menu_updates`
+- Automatically creates Kafka topics on startup: `breakfast_recipe_logs`, `breakfast_recipe_costs`, `breakfast_orders_served`, `breakfast_menu_updates`
 
 #### docker-compose-prometheus.yml [↑](#top)<a name="docker-compose-prometheus-yml"></a>
 
@@ -848,6 +858,8 @@ To publish a new Kafka event:
 7. Add a Kafka test assertion to the relevant test scenario.
 
 ### Consuming Events
+
+Consumed events today: `RecipeCostCalculatedEvent` (`breakfast_recipe_costs` → BigQuery → gRPC → Kitchen Service) and `OrderServedEvent` (`breakfast_orders_served` → ClickHouse `service_times` → gRPC notification → Kitchen Service `GET /status/{orderId}`). Both are reflected into `docs/asyncapi.json` because they implement `IKafkaEvent` with `[Description]` attributes. In component tests the real consumers are always replaced by in-memory consumers that subscribe to `ConsumedKafkaMessageStore`, in every lane.
 
 To consume a new Kafka event:
 

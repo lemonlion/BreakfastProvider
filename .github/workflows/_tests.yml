@@ -129,6 +129,15 @@ jobs:
             sleep 5
           done
 
+          echo "Waiting for ClickHouse..."
+          for i in $(seq 1 60); do
+            if curl -sf http://localhost:8123/ping > /dev/null 2>&1; then
+              echo "ClickHouse ready after $((i*5))s"
+              break
+            fi
+            sleep 5
+          done
+
       - name: Set component test settings to InDocker
         if: ${{ inputs.test-run-type == 'docker' }}
         run: |
@@ -140,6 +149,8 @@ jobs:
           echo "BigQueryConfig__EmulatorEndpoint=http://localhost:9050/bigquery/v2/" >> $GITHUB_ENV
           echo "MongoDbConfig__ConnectionString=mongodb://admin:password@localhost:27017" >> $GITHUB_ENV
           echo "MongoDbConfig__DatabaseName=breakfast_reviews" >> $GITHUB_ENV
+          echo "ClickHouseConfig__ConnectionString=Host=localhost;Port=8123;Database=kitchen_analytics" >> $GITHUB_ENV
+          echo "CLICKHOUSE_CONFORMANCE_CONNECTION_STRING=Host=localhost;Port=8123;Database=kitchen_analytics" >> $GITHUB_ENV
 
       - name: Make entrypoint script executable
         if: ${{ inputs.test-run-type == 'external-sut' }}
@@ -273,6 +284,9 @@ jobs:
           echo ""
           echo "=== Cosmos DB Emulator Logs (last 30 lines) ==="
           docker logs azure-cosmosdb-emulator 2>&1 | tail -30 || true
+          echo ""
+          echo "=== ClickHouse Logs (last 30 lines) ==="
+          docker logs clickhouse 2>&1 | tail -30 || true
 
       - name: Spin down docker
         if: ${{ always() && (inputs.test-run-type == 'docker' || inputs.test-run-type == 'external-sut') }}

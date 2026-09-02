@@ -15,6 +15,7 @@ public static class HealthCheckNames
     public const string Spanner = "Spanner";
     public const string MongoDB = "MongoDB";
     public const string BigQuery = "BigQuery";
+    public const string ClickHouse = "ClickHouse";
 }
 
 public static class HealthCheckTags
@@ -106,6 +107,16 @@ public static class HealthCheckServiceExtensions
             {
                 var bigQueryCheck = sp.GetService<BigQueryHealthCheck>();
                 return bigQueryCheck ?? (IHealthCheck)new NoOpHealthCheck("BigQuery not configured.");
+            },
+            failureStatus: HealthStatus.Unhealthy,
+            tags: [HealthCheckTags.Infrastructure, HealthCheckTags.Database]));
+
+        builder.Add(new HealthCheckRegistration(
+            HealthCheckNames.ClickHouse,
+            sp =>
+            {
+                var clickHouseCheck = sp.GetService<ClickHouseHealthCheck>();
+                return clickHouseCheck ?? (IHealthCheck)new NoOpHealthCheck("ClickHouse not configured.");
             },
             failureStatus: HealthStatus.Unhealthy,
             tags: [HealthCheckTags.Infrastructure, HealthCheckTags.Database]));

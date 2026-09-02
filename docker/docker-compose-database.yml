@@ -223,3 +223,36 @@ services:
         echo "BigQuery initialisation complete."
     networks:
       - localdev
+
+  clickhouse:
+    container_name: clickhouse
+    image: clickhouse/clickhouse-server:25.8-alpine
+    hostname: clickhouse.local
+    ports:
+      - '8123:8123'
+      - '9000:9000'
+    environment:
+      - CLICKHOUSE_DB=kitchen_analytics
+      - CLICKHOUSE_USER=default
+      - CLICKHOUSE_PASSWORD=
+      - CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT=1
+      - TZ=UTC
+    ulimits:
+      nofile:
+        soft: 262144
+        hard: 262144
+    volumes:
+      # Runs every *.sql against a temporary server before the real one starts, so
+      # service_healthy implies the kitchen_analytics schema exists. No named volume:
+      # every `up` re-runs the DDL on a clean data directory.
+      - ./clickhouse/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:8123/ping || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 10s
+    networks:
+      localdev:
+        aliases:
+          - clickhouse.local

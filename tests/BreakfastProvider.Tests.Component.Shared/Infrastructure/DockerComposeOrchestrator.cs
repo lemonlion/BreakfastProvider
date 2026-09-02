@@ -97,6 +97,7 @@ public sealed class DockerComposeOrchestrator : IDisposable
         WaitUntilReady("Cosmos DB (data plane)", IsCosmosDbReady);
         WaitUntilReady("Kafka (SSL handshake)", () => IsKafkaSslReady(settings));
         WaitUntilReady("SQL Server", IsSqlServerReady);
+        WaitUntilReady("ClickHouse (/ping)", IsClickHouseReady);
 
         if (settings.RunAgainstExternalServiceUnderTest)
             WaitUntilReady("SUT (/health)", () => IsSutHealthy(settings));
@@ -312,6 +313,28 @@ public sealed class DockerComposeOrchestrator : IDisposable
     }
 
     /// <summary>
+    /// Verifies ClickHouse is ready via its HTTP ping endpoint. The container's entrypoint runs the
+    /// init DDL before the real server starts listening, so a successful ping implies the schema exists.
+    /// </summary>
+    private static bool IsClickHouseReady()
+    {
+        try
+        {
+            using var client = new HttpClient { Timeout = TimeSpan.FromSeconds(5) };
+            var response = client.GetAsync("http://localhost:8123/ping").GetAwaiter().GetResult();
+            if (!response.IsSuccessStatusCode)
+                return false;
+
+            var body = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
+            return body.Trim() == "Ok.";
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+    /// <summary>
     /// Resolves the docker/ directory relative to the solution root.
     /// The test working directory is tests/BreakfastProvider.Tests.Component/bin/…/net10.0/,
     /// so we walk upward to find the docker/ folder.
@@ -387,6 +410,10 @@ public sealed class DockerComposeOrchestrator : IDisposable
                 return false;
 
             if (!IsSqlServerReady())
+                return false;
+
+            // A stale container set from before ClickHouse was added must not be reused.
+            if (!IsClickHouseReady())
                 return false;
 
             if (settings.RunAgainstExternalServiceUnderTest && !IsSutHealthy(settings))

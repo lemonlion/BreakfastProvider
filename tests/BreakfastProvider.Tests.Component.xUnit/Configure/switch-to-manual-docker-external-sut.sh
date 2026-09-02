@@ -22,6 +22,7 @@ sed -i \
   -e 's/"RunWithAnInMemorySpannerDatabase": true/"RunWithAnInMemorySpannerDatabase": false/' \
   -e 's/"RunWithAnInMemoryMongoDatabase": true/"RunWithAnInMemoryMongoDatabase": false/' \
   -e 's/"RunWithAnInMemoryBigQuery": true/"RunWithAnInMemoryBigQuery": false/' \
+  -e 's/"RunWithAnInMemoryClickHouse": true/"RunWithAnInMemoryClickHouse": false/' \
   -e 's/"RunWithAnInMemoryNotificationService": true/"RunWithAnInMemoryNotificationService": false/' \
   -e 's/"RunWithAnInMemoryEventHub": true/"RunWithAnInMemoryEventHub": false/' \
   -e 's/"RunWithAnInMemoryPubSub": true/"RunWithAnInMemoryPubSub": false/' \

@@ -13,12 +13,19 @@
 
   <ItemGroup>
     <PackageReference Include="AwesomeAssertions" Version="9.4.0" />
+    <PackageReference Include="ClickHouse.Client" Version="7.14.0" />
     <PackageReference Include="NSubstitute" Version="5.3.0" />
     <PackageReference Include="xunit.v3" Version="3.2.2" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\BreakfastProvider.Api\BreakfastProvider.Api.csproj" />
+    <ProjectReference Include="..\InMemoryEmulator.ClickHouse\InMemoryEmulator.ClickHouse.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- The same DDL that seeds the Docker container: one source of truth for the schema. -->
+    <Content Include="..\..\docker\clickhouse\init\001-kitchen-analytics.sql" Link="Emulator\001-kitchen-analytics.sql" CopyToOutputDirectory="Always" />
   </ItemGroup>
 
 </Project>

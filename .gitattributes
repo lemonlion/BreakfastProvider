@@ -4,3 +4,6 @@ docs/*.yml eol=lf
 
 # ClickHouse init DDL is fed to the container's clickhouse-client - keep it LF on every checkout
 docker/clickhouse/init/*.sql text eol=lf
+
+# Mounted into the SUT container and run by /bin/sh - CRLF breaks `set -e`
+docker/docker-entrypoint.sh text eol=lf

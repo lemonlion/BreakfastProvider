@@ -85,15 +85,26 @@ services:
           sleep 2
         done
 
-        echo "Creating Spanner instance..."
-        curl -sf -X POST "$$EMULATOR/v1/projects/breakfast-provider-project/instances" \
-          -H "Content-Type: application/json" \
-          -d '{"instanceId":"breakfast-instance","instance":{"config":"emulator-config","displayName":"Breakfast Instance","nodeCount":1}}'
+        # Idempotent: `docker compose up` re-runs this container on an existing stack,
+        # and a second create would be a 409 that aborts the script under `set -e`.
+        INSTANCE="$$EMULATOR/v1/projects/breakfast-provider-project/instances/breakfast-instance"
+        if curl -sf "$$INSTANCE" >/dev/null 2>&1; then
+          echo "Spanner instance already exists."
+        else
+          echo "Creating Spanner instance..."
+          curl -sf -X POST "$$EMULATOR/v1/projects/breakfast-provider-project/instances" \
+            -H "Content-Type: application/json" \
+            -d '{"instanceId":"breakfast-instance","instance":{"config":"emulator-config","displayName":"Breakfast Instance","nodeCount":1}}'
+        fi
 
-        echo "Creating Spanner database..."
-        curl -sf -X POST "$$EMULATOR/v1/projects/breakfast-provider-project/instances/breakfast-instance/databases" \
-          -H "Content-Type: application/json" \
-          -d '{"createStatement":"CREATE DATABASE `breakfast-db`","extraStatements":["CREATE TABLE Feedback (FeedbackId STRING(MAX) NOT NULL, CustomerName STRING(MAX), OrderId STRING(MAX), Rating INT64, Comment STRING(MAX), CreatedAt TIMESTAMP) PRIMARY KEY (FeedbackId)","CREATE TABLE CustomerPreferences (CustomerId STRING(MAX) NOT NULL, CustomerName STRING(MAX), PreferredMilkType STRING(MAX), LikesExtraToppings BOOL, FavouriteItem STRING(MAX), UpdatedAt TIMESTAMP) PRIMARY KEY (CustomerId)"]}'
+        if curl -sf "$$INSTANCE/databases/breakfast-db" >/dev/null 2>&1; then
+          echo "Spanner database already exists."
+        else
+          echo "Creating Spanner database..."
+          curl -sf -X POST "$$INSTANCE/databases" \
+            -H "Content-Type: application/json" \
+            -d '{"createStatement":"CREATE DATABASE `breakfast-db`","extraStatements":["CREATE TABLE Feedback (FeedbackId STRING(MAX) NOT NULL, CustomerName STRING(MAX), OrderId STRING(MAX), Rating INT64, Comment STRING(MAX), CreatedAt TIMESTAMP) PRIMARY KEY (FeedbackId)","CREATE TABLE CustomerPreferences (CustomerId STRING(MAX) NOT NULL, CustomerName STRING(MAX), PreferredMilkType STRING(MAX), LikesExtraToppings BOOL, FavouriteItem STRING(MAX), UpdatedAt TIMESTAMP) PRIMARY KEY (CustomerId)"]}'
+        fi
 
         echo "Spanner initialisation complete."
     networks:
@@ -200,25 +211,44 @@ services:
         set -e
         EMULATOR=http://bigquery-emulator.local:9050/bigquery/v2
 
-        echo "Creating BigQuery dataset..."
-        curl -sf -X POST "$$EMULATOR/projects/breakfast-provider-project/datasets" \
-          -H "Content-Type: application/json" \
-          -d '{"datasetReference":{"datasetId":"breakfast_analytics","projectId":"breakfast-provider-project"}}'
+        # Idempotent: `docker compose up` re-runs this container on an existing stack,
+        # and a second create would be a 409 that aborts the script under `set -e`.
+        DATASET="$$EMULATOR/projects/breakfast-provider-project/datasets/breakfast_analytics"
+        if curl -sf "$$DATASET" >/dev/null 2>&1; then
+          echo "BigQuery dataset already exists."
+        else
+          echo "Creating BigQuery dataset..."
+          curl -sf -X POST "$$EMULATOR/projects/breakfast-provider-project/datasets" \
+            -H "Content-Type: application/json" \
+            -d '{"datasetReference":{"datasetId":"breakfast_analytics","projectId":"breakfast-provider-project"}}'
+        fi
 
-        echo "Creating BigQuery ingredient_usage table..."
-        curl -sf -X POST "$$EMULATOR/projects/breakfast-provider-project/datasets/breakfast_analytics/tables" \
-          -H "Content-Type: application/json" \
-          -d '{"tableReference":{"tableId":"ingredient_usage","datasetId":"breakfast_analytics","projectId":"breakfast-provider-project"},"schema":{"fields":[{"name":"usage_id","type":"STRING","mode":"REQUIRED"},{"name":"ingredient_name","type":"STRING","mode":"REQUIRED"},{"name":"quantity_used","type":"FLOAT","mode":"REQUIRED"},{"name":"unit","type":"STRING","mode":"REQUIRED"},{"name":"recipe_name","type":"STRING","mode":"REQUIRED"},{"name":"recorded_at","type":"STRING","mode":"REQUIRED"}]}}'
+        if curl -sf "$$DATASET/tables/ingredient_usage" >/dev/null 2>&1; then
+          echo "BigQuery ingredient_usage table already exists."
+        else
+          echo "Creating BigQuery ingredient_usage table..."
+          curl -sf -X POST "$$EMULATOR/projects/breakfast-provider-project/datasets/breakfast_analytics/tables" \
+            -H "Content-Type: application/json" \
+            -d '{"tableReference":{"tableId":"ingredient_usage","datasetId":"breakfast_analytics","projectId":"breakfast-provider-project"},"schema":{"fields":[{"name":"usage_id","type":"STRING","mode":"REQUIRED"},{"name":"ingredient_name","type":"STRING","mode":"REQUIRED"},{"name":"quantity_used","type":"FLOAT","mode":"REQUIRED"},{"name":"unit","type":"STRING","mode":"REQUIRED"},{"name":"recipe_name","type":"STRING","mode":"REQUIRED"},{"name":"recorded_at","type":"STRING","mode":"REQUIRED"}]}}'
+        fi
 
-        echo "Creating BigQuery recipe_costs table..."
-        curl -sf -X POST "$$EMULATOR/projects/breakfast-provider-project/datasets/breakfast_analytics/tables" \
-          -H "Content-Type: application/json" \
-          -d '{"tableReference":{"tableId":"recipe_costs","datasetId":"breakfast_analytics","projectId":"breakfast-provider-project"},"schema":{"fields":[{"name":"calculation_id","type":"STRING","mode":"REQUIRED"},{"name":"recipe_name","type":"STRING","mode":"REQUIRED"},{"name":"ingredients","type":"STRING","mode":"REQUIRED"},{"name":"total_cost","type":"FLOAT","mode":"REQUIRED"},{"name":"currency","type":"STRING","mode":"REQUIRED"},{"name":"calculated_at","type":"STRING","mode":"REQUIRED"}]}}'
+        if curl -sf "$$DATASET/tables/recipe_costs" >/dev/null 2>&1; then
+          echo "BigQuery recipe_costs table already exists."
+        else
+          echo "Creating BigQuery recipe_costs table..."
+          curl -sf -X POST "$$EMULATOR/projects/breakfast-provider-project/datasets/breakfast_analytics/tables" \
+            -H "Content-Type: application/json" \
+            -d '{"tableReference":{"tableId":"recipe_costs","datasetId":"breakfast_analytics","projectId":"breakfast-provider-project"},"schema":{"fields":[{"name":"calculation_id","type":"STRING","mode":"REQUIRED"},{"name":"recipe_name","type":"STRING","mode":"REQUIRED"},{"name":"ingredients","type":"STRING","mode":"REQUIRED"},{"name":"total_cost","type":"FLOAT","mode":"REQUIRED"},{"name":"currency","type":"STRING","mode":"REQUIRED"},{"name":"calculated_at","type":"STRING","mode":"REQUIRED"}]}}'
+        fi
 
-        echo "Creating BigQuery ingredient_waste table..."
-        curl -sf -X POST "$$EMULATOR/projects/breakfast-provider-project/datasets/breakfast_analytics/tables" \
-          -H "Content-Type: application/json" \
-          -d '{"tableReference":{"tableId":"ingredient_waste","datasetId":"breakfast_analytics","projectId":"breakfast-provider-project"},"schema":{"fields":[{"name":"waste_id","type":"STRING","mode":"REQUIRED"},{"name":"ingredient_name","type":"STRING","mode":"REQUIRED"},{"name":"quantity_wasted","type":"FLOAT","mode":"REQUIRED"},{"name":"unit","type":"STRING","mode":"REQUIRED"},{"name":"recipe_name","type":"STRING","mode":"REQUIRED"},{"name":"reason","type":"STRING","mode":"REQUIRED"},{"name":"recorded_at","type":"STRING","mode":"REQUIRED"}]}}'
+        if curl -sf "$$DATASET/tables/ingredient_waste" >/dev/null 2>&1; then
+          echo "BigQuery ingredient_waste table already exists."
+        else
+          echo "Creating BigQuery ingredient_waste table..."
+          curl -sf -X POST "$$EMULATOR/projects/breakfast-provider-project/datasets/breakfast_analytics/tables" \
+            -H "Content-Type: application/json" \
+            -d '{"tableReference":{"tableId":"ingredient_waste","datasetId":"breakfast_analytics","projectId":"breakfast-provider-project"},"schema":{"fields":[{"name":"waste_id","type":"STRING","mode":"REQUIRED"},{"name":"ingredient_name","type":"STRING","mode":"REQUIRED"},{"name":"quantity_wasted","type":"FLOAT","mode":"REQUIRED"},{"name":"unit","type":"STRING","mode":"REQUIRED"},{"name":"recipe_name","type":"STRING","mode":"REQUIRED"},{"name":"reason","type":"STRING","mode":"REQUIRED"},{"name":"recorded_at","type":"STRING","mode":"REQUIRED"}]}}'
+        fi
 
         echo "BigQuery initialisation complete."
     networks:

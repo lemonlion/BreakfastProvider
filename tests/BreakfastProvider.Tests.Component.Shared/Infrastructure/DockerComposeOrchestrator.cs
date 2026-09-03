@@ -362,6 +362,12 @@ public sealed class DockerComposeOrchestrator : IDisposable
     /// verify it can sustain document operations under light concurrency. A single
     /// successful probe isn't enough — the emulator can complete one write but still
     /// be unstable for the burst of parallel requests that follow when tests start.
+    /// <para>
+    /// The database and container are created if missing, exactly as the API does at
+    /// start-up. On a fresh emulator nothing else has created them yet — the API only
+    /// starts after readiness passes — so without this the probe could never succeed
+    /// on a cold start.
+    /// </para>
     /// </summary>
     private static bool IsCosmosWriteProbeSuccessful()
     {
@@ -371,7 +377,10 @@ public sealed class DockerComposeOrchestrator : IDisposable
         {
             using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(30));
             using var cosmosClient = CreateCosmosProbeClient();
-            var container = cosmosClient.GetContainer("BreakfastDb", "orders");
+            var database = cosmosClient.CreateDatabaseIfNotExistsAsync("BreakfastDb", cancellationToken: cts.Token)
+                .GetAwaiter().GetResult().Database;
+            var container = database.CreateContainerIfNotExistsAsync("orders", "/partitionKey", cancellationToken: cts.Token)
+                .GetAwaiter().GetResult().Container;
 
             for (var i = 0; i < probeCount; i++)
             {

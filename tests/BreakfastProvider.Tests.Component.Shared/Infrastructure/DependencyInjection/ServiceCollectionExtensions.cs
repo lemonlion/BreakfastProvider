@@ -1161,6 +1161,10 @@ public static class ServiceCollectionExtensions
         CallerName = Documentation.ServiceNames.BreakfastProvider,
         Verbosity = Kronikol.Sql.SqlTrackingVerbosityLevel.Detailed,
         LogParameters = true,
+        // Both lanes create ClickHouse.Client connections (the emulator serves its HTTP protocol),
+        // whose ExecuteNonQuery return value is always 0 for INSERT; the pairing adapter reads the
+        // real count from QueryStats (X-ClickHouse-Summary), which the emulator also emits.
+        DriverAdapter = Kronikol.Extensions.ClickHouse.Client.ClickHouseClientDriverAdapter.Instance,
         // The target property is Func<(string, string)?> (nullable tuple); there is no delegate
         // variance for value types, so a bare assignment of the fetcher would not compile.
         CurrentTestInfoFetcher = () => currentTestInfoFetcher()

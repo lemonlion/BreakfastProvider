@@ -28,18 +28,19 @@
     <PackageReference Include="morelinq" Version="4.4.0" />
     <PackageReference Include="NSubstitute" Version="5.3.0" />
     <PackageReference Include="AutoFixture" Version="4.18.1" />
-    <PackageReference Include="Kronikol" Version="3.0.72" />
-    <PackageReference Include="Kronikol.AssertionTracking" Version="3.0.72" />
-    <PackageReference Include="Kronikol.Extensions.CosmosDB" Version="3.0.72" />
+    <PackageReference Include="Kronikol" Version="3.0.74" />
+    <PackageReference Include="Kronikol.AssertionTracking" Version="3.0.74" />
+    <PackageReference Include="Kronikol.Extensions.CosmosDB" Version="3.0.74" />
     <PackageReference Include="CosmosDB.InMemoryEmulator" Version="4.0.6" />
-    <PackageReference Include="Kronikol.Extensions.EfCore.Relational" Version="3.0.72" />
-    <PackageReference Include="Kronikol.Extensions.Kafka" Version="3.0.72" />
-    <PackageReference Include="Kronikol.Extensions.PubSub" Version="3.0.72" />
-    <PackageReference Include="Kronikol.Extensions.Grpc" Version="3.0.72" />
-    <PackageReference Include="Kronikol.Extensions.Spanner" Version="3.0.72" />
-    <PackageReference Include="Kronikol.Extensions.MongoDB" Version="3.0.72" />
-    <PackageReference Include="Kronikol.Extensions.BigQuery" Version="3.0.72" />
-    <PackageReference Include="Kronikol.Extensions.ClickHouse" Version="3.0.72" />
+    <PackageReference Include="Kronikol.Extensions.EfCore.Relational" Version="3.0.74" />
+    <PackageReference Include="Kronikol.Extensions.Kafka" Version="3.0.74" />
+    <PackageReference Include="Kronikol.Extensions.PubSub" Version="3.0.74" />
+    <PackageReference Include="Kronikol.Extensions.Grpc" Version="3.0.74" />
+    <PackageReference Include="Kronikol.Extensions.Spanner" Version="3.0.74" />
+    <PackageReference Include="Kronikol.Extensions.MongoDB" Version="3.0.74" />
+    <PackageReference Include="Kronikol.Extensions.BigQuery" Version="3.0.74" />
+    <PackageReference Include="Kronikol.Extensions.ClickHouse" Version="3.0.74" />
+    <PackageReference Include="Kronikol.Extensions.ClickHouse.Client" Version="3.0.74" />
     <PackageReference Include="ClickHouse.Client" Version="7.14.0" />
     <PackageReference Include="Spanner.InMemoryEmulator" Version="1.0.20" />
     <PackageReference Include="InMemoryEmulator.MongoDB" Version="1.1.1" />

@@ -470,7 +470,7 @@ The solution follows a straightforward **API + Tests** layout with feature-based
 - **Apache Kafka** for recipe logging events
 - **HotChocolate** for GraphQL reporting endpoints (business intelligence queries)
 - **Entity Framework Core** with SQL Server (Docker/production) and SQLite (in-memory tests) for the reporting database
-- **ClickHouse** (via `ClickHouse.Client` over HTTP) for kitchen analytics — order timings, equipment readings and service times; a DuckDB-backed in-process emulator (`tests/InMemoryEmulator.ClickHouse`) stands in for it in in-memory tests, tracked in diagrams by `Kronikol.Extensions.ClickHouse`
+- **ClickHouse** (via `ClickHouse.Driver`, the official ClickHouse .NET client, over HTTP) for kitchen analytics — order timings, equipment readings and service times; a DuckDB-backed in-process emulator (`tests/InMemoryEmulator.ClickHouse`) stands in for it in in-memory tests, tracked in diagrams by `Kronikol.Extensions.ClickHouse`
 - **Serilog** for structured logging
 - **OpenTelemetry** for distributed traces, metrics, and log correlation (OTLP exporter)
 - **prometheus-net** for Prometheus metrics exposition (`/metrics` endpoint), ASP.NET Core HTTP metrics, HttpClient metrics, and health check status metrics
@@ -548,7 +548,7 @@ Configuration is managed via `appsettings.json` with strongly-typed options usin
 | `KitchenServiceConfig` | Kitchen Service base address |
 | `OutboxConfig` | Outbox polling interval, batch size, max retries, enable/disable |
 | `ReportingConfig` | SQL Server connection string for the reporting database |
-| `ClickHouseConfig` | `ClickHouse.Client` connection string for the kitchen analytics database (`Host=localhost;Port=8123;Database=kitchen_analytics`); empty disables ClickHouse |
+| `ClickHouseConfig` | `ClickHouse.Driver` connection string for the kitchen analytics database (`Host=localhost;Port=8123;Database=kitchen_analytics`); empty disables ClickHouse |
 
 Feature-specific config classes follow the `{Feature}Config` naming convention and inherit from `BaseConfig` (for `BaseAddress`).
 

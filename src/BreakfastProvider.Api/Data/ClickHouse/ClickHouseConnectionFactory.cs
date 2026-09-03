@@ -1,5 +1,5 @@
 using System.Data.Common;
-using ClickHouse.Client.ADO;
+using ClickHouse.Driver.ADO;
 
 namespace BreakfastProvider.Api.Data.ClickHouse;
 

@@ -1161,10 +1161,10 @@ public static class ServiceCollectionExtensions
         CallerName = Documentation.ServiceNames.BreakfastProvider,
         Verbosity = Kronikol.Sql.SqlTrackingVerbosityLevel.Detailed,
         LogParameters = true,
-        // Both lanes create ClickHouse.Client connections (the emulator serves its HTTP protocol),
+        // Both lanes create ClickHouse.Driver connections (the emulator serves its HTTP protocol),
         // whose ExecuteNonQuery return value is always 0 for INSERT; the pairing adapter reads the
         // real count from QueryStats (X-ClickHouse-Summary), which the emulator also emits.
-        DriverAdapter = Kronikol.Extensions.ClickHouse.Client.ClickHouseClientDriverAdapter.Instance,
+        DriverAdapter = Kronikol.Extensions.ClickHouse.Driver.ClickHouseDriverAdapter.Instance,
         // The target property is Func<(string, string)?> (nullable tuple); there is no delegate
         // variance for value types, so a bare assignment of the fetcher would not compile.
         CurrentTestInfoFetcher = () => currentTestInfoFetcher()
@@ -1172,7 +1172,7 @@ public static class ServiceCollectionExtensions
 
     /// <summary>
     /// Replaces the real <see cref="IClickHouseConnectionFactory"/> with one that creates
-    /// <c>ClickHouse.Client</c> connections routed through the process-wide in-memory emulator
+    /// <c>ClickHouse.Driver</c> connections routed through the process-wide in-memory emulator
     /// (<see cref="SharedInMemoryClickHouse"/>) and wrapped with Kronikol's
     /// <c>TrackingClickHouseConnection</c>, so every ClickHouse statement appears in the diagrams.
     /// The services only see a <see cref="DbConnection"/>, so nothing in <c>src</c> changes.
@@ -1214,7 +1214,7 @@ public static class ServiceCollectionExtensions
             options.HttpContextAccessor ??= sp.GetService<IHttpContextAccessor>() ?? new HttpContextAccessor();
             var config = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<Api.Configuration.ClickHouseConfig>>().Value;
             return new TrackedClickHouseConnectionFactory(
-                () => new global::ClickHouse.Client.ADO.ClickHouseConnection(config.ConnectionString), options);
+                () => new global::ClickHouse.Driver.ADO.ClickHouseConnection(config.ConnectionString), options);
         });
 
         return services;

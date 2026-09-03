@@ -1,5 +1,5 @@
 using System.Data.Common;
-using ClickHouse.Client.ADO;
+using ClickHouse.Driver.ADO;
 using InMemoryEmulator.ClickHouse.Core;
 using InMemoryEmulator.ClickHouse.Http;
 
@@ -8,7 +8,7 @@ namespace InMemoryEmulator.ClickHouse;
 /// <summary>
 /// An in-process ClickHouse emulator for tests: a DuckDB-backed query engine behind an
 /// <see cref="HttpMessageHandler"/> that speaks the ClickHouse HTTP interface as
-/// <c>ClickHouse.Client</c> uses it. Create one per process, share it between test hosts and
+/// <c>ClickHouse.Driver</c> uses it. Create one per process, share it between test hosts and
 /// isolate tests with randomised keys.
 /// </summary>
 public sealed class InMemoryClickHouseServer : IDisposable
@@ -42,7 +42,7 @@ public sealed class InMemoryClickHouseServer : IDisposable
 
     public HttpClient CreateHttpClient() => new(Handler, disposeHandler: false);
 
-    /// <summary>A <c>ClickHouse.Client</c> connection routed through the emulator.</summary>
+    /// <summary>A <c>ClickHouse.Driver</c> connection routed through the emulator.</summary>
     public DbConnection CreateConnection() => new ClickHouseConnection(ConnectionString, CreateHttpClient());
 
     /// <summary>Runs additional DDL after construction.</summary>

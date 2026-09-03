@@ -8,7 +8,7 @@ namespace InMemoryEmulator.ClickHouse.Http;
 
 /// <summary>
 /// An <see cref="HttpMessageHandler"/> that speaks enough of the ClickHouse HTTP interface for
-/// <c>ClickHouse.Client</c> to open a connection and run parameterised SELECT / INSERT / DELETE
+/// <c>ClickHouse.Driver</c> to open a connection and run parameterised SELECT / INSERT / DELETE
 /// statements against an <see cref="IClickHouseQueryEngine"/>. No ports, no lifecycle: hand it to an
 /// <see cref="HttpClient"/> and hand that to the driver.
 /// </summary>
@@ -21,6 +21,11 @@ public sealed partial class InMemoryClickHouseHandler(IClickHouseQueryEngine eng
 
     [GeneratedRegex(@"^\s*SELECT\s+version\(\)\s*,\s*timezone\(\)\s*$", RegexOptions.IgnoreCase)]
     private static partial Regex HandshakeRegex();
+
+    // A real ClickHouse answers these with its own values; without this branch they would fall
+    // through to DuckDB, whose version()/timezone() answer for DuckDB itself.
+    [GeneratedRegex(@"^\s*SELECT\s+(version|timezone)\(\)\s*$", RegexOptions.IgnoreCase)]
+    private static partial Regex ServerIntrospectionRegex();
 
     protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
     {
@@ -42,6 +47,16 @@ public sealed partial class InMemoryClickHouseHandler(IClickHouseQueryEngine eng
                     [new ClickHouseColumn("version()", "String"), new ClickHouseColumn("timezone()", "String")],
                     [[ServerVersion, Timezone]]);
                 return ResultResponse(handshake, parsed.Format);
+            }
+
+            var introspection = ServerIntrospectionRegex().Match(parsed.Sql);
+            if (introspection.Success)
+            {
+                var function = introspection.Groups[1].Value.ToLowerInvariant();
+                var single = new ClickHouseResultSet(
+                    [new ClickHouseColumn($"{function}()", "String")],
+                    [[function == "version" ? ServerVersion : Timezone]]);
+                return ResultResponse(single, parsed.Format);
             }
 
             if (ClickHouseSqlTranslator.ReturnsResultSet(parsed.Sql))

@@ -110,7 +110,9 @@ public class OrderTimingService(IClickHouseConnectionFactory connectionFactory, 
                 Station = reader.GetString(reader.GetOrdinal("station")),
                 ItemType = reader.GetString(reader.GetOrdinal("item_type")),
                 PrepSeconds = Convert.ToDecimal(reader.GetDouble(reader.GetOrdinal("prep_seconds"))),
-                RecordedAt = reader.GetDateTime(reader.GetOrdinal("recorded_at"))
+                // The column is DateTime (UTC wall-clock); ClickHouse.Driver reads it back with
+                // Kind=Unspecified, which would serialize without the trailing 'Z'.
+                RecordedAt = DateTime.SpecifyKind(reader.GetDateTime(reader.GetOrdinal("recorded_at")), DateTimeKind.Utc)
             });
         }
 

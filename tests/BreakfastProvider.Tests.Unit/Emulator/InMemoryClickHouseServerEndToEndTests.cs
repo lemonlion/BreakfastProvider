@@ -1,4 +1,4 @@
-using ClickHouse.Client;
+using ClickHouse.Driver;
 using InMemoryEmulator.ClickHouse;
 using static BreakfastProvider.Tests.Unit.Emulator.TestSupport;
 
@@ -21,7 +21,12 @@ public sealed class InMemoryClickHouseServerEndToEndTests : IDisposable
         await using var connection = _server.CreateConnection();
         await connection.OpenAsync();
 
-        connection.ServerVersion.Should().Be("25.8.33.6");
+        // ClickHouse.Driver's ServerVersion property throws by design ("use SELECT version()").
+        await using (var version = connection.CreateCommand())
+        {
+            version.CommandText = "SELECT version()";
+            (await version.ExecuteScalarAsync()).Should().Be("25.8.33.6");
+        }
         connection.Database.Should().Be("kitchen_analytics");
 
         var station = $"Griddle-{Guid.NewGuid():N}";
@@ -52,7 +57,7 @@ public sealed class InMemoryClickHouseServerEndToEndTests : IDisposable
             reader.GetString(0).Should().Be("t-1");
             reader.GetDouble(1).Should().Be(12.5d);
             reader.GetDateTime(2).Should().Be(recordedAt);
-            reader.GetDateTime(2).Kind.Should().Be(DateTimeKind.Utc);
+            reader.GetDateTime(2).Kind.Should().Be(DateTimeKind.Unspecified); // ClickHouse.Driver returns zoneless DateTimes as Unspecified
             (await reader.ReadAsync()).Should().BeFalse();
         }
 
@@ -99,7 +104,7 @@ public sealed class InMemoryClickHouseServerEndToEndTests : IDisposable
     public async Task Compression_enabled_connections_work_too()
     {
         var handler = _server.Handler;
-        await using var connection = new ClickHouse.Client.ADO.ClickHouseConnection(
+        await using var connection = new ClickHouse.Driver.ADO.ClickHouseConnection(
             "Host=inmemory;Port=8123;Database=kitchen_analytics", new HttpClient(handler, disposeHandler: false));
         await connection.OpenAsync();
         await using var command = connection.CreateCommand();

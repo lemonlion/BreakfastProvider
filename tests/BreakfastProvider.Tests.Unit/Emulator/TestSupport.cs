@@ -1,6 +1,6 @@
 using System.Net;
 using System.Net.Http.Headers;
-using ClickHouse.Client.ADO;
+using ClickHouse.Driver.ADO;
 using InMemoryEmulator.ClickHouse.Core;
 using InMemoryEmulator.ClickHouse.Http;
 

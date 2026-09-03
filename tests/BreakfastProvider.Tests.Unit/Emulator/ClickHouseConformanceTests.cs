@@ -1,6 +1,6 @@
 using System.Data.Common;
-using ClickHouse.Client;
-using ClickHouse.Client.ADO;
+using ClickHouse.Driver;
+using ClickHouse.Driver.ADO;
 using InMemoryEmulator.ClickHouse;
 using static BreakfastProvider.Tests.Unit.Emulator.TestSupport;
 
@@ -76,13 +76,13 @@ public sealed class ClickHouseConformanceTests : IDisposable
             Add(list, "station", station);
 
             await using var reader = await list.ExecuteReaderAsync();
-            Enumerable.Range(0, 6).Select(reader.GetDataTypeName).Should().Equal("String", "String", "String", "String", "Float64", "DateTime(UTC)"); // the driver renders a zoneless DateTime with the server timezone from the handshake
+            Enumerable.Range(0, 6).Select(reader.GetDataTypeName).Should().Equal("String", "String", "String", "String", "Float64", "DateTime"); // ClickHouse.Driver reports the bare column type (ClickHouse.Client used to append the handshake server timezone)
             Enumerable.Range(0, 6).Select(reader.GetFieldType).Should().Equal(typeof(string), typeof(string), typeof(string), typeof(string), typeof(double), typeof(DateTime));
 
             (await reader.ReadAsync()).Should().BeTrue();
             reader.GetString(0).Should().Be(secondId, "ORDER BY recorded_at DESC puts the later row first");
             reader.GetDateTime(5).Should().Be(recordedAt.AddMinutes(1));
-            reader.GetDateTime(5).Kind.Should().Be(DateTimeKind.Utc);
+            reader.GetDateTime(5).Kind.Should().Be(DateTimeKind.Unspecified); // ClickHouse.Driver returns zoneless DateTimes as Unspecified (ClickHouse.Client stamped Utc); services SpecifyKind at their read sites
             (await reader.ReadAsync()).Should().BeTrue();
             reader.GetString(0).Should().Be(firstId);
             reader.GetDouble(4).Should().Be(12.5d);
@@ -159,7 +159,7 @@ public sealed class ClickHouseConformanceTests : IDisposable
         var stored = (DateTime)(await select.ExecuteScalarAsync())!;
 
         stored.Should().Be(expected);
-        stored.Kind.Should().Be(DateTimeKind.Utc);
+        stored.Kind.Should().Be(DateTimeKind.Unspecified); // ClickHouse.Driver returns zoneless DateTimes as Unspecified (ClickHouse.Client stamped Utc)
     }
 
     private async Task<DbConnection> Open(string backend)

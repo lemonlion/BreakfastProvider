@@ -46,7 +46,7 @@ public class RowBinaryWriterTests
         reader.GetString(0).Should().Be("id-1");
         reader.GetDouble(1).Should().Be(2.5d);
         reader.GetDateTime(2).Should().Be(SampleUtc);
-        reader.GetDateTime(2).Kind.Should().Be(DateTimeKind.Utc);
+        reader.GetDateTime(2).Kind.Should().Be(DateTimeKind.Unspecified); // ClickHouse.Driver returns zoneless DateTimes as Unspecified
         reader.GetValue(3).Should().Be(3UL);
         reader.GetString(4).Should().Be("hello");
         reader.GetValue(5).Should().Be((byte)1);

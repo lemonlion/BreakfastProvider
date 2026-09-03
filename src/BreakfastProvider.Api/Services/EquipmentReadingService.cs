@@ -82,7 +82,9 @@ public class EquipmentReadingService(IClickHouseConnectionFactory connectionFact
                 Metric = reader.GetString(reader.GetOrdinal("metric")),
                 Value = Convert.ToDecimal(reader.GetDouble(reader.GetOrdinal("value"))),
                 Unit = reader.GetString(reader.GetOrdinal("unit")),
-                RecordedAt = reader.GetDateTime(reader.GetOrdinal("recorded_at"))
+                // The column is DateTime (UTC wall-clock); ClickHouse.Driver reads it back with
+                // Kind=Unspecified, which would serialize without the trailing 'Z'.
+                RecordedAt = DateTime.SpecifyKind(reader.GetDateTime(reader.GetOrdinal("recorded_at")), DateTimeKind.Utc)
             });
         }
 

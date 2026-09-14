@@ -285,7 +285,11 @@ jobs:
       - name: Install dotnet-coverage tool
         run: dotnet tool install --global dotnet-coverage
 
+      # A component run does not fail the job here: the history gate below reads the failures against the
+      # ledger and decides. A unit run still does.
       - name: Run tests
+        id: tests
+        continue-on-error: ${{ inputs.test-type == 'component' }}
         run: >
           dotnet-coverage collect
           --output ./coverage/coverage.cobertura.xml
@@ -297,23 +301,36 @@ jobs:
           --
           ${{ steps.get-trx-report-args.outputs.args }}"
 
-      # What the ledger says about this run, in the job summary: the gate trips on what is new and reads
-      # the rest out. Advisory here (continue-on-error) - the build's verdict is still the test step's -
-      # so the demo shows the reading without a known-flaky scenario turning the lane red. --min-runs 3
-      # is the bar the suites report with (KronikolHistory.WithCrossRunHistory).
+      # What the ledger says about this run decides the lane: a failure the ledger already knows (flaky,
+      # failing since an earlier run) is read out, a new one fails the job. That is what the test step
+      # above stopped doing for a component run. --min-runs 3 is the bar the suites report with
+      # (KronikolHistory.WithCrossRunHistory). Without a ledger to read, or without the tool, the test
+      # step's own outcome stands (the step after this one).
       - name: History gate
+        id: gate
         if: ${{ always() && inputs.test-type == 'component' && env.KRONIKOL_HISTORY != '' }}
-        continue-on-error: true
         run: |
-          dotnet tool install --global Kronikol.Tool --version 3.13.0
+          if ! dotnet tool install --global Kronikol.Tool --version 3.14.0; then
+            echo "::warning::Kronikol.Tool could not be installed; the test step's outcome stands"
+            if [ "${{ steps.tests.outcome }}" = "success" ]; then exit 0; else exit 1; fi
+          fi
           echo "${HOME}/.dotnet/tools" >> "$GITHUB_PATH"
           export PATH="${HOME}/.dotnet/tools:$PATH"
+          status=0
+          kronikol history gate "${{ steps.reports-dir.outputs.dir }}" --history "$RUNNER_TEMP/history.jsonl" --min-runs 3 > "$RUNNER_TEMP/gate.txt" 2>&1 || status=$?
           {
             echo "### History gate (${{ inputs.test-run-description }})"
             echo '```'
-            kronikol history gate "${{ steps.reports-dir.outputs.dir }}" --history "$RUNNER_TEMP/history.jsonl" --min-runs 3
+            cat "$RUNNER_TEMP/gate.txt"
             echo '```'
           } | tee -a "$GITHUB_STEP_SUMMARY"
+          exit $status
+
+      - name: Tests failed and no ledger to read them against
+        if: ${{ always() && inputs.test-type == 'component' && env.KRONIKOL_HISTORY == '' && steps.tests.outcome == 'failure' }}
+        run: |
+          echo "::error::the test step failed and there is no history ledger yet to say whether that is new"
+          exit 1
 
       # The CTRF document the run wrote, with `flaky` set from the ledger, rendered by the CTRF reporter:
       # its flaky list is producer-driven, so this is the only thing that fills it for a suite that never

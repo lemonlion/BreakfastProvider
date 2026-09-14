@@ -896,7 +896,10 @@ published `TestRunReport.html` (a sparkline and verdict beside each scenario, a 
 the timeline, `$flaky` in the search box). The ledger lives on the orphan branch
 [`kronikol-history`](https://github.com/lemonlion/BreakfastProvider/tree/kronikol-history), one line per
 run and lane, appended by the `history` job of `ci-main.yml` and never merged into `main`; a nightly run
-keeps it accruing. A pull request build reads against `main`. To read it locally:
+keeps it accruing. A pull request build reads against `main`. The gate decides each component lane: a
+failure the ledger already knows (flaky, failing since an earlier run) is read out in the job summary,
+a new one fails the lane, and a lane with no ledger to read falls back to the test step's own outcome.
+To read it locally:
 
 ```bash
 git fetch origin kronikol-history && git show FETCH_HEAD:history.jsonl > history.jsonl

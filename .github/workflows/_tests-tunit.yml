@@ -10,6 +10,8 @@ on:
 
 env:
   BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
+  # One cross-run history stream per suite and per lane (see KronikolHistory.WithCrossRunHistory).
+  KRONIKOL_SUITE: ${{ inputs.test-run-description }}
 
 jobs:
   run-tests:
@@ -204,6 +206,27 @@ jobs:
           done
           echo Cosmos DB emulator started successfully
 
+      - id: history-reports-dir
+        name: Locate the reports directory
+        run: echo "dir=$(dirname "${{ inputs.features-report-path }}")" >> "$GITHUB_OUTPUT"
+
+      # Cross-run history (Kronikol 3.9.0+), the same steps as _tests.yml: read the ledger from the orphan
+      # branch `kronikol-history` before the run, so the run's outputs already say what the last runs said;
+      # the run's own History.run.json is uploaded with the report and folded in by the `history` job of
+      # ci-main.yml. A pull request build reads against the branch it targets (Kronikol reads GITHUB_BASE_REF).
+      - name: Fetch the history ledger
+        run: |
+          if git fetch --depth=1 origin kronikol-history 2>/dev/null; then
+            git show FETCH_HEAD:history.jsonl > "$RUNNER_TEMP/history.jsonl"
+            for companion in quarantine.json aliases.json; do
+              git show "FETCH_HEAD:$companion" > "$RUNNER_TEMP/$companion" 2>/dev/null || rm -f "$RUNNER_TEMP/$companion"
+            done
+            echo "KRONIKOL_HISTORY=$RUNNER_TEMP/history.jsonl" >> "$GITHUB_ENV"
+            echo "ledger: $(wc -l < "$RUNNER_TEMP/history.jsonl") lines from origin/kronikol-history"
+          else
+            echo "no kronikol-history branch yet: the first run of ci-main starts it"
+          fi
+
       - name: Build TUnit project
         run: >
           dotnet build tests/BreakfastProvider.Tests.Component.TUnit/BreakfastProvider.Tests.Component.TUnit.csproj
@@ -214,6 +237,33 @@ jobs:
         run: |
           cd tests/BreakfastProvider.Tests.Component.TUnit/bin/Debug/net10.0
           ./BreakfastProvider.Tests.Component.TUnit
+
+      # What the ledger says about this run, in the job summary; advisory (continue-on-error), with the
+      # same minimum-runs bar the suite reports with.
+      - name: History gate
+        if: ${{ always() && env.KRONIKOL_HISTORY != '' }}
+        continue-on-error: true
+        run: |
+          dotnet tool install --global Kronikol.Tool --version 3.13.0
+          echo "${HOME}/.dotnet/tools" >> "$GITHUB_PATH"
+          export PATH="${HOME}/.dotnet/tools:$PATH"
+          {
+            echo "### History gate (${{ inputs.test-run-description }})"
+            echo '```'
+            kronikol history gate "${{ steps.history-reports-dir.outputs.dir }}" --history "$RUNNER_TEMP/history.jsonl" --min-runs 3
+            echo '```'
+          } | tee -a "$GITHUB_STEP_SUMMARY"
+
+      - name: Test report (CTRF)
+        if: ${{ always() && hashFiles(format('{0}/ctrf-report.json', steps.history-reports-dir.outputs.dir)) != '' }}
+        continue-on-error: true
+        uses: ctrf-io/github-test-reporter@v1
+        with:
+          report-path: ${{ steps.history-reports-dir.outputs.dir }}/ctrf-report.json
+          summary-report: true
+          flaky-report: true
+          failed-report: true
+          pull-request: false
 
       - name: Dump container logs on failure
         if: ${{ failure() && (inputs.test-run-type == 'docker' || inputs.test-run-type == 'external-sut') }}

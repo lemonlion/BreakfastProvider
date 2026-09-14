@@ -14,6 +14,8 @@ on:
 
 env:
   BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
+  # One cross-run history stream per suite and per lane (see KronikolHistory.WithCrossRunHistory).
+  KRONIKOL_SUITE: ${{ inputs.test-run-description }}
 
 jobs:
   run-tests:
@@ -256,6 +258,30 @@ jobs:
             echo "args=--report-xunit-trx --report-xunit-trx-filename ${{ steps.get-trx-file-name.outputs.trx_file }}" >> $GITHUB_OUTPUT
           fi
 
+      - id: reports-dir
+        name: Locate the reports directory
+        run: echo "dir=$(dirname "${{ inputs.features-report-path }}")" >> "$GITHUB_OUTPUT"
+
+      # Cross-run history (Kronikol 3.9.0+): the ledger lives on the orphan branch `kronikol-history`,
+      # never in the working tree. Read here, before the run, so this run's Failures.md, CTRF document and
+      # TestRunReport.html already say whether a failure is a regression, has been failing since a
+      # particular run, or flips. The copy is discarded; the run's own History.run.json is uploaded with
+      # the report and folded into the branch by the `history` job of ci-main.yml. A pull request build
+      # reads against the branch it targets (Kronikol reads GITHUB_BASE_REF itself).
+      - name: Fetch the history ledger
+        if: ${{ inputs.test-type == 'component' }}
+        run: |
+          if git fetch --depth=1 origin kronikol-history 2>/dev/null; then
+            git show FETCH_HEAD:history.jsonl > "$RUNNER_TEMP/history.jsonl"
+            for companion in quarantine.json aliases.json; do
+              git show "FETCH_HEAD:$companion" > "$RUNNER_TEMP/$companion" 2>/dev/null || rm -f "$RUNNER_TEMP/$companion"
+            done
+            echo "KRONIKOL_HISTORY=$RUNNER_TEMP/history.jsonl" >> "$GITHUB_ENV"
+            echo "ledger: $(wc -l < "$RUNNER_TEMP/history.jsonl") lines from origin/kronikol-history"
+          else
+            echo "no kronikol-history branch yet: the first run of ci-main starts it"
+          fi
+
       - name: Install dotnet-coverage tool
         run: dotnet tool install --global dotnet-coverage
 
@@ -270,6 +296,38 @@ jobs:
           ${{ inputs.filter && format('--filter {0}', inputs.filter) || '' }}
           --
           ${{ steps.get-trx-report-args.outputs.args }}"
+
+      # What the ledger says about this run, in the job summary: the gate trips on what is new and reads
+      # the rest out. Advisory here (continue-on-error) - the build's verdict is still the test step's -
+      # so the demo shows the reading without a known-flaky scenario turning the lane red. --min-runs 3
+      # is the bar the suites report with (KronikolHistory.WithCrossRunHistory).
+      - name: History gate
+        if: ${{ always() && inputs.test-type == 'component' && env.KRONIKOL_HISTORY != '' }}
+        continue-on-error: true
+        run: |
+          dotnet tool install --global Kronikol.Tool --version 3.13.0
+          echo "${HOME}/.dotnet/tools" >> "$GITHUB_PATH"
+          export PATH="${HOME}/.dotnet/tools:$PATH"
+          {
+            echo "### History gate (${{ inputs.test-run-description }})"
+            echo '```'
+            kronikol history gate "${{ steps.reports-dir.outputs.dir }}" --history "$RUNNER_TEMP/history.jsonl" --min-runs 3
+            echo '```'
+          } | tee -a "$GITHUB_STEP_SUMMARY"
+
+      # The CTRF document the run wrote, with `flaky` set from the ledger, rendered by the CTRF reporter:
+      # its flaky list is producer-driven, so this is the only thing that fills it for a suite that never
+      # retries (its flakiness *rate* counts retries, and stays 0.00% by design).
+      - name: Test report (CTRF)
+        if: ${{ always() && inputs.test-type == 'component' && hashFiles(format('{0}/ctrf-report.json', steps.reports-dir.outputs.dir)) != '' }}
+        continue-on-error: true
+        uses: ctrf-io/github-test-reporter@v1
+        with:
+          report-path: ${{ steps.reports-dir.outputs.dir }}/ctrf-report.json
+          summary-report: true
+          flaky-report: true
+          failed-report: true
+          pull-request: false
 
       - name: Dump container logs on failure
         if: ${{ failure() && (inputs.test-run-type == 'docker' || inputs.test-run-type == 'external-sut') }}

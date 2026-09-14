@@ -886,3 +886,20 @@ When a new topic is created for Kafka, each topic has its own API key and secret
 - [OpenAPI Spec](docs/openapi.json)
 - [AsyncAPI Spec](docs/asyncapi.json)
 - [Component Specifications](docs/ComponentSpecifications.yml)
+
+## Cross-run test history
+
+Every component test run reads a [Kronikol](https://github.com/lemonlion/Kronikol) cross-run history
+ledger before it starts and says, on every surface it writes, whether a failure is a regression, has been
+failing since a particular run, or flips: `Failures.md`, `ctrf-report.json`, the job summary, and the
+published `TestRunReport.html` (a sparkline and verdict beside each scenario, a History section beside
+the timeline, `$flaky` in the search box). The ledger lives on the orphan branch
+[`kronikol-history`](https://github.com/lemonlion/BreakfastProvider/tree/kronikol-history), one line per
+run and lane, appended by the `history` job of `ci-main.yml` and never merged into `main`; a nightly run
+keeps it accruing. A pull request build reads against `main`. To read it locally:
+
+```bash
+git fetch origin kronikol-history && git show FETCH_HEAD:history.jsonl > history.jsonl
+kronikol query history <reports-dir> --history history.jsonl                 # dotnet tool install -g Kronikol.Tool
+kronikol history gate  <reports-dir> --history history.jsonl --min-runs 3    # exit 1 on a new failure, flaky read out
+```

@@ -1,3 +1,4 @@
+using BreakfastProvider.Tests.Component.Shared;
 using BreakfastProvider.Tests.Component.Shared.Constants;
 using BreakfastProvider.Tests.Component.Shared.Fakes.Kafka;
 using BreakfastProvider.Tests.Component.Shared.Fakes.PubSub;
@@ -54,7 +55,7 @@ public sealed class TestRunHooks
                 TestRunReportTitle = "Breakfast Provider (ReqNRoll) Test Run Report",
                 WriteCiSummary = true,
                 ExcludedHeaders = [CustomHeaders.ComponentTestRequestId, CustomHeaders.CorrelationId]
-            });
+            }.WithCrossRunHistory("ReqNRoll"));
 
         Support.AppManager.DisposeFactory();
         SourceControlledDocsHelper.CopySpecificationsFileToDocsFolder().GetAwaiter().GetResult();

@@ -1,4 +1,5 @@
 using BreakfastProvider.Tests.Component.NUnit.Infrastructure;
+using BreakfastProvider.Tests.Component.Shared;
 using BreakfastProvider.Tests.Component.Shared.Constants;
 using BreakfastProvider.Tests.Component.Shared.Fakes.Kafka;
 using BreakfastProvider.Tests.Component.Shared.Fakes.PubSub;
@@ -72,7 +73,7 @@ public class GlobalTestSetup : DiagrammedTestRun
                 TestRunReportTitle = "Breakfast Provider (NUnit) Test Run Report",
                 WriteCiSummary = true,
                 ExcludedHeaders = [CustomHeaders.ComponentTestRequestId, CustomHeaders.CorrelationId]
-            });
+            }.WithCrossRunHistory("NUnit"));
 
         await SourceControlledDocsHelper.CopySpecificationsFileToDocsFolder();
         await SourceControlledDocsHelper.CopyApiSpecificationFilesToDocsFolder();

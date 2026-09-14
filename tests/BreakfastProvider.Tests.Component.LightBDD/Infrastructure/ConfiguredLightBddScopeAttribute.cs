@@ -1,3 +1,4 @@
+using BreakfastProvider.Tests.Component.Shared;
 using BreakfastProvider.Tests.Component.Shared.Constants;
 using BreakfastProvider.Tests.Component.Shared.Fakes.Kafka;
 using BreakfastProvider.Tests.Component.Shared.Fakes.PubSub;
@@ -50,7 +51,7 @@ public class ConfiguredLightBddScopeAttribute : LightBddScope
                     TestRunReportTitle = "Breakfast Provider (LightBDD) Test Run Report",
                     WriteCiSummary = true,
                     ExcludedHeaders = [CustomHeaders.ComponentTestRequestId, CustomHeaders.CorrelationId]
-                });
+                }.WithCrossRunHistory("LightBDD"));
 
         // To stop the output repeating the step name each step
         configuration.ProgressNotifierConfiguration().Clear().Append(

@@ -7,6 +7,11 @@ on:
   push:
     branches: ["main"]
 
+  # A run a day keeps the cross-run history ledger accruing (flakiness needs earlier runs to read
+  # against) and the published reports saying what the last runs said.
+  schedule:
+    - cron: "0 3 * * *"
+
 permissions:
   contents: read
   checks: write
@@ -547,6 +552,112 @@ jobs:
     secrets: inherit
 
 
+  # ─── Cross-run history ─────────────────────────────
+  # Folds every lane's History.run.json (already inside the `*-report` artifacts) into the ledger on the
+  # orphan branch `kronikol-history`, which the lanes read before they run. One line per run and lane; a
+  # run already recorded is skipped, so re-running this job is safe. The branch shares no history with
+  # main, so fetching it costs nothing and it can never be merged into main by accident.
+  history:
+    name: Record the runs in the history ledger
+    needs:
+      - lightbdd-in-memory
+      - reqnroll-in-memory
+      - xunit-in-memory
+      - tunit-in-memory
+      - nunit-in-memory
+      - bddfy-in-memory
+      - lightbdd-in-docker
+      - reqnroll-in-docker
+      - xunit-in-docker
+      - tunit-in-docker
+      - nunit-in-docker
+      - bddfy-in-docker
+      - lightbdd-external-sut
+      - reqnroll-external-sut
+      - xunit-external-sut
+      - tunit-external-sut
+      - nunit-external-sut
+      - bddfy-external-sut
+    if: always()
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v5
+        with:
+          token: ${{ secrets.PUSH_SPECS_IN_CI_TOKEN != '' && secrets.PUSH_SPECS_IN_CI_TOKEN || github.token }}
+
+      - name: Setup .NET v10
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Download the run's reports
+        uses: actions/download-artifact@v7
+        with:
+          pattern: '*-report'
+          path: fragments
+
+      - name: Fold the fragments into the kronikol-history branch
+        run: |
+          set -euo pipefail
+          dotnet tool install --global Kronikol.Tool --version 3.13.0
+          echo "${HOME}/.dotnet/tools" >> "$GITHUB_PATH"
+          export PATH="${HOME}/.dotnet/tools:$PATH"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          WT="$RUNNER_TEMP/history-branch"
+          # FETCH_HEAD is per-worktree, so the new worktree names the remote-tracking ref the fetch updates.
+          if git fetch origin kronikol-history; then
+            git worktree add -B kronikol-history "$WT" origin/kronikol-history
+          else
+            git worktree add --detach "$WT"
+            git -C "$WT" checkout -q --orphan kronikol-history
+            git -C "$WT" rm -rfq .
+            printf '%s\n' "# Kronikol history ledger" "" \
+              "The cross-run ledger of BreakfastProvider's component test runs: an orphan data branch, appended to by the" \
+              "history job of .github/workflows/ci-main.yml and never merged into main. Each lane of each CI run is one line." \
+              "" "Read it: git fetch origin kronikol-history && git show FETCH_HEAD:history.jsonl > history.jsonl" \
+              "         kronikol query history <reports-dir> --history history.jsonl" \
+              > "$WT/README.md"
+            printf '%s\n' "history.jsonl merge=union text eol=lf" > "$WT/.gitattributes"
+          fi
+          if [ ! -d fragments ] || [ -z "$(find fragments -name History.run.json -print -quit)" ]; then
+            echo "no fragments to record"
+            exit 0
+          fi
+          kronikol history record fragments --history "$WT/history.jsonl"
+          cd "$WT"
+          git add history.jsonl README.md .gitattributes
+          if git diff --cached --quiet; then
+            echo "nothing new to record"
+            exit 0
+          fi
+          git commit -q -m "Record run ${GITHUB_RUN_ID}:${GITHUB_RUN_ATTEMPT} (${GITHUB_SHA::7})"
+          for attempt in 1 2 3 4 5; do
+            if git push origin HEAD:kronikol-history; then
+              exit 0
+            fi
+            echo "push $attempt lost the race; rebasing onto the branch as it is now"
+            git fetch origin kronikol-history
+            git rebase origin/kronikol-history
+          done
+          echo "could not push the ledger after 5 attempts"
+          exit 1
+
+      - name: What the ledger holds now
+        run: |
+          export PATH="${HOME}/.dotnet/tools:$PATH"
+          if [ -f "$RUNNER_TEMP/history-branch/history.jsonl" ]; then
+            {
+              echo "### History ledger (kronikol-history)"
+              echo '```'
+              kronikol history show --history "$RUNNER_TEMP/history-branch/history.jsonl"
+              echo '```'
+            } | tee -a "$GITHUB_STEP_SUMMARY"
+          fi
+
   # ─── GitHub Pages ───────────────────────────────────────────────────────────
 
   deploy-pages:
@@ -841,6 +952,7 @@ jobs:
 
             <div class="container">
               <p class="section-title">Test Run Reports</p>
+              <p style="margin:-0.4em 0 1em;color:#6b7280;font-size:0.95em">Every report reads the last runs of its lane from the <a href="https://github.com/lemonlion/BreakfastProvider/tree/kronikol-history">cross-run history ledger</a>: a sparkline and verdict beside each scenario, a History section beside the timeline, and <code>$flaky</code> in the search box. Each report folder also carries <code>Failures.md</code> and <code>ctrf-report.json</code>.</p>
               <div class="card-grid">
                 <a href="reports/reqnroll/TestRunReport.html" class="card">
                   <div class="card-icon">🥒</div>

@@ -439,3 +439,6 @@ bddfy_il.txt
 test-results.txt
 publish-output/
 coverage/
+
+# Kronikol cross-run history: a local run appends to a scratch ledger here; the real one is the kronikol-history branch
+.kronikol/

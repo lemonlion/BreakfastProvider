@@ -203,6 +203,8 @@ public abstract class BaseFixture : FeatureFixture, IDisposable, IIgnorable<Comp
                 {
                     ConfigureTestServices(services);
                     additionalServices?.Invoke(services);
+                    // A hosted service the test registered itself is detached too (wrapping twice wraps once).
+                    services.DetachHostedServicesFromTestIdentity();
                 });
             });
         }
@@ -518,6 +520,11 @@ public abstract class BaseFixture : FeatureFixture, IDisposable, IIgnorable<Comp
 
         // Register Kafka message store (avoids src/ model imports in step files)
         services.AddTestTypedEventStores(ConsumedKafkaMessageStore, ConsumedEventHubMessageStore, CurrentTestInfo.Fetcher);
+
+        // Last: a host built inside a test inherits that test's identity, and so would every hosted service
+        // the host starts (outbox processor, consumer loops). Detached, their housekeeping belongs to no
+        // scenario, while a message that names its scenario still reaches it.
+        services.DetachHostedServicesFromTestIdentity();
     }
 
     private HttpClient CreateTestClient()

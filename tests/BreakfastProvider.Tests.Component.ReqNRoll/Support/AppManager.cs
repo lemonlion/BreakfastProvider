@@ -107,6 +107,8 @@ public sealed class AppManager : IDisposable
                 {
                     ConfigureTestServices(services);
                     additionalServices?.Invoke(services);
+                    // A hosted service the test registered itself is detached too (wrapping twice wraps once).
+                    services.DetachHostedServicesFromTestIdentity();
                 });
             });
         }
@@ -392,6 +394,11 @@ public sealed class AppManager : IDisposable
         services.UseTrackedPubSubPublishers();
 
         services.AddTestTypedEventStores(ConsumedKafkaMessageStore, ConsumedEventHubMessageStore, CurrentTestInfo.Fetcher);
+
+        // Last: a host built inside a test inherits that test's identity, and so would every hosted service
+        // the host starts (outbox processor, consumer loops). Detached, their housekeeping belongs to no
+        // scenario, while a message that names its scenario still reaches it.
+        services.DetachHostedServicesFromTestIdentity();
     }
 
     private HttpClient CreateTestClient()

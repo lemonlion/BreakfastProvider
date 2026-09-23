@@ -602,7 +602,7 @@ jobs:
       - name: Fold the fragments into the kronikol-history branch
         run: |
           set -euo pipefail
-          dotnet tool install --global Kronikol.Tool --version 3.27.1
+          dotnet tool install --global Kronikol.Tool --version 3.29.0
           echo "${HOME}/.dotnet/tools" >> "$GITHUB_PATH"
           export PATH="${HOME}/.dotnet/tools:$PATH"
           git config user.name "github-actions[bot]"

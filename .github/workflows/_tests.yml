@@ -310,7 +310,7 @@ jobs:
         id: gate
         if: ${{ always() && inputs.test-type == 'component' && env.KRONIKOL_HISTORY != '' }}
         run: |
-          if ! dotnet tool install --global Kronikol.Tool --version 3.27.1; then
+          if ! dotnet tool install --global Kronikol.Tool --version 3.29.0; then
             echo "::warning::Kronikol.Tool could not be installed; the test step's outcome stands"
             if [ "${{ steps.tests.outcome }}" = "success" ]; then exit 0; else exit 1; fi
           fi

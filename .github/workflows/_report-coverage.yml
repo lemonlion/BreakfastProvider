@@ -83,3 +83,6 @@ jobs:
         uses: geekyeggo/delete-artifact@v6
         with:
           name: ${{ inputs.coverage-file }}
+          # Cleanup only, and the artifact expires in a day anyway. A delete the action retries after a slow first
+          # answer finds the artifact already gone (404) and would fail a job whose work is done.
+          failOnError: false

@@ -6,7 +6,7 @@ An example api, providing breakfast preparation capabilities including pancake/w
 
 ## Purpose [↑](#top)<a name="purpose"></a>
 
-This project is a **deliberately opinionated reference implementation** of a component testing design philosophy. It exists to demonstrate how a modern .NET service can be built and tested, serving as a template for teams adopting outside-in component testing, running all dependencies both in memory and in docker/external (depending on a config switch) and using [Kronikol](https://lemonlion.github.io/Kronikol) to autogenerate test reports that have [interactive sequence diagrams](https://lemonlion.github.io/BreakfastProvider/) of your tests.
+This project is a **deliberately opinionated reference implementation** of a component testing design philosophy. It exists to demonstrate how a modern .NET service can be built and tested, serving as a template for teams adopting outside-in component testing, running all dependencies both in memory and in docker/external (depending on a config switch) and using [Kronikol](https://github.com/lemonlion/Kronikol) to autogenerate test reports that have [interactive sequence diagrams](https://lemonlion.github.io/BreakfastProvider/) of your tests.
 
 ## Table Of Contents<a name="table-of-contents"></a>
 

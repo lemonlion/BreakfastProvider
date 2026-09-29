@@ -210,22 +210,13 @@ jobs:
         name: Locate the reports directory
         run: echo "dir=$(dirname "${{ inputs.features-report-path }}")" >> "$GITHUB_OUTPUT"
 
-      # Cross-run history (Kronikol 3.9.0+), the same steps as _tests.yml: read the ledger from the orphan
-      # branch `kronikol-history` before the run, so the run's outputs already say what the last runs said;
-      # the run's own History.run.json is uploaded with the report and folded in by the `history` job of
-      # ci-main.yml. A pull request build reads against the branch it targets (Kronikol reads GITHUB_BASE_REF).
-      - name: Fetch the history ledger
-        run: |
-          if git fetch --depth=1 origin kronikol-history 2>/dev/null; then
-            git show FETCH_HEAD:history.jsonl > "$RUNNER_TEMP/history.jsonl"
-            for companion in quarantine.json aliases.json; do
-              git show "FETCH_HEAD:$companion" > "$RUNNER_TEMP/$companion" 2>/dev/null || rm -f "$RUNNER_TEMP/$companion"
-            done
-            echo "KRONIKOL_HISTORY=$RUNNER_TEMP/history.jsonl" >> "$GITHUB_ENV"
-            echo "ledger: $(wc -l < "$RUNNER_TEMP/history.jsonl") lines from origin/kronikol-history"
-          else
-            echo "no kronikol-history branch yet: the first run of ci-main starts it"
-          fi
+      # Cross-run history, through Kronikol's history action. The ledger lives on the orphan branch
+      # `kronikol-history`, never in the working tree. It is read here, with its quarantine and aliases, before
+      # the run, so this run's Failures.md, CTRF document and TestRunReport.html already say whether a failure
+      # is a regression, has been failing since a particular run, or flips. A pull request build reads against
+      # the branch it targets (Kronikol reads GITHUB_BASE_REF itself).
+      - name: Read the history ledger
+        uses: lemonlion/Kronikol/templates/github-actions/kronikol-history/read@v3.34.0
 
       - name: Build TUnit project
         run: >
@@ -242,35 +233,25 @@ jobs:
           ./BreakfastProvider.Tests.Component.TUnit
 
       # What the ledger says about this run decides the lane: a failure the ledger already knows (flaky,
-      # failing since an earlier run) is read out, a new one fails the job. That is what the test step
-      # above stopped doing. --min-runs 3 is the bar the suites report with
-      # (KronikolHistory.WithCrossRunHistory). Without a ledger to read, or without the tool, the test
-      # step's own outcome stands (the step after this one).
+      # failing since an earlier run) is read out, a new one fails the job. That is what the test step above
+      # stopped doing. With no ledger yet, the test step's outcome stands. --min-runs 3 is the bar the
+      # suites report with (KronikolHistory.WithCrossRunHistory).
       - name: History gate
-        id: gate
-        if: ${{ always() && env.KRONIKOL_HISTORY != '' }}
-        run: |
-          if ! dotnet tool install --global Kronikol.Tool --version 3.32.4; then
-            echo "::warning::Kronikol.Tool could not be installed; the test step's outcome stands"
-            if [ "${{ steps.tests.outcome }}" = "success" ]; then exit 0; else exit 1; fi
-          fi
-          echo "${HOME}/.dotnet/tools" >> "$GITHUB_PATH"
-          export PATH="${HOME}/.dotnet/tools:$PATH"
-          status=0
-          kronikol history gate "${{ steps.history-reports-dir.outputs.dir }}" --history "$RUNNER_TEMP/history.jsonl" --min-runs 3 > "$RUNNER_TEMP/gate.txt" 2>&1 || status=$?
-          {
-            echo "### History gate (${{ inputs.test-run-description }})"
-            echo '```'
-            cat "$RUNNER_TEMP/gate.txt"
-            echo '```'
-          } | tee -a "$GITHUB_STEP_SUMMARY"
-          exit $status
+        if: ${{ !cancelled() }}
+        uses: lemonlion/Kronikol/templates/github-actions/kronikol-history/gate@v3.34.0
+        with:
+          reports: ${{ steps.history-reports-dir.outputs.dir }}
+          test-outcome: ${{ steps.tests.outcome }}
+          min-runs: '3'
 
-      - name: Tests failed and no ledger to read them against
-        if: ${{ always() && env.KRONIKOL_HISTORY == '' && steps.tests.outcome == 'failure' }}
-        run: |
-          echo "::error::the test step failed and there is no history ledger yet to say whether that is new"
-          exit 1
+      # The run's History.run.json, as an artifact of its own, for the `history` job of ci-main.yml to fold
+      # into the ledger. A pull request's run is read against the ledger, never recorded.
+      - name: Save the history fragment
+        if: ${{ !cancelled() && github.event_name != 'pull_request' }}
+        uses: lemonlion/Kronikol/templates/github-actions/kronikol-history/save@v3.34.0
+        with:
+          path: ${{ steps.history-reports-dir.outputs.dir }}
+          name: ${{ inputs.test-run-description }}
 
       - name: Test report (CTRF)
         if: ${{ always() && hashFiles(format('{0}/ctrf-report.json', steps.history-reports-dir.outputs.dir)) != '' }}

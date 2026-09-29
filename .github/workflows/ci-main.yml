@@ -553,9 +553,10 @@ jobs:
 
 
   # ─── Cross-run history ─────────────────────────────
-  # Folds every lane's History.run.json (already inside the `*-report` artifacts) into the ledger on the
-  # orphan branch `kronikol-history`, which the lanes read before they run. One line per run and lane; a
-  # run already recorded is skipped, so re-running this job is safe. The branch shares no history with
+  # Folds every lane's History.run.json, which each lane saves as an artifact of its own, into the ledger on
+  # the orphan branch `kronikol-history` that the lanes read before they run, through Kronikol's history action.
+  # One line per run and lane; a run already recorded is skipped, so re-running this job is safe, and a push
+  # that another run's push beat records again on the branch as it now is. The branch shares no history with
   # main, so fetching it costs nothing and it can never be merged into main by accident.
   history:
     name: Record the runs in the history ledger
@@ -578,85 +579,14 @@ jobs:
       - tunit-external-sut
       - nunit-external-sut
       - bddfy-external-sut
-    if: always()
+    if: ${{ !cancelled() }}
     runs-on: ubuntu-24.04
     permissions:
       contents: write
     steps:
-      - name: Checkout source
-        uses: actions/checkout@v5
+      - uses: lemonlion/Kronikol/templates/github-actions/kronikol-history/record@v3.34.0
         with:
           token: ${{ secrets.PUSH_SPECS_IN_CI_TOKEN != '' && secrets.PUSH_SPECS_IN_CI_TOKEN || github.token }}
-
-      - name: Setup .NET v10
-        uses: actions/setup-dotnet@v5
-        with:
-          dotnet-version: 10.0.x
-
-      - name: Download the run's reports
-        uses: actions/download-artifact@v7
-        with:
-          pattern: '*-report'
-          path: fragments
-
-      - name: Fold the fragments into the kronikol-history branch
-        run: |
-          set -euo pipefail
-          dotnet tool install --global Kronikol.Tool --version 3.32.4
-          echo "${HOME}/.dotnet/tools" >> "$GITHUB_PATH"
-          export PATH="${HOME}/.dotnet/tools:$PATH"
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          WT="$RUNNER_TEMP/history-branch"
-          # FETCH_HEAD is per-worktree, so the new worktree names the remote-tracking ref the fetch updates.
-          if git fetch origin kronikol-history; then
-            git worktree add -B kronikol-history "$WT" origin/kronikol-history
-          else
-            git worktree add --detach "$WT"
-            git -C "$WT" checkout -q --orphan kronikol-history
-            git -C "$WT" rm -rfq .
-            printf '%s\n' "# Kronikol history ledger" "" \
-              "The cross-run ledger of BreakfastProvider's component test runs: an orphan data branch, appended to by the" \
-              "history job of .github/workflows/ci-main.yml and never merged into main. Each lane of each CI run is one line." \
-              "" "Read it: git fetch origin kronikol-history && git show FETCH_HEAD:history.jsonl > history.jsonl" \
-              "         kronikol query history <reports-dir> --history history.jsonl" \
-              > "$WT/README.md"
-            printf '%s\n' "history.jsonl merge=union text eol=lf" > "$WT/.gitattributes"
-          fi
-          if [ ! -d fragments ] || [ -z "$(find fragments -name History.run.json -print -quit)" ]; then
-            echo "no fragments to record"
-            exit 0
-          fi
-          kronikol history record fragments --history "$WT/history.jsonl"
-          cd "$WT"
-          git add history.jsonl README.md .gitattributes
-          if git diff --cached --quiet; then
-            echo "nothing new to record"
-            exit 0
-          fi
-          git commit -q -m "Record run ${GITHUB_RUN_ID}:${GITHUB_RUN_ATTEMPT} (${GITHUB_SHA::7})"
-          for attempt in 1 2 3 4 5; do
-            if git push origin HEAD:kronikol-history; then
-              exit 0
-            fi
-            echo "push $attempt lost the race; rebasing onto the branch as it is now"
-            git fetch origin kronikol-history
-            git rebase origin/kronikol-history
-          done
-          echo "could not push the ledger after 5 attempts"
-          exit 1
-
-      - name: What the ledger holds now
-        run: |
-          export PATH="${HOME}/.dotnet/tools:$PATH"
-          if [ -f "$RUNNER_TEMP/history-branch/history.jsonl" ]; then
-            {
-              echo "### History ledger (kronikol-history)"
-              echo '```'
-              kronikol history show --history "$RUNNER_TEMP/history-branch/history.jsonl"
-              echo '```'
-            } | tee -a "$GITHUB_STEP_SUMMARY"
-          fi
 
   # ─── GitHub Pages ───────────────────────────────────────────────────────────
 

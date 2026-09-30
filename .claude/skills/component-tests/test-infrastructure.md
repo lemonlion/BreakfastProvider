@@ -716,11 +716,12 @@ Component tests generate an HTML specification report with embedded PlantUML seq
 
 ### Configuration
 
-`ConfiguredLightBddScopeAttribute` configures three report writers:
+`ConfiguredLightBddScopeAttribute` configures Kronikol's standard reports (`CreateStandardReportsWithDiagrams`), written to `bin/Debug/net10.0/Reports/`:
 
-1. **`ComponentSpecificationsWithExamples.html`** — formatted specs with PlantUML diagrams (for DevPortal)
-2. **`ComponentSpecifications.yml`** — plain YAML spec (source-controlled in `/docs/`)
-3. **`FeaturesReport.html`** — full report with test run details (for analysis)
+1. **`Specifications.html`** — formatted specs with PlantUML diagrams
+2. **`Specifications.yml`** — plain YAML spec (source-controlled in `/docs/`)
+3. **`TestRunReport.html`** — full report with test run details (for analysis)
+4. **`Failures.md`** — every failure in context; read this (or `kronikol query`) rather than opening the report
 
 ### Redaction Pipeline
 
@@ -728,7 +729,7 @@ Component tests generate an HTML specification report with embedded PlantUML seq
 
 ### Specifications YAML
 
-After tests complete, the YAML specification is copied to `docs/ComponentSpecifications.yml`. This source-controlled YAML is the living specification document.
+After tests complete, the YAML specification is copied to `docs/Specifications.yml`. This source-controlled YAML is the living specification document.
 
 ### Instance Data Validation
 
@@ -736,7 +737,7 @@ The framework validates that the YAML specification does not contain instance-sp
 
 ### Debugging with PlantUML Diagrams
 
-Open `tests/BreakfastProvider.Tests.Component/bin/Debug/net10.0/Reports/FeaturesReport.html` to see:
+Open `tests/BreakfastProvider.Tests.Component.LightBDD/bin/Debug/net10.0/Reports/TestRunReport.html` in a browser to see:
 - Every HTTP request/response
 - All downstream calls to Cow Service, Goat Service, etc.
 - Complete visual trace without breakpoints
@@ -779,11 +780,16 @@ dotnet test tests/BreakfastProvider.Tests.Component/BreakfastProvider.Tests.Comp
 
 | Artifact | Source Controlled | Contains Instance Data | Purpose |
 |---|---|---|---|
-| `ComponentSpecificationsWithExamples.html` | No | Yes (PlantUML diagrams) | DevPortal documentation |
-| `ComponentSpecifications.yml` | Yes (`/docs/`) | No | Living specification, git diffs |
-| `FeaturesReport.html` | No | Yes | Local/CI analysis |
+| `Specifications.html` | No | Yes (PlantUML diagrams) | Specifications with interaction diagrams |
+| `Specifications.yml` | Yes (`docs/Specifications.yml`) | No | Living specification, git diffs |
+| `TestRunReport.html` / `Failures.md` | No | Yes | Local/CI analysis |
+| `openapi.json`, `asyncapi.json` | Yes (`docs/`) | No | OpenAPI and AsyncAPI documents, fetched from the service |
+| `grpc.json`, `grpc.html` | Yes (`docs/`) | No | The gRPC contract (descriptor set in JSON) and its documentation page |
+| `graphql.json`, `schema.graphql` | Yes (`docs/`) | No | The GraphQL contract as introspection JSON and as SDL |
 | `*.trx` | No | Yes | Test results for CI reporting |
 | Coverage XML/HTML | No | Yes | Code coverage analysis |
+
+The six contract files are written by the Specifications scenarios of every suite through `ContractDocs` (UTF-8 without a BOM, LF), so all six suites write the same bytes, and the teardown copies each report attachment over `docs/` the same way. GitHub Pages publishes the committed files. **The drift gate**, the last step of `_tests.yml` and `_tests-tunit.yml`, fails an in-memory lane when `git status` shows any of the six changed, deleted or untracked: after changing a contract, run any suite in memory and commit `docs/`.
 
 ## Additional Service Registration (additionalServices callback)
 

@@ -58,7 +58,10 @@ This project is a **deliberately opinionated reference implementation** of a com
   + [Prometheus](#prometheus)
   + [Jaeger](#jaeger)
   + [Grafana](#grafana)
-* [Specifications & Documentation](#specifications--documentation)
+* [Contracts](#contracts)
+  + [Calling the gRPC service](#calling-the-grpc-service)
+  + [The GraphQL IDE](#the-graphql-ide)
+  + [Test Reports](#test-reports)
 * [Build and Deploy](#build-and-deploy)
 * [Docker Folder](#docker-folder)
   + [Docker Compose Files](#docker-compose-files)
@@ -441,6 +444,7 @@ The solution follows a straightforward **API + Tests** layout with feature-based
   - Configuration - Strongly-typed options classes
   - Filters - ASP.NET Core action filters
   - HttpClients - Typed HTTP clients for downstream services
+  - Contracts - The gRPC and GraphQL contracts as published documents: the descriptor set, the proto file and the gRPC documentation page, and the GraphQL introspection document
 
 ### Tests (`tests`) [↑](#top)<a name="tests-tests"></a>
 
@@ -468,7 +472,8 @@ The solution follows a straightforward **API + Tests** layout with feature-based
 - **Cosmos DB** for storage (orders, recipes, audit logs, outbox messages)
 - **Azure EventGrid** for domain events (e.g. order created), dispatched via the transactional outbox
 - **Apache Kafka** for recipe logging events
-- **HotChocolate** for GraphQL reporting endpoints (business intelligence queries)
+- **HotChocolate** for GraphQL reporting endpoints (business intelligence queries), with **Nitro** as the GraphQL IDE at `/graphql/`, served from its package (see [The GraphQL IDE](#the-graphql-ide))
+- **gRPC** (`Grpc.AspNetCore`) for the `breakfast.BreakfastGrpc` service and the Notification Service client, with **server reflection** (`Grpc.AspNetCore.Server.Reflection`) so gRPC tools can discover the service
 - **Entity Framework Core** with SQL Server (Docker/production) and SQLite (in-memory tests) for the reporting database
 - **ClickHouse** (via `ClickHouse.Driver`, the official ClickHouse .NET client, over HTTP) for kitchen analytics — order timings, equipment readings and service times; a DuckDB-backed in-process emulator (`tests/InMemoryEmulator.ClickHouse`) stands in for it in in-memory tests, tracked in diagrams by `Kronikol.Extensions.ClickHouse`
 - **Serilog** for structured logging
@@ -481,6 +486,7 @@ The solution follows a straightforward **API + Tests** layout with feature-based
 - **System.Text.Json** for serialisation
 - **Microsoft.AspNetCore.OpenApi** + **Scalar** for OpenAPI documentation
 - **Bielu.AspNetCore.AsyncApi** (backed by **ByteBard.AsyncAPI.NET**) for AsyncAPI documentation
+- The gRPC and GraphQL contracts, published as JSON and as a page beside OpenAPI and AsyncAPI — see [Contracts](#contracts)
 - **LightBDD** for BDD-style component tests
 - **xUnit** for unit tests
 - **In-process ASP.NET Core fakes** for downstream service simulation in component tests
@@ -508,6 +514,12 @@ The solution follows a straightforward **API + Tests** layout with feature-based
 | `DELETE` | `/menu/cache` | Clear menu cache |
 | `GET` | `/audit-logs` | Query audit logs (filterable by entityType, entityId) |
 | `POST` | `/graphql` | GraphQL endpoint for reporting queries (order summaries, recipe reports, ingredient usage, popular recipes) |
+| `GET` | `/graphql/` | Nitro, the GraphQL IDE |
+| `GET` | `/graphql/schema.json` | The GraphQL contract: the standard introspection response |
+| `GET` | `/graphql/schema.graphql` | The GraphQL contract as SDL |
+| `GET` | `/grpc/` | The gRPC contract's documentation page |
+| `GET` | `/grpc/v1.json` | The gRPC contract: `breakfast.proto`'s descriptor set in protobuf's JSON mapping |
+| `GET` | `/grpc/protos/breakfast.proto` | The gRPC contract's proto file |
 | `POST` | `/order-timings` | Record a kitchen order timing (ClickHouse) |
 | `GET` | `/order-timings/summary` | Per-station average, p95 and count of prep times (ClickHouse) |
 | `GET` | `/order-timings/station/{station}` | List timings for a station (ClickHouse) |
@@ -515,7 +527,8 @@ The solution follows a straightforward **API + Tests** layout with feature-based
 | `GET` | `/equipment-readings/equipment/{equipmentId}` | List readings for a piece of equipment (ClickHouse) |
 | `DELETE` | `/equipment-readings/{readingId}` | Delete a reading (ClickHouse lightweight delete) |
 
-- The OpenAPI document is served at `/openapi/v1.json` and rendered by Scalar at `/scalar/v1`, in every environment
+- The OpenAPI document is served at `/openapi/v1.json` and rendered by Scalar at `/scalar/v1`, in every environment; every contract's routes are in [Contracts](#contracts)
+- The gRPC service `breakfast.BreakfastGrpc` (`GetRecipeSummary`, `GetOrderStatus`, `StreamOrderUpdates`) and server reflection answer over HTTP/2 — see [Calling the gRPC service](#calling-the-grpc-service)
 - Validation returns `400 Bad Request` with `ProblemDetails`
 - Standard REST conventions: `POST` for creation, `GET` for retrieval, `PATCH` for updates, `DELETE` for removal
 - `X-Correlation-Id` header is propagated on all responses
@@ -639,7 +652,47 @@ dotnet build BreakfastProvider.sln
 dotnet test BreakfastProvider.sln
 ```
 
-## Specifications & Documentation [↑](#top)<a name="specifications--documentation"></a>
+## Contracts [↑](#top)<a name="contracts"></a>
+
+The service publishes each of its four contracts as a JSON document and as a UI page, in every environment. The component tests fetch every document from the service, check it and write it into `docs/`, in all six suites and byte for byte the same (UTF-8 without a BOM, LF). Each in-memory CI lane then fails if `docs/` no longer matches what the service serves, and [GitHub Pages](https://lemonlion.github.io/BreakfastProvider/) publishes the committed files, each document one click from the landing page and from its own page.
+
+| Contract | JSON served | Also served | UI page | In `docs/` | On GitHub Pages |
+|---|---|---|---|---|---|
+| **OpenAPI** (REST) | `GET /openapi/v1.json` | — | `GET /scalar/v1` (Scalar) | `openapi.json` | `api/openapi.html`, `api/openapi.json` |
+| **AsyncAPI** (events) | `GET /asyncapi/v1.json` | — | `GET /asyncapi` | `asyncapi.json` | `api/asyncapi.html`, `api/asyncapi.json` |
+| **gRPC** | `GET /grpc/v1.json`: `breakfast.proto`'s `FileDescriptorSet`, comments included, in protobuf's JSON mapping | `GET /grpc/protos/breakfast.proto`; server reflection, `grpc.reflection.v1` and `v1alpha` | `GET /grpc/`, rendered by the service from the descriptor set | `grpc.json`, `grpc.html` | `api/grpc/`, `api/grpc.json`, `api/grpc/protos/breakfast.proto` |
+| **GraphQL** | `GET /graphql/schema.json`: the standard introspection response | `GET /graphql/schema.graphql` (SDL) | `GET /graphql/` (Nitro) | `graphql.json`, `schema.graphql` | `api/graphql.html` (GraphQL Voyager), `api/graphql.json`, `api/schema.graphql` |
+
+- **The descriptions are part of the contract.** Every rpc, message and field of `breakfast.proto` carries a comment, and every GraphQL type and field an XML doc comment that HotChocolate turns into its description. The scenarios fail if an rpc or a root query field has none.
+- **The gRPC document is produced at build time.** protoc writes the descriptor set with its source info (the `EmbedGrpcContract` target in `BreakfastProvider.Api.csproj`), so the comments survive; the descriptors compiled into the service have none.
+- **The GraphQL document is produced inside the service.** HotChocolate refuses client introspection outside Development, so `/graphql/schema.json` runs the introspection query itself, with introspection allowed for that one request. Client introspection keeps HotChocolate's default.
+- **Keeping `docs/` current.** Run any component suite in memory and commit `docs/`. CI's gate in `_tests.yml` and `_tests-tunit.yml` fails an in-memory lane when a contract file changed, was deleted or was never committed.
+- **The Pages site builds locally**: `.github/scripts/build-api-pages.sh site && .github/scripts/check-site-links.py site && python3 -m http.server -d site 8000`. The renderers are pinned in the build script.
+
+### Calling the gRPC service [↑](#top)<a name="calling-the-grpc-service"></a>
+
+gRPC needs HTTP/2. With server reflection, grpcurl, Postman, Kreya and grpcui discover the service without the proto file:
+
+```shell
+# The API in Docker (docker-compose-sut.yml): port 5081 is HTTP/2 without TLS
+grpcurl -plaintext localhost:5081 list
+grpcurl -plaintext -d '{"recipe_type": "Pancakes"}' localhost:5081 breakfast.BreakfastGrpc/GetRecipeSummary
+
+# The API under dotnet run --launch-profile https: HTTP/2 over TLS on port 7270
+grpcurl -insecure localhost:7270 list
+```
+
+Don't use the `http` profile's port 5239: it accepts HTTP/1.1 and HTTP/2 without TLS, and a cleartext Kestrel endpoint that accepts both serves only HTTP/1.1, so gRPC calls to it time out. To generate a .NET client from the published proto: `dotnet grpc add-url -o Protos/breakfast.proto <host>/grpc/protos/breakfast.proto`.
+
+### The GraphQL IDE [↑](#top)<a name="the-graphql-ide"></a>
+
+`/graphql/` serves [Nitro](https://chillicream.com/docs/nitro), HotChocolate's IDE, from the files in the `ChilliCream.Nitro.App` package (`ServeMode = Embedded` in `Program.cs`). HotChocolate's default would proxy it from ChilliCream's CDN on every request, which fails with no internet. It loads the schema from `/graphql/schema.graphql`, so it works in Production, where client introspection is refused.
+
+Two things to know:
+- **Licence.** Nitro is under the ChilliCream License 1.0: free to use, copy and modify, but source-available rather than OSI-approved. `HotChocolate.AspNetCore` (MIT) depends on it, so it is in the build either way. Anyone who ships the API image should carry the licence in its third-party notices. `GRPC_GRAPHQL_CONTRACTS_PLAN.md`, Appendix D, has a tested way to remove Nitro from the build and serve GraphiQL (MIT) instead.
+- **Status call.** The page calls `https://api.chillicream.com/status` from the browser, even with telemetry disabled.
+
+### Test Reports [↑](#top)<a name="test-reports"></a>
 
 After running component tests, the following reports are generated:
 
@@ -650,13 +703,7 @@ After running component tests, the following reports are generated:
 | `TestRunReport.html` | Full report with test run details |
 | `Failures.md` | Every failure of the run in context, for reading without opening the report |
 
-Additional documentation in `/docs/`:
-
-| File | Description |
-|---|---|
-| `openapi.json` | OpenAPI document |
-| `asyncapi.json` | AsyncAPI document for EventGrid/Kafka events |
-| `Specifications.yml` | BDD component specifications |
+`docs/` also holds `Specifications.yml`, the BDD component specifications, beside the six contract files above.
 
 ## Docker Folder [↑](#top)<a name="docker-folder"></a>
 
@@ -886,7 +933,10 @@ When a new topic is created for Kafka, each topic has its own API key and secret
 
 - [OpenAPI Spec](docs/openapi.json)
 - [AsyncAPI Spec](docs/asyncapi.json)
+- [gRPC Contract](docs/grpc.json) — its [documentation page](docs/grpc.html) and [proto file](src/BreakfastProvider.Api/Protos/breakfast.proto)
+- [GraphQL Schema](docs/schema.graphql) — and as [introspection JSON](docs/graphql.json)
 - [Component Specifications](docs/Specifications.yml)
+- [All four contracts on GitHub Pages](https://lemonlion.github.io/BreakfastProvider/)
 
 ## Cross-run test history
 

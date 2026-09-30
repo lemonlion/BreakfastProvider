@@ -16,7 +16,8 @@ This is the **Breakfast Provider** platform service, owned by **Team Griddle**. 
 - **System.Text.Json** for serialisation
 - **Microsoft.AspNetCore.OpenApi** + **Scalar** for OpenAPI documentation
 - **Bielu.AspNetCore.AsyncApi** (backed by **ByteBard.AsyncAPI.NET**) for AsyncAPI documentation
-- **HotChocolate** for GraphQL reporting endpoints (business intelligence queries)
+- **HotChocolate** for GraphQL reporting endpoints (business intelligence queries); the IDE, **Nitro**, is served from its package (`ServeMode = Embedded`), never from ChilliCream's CDN, and is under the ChilliCream License 1.0 (source-available, not OSI)
+- **gRPC** (`Grpc.AspNetCore` 2.84) for the `breakfast.BreakfastGrpc` service, with **server reflection** (`grpc.reflection.v1` and `v1alpha`) mapped POST-only like the service
 - **Entity Framework Core** with SQL Server (Docker/production) and SQLite (in-memory tests) for the reporting database
 - **ClickHouse** (`ClickHouse.Client` over HTTP, ADO.NET abstractions only in services) for kitchen analytics (`/order-timings`, `/equipment-readings`, and the `OrderServedEvent` Kafka flow); `tests/InMemoryEmulator.ClickHouse` is a DuckDB-backed in-process emulator for in-memory tests, tracked by `Kronikol.Extensions.ClickHouse`
 
@@ -130,6 +131,11 @@ Comprehensive testing conventions, patterns, and infrastructure are documented i
 
 - Route prefix: `/` (e.g. `/pancakes`, `/waffles`, `/orders`, `/eggs`, `/milk`, `/flour`, `/toppings`, `/menu`, `/daily-specials`, `/health`, `/graphql`)
 - OpenAPI via Microsoft.AspNetCore.OpenApi (`/openapi/v1.json`), rendered by Scalar (`/scalar/v1`)
+- Contracts beyond OpenAPI and AsyncAPI live in `src/BreakfastProvider.Api/Contracts/` and are mapped with `Map…` extensions, not controllers, and with `.ExcludeFromDescription()` so they stay out of `openapi.json`:
+  - gRPC: `/grpc/v1.json` (protoc's descriptor set of `breakfast.proto`, comments included, embedded by the `EmbedGrpcContract` target), `/grpc/protos/breakfast.proto`, and the documentation page `/grpc/`
+  - GraphQL: `/graphql/schema.json` (introspection run inside the service with `AllowIntrospection()` on that request only — client introspection stays off outside Development), `/graphql/schema.graphql` (SDL), Nitro at `/graphql/`
+- Descriptions are part of the contracts: every rpc, message and field in `breakfast.proto` carries a comment, and every GraphQL type and field an XML doc comment; the specification scenarios fail when an rpc or a root query field has none
+- The component tests write the six contract files into `docs/` (`openapi.json`, `asyncapi.json`, `grpc.json`, `grpc.html`, `graphql.json`, `schema.graphql`) through `ContractDocs`; each in-memory CI lane fails if they differ from what the service serves, so commit `docs/` after changing a contract
 - Standard REST conventions: POST for creation, GET for retrieval, PATCH for updates, DELETE for removal
 - Validation returns 400 Bad Request with ProblemDetails
 - Downstream errors return 502 Bad Gateway with ProblemDetails

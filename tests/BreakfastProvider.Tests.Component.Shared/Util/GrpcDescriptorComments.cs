@@ -15,6 +15,8 @@ public static class GrpcDescriptorComments
     public static IReadOnlyList<string> UndocumentedMethods(FileDescriptorProto file, string serviceName)
     {
         var s = file.Service.Select(service => service.Name).ToList().IndexOf(serviceName);
+        if (s < 0)
+            throw new InvalidOperationException($"{file.Name} declares no service {serviceName}.");
         var service = file.Service[s];
         return service.Method
             .Where((_, m) => string.IsNullOrWhiteSpace(LeadingComment(file, FileServiceField, s, ServiceMethodField, m)))

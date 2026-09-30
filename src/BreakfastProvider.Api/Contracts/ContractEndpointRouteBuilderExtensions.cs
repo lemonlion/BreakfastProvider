@@ -1,4 +1,5 @@
 using System.Net.Mime;
+using System.Text;
 using HotChocolate.Execution;
 
 namespace BreakfastProvider.Api.Contracts;
@@ -15,16 +16,16 @@ public static class ContractEndpointRouteBuilderExtensions
     /// </summary>
     public static IEndpointRouteBuilder MapGrpcContract(this IEndpointRouteBuilder app)
     {
-        app.MapGet(Documentation.Contracts.GrpcJson, () => Results.Text(GrpcContract.Json, MediaTypeNames.Application.Json))
+        app.MapGet(Documentation.Contracts.GrpcJson, () => Results.Text(GrpcContract.Json, MediaTypeNames.Application.Json, Encoding.UTF8))
             .ExcludeFromDescription();
-        app.MapGet(Documentation.Contracts.GrpcProto, () => Results.Text(GrpcContract.Proto, MediaTypeNames.Text.Plain))
+        app.MapGet(Documentation.Contracts.GrpcProto, () => Results.Text(GrpcContract.Proto, MediaTypeNames.Text.Plain, Encoding.UTF8))
             .ExcludeFromDescription();
 
         // One route matches /grpc and /grpc/. The page is served on the trailing-slash form, so its relative links
         // (v1.json, protos/breakfast.proto) resolve the same way here and on GitHub Pages; /grpc redirects to it.
         app.MapGet(Documentation.Contracts.GrpcUi, (HttpContext context) =>
                 context.Request.Path.Value!.EndsWith('/')
-                    ? Results.Text(GrpcContract.Html, MediaTypeNames.Text.Html)
+                    ? Results.Text(GrpcContract.Html, MediaTypeNames.Text.Html, Encoding.UTF8)
                     : Results.Redirect($"{context.Request.PathBase}{context.Request.Path}/", permanent: true))
             .ExcludeFromDescription();
         return app;
@@ -34,7 +35,7 @@ public static class ContractEndpointRouteBuilderExtensions
     public static IEndpointRouteBuilder MapGraphQLSchemaJson(this IEndpointRouteBuilder app)
     {
         app.MapGet(Documentation.Contracts.GraphQLSchemaJson, async (IRequestExecutorResolver executors, CancellationToken ct) =>
-                Results.Text(await GraphQLContract.IntrospectAsync(executors, ct), MediaTypeNames.Application.Json))
+                Results.Text(await GraphQLContract.IntrospectAsync(executors, ct), MediaTypeNames.Application.Json, Encoding.UTF8))
             .ExcludeFromDescription();
         return app;
     }

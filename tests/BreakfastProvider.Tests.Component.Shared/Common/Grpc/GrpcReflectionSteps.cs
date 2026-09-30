@@ -51,6 +51,10 @@ public class GrpcReflectionSteps
         await call.RequestStream.WriteAsync(request);
         await call.RequestStream.CompleteAsync();
         await call.ResponseStream.MoveNext(CancellationToken.None);
-        return call.ResponseStream.Current;
+        var response = call.ResponseStream.Current;
+        if (response.MessageResponseCase == ServerReflectionResponse.MessageResponseOneofCase.ErrorResponse)
+            throw new InvalidOperationException(
+                $"Server reflection answered {response.ErrorResponse.ErrorCode}: {response.ErrorResponse.ErrorMessage}");
+        return response;
     }
 }

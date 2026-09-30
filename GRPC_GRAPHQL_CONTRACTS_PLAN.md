@@ -1,6 +1,9 @@
 # gRPC and GraphQL contracts plan — published as JSON and as a UI
 
-**Status:** proposed (2026-09-30). Nothing here is implemented. Every decision was checked against a spike run on
+**Status:** implemented (2026-09-30), one commit per phase on `ccr-8f587aa5-z37wc1`, with the O1–O4 defaults. What
+turned out differently is recorded in the implementation record below; the rest of the plan stands as written.
+
+**The plan as proposed.** Every decision was checked against a spike run on
 this checkout: a standalone app on the same package versions, then a scratch copy of the real API and its xUnit
 suite (Appendix A holds the results, Appendix B reproduces them). A second, independent research pass checked the same
 ground with the network switched off and against upstream sources; what it added is folded in, and its sources are
@@ -35,6 +38,65 @@ decision below.
 | O2 | Is Nitro's ChilliCream License 1.0 (source-available, not OSI) acceptable? | Yes: Nitro, embedded (D7, §8) | GraphiQL, self-hosted, and Nitro removed from the build entirely — tested, Appendix D |
 | O3 | gRPC server reflection in every environment, or Development only (Microsoft's advice)? | Every environment, like `/openapi/v1.json` (D3) | Development only: `MapGrpcReflectionService()` behind a setting; S5 and S6 then need `[IgnoreIf]` where it is off (the Docker SUT runs Development, so CI keeps them) |
 | O4 | Bump `Microsoft.AspNetCore.OpenApi` 10.0.7 → 10.0.12 in Phase 0 (vulnerable `Microsoft.OpenApi` 2.0.0)? | Yes, in its own commit if the `docs/openapi.json` diff is large (§4, item 0.5) | Leave it for a separate change |
+
+**Implementation record.** Each suite ends 9 above §0.5, as planned: xUnit, NUnit, TUnit and BDDfy 212/212, LightBDD
+187/187, ReqNRoll 214/214. Where the implementation departs from the plan or adds to it:
+
+- **LightBDD deleted `docs/openapi.json` and `docs/asyncapi.json` on every run** (Phase 0).
+  - LightBDD's `CreateFromFile` removes the original file by default, and LightBDD keeps attachments as
+    `Reports/<guid>.json`, so the teardown copy never restored them.
+  - Another suite running afterwards hid it, including in the baseline of A.3, but a lane that runs LightBDD alone
+    ended with both files deleted, and the drift gate would have failed it.
+  - Every LightBDD contract attachment now passes `removeOriginalFile: false`.
+- **`post-deployment-tests.yml` had a second fault** (Phase 0). Besides the missing project, it passed `--logger
+  GitHubActions`, a VSTest option: Microsoft.Testing.Platform answers "Unknown option '--logger'" and runs no tests.
+  The option is removed.
+- **S2's red step was 405, not 404** (Phase 1). The gRPC package's catch-all for unimplemented services matches
+  `/grpc/v1.json` and is POST-only.
+- **BDDfy keeps running steps after a failed assertion** (Phase 1). In the red run it wrote a 405's empty body over
+  `docs/grpc.json`. So `SpecificationDocumentSteps.WriteToDocs` refuses a document that was not fetched successfully,
+  and `ContractDocs.WriteAsync` refuses empty content.
+- **"Every … should be documented" checks every method and every root field in the document**, not just the known
+  ones, through `GrpcDescriptorComments.UndocumentedMethods` and `GraphQLSchemaDocuments.UndocumentedFields`. A new rpc
+  or query without a description fails the scenario.
+- **ReqNRoll's `SpecificationDocumentContext`** wraps the Shared `SpecificationDocumentSteps` with the format the When
+  expects (`Json`, `DescriptorSet`), and the shared Then validates by it.
+- **The gRPC page on a phone** (Phase 3). Its tables scroll inside their own box: the first version scrolled a 390 px
+  page sideways by 366 px.
+- **The renderer's unit tests.** `breakfast.proto` has no enums, nested or map types, optional fields or other
+  streaming kinds, so `BreakfastProvider.Tests.Unit` gains `GrpcContractPageTests` (8 tests) on a synthetic descriptor
+  set. The unit project stands at 92 tests: 87 pass and 5 are skipped, as before.
+- **`charset=utf-8`** (Phase 6). The contract routes now declare it, as §3.1 specifies; the first version sent
+  `text/plain` with no charset, whose default is US-ASCII. Found by the live-host check below.
+- **Pages** (Phase 5):
+  - The UI shells are files in `.github/pages/api/`, beside the landing page, rather than heredocs inside the build
+    script.
+  - Scalar is pinned at 1.72.3, which became npm latest on the day, instead of 1.72.2.
+  - The link check also covers `src=` and reports each missing link once.
+  - The landing page's specifications grid has two columns.
+- **Checked beyond the suites:**
+  - xUnit passes 212/212 with no network (`unshare -rn`).
+  - Running the six suites back to back leaves `docs/` untouched.
+  - The drift gate's script, run locally, passes a clean tree and fails an edited, a deleted and an untracked
+    contract.
+  - The Pages site was built locally, link-checked, and walked in headless Chromium.
+  - The real API ran under `dotnet run --launch-profile https` against the Cosmos emulator:
+    - every contract route answered byte-identical to `docs/`, and `/grpc` answered 301 to `/grpc/`;
+    - Nitro came from Kestrel with no `cf-ray`;
+    - `grpcurl -insecure localhost:7270 list`, `describe` and a unary call worked;
+    - cleartext port 5239 timed out, as §11 expects.
+  - A Production run of the whole API was not possible here, for two reasons:
+    - the app refuses Cosmos gateway mode outside Development;
+    - the vNext emulator serves only gateway mode (direct mode answered 400).
+
+    So `/graphql/schema.json` in Production still rests on A.4.4.
+- **Not exercised:** CI (no pull request was opened), so neither the docker and external-SUT lanes nor the drift gate
+  in CI have run. Neither has the Pages deploy, which runs only on `main`.
+- **Observed and left alone:**
+  - A TUnit run once read the Kitchen Service fake as unreachable in "Health check endpoint should return healthy
+    status…", and passed on re-run: a flake this change does not touch.
+  - `dotnet run` needs the configuration that `docker-compose-sut.yml` supplies before the app will start.
+  - HotChocolate's SDL printer escapes `/` as `\/` inside descriptions, which is valid GraphQL.
 
 ---
 
@@ -1292,18 +1354,19 @@ report).
 
 **Acceptance.**
 
-- [ ] All six suites green in memory; each total exactly 9 above §0.5.
-- [ ] One suite green in memory **with the network off** (e.g. `unshare -rn` on Linux, as in Appendix B): no contract
-      page or document needs the internet.
-- [ ] Running the six suites one after another leaves `git status` clean: six identical writers.
-- [ ] `docs/` holds `openapi.json`, `asyncapi.json`, `grpc.json`, `grpc.html`, `graphql.json`, `schema.graphql`, all LF
+- [x] All six suites green in memory; each total exactly 9 above §0.5.
+- [x] One suite green in memory **with the network off** (e.g. `unshare -rn` on Linux, as in Appendix B): no contract
+      page or document needs the internet. *(xUnit, 212/212.)*
+- [x] Running the six suites one after another leaves `git status` clean: six identical writers.
+- [x] `docs/` holds `openapi.json`, `asyncapi.json`, `grpc.json`, `grpc.html`, `graphql.json`, `schema.graphql`, all LF
       without a BOM; `docs/openapi.json` lists no `/grpc…` or `/graphql/schema.json` path.
 - [ ] CI: all eighteen component lanes green — the docker lanes and the external-SUT lanes prove reflection over h2c on
       `:8081` and the XML documentation inside the published image; the drift gate passes in the six memory lanes.
+      *(Not run yet: CI starts with the pull request.)*
 - [ ] Pages: each of the four specification cards opens its UI page and its JSON (and the SDL and proto); each UI page
       opens with a bar linking its documents; every JSON opens in the browser; `check-site-links.py` passes; each page
-      renders its contract.
-- [ ] README, copilot instructions and the component-test skill updated; this plan marked implemented.
+      renders its contract. *(Checked on a local build of the site; the deployed site waits for `main`.)*
+- [x] README, copilot instructions and the component-test skill updated; this plan marked implemented.
 
 ---
 

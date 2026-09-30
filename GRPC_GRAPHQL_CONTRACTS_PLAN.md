@@ -20,7 +20,7 @@ contracts are published today:
 What they lack is a published document, descriptions worth publishing, runtime discovery for gRPC tools, and tests.
 
 **Size:** nine new scenarios per suite (one of them closes a gap in today's AsyncAPI coverage), one small `Contracts/`
-folder in `src`, one Shared step class per protocol, two CI steps and a Pages script.
+folder in `src`, one Shared step class per protocol, two CI steps, and a Pages build script with a link check.
 
 This document is self-contained. §0 orients a reader new to the repo, §1 is the target, §2 the decisions, §3 the exact
 contracts, §4–§11 the phases in order, §12 the order of work and acceptance, §13 the traps, §14 the alternatives that
@@ -43,7 +43,7 @@ Docker) from six test frameworks, and every run writes a Kronikol report with se
 | **JSON served by the service** | `GET /openapi/v1.json` (`MapOpenApi`, `Program.cs:345`) | `GET /asyncapi/v1.json` (`MapAsyncApi`, `:369`) | — | — (POST introspection works only in Development, A.4.3) |
 | **UI served by the service** | `GET /scalar/v1` (`MapScalarApiReference`, `:346`) | `GET /asyncapi` (`MapAsyncApiUi`, `:370`) | — | Nitro at `GET /graphql/` — on by default in HotChocolate 15, **proxied from ChilliCream's CDN** (so it fails offline, A.4.6), never tested or documented |
 | **Written to `docs/` by the tests** | `docs/openapi.json` | `docs/asyncapi.json` | — | — |
-| **On GitHub Pages** | `api/openapi.json` + `api/openapi.html` (Scalar) | `api/asyncapi.json` + `api/asyncapi.html` (AsyncAPI React) | — | — |
+| **On GitHub Pages** | `api/openapi.json` + `api/openapi.html` (Scalar) — the landing page links only the page | `api/asyncapi.json` + `api/asyncapi.html` (AsyncAPI React) — likewise | — | — |
 | **Scenarios, six suites** | document + UI page | document only — **the UI page is untested** | calls only (3 features) | queries only (5 features) |
 
 All four existing endpoints are always on: none sits behind `IsDevelopment()`.
@@ -83,7 +83,8 @@ All four existing endpoints are always on: none sits behind `IsDevelopment()`.
    (the only comparison, for `Specifications.yml` in `_tests.yml` :409-434, computes `matching` and nothing reads it).
 5. `deploy-pages` copies the **committed** `docs/openapi.json` and `docs/asyncapi.json` to `site/api/`, downloads the
    Scalar and AsyncAPI renderers unpinned with `curl -sL` (no `-f`, so a failed download publishes a broken page),
-   writes two HTML shells and the landing page, and deploys https://lemonlion.github.io/BreakfastProvider/.
+   writes two HTML shells and the landing page, and deploys https://lemonlion.github.io/BreakfastProvider/. The two
+   JSON documents are on the site, but no page links to them: a reader who wants the JSON has to guess its URL.
 
 ### 0.4 Nothing needs building first
 
@@ -123,8 +124,11 @@ Every suite leaves `docs/openapi.json` changed by one line (A.3) — the cross-O
 | **Also served** | `GET /grpc/protos/breakfast.proto` (the source contract); gRPC **server reflection** v1 and v1alpha on the gRPC endpoint | `GET /graphql/schema.graphql` (SDL; HotChocolate's own route, made explicit) |
 | **UI served** | `GET /grpc/` — a documentation page the service renders from the same descriptor set (`/grpc` redirects to it) | `GET /graphql/` — Nitro, HotChocolate's IDE, made explicit and served from the package instead of proxied from ChilliCream's CDN |
 | **`docs/`** | `docs/grpc.json`, `docs/grpc.html` | `docs/graphql.json`, `docs/schema.graphql` |
-| **Pages** | `api/grpc/` (the page), `api/grpc/v1.json`, `api/grpc/protos/breakfast.proto` | `api/graphql.html` (GraphQL Voyager over `graphql.json`), `api/graphql.json`, `api/schema.graphql` |
+| **Pages** | `api/grpc/` (the page), `api/grpc.json`, `api/grpc/protos/breakfast.proto` | `api/graphql.html` (GraphQL Voyager over `graphql.json`), `api/graphql.json`, `api/schema.graphql` |
 | **Scenarios per suite** | 5: contract document, proto file, UI page, reflection lists the service, reflection describes it | 3: schema document, schema definition, UI page |
+
+On Pages every contract's JSON — OpenAPI and AsyncAPI included — is one click from the landing page and one click from
+its own UI page (D13).
 
 With Phase 0's AsyncAPI UI scenario that makes **9 new scenarios per suite**. Every suite's total rises by exactly 9:
 xUnit, NUnit, TUnit and BDDfy 203 → 212, LightBDD 178 → 187, ReqNRoll 205 → 214.
@@ -217,6 +221,13 @@ differs from what the service now serves, is missing, or is untracked. That make
 a checked property and means Pages never publishes a stale contract. The docker and external-SUT lanes are not gated: the
 OpenAPI document's `servers` entry names the host it was fetched from, `http://localhost/` under the TestServer (the
 committed value) but the published port against the external SUT.
+
+**D13. On Pages, every document is one click away.** Publishing a JSON document only helps if a reader can get to it.
+Today the landing page links the OpenAPI and AsyncAPI pages but not their JSON. The landing page's specification cards
+will carry two kinds of link, the UI page and the documents behind it, and every UI page will open with a bar linking
+its documents. Each contract's JSON lives at a predictable URL, `api/<contract>.json`, and opens in the browser. A link
+check fails the Pages build when any link on the site points at a missing file. The prototype site was checked in
+headless Chromium (A.12).
 
 ---
 
@@ -676,10 +687,11 @@ app.MapGet(Documentation.Contracts.GrpcUi, (HttpContext context) =>
 `public static string Render(FileDescriptorSet set)`, pure and deterministic (no clock, no GUID, descriptor order).
 Contents, top to bottom:
 
-1. `<title>Breakfast Provider — gRPC API</title>`, a heading, and one line: *gRPC over HTTP/2. Server reflection is
-   enabled (`grpc.reflection.v1`), so grpcurl, Postman and Kreya can discover and call the service.* Then two links:
-   `v1.json` ("Contract (descriptor set, JSON)") and `protos/breakfast.proto` ("breakfast.proto"). No host names or
-   ports: the page is also published on Pages.
+1. `<title>Breakfast Provider — gRPC API</title>` and, first on the page, a `<nav class="contract-bar">` with the
+   documents as buttons, styled like the Pages bar (§10.2): `v1.json` (the descriptor set) and
+   `protos/breakfast.proto`. On Pages the build prepends a link back to the landing page. Then a heading and one line:
+   *gRPC over HTTP/2. Server reflection is enabled (`grpc.reflection.v1`), so grpcurl, Postman and Kreya can discover
+   and call the service.* No host names or ports: the page is also published on Pages.
 2. Per service: `<h2 id="breakfast.BreakfastGrpc">` with its comment, then a table *Method | Request | Response | Kind |
    Description*. Kind is `unary`, `server streaming`, `client streaming` or `bidirectional streaming`. Request and
    response types link to their message anchors.
@@ -1049,82 +1061,187 @@ Last, because a failed step skips every later step whose `if:` has no status fun
 `git status --porcelain` rather than `git diff`, so a contract file generated but never committed (untracked) fails
 the lane too. `docs/Specifications.yml` stays out: each suite writes its own dialect.
 
-### 10.2 The Pages site
+### 10.2 The Pages site — every contract as a page and as a document
+
+On Pages every contract's JSON is **one click from the landing page and one click from its own UI page**, at a
+predictable URL, `api/<contract>.json` (D13):
+
+| Contract | UI page | JSON document | Also |
+|---|---|---|---|
+| OpenAPI | `api/openapi.html` (Scalar) | `api/openapi.json` | — |
+| AsyncAPI | `api/asyncapi.html` (AsyncAPI React) | `api/asyncapi.json` | — |
+| gRPC | `api/grpc/` (the service's own page) | `api/grpc.json` | `api/grpc/protos/breakfast.proto`; `api/grpc/v1.json`, the same file where the page's relative link expects it |
+| GraphQL | `api/graphql.html` (GraphQL Voyager) | `api/graphql.json` | `api/schema.graphql` |
 
 **Move the inline heredocs into `.github/scripts/build-api-pages.sh <site-dir>`**, so the site can be built and looked
-at locally (`.github/scripts/build-api-pages.sh site && python3 -m http.server -d site 8000`). The script:
+at locally. Move the landing page out of its heredoc too (`ci-main.yml:791-955` → `.github/pages/index.html`, copied
+by the script), so the link check below covers it. The script:
 
-1. pins every renderer and downloads with `curl -fsSL` (a failed download fails the job): `@scalar/api-reference`
-   1.72.2, `@asyncapi/react-component` 3.2.1, `graphql-voyager` 2.1.0 — the npm latest on 2026-09-30; re-check when
-   implementing;
-2. writes `openapi.html` and `asyncapi.html` exactly as today;
-3. gRPC: `docs/grpc.html` → `api/grpc/index.html`, `docs/grpc.json` → `api/grpc/v1.json`,
-   `src/BreakfastProvider.Api/Protos/breakfast.proto` → `api/grpc/protos/breakfast.proto` — the layout the page's
-   relative links expect;
-4. GraphQL: `docs/graphql.json` and `docs/schema.graphql` → `api/`, plus `api/graphql.html` (verified shell, A.9):
+1. **pins every renderer** and downloads it with `curl -fsSL`, so a failed download fails the job instead of
+   publishing a broken page: `@scalar/api-reference@1.72.2/dist/browser/standalone.js` (the file today's unpinned
+   `https://cdn.jsdelivr.net/npm/@scalar/api-reference` resolves to, the package's `browser` entry),
+   `@asyncapi/react-component@3.2.1` (`browser/standalone/index.js`, `styles/default.min.css`) and
+   `graphql-voyager@2.1.0` (`dist/voyager.standalone.js`, `dist/voyager.css`). These were the npm latest on 2026-09-30;
+   re-check when implementing.
+2. **copies the documents** to the URLs in the table: `docs/openapi.json`, `docs/asyncapi.json`, `docs/graphql.json`
+   and `docs/schema.graphql` into `api/`; `docs/grpc.json` to both `api/grpc.json` and `api/grpc/v1.json`;
+   `docs/grpc.html` to `api/grpc/index.html`; `src/BreakfastProvider.Api/Protos/breakfast.proto` to
+   `api/grpc/protos/breakfast.proto`.
+3. **opens every UI page with the same bar**: the way back to the landing page, the page's name, and its documents as
+   buttons. `contract-bar.css`:
+
+   ```css
+   /* The bar every contract page opens with: the way back, and the documents behind the page. */
+   .contract-bar { display: flex; flex-wrap: wrap; align-items: center; gap: .25rem 1rem; padding: .5rem 1rem;
+     font: 14px/1.4 -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #4f46e5; color: #fff; }
+   .contract-bar a { color: #fff; text-decoration: none; }
+   .contract-bar a:hover { text-decoration: underline; }
+   .contract-bar .title { font-weight: 600; margin-right: auto; }
+   .contract-bar .doc { border: 1px solid rgba(255,255,255,.5); border-radius: 6px; padding: .1rem .5rem;
+     font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 13px; }
+   ```
+
+   The OpenAPI shell is today's plus the bar (the AsyncAPI shell likewise, with `asyncapi.json`):
+
+   ```html
+   <!DOCTYPE html>
+   <html lang="en">
+   <head>
+     <meta charset="utf-8">
+     <meta name="viewport" content="width=device-width, initial-scale=1">
+     <title>Breakfast Provider — OpenAPI</title>
+     <link rel="stylesheet" href="./contract-bar.css">
+   </head>
+   <body style="margin:0">
+     <nav class="contract-bar">
+       <a href="../">← Breakfast Provider</a>
+       <span class="title">OpenAPI</span>
+       <a class="doc" href="./openapi.json">openapi.json</a>
+     </nav>
+     <script id="api-reference" data-url="./openapi.json"></script>
+     <script src="./scalar.js"></script>
+   </body>
+   </html>
+   ```
+
+   The GraphQL shell (verified, A.9 and A.12) gives Voyager the height the bar leaves:
+
+   ```html
+   <!DOCTYPE html>
+   <html lang="en">
+   <head>
+     <meta charset="utf-8">
+     <meta name="viewport" content="width=device-width, initial-scale=1">
+     <title>Breakfast Provider — GraphQL</title>
+     <link rel="stylesheet" href="./voyager.css">
+     <link rel="stylesheet" href="./contract-bar.css">
+     <style>html, body { height: 100%; margin: 0; } body { display: flex; flex-direction: column; } #voyager { flex: 1; min-height: 0; }</style>
+   </head>
+   <body>
+     <nav class="contract-bar">
+       <a href="../">← Breakfast Provider</a>
+       <span class="title">GraphQL</span>
+       <a class="doc" href="./graphql.json">graphql.json</a>
+       <a class="doc" href="./schema.graphql">schema.graphql</a>
+     </nav>
+     <div id="voyager">Loading…</div>
+     <script src="./voyager.standalone.js"></script>
+     <script>
+       GraphQLVoyager.renderVoyager(document.getElementById('voyager'), {
+         introspection: fetch('./graphql.json').then(response => response.json()),
+         displayOptions: { rootType: 'ReportingQuery' }
+       });
+     </script>
+   </body>
+   </html>
+   ```
+
+   The gRPC page draws its own bar with its documents (§7.2), because the service serves the same page in-app, where
+   a link back to the landing page would mean nothing. The script adds that link when it copies the page to Pages:
+   `sed 's#<nav class="contract-bar">#&<a href="../../">← Breakfast Provider</a>#'`.
+4. **checks every contract link**: `.github/scripts/check-site-links.py site` resolves the landing page's links into
+   `api/` and every relative link on each page under `api/` against the files in `site/`. It fails the job, naming
+   page and link, when one is missing — verified: with `schema.graphql` removed it failed on both pages that link it,
+   and with `grpc.json` removed on the landing page (A.12). It leaves the test-report links alone, so it also runs
+   locally, where no reports have been downloaded.
+
+   ```python
+   #!/usr/bin/env python3
+   """Every link to a contract on the Pages site must reach a file the site contains: the landing page's links into
+   api/, and every relative link on the pages under api/. usage: check-site-links.py <site-dir>"""
+   import pathlib, re, sys
+
+   site = pathlib.Path(sys.argv[1]).resolve()
+   checks = [(site / "index.html", lambda href: href.startswith("api/"))]
+   checks += [(page, lambda href: True) for page in sorted((site / "api").rglob("*.html"))]
+   missing = []
+   for page, wanted in checks:
+       for href in re.findall(r'href="([^"#?]+)', page.read_text(encoding="utf-8")):
+           if re.match(r"^[a-z]+:|^//", href) or not wanted(href):   # absolute URLs, and links that are not ours
+               continue
+           target = (page.parent / href).resolve()
+           if target.is_dir():
+               target = target / "index.html"
+           if not target.is_file():
+               missing.append(f"{page.relative_to(site)} -> {href}")
+   print("\n".join(missing) or f"all contract links resolve ({len(checks)} pages)")
+   sys.exit(1 if missing else 0)
+   ```
+
+`deploy-pages` then runs the two scripts; its sparse checkout adds the four new `docs/` files, `breakfast.proto`,
+`.github/pages/` and the scripts.
+
+**Landing page** ("API Specifications", `ci-main.yml:920-932`). Today each card is a single `<a>`, and a link cannot sit
+inside a link, so the specification cards become containers holding two kinds of link: the page, and the documents
+behind it (verified render, A.12):
 
 ```html
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Breakfast Provider — GraphQL</title>
-  <link rel="stylesheet" href="./voyager.css">
-  <style>html, body, #voyager { height: 100%; margin: 0; }</style>
-</head>
-<body>
-  <div id="voyager">Loading…</div>
-  <script src="./voyager.standalone.js"></script>
-  <script>
-    GraphQLVoyager.renderVoyager(document.getElementById('voyager'), {
-      introspection: fetch('./graphql.json').then(response => response.json()),
-      displayOptions: { rootType: 'ReportingQuery' }
-    });
-  </script>
-</body>
-</html>
+<div class="card">
+  <div class="card-icon">🔌</div>
+  <h3>OpenAPI</h3>
+  <p>REST endpoints</p>
+  <div class="spec-links">
+    <a class="ui" href="api/openapi.html">Open in Scalar</a>
+    <a class="doc" href="api/openapi.json">openapi.json</a>
+  </div>
+</div>
+<!-- AsyncAPI: api/asyncapi.html + api/asyncapi.json
+     gRPC:     api/grpc/ + api/grpc.json + api/grpc/protos/breakfast.proto
+     GraphQL:  api/graphql.html + api/graphql.json + api/schema.graphql -->
 ```
 
-`deploy-pages` then runs the script; its sparse checkout adds `docs/grpc.json`, `docs/grpc.html`, `docs/graphql.json`,
-`docs/schema.graphql`, `src/BreakfastProvider.Api/Protos/breakfast.proto` and `.github/scripts/build-api-pages.sh`.
-
-**Landing page** ("API Specifications", `ci-main.yml:920-932`): two more cards and a line of documents, so "published
-as JSON" is as visible as "published as a UI":
-
-```html
-<a href="api/grpc/" class="card">
-  <div class="card-icon">📡</div>
-  <h3>gRPC</h3>
-  <p>Service, methods and messages from breakfast.proto</p>
-</a>
-<a href="api/graphql.html" class="card">
-  <div class="card-icon">🕸️</div>
-  <h3>GraphQL</h3>
-  <p>The reporting schema as an interactive graph (GraphQL Voyager)</p>
-</a>
-…
-<p class="documents">Documents:
-  <a href="api/openapi.json">openapi.json</a> ·
-  <a href="api/asyncapi.json">asyncapi.json</a> ·
-  <a href="api/grpc/v1.json">grpc v1.json</a> ·
-  <a href="api/grpc/protos/breakfast.proto">breakfast.proto</a> ·
-  <a href="api/graphql.json">graphql.json</a> ·
-  <a href="api/schema.graphql">schema.graphql</a></p>
+```css
+/* A specification card holds two kinds of link: the page, and the documents behind it. */
+.spec-links { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: .9rem; }
+.spec-links a { font-size: .8rem; font-weight: 600; text-decoration: none; border-radius: 6px; padding: .3rem .65rem;
+  border: 1px solid var(--primary); color: var(--primary); }
+.spec-links a.ui { background: var(--primary); color: #fff; }
+.spec-links a.doc { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-weight: 500; }
+.spec-links a:hover { background: var(--primary-dark); border-color: var(--primary-dark); color: #fff; }
 ```
+
+The JSON documents open in the browser: a `.json` file is served as `application/json`. A plain static server sent the
+`.graphql` and `.proto` files as `application/octet-stream`, so expect Pages to offer those two for download, which is
+fine for source files. Check both after the first deploy.
 
 ### 10.3 Checking it
 
-The Pages job only runs on `main`. Before merging: run the script locally, serve `site/`, and open the four pages in a
-browser — each must render its contract (the spike did exactly this for the Voyager page, A.9). After merging: open
-the four pages and the six document links on https://lemonlion.github.io/BreakfastProvider/.
+The Pages job only runs on `main`. Before merging:
+
+```bash
+.github/scripts/build-api-pages.sh site && .github/scripts/check-site-links.py site && python3 -m http.server -d site 8000
+```
+
+Then open the landing page, each of the four pages, and each document from both places. The spike did this with a
+prototype of the site in headless Chromium (A.12). After merging, do the same on
+https://lemonlion.github.io/BreakfastProvider/.
 
 ---
 
 ## 11. Phase 6 — Documentation
 
 - **README.md.** A "Contracts" section replacing "Specifications & Documentation": the §1 table (service routes,
-  `docs/` files, Pages links); how to reach gRPC — `grpcurl -plaintext localhost:5081 list` against the Docker SUT, and
+  `docs/` files, and on Pages each UI page beside its JSON URL); how to reach gRPC — `grpcurl -plaintext localhost:5081 list` against the Docker SUT, and
   `grpcurl -insecure localhost:7270 list` under the `https` launch profile, because the `http` profile's cleartext port
   5239 cannot carry HTTP/2 (A.5.7; try the TLS command when writing the README, the spike had no development
   certificate); the Nitro licence and status call (D7). "API Endpoints" gains the six routes; "Tech Stack" gains server
@@ -1148,7 +1265,7 @@ One commit per phase, each green in all six suites in memory before it is pushed
 | 3 | Phase 2 — gRPC server reflection, gRPC 2.84.0 | 208 / 183 / 210 |
 | 4 | Phase 3 — gRPC documentation page | 209 / 184 / 211 |
 | 5 | Phase 4 — GraphQL schema document, definition and Nitro | 212 / 187 / 214 |
-| 6 | Phase 5 — drift gate and Pages | 212 / 187 / 214 |
+| 6 | Phase 5 — drift gate; Pages with every JSON one click away and a link check | 212 / 187 / 214 |
 | 7 | Phase 6 — documentation | — |
 
 NUnit, TUnit and BDDfy move with xUnit. Commit messages follow the repo's style (what changed, what was measured —
@@ -1165,7 +1282,9 @@ report).
       without a BOM; `docs/openapi.json` lists no `/grpc…` or `/graphql/schema.json` path.
 - [ ] CI: all eighteen component lanes green — the docker lanes and the external-SUT lanes prove reflection over h2c on
       `:8081` and the XML documentation inside the published image; the drift gate passes in the six memory lanes.
-- [ ] Pages: four specification cards, six document links, and each page renders its contract.
+- [ ] Pages: each of the four specification cards opens its UI page and its JSON (and the SDL and proto); each UI page
+      opens with a bar linking its documents; every JSON opens in the browser; `check-site-links.py` passes; each page
+      renders its contract.
 - [ ] README, copilot instructions and the component-test skill updated; this plan marked implemented.
 
 ---
@@ -1189,6 +1308,7 @@ report).
 | Custom options vanish from the JSON | `Google.Protobuf`'s `JsonFormatter` writes an extension option such as `(google.api.http)` as `"options": {}` (research pass, C) | None needed today — `breakfast.proto` has none. If it gains one, the `.proto` (D2) carries it; say so on the page |
 | Well-known types in the published set | If `breakfast.proto` ever imports `google/protobuf/*.proto`, their descriptors change with `Google.Protobuf` releases and would churn `docs/grpc.json` | Keep `--include_imports` off, as §5 item 1.2 has it: the set holds `breakfast.proto` only |
 | Six suites writing `docs/` at once | Parallel lanes on one machine share the workspace | Identical bytes, and `ContractDocs.WriteAsync` keeps the `IOException` retries |
+| A Pages page loses its link to the JSON, or links a file that is not there | The shells and the landing page are hand-written HTML | `check-site-links.py` fails the Pages job on any relative link to a missing file (§10.2); the acceptance list clicks through every document |
 | Two attachments with one file name | Kronikol copies an attachment into `Reports/attachments/` under its file name and renames a clash (`ReportGenerator`, `GetUniqueFileName`); the teardown copy looks files up by name, so it would publish the wrong one | Six distinct names (`openapi.json`, `asyncapi.json`, `grpc.json`, `grpc.html`, `graphql.json`, `schema.graphql`) — never a second `schema.json` or `v1.json` |
 | Kestrel cleartext `Http1AndHttp2` | Does not accept HTTP/2 without TLS (A.5.7) | The Docker SUT keeps the separate `Http2` endpoint on `:8081`; the README says how to reach gRPC locally |
 
@@ -1368,6 +1488,26 @@ GHSA-v5pm-xwqc-g5wc); 10.0.12 → `Microsoft.OpenApi` `[2.12.0, 3.0.0)`.
 JsonTranscoding 10.0.11 and `Swashbuckle.AspNetCore` 6.6.2); `GrpcBrowser` 1.3.4; `GraphQL.Server.Ui.GraphiQL` and
 `.Voyager` 8.3.3; npm `graphql-voyager` 2.1.0, `@asyncapi/react-component` 3.2.1, `@scalar/api-reference` 1.72.2,
 `graphiql` 5.4.0, `spectaql` 3.0.9.
+
+**A.12 The Pages prototype** (§10.2). The prototype site used:
+- the pinned renderers from npm: Scalar 1.72.2's `dist/browser/standalone.js` (4,359,078 bytes; the file the package's
+  `browser` field names), AsyncAPI React 3.2.1's standalone bundle and stylesheet, and GraphQL Voyager 2.1.0;
+- today's `docs/openapi.json` and `docs/asyncapi.json`, and the real API's `graphql.json`;
+- the §10.2 contract bar and landing-page cards;
+- a plain `python3 -m http.server`.
+
+In headless Chromium at 1280×800:
+- **The pages.** Each UI page drew its bar at the top, 39 px high, and rendered its contract below it: Scalar with its
+  sidebar, AsyncAPI, and Voyager on `ReportingQuery`. No page errors, and no failed requests except Scalar's fonts from
+  `fonts.scalar.com`, which this sandbox blocks.
+- **The JSON links.** Clicking a bar's JSON link opened the raw document in the browser each time: `openapi.json`
+  begins `{"openapi": "3.1.1"`, `asyncapi.json` `{"asyncapi": "3.1.0"`, `graphql.json` `{"data": {"__schema"`.
+- **The landing page.** It showed each card's "Open …" button beside its document buttons.
+- **Content types.** The server sent `.json` as `application/json`, and `.graphql` and `.proto` as
+  `application/octet-stream`.
+- **The link check.** `check-site-links.py` passed over five pages, ignoring a test-report link that had no file
+  locally. With `schema.graphql` removed it failed, naming `index.html -> api/schema.graphql` and
+  `api/graphql.html -> ./schema.graphql`. With `grpc.json` removed it failed on `index.html -> api/grpc.json`.
 
 ## Appendix B — Reproducing the spike
 

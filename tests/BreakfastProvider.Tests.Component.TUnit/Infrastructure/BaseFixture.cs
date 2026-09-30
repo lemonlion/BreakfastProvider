@@ -164,6 +164,7 @@ public abstract class BaseFixture : DiagrammedComponentTest, IDisposable
         services.AddTransient<DeleteEquipmentReadingSteps>();
         services.AddTransient<PublishOrderServedEventSteps>();
         services.AddTransient<GrpcBreakfastSteps>();
+        services.AddTransient<GrpcReflectionSteps>();
         services.AddTransient<SpecificationDocumentSteps>();
         services.AddSingleton(ConsumedKafkaMessageStore);
         services.AddSingleton(ConsumedPubSubMessageStore);

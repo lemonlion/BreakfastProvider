@@ -19,7 +19,8 @@
     <PackageReference Include="Google.Cloud.PubSub.V1" Version="3.33.0" />
     <PackageReference Include="Google.Cloud.Spanner.Data" Version="5.0.0" />
     <PackageReference Include="MongoDB.Driver" Version="3.4.0" />
-    <PackageReference Include="Grpc.AspNetCore" Version="2.71.0" />
+    <PackageReference Include="Grpc.AspNetCore" Version="2.84.0" />
+    <PackageReference Include="Grpc.AspNetCore.Server.Reflection" Version="2.84.0" />
     <PackageReference Include="OpenTelemetry.Exporter.Console" Version="1.15.3" />
     <PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.15.3" />
     <PackageReference Include="OpenTelemetry.Extensions.Hosting" Version="1.15.3" />

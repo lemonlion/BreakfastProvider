@@ -243,6 +243,7 @@ public class Program
 
         // gRPC
         builder.Services.AddGrpc();
+        builder.Services.AddGrpcReflection();
         builder.Services.AddNotificationGrpcClient(builder.Configuration);
 
         // Services
@@ -361,6 +362,10 @@ public class Program
                 // Constrain all gRPC endpoints to POST only, since gRPC exclusively uses POST.
                 b.Metadata.Add(new HttpMethodMetadata(["POST"]));
             });
+        // Server reflection (grpc.reflection.v1 and v1alpha) lets grpcurl, Postman and Kreya discover the service.
+        // POST only, for the same reason as the service above.
+        app.MapGrpcReflectionService()
+            .Add(b => b.Metadata.Add(new HttpMethodMetadata(["POST"])));
         app.MapGrpcContract();
         app.MapGraphQL();
         app.MapMetrics();

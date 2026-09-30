@@ -174,6 +174,7 @@ public abstract class BaseFixture : FeatureFixture, IDisposable, IIgnorable<Comp
         services.AddTransient<DeleteEquipmentReadingSteps>();
         services.AddTransient<PublishOrderServedEventSteps>();
         services.AddTransient<GrpcBreakfastSteps>();
+        services.AddTransient<GrpcReflectionSteps>();
         services.AddTransient<SpecificationDocumentSteps>();
         services.AddSingleton(ConsumedKafkaMessageStore);
         services.AddSingleton(ConsumedPubSubMessageStore);

@@ -1,0 +1,399 @@
+{
+  "file": [
+    {
+      "name": "breakfast.proto",
+      "package": "breakfast",
+      "messageType": [
+        {
+          "name": "RecipeSummaryRequest",
+          "field": [
+            {
+              "name": "recipe_type",
+              "number": 1,
+              "label": "LABEL_OPTIONAL",
+              "type": "TYPE_STRING",
+              "jsonName": "recipeType"
+            }
+          ]
+        },
+        {
+          "name": "RecipeSummaryReply",
+          "field": [
+            {
+              "name": "recipe_type",
+              "number": 1,
+              "label": "LABEL_OPTIONAL",
+              "type": "TYPE_STRING",
+              "jsonName": "recipeType"
+            },
+            {
+              "name": "total_batches",
+              "number": 2,
+              "label": "LABEL_OPTIONAL",
+              "type": "TYPE_INT32",
+              "jsonName": "totalBatches"
+            },
+            {
+              "name": "common_ingredients",
+              "number": 3,
+              "label": "LABEL_REPEATED",
+              "type": "TYPE_STRING",
+              "jsonName": "commonIngredients"
+            },
+            {
+              "name": "last_prepared_at",
+              "number": 4,
+              "label": "LABEL_OPTIONAL",
+              "type": "TYPE_STRING",
+              "jsonName": "lastPreparedAt"
+            }
+          ]
+        },
+        {
+          "name": "OrderStatusRequest",
+          "field": [
+            {
+              "name": "order_id",
+              "number": 1,
+              "label": "LABEL_OPTIONAL",
+              "type": "TYPE_STRING",
+              "jsonName": "orderId"
+            }
+          ]
+        },
+        {
+          "name": "OrderStatusReply",
+          "field": [
+            {
+              "name": "order_id",
+              "number": 1,
+              "label": "LABEL_OPTIONAL",
+              "type": "TYPE_STRING",
+              "jsonName": "orderId"
+            },
+            {
+              "name": "status",
+              "number": 2,
+              "label": "LABEL_OPTIONAL",
+              "type": "TYPE_STRING",
+              "jsonName": "status"
+            },
+            {
+              "name": "customer_name",
+              "number": 3,
+              "label": "LABEL_OPTIONAL",
+              "type": "TYPE_STRING",
+              "jsonName": "customerName"
+            },
+            {
+              "name": "item_count",
+              "number": 4,
+              "label": "LABEL_OPTIONAL",
+              "type": "TYPE_INT32",
+              "jsonName": "itemCount"
+            },
+            {
+              "name": "created_at",
+              "number": 5,
+              "label": "LABEL_OPTIONAL",
+              "type": "TYPE_STRING",
+              "jsonName": "createdAt"
+            }
+          ]
+        }
+      ],
+      "service": [
+        {
+          "name": "BreakfastGrpc",
+          "method": [
+            {
+              "name": "GetRecipeSummary",
+              "inputType": ".breakfast.RecipeSummaryRequest",
+              "outputType": ".breakfast.RecipeSummaryReply"
+            },
+            {
+              "name": "GetOrderStatus",
+              "inputType": ".breakfast.OrderStatusRequest",
+              "outputType": ".breakfast.OrderStatusReply"
+            },
+            {
+              "name": "StreamOrderUpdates",
+              "inputType": ".breakfast.OrderStatusRequest",
+              "outputType": ".breakfast.OrderStatusReply",
+              "serverStreaming": true
+            }
+          ]
+        }
+      ],
+      "options": {
+        "csharpNamespace": "BreakfastProvider.Api.Grpc"
+      },
+      "sourceCodeInfo": {
+        "location": [
+          {
+            "path": [
+              6,
+              0
+            ],
+            "span": [
+              7,
+              0,
+              18,
+              1
+            ],
+            "leadingComments": " Breakfast Provider's gRPC API: recipe summaries and order status for kitchen systems.\n"
+          },
+          {
+            "path": [
+              6,
+              0,
+              2,
+              0
+            ],
+            "span": [
+              10,
+              2,
+              75
+            ],
+            "leadingComments": " Summarises a recipe type. Pancakes and Waffles return fixed sample figures;\n any other recipe type returns zero batches and no ingredients.\n"
+          },
+          {
+            "path": [
+              6,
+              0,
+              2,
+              1
+            ],
+            "span": [
+              13,
+              2,
+              69
+            ],
+            "leadingComments": " Returns an order's current status. NOT_FOUND when no order has the id.\n"
+          },
+          {
+            "path": [
+              6,
+              0,
+              2,
+              2
+            ],
+            "span": [
+              17,
+              2,
+              80
+            ],
+            "leadingComments": " Streams an order's status: today one message, the current status, then the stream completes.\n NOT_FOUND when no order has the id.\n"
+          },
+          {
+            "path": [
+              4,
+              0
+            ],
+            "span": [
+              21,
+              0,
+              24,
+              1
+            ],
+            "leadingComments": " Which recipe type to summarise.\n"
+          },
+          {
+            "path": [
+              4,
+              0,
+              2,
+              0
+            ],
+            "span": [
+              23,
+              2,
+              25
+            ],
+            "leadingComments": " The recipe type, e.g. \"Pancakes\" or \"Waffles\".\n"
+          },
+          {
+            "path": [
+              4,
+              1
+            ],
+            "span": [
+              27,
+              0,
+              36,
+              1
+            ],
+            "leadingComments": " A recipe type's summary.\n"
+          },
+          {
+            "path": [
+              4,
+              1,
+              2,
+              0
+            ],
+            "span": [
+              29,
+              2,
+              25
+            ],
+            "leadingComments": " The recipe type that was asked for.\n"
+          },
+          {
+            "path": [
+              4,
+              1,
+              2,
+              1
+            ],
+            "span": [
+              31,
+              2,
+              26
+            ],
+            "leadingComments": " How many batches have been prepared.\n"
+          },
+          {
+            "path": [
+              4,
+              1,
+              2,
+              2
+            ],
+            "span": [
+              33,
+              2,
+              41
+            ],
+            "leadingComments": " The ingredients the recipe is usually made with.\n"
+          },
+          {
+            "path": [
+              4,
+              1,
+              2,
+              3
+            ],
+            "span": [
+              35,
+              2,
+              30
+            ],
+            "leadingComments": " When the summary was produced, ISO 8601 round-trip format.\n"
+          },
+          {
+            "path": [
+              4,
+              2
+            ],
+            "span": [
+              39,
+              0,
+              42,
+              1
+            ],
+            "leadingComments": " Which order to look up.\n"
+          },
+          {
+            "path": [
+              4,
+              2,
+              2,
+              0
+            ],
+            "span": [
+              41,
+              2,
+              22
+            ],
+            "leadingComments": " The order's id, as returned by POST /orders.\n"
+          },
+          {
+            "path": [
+              4,
+              3
+            ],
+            "span": [
+              45,
+              0,
+              56,
+              1
+            ],
+            "leadingComments": " An order's current status.\n"
+          },
+          {
+            "path": [
+              4,
+              3,
+              2,
+              0
+            ],
+            "span": [
+              47,
+              2,
+              22
+            ],
+            "leadingComments": " The order's id.\n"
+          },
+          {
+            "path": [
+              4,
+              3,
+              2,
+              1
+            ],
+            "span": [
+              49,
+              2,
+              20
+            ],
+            "leadingComments": " Created, Preparing, Ready, Completed or Cancelled.\n"
+          },
+          {
+            "path": [
+              4,
+              3,
+              2,
+              2
+            ],
+            "span": [
+              51,
+              2,
+              27
+            ],
+            "leadingComments": " The customer the order is for.\n"
+          },
+          {
+            "path": [
+              4,
+              3,
+              2,
+              3
+            ],
+            "span": [
+              53,
+              2,
+              23
+            ],
+            "leadingComments": " How many items the order has.\n"
+          },
+          {
+            "path": [
+              4,
+              3,
+              2,
+              4
+            ],
+            "span": [
+              55,
+              2,
+              24
+            ],
+            "leadingComments": " When the order was created, ISO 8601 round-trip format.\n"
+          }
+        ]
+      },
+      "syntax": "proto3"
+    }
+  ]
+}

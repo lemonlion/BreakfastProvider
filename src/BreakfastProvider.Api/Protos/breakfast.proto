@@ -4,31 +4,54 @@ option csharp_namespace = "BreakfastProvider.Api.Grpc";
 
 package breakfast;
 
+// Breakfast Provider's gRPC API: recipe summaries and order status for kitchen systems.
 service BreakfastGrpc {
+  // Summarises a recipe type. Pancakes and Waffles return fixed sample figures;
+  // any other recipe type returns zero batches and no ingredients.
   rpc GetRecipeSummary (RecipeSummaryRequest) returns (RecipeSummaryReply);
+
+  // Returns an order's current status. NOT_FOUND when no order has the id.
   rpc GetOrderStatus (OrderStatusRequest) returns (OrderStatusReply);
+
+  // Streams an order's status: today one message, the current status, then the stream completes.
+  // NOT_FOUND when no order has the id.
   rpc StreamOrderUpdates (OrderStatusRequest) returns (stream OrderStatusReply);
 }
 
+// Which recipe type to summarise.
 message RecipeSummaryRequest {
+  // The recipe type, e.g. "Pancakes" or "Waffles".
   string recipe_type = 1;
 }
 
+// A recipe type's summary.
 message RecipeSummaryReply {
+  // The recipe type that was asked for.
   string recipe_type = 1;
+  // How many batches have been prepared.
   int32 total_batches = 2;
+  // The ingredients the recipe is usually made with.
   repeated string common_ingredients = 3;
+  // When the summary was produced, ISO 8601 round-trip format.
   string last_prepared_at = 4;
 }
 
+// Which order to look up.
 message OrderStatusRequest {
+  // The order's id, as returned by POST /orders.
   string order_id = 1;
 }
 
+// An order's current status.
 message OrderStatusReply {
+  // The order's id.
   string order_id = 1;
+  // Created, Preparing, Ready, Completed or Cancelled.
   string status = 2;
+  // The customer the order is for.
   string customer_name = 3;
+  // How many items the order has.
   int32 item_count = 4;
+  // When the order was created, ISO 8601 round-trip format.
   string created_at = 5;
 }

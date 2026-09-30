@@ -25,6 +25,7 @@ public static class ContractDocs
     /// <summary>Writes the document into docs/ and returns the full path, for the suite to attach.</summary>
     public static async Task<string> WriteAsync(string fileName, string content)
     {
+        ArgumentException.ThrowIfNullOrEmpty(content);
         var path = Path.GetFullPath($"{FolderPath}{fileName}");
         const int maxRetries = 3;
         for (var attempt = 1; ; attempt++)

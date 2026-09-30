@@ -43,8 +43,23 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Protobuf Include="Protos\breakfast.proto" GrpcServices="Both" />
+    <Protobuf Include="Protos\breakfast.proto" GrpcServices="Both" ProtoRoot="Protos"
+              AdditionalProtocArguments="--include_source_info;--descriptor_set_out=$(IntermediateOutputPath)breakfast.protoset" />
     <Protobuf Include="Protos\notifications.proto" GrpcServices="Client" />
   </ItemGroup>
+
+  <ItemGroup>
+    <!-- The source contract, served at /grpc/protos/breakfast.proto. -->
+    <EmbeddedResource Include="Protos\breakfast.proto" LogicalName="Contracts.breakfast.proto" />
+  </ItemGroup>
+
+  <!-- protoc's descriptor set, comments included, is the published gRPC contract (/grpc/v1.json, /grpc/).
+       It only exists once Protobuf_Compile has run, which is after PrepareResources would collect it. -->
+  <Target Name="EmbedGrpcContract" BeforeTargets="PrepareResources" DependsOnTargets="Protobuf_Compile">
+    <ItemGroup>
+      <EmbeddedResource Include="$(IntermediateOutputPath)breakfast.protoset" LogicalName="Contracts.breakfast.protoset"
+                        WithCulture="false" Type="Non-Resx" />
+    </ItemGroup>
+  </Target>
 
 </Project>

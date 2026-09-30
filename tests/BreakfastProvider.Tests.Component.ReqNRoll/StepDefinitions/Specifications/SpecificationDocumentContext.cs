@@ -5,7 +5,10 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.StepDefinitions.Specificati
 /// <summary>What a fetched specification document must be for "the response should be valid" to pass.</summary>
 public enum SpecificationDocumentFormat
 {
-    Json
+    Json,
+
+    /// <summary>A protobuf FileDescriptorSet in protobuf's JSON mapping: the gRPC contract.</summary>
+    DescriptorSet
 }
 
 /// <summary>

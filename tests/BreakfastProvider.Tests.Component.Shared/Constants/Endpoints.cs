@@ -54,6 +54,12 @@ public static class Endpoints
         public const string DailySpecialsOrdersPath = "/" + DailySpecialsOrders;
     }
 
+    public static class GrpcContract
+    {
+        public const string ContractJson = "grpc/v1.json";
+        public const string ProtoFile = "grpc/protos/breakfast.proto";
+    }
+
     public static class AsyncApi
     {
         private const string BasePath = "/asyncapi";

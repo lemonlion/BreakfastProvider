@@ -67,6 +67,9 @@ public class ApiSpecificationSteps(SpecificationDocumentContext context, IReqnro
                 responseIsValidJson.Should().BeTrue(
                     $"response body (first 500 chars): {context.Document.Body?[..Math.Min(context.Document.Body.Length, 500)]}");
                 break;
+            case SpecificationDocumentFormat.DescriptorSet:
+                context.Document.DescriptorSet.Should().NotBeNull();
+                break;
         }
     }
 

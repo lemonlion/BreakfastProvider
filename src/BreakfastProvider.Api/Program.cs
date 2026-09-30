@@ -1,6 +1,7 @@
 using Azure;
 using Azure.Messaging.EventGrid;
 using BreakfastProvider.Api.Configuration;
+using BreakfastProvider.Api.Contracts;
 using BreakfastProvider.Api.Data;
 using BreakfastProvider.Api.Events.Outbox;
 using BreakfastProvider.Api.HttpClients;
@@ -360,6 +361,7 @@ public class Program
                 // Constrain all gRPC endpoints to POST only, since gRPC exclusively uses POST.
                 b.Metadata.Add(new HttpMethodMetadata(["POST"]));
             });
+        app.MapGrpcContract();
         app.MapGraphQL();
         app.MapMetrics();
         app.MapHealthChecks("/health", new HealthCheckOptions

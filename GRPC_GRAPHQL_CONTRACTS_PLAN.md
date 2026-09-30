@@ -2,7 +2,9 @@
 
 **Status:** proposed (2026-09-30). Nothing here is implemented. Every decision was checked against a spike run on
 this checkout: a standalone app on the same package versions, then a scratch copy of the real API and its xUnit
-suite (Appendix A holds the results, Appendix B reproduces them).
+suite (Appendix A holds the results, Appendix B reproduces them). A second, independent research pass checked the same
+ground with the network switched off and against upstream sources; what it added is folded in, and its sources are
+Appendix C.
 
 **Goal:** publish BreakfastProvider's **gRPC contract** and **GraphQL contract** the way its OpenAPI and AsyncAPI
 contracts are published today:
@@ -39,7 +41,7 @@ Docker) from six test frameworks, and every run writes a Kronikol report with se
 | | OpenAPI | AsyncAPI | gRPC | GraphQL |
 |---|---|---|---|---|
 | **JSON served by the service** | `GET /openapi/v1.json` (`MapOpenApi`, `Program.cs:345`) | `GET /asyncapi/v1.json` (`MapAsyncApi`, `:369`) | — | — (POST introspection works only in Development, A.4.3) |
-| **UI served by the service** | `GET /scalar/v1` (`MapScalarApiReference`, `:346`) | `GET /asyncapi` (`MapAsyncApiUi`, `:370`) | — | Nitro at `GET /graphql/` — on by default in HotChocolate 15, never tested or documented |
+| **UI served by the service** | `GET /scalar/v1` (`MapScalarApiReference`, `:346`) | `GET /asyncapi` (`MapAsyncApiUi`, `:370`) | — | Nitro at `GET /graphql/` — on by default in HotChocolate 15, **proxied from ChilliCream's CDN** (so it fails offline, A.4.6), never tested or documented |
 | **Written to `docs/` by the tests** | `docs/openapi.json` | `docs/asyncapi.json` | — | — |
 | **On GitHub Pages** | `api/openapi.json` + `api/openapi.html` (Scalar) | `api/asyncapi.json` + `api/asyncapi.html` (AsyncAPI React) | — | — |
 | **Scenarios, six suites** | document + UI page | document only — **the UI page is untested** | calls only (3 features) | queries only (5 features) |
@@ -119,7 +121,7 @@ Every suite leaves `docs/openapi.json` changed by one line (A.3) — the cross-O
 |---|---|---|
 | **JSON served** | `GET /grpc/v1.json` — the protobuf `FileDescriptorSet` of `breakfast.proto` in protobuf's JSON mapping, comments included | `GET /graphql/schema.json` — the response to the standard introspection query |
 | **Also served** | `GET /grpc/protos/breakfast.proto` (the source contract); gRPC **server reflection** v1 and v1alpha on the gRPC endpoint | `GET /graphql/schema.graphql` (SDL; HotChocolate's own route, made explicit) |
-| **UI served** | `GET /grpc/` — a documentation page the service renders from the same descriptor set (`/grpc` redirects to it) | `GET /graphql/` — Nitro, HotChocolate's IDE, made explicit |
+| **UI served** | `GET /grpc/` — a documentation page the service renders from the same descriptor set (`/grpc` redirects to it) | `GET /graphql/` — Nitro, HotChocolate's IDE, made explicit and served from the package instead of proxied from ChilliCream's CDN |
 | **`docs/`** | `docs/grpc.json`, `docs/grpc.html` | `docs/graphql.json`, `docs/schema.graphql` |
 | **Pages** | `api/grpc/` (the page), `api/grpc/v1.json`, `api/grpc/protos/breakfast.proto` | `api/graphql.html` (GraphQL Voyager over `graphql.json`), `api/graphql.json`, `api/schema.graphql` |
 | **Scenarios per suite** | 5: contract document, proto file, UI page, reflection lists the service, reflection describes it | 3: schema document, schema definition, UI page |
@@ -145,23 +147,28 @@ locations that carry a comment (73 → 4 locations, 20 KB → 5.5 KB, A.5.3) and
 document is a valid descriptor set, not just valid JSON.
 
 **D2. The `.proto` is published too**, at `GET /grpc/protos/breakfast.proto`, because it is what a client generates
-code from. `ProtoRoot="Protos"` makes the file `breakfast.proto` everywhere — descriptor, reflection and URL (A.5.5);
+code from — a .NET consumer can point `dotnet grpc add-url` at it. `ProtoRoot="Protos"` makes the file `breakfast.proto` everywhere — descriptor, reflection and URL (A.5.5);
 today it is `Protos/breakfast.proto`. `notifications.proto` is not published: BreakfastProvider consumes it.
 
 **D3. gRPC server reflection, `grpc.reflection.v1` and `v1alpha`.** It lets grpcurl, Postman, Kreya, Insomnia and
 grpcui discover and call the service from the running endpoint — the gRPC equivalent of fetching
 `/openapi/v1.json`. `Grpc.AspNetCore.Server.Reflection` 2.71.0 serves only `v1alpha`; `v1` arrived in `Grpc.Reflection`
-2.80.0 (A.5.6). So `Grpc.AspNetCore` moves 2.71.0 → 2.84.0 with it; the test projects already use
-`Grpc.Net.Client` 2.84.0. All 203 existing xUnit scenarios pass on 2.84.0 with reflection mapped (A.5.8). Reflection
-serves the runtime descriptors, so it carries no comments; the JSON document does.
+2.80.0 (A.5.6). So `Grpc.AspNetCore` moves 2.71.0 → 2.84.0 with it, which also gives the API a `net10.0` build of the
+gRPC server (2.71.0 stops at `net9.0`, A.11); the test projects already use `Grpc.Net.Client` 2.84.0. All 203 existing
+xUnit scenarios pass on 2.84.0 with reflection mapped (A.5.8). Reflection serves the runtime descriptors, so it carries no
+comments; the JSON document does. Microsoft's gRPC tooling docs suggest mapping reflection in Development only; here it
+is always on, like `/openapi/v1.json`, because it discloses nothing `/grpc/v1.json` does not already publish. An
+environment that must not expose it can put `MapGrpcReflectionService()` behind a setting, at the price of S5 and S6
+there.
 
 **D4. The gRPC UI is a documentation page the service renders from the descriptor set**, at `GET /grpc/`: services,
 methods and their streaming kind, messages, fields and enums, each with its comment, linking `v1.json` and
 `protos/breakfast.proto`. It is static HTML with no script and no external request, so the same bytes are served
 in-app, committed as `docs/grpc.html` and published on Pages, and all six suites can assert **what the page says**,
 not just that it is HTML. Like the AsyncAPI UI it documents rather than calls; calling is what reflection (D3) opens
-to grpcurl, Postman and Kreya. The alternatives (GrpcBrowser, grpcui, Scalar, JSON transcoding + OpenAPI,
-protoc-gen-doc) are rejected in §14, each with evidence.
+to grpcurl, Postman and Kreya. The alternatives (GrpcBrowser, Kaya.GrpcExplorer, grpcui, Scalar, JSON transcoding +
+OpenAPI, protoc-gen-doc, buf) are rejected in §14, each with evidence; grpcui stays on offer as a local Docker tool
+(§15).
 
 **D5. The GraphQL JSON document is the standard introspection response**, served at `GET /graphql/schema.json` by
 running the introspection query **inside** the service with `AllowIntrospection()` on that one request. HotChocolate 15
@@ -176,11 +183,16 @@ GraphQL Voyager reads it as is (A.9); graphql-js's `buildClientSchema` takes its
 environment (A.4.2) and made explicit with `EnableSchemaRequests = true`. It is the form a reviewer reads in a diff:
 `docs/schema.graphql`.
 
-**D7. The GraphQL UI is Nitro**, which HotChocolate 15 already serves at `/graphql/` from embedded assets. It works in
-Production too, because it loads the schema from the SDL route rather than by introspection (A.4.6). The plan makes it
-explicit (`Tool.Enable = true`), tests it and documents it. Two facts go into the README: Nitro is under the ChilliCream
-License 1.0 (source-available, not OSI), and the page calls `https://api.chillicream.com/status` from the browser even
-with `DisableTelemetry = true` (A.4.7).
+**D7. The GraphQL UI is Nitro, served from the package's embedded files.** HotChocolate 15 already serves Nitro at
+`/graphql/`, but by default (`ServeMode = Latest`) the service **reverse-proxies it from ChilliCream's CDN** on every
+request: the responses carry `Server: cloudflare` and `cf-ray`, and with no network `GET /graphql/` is a `502` — in the
+in-memory lane too (A.4.6). That breaks the repo's first rule, that tests just work on pull and build with no
+internet. `ServeMode = GraphQLToolServeMode.Embedded` serves the copy inside `ChilliCream.Nitro.App` instead: `200` with
+no network, assets from the service (A.4.6). It works in Production too, because it loads the schema from the SDL route
+rather than by introspection (A.4.6). The plan makes all of this explicit (`Tool.Enable = true`, embedded), tests it —
+including that the page no longer comes from the CDN — and documents it. Two facts go into the README: Nitro is under the
+ChilliCream License 1.0 (source-available, not OSI), and the page calls `https://api.chillicream.com/status` from the
+browser even with `DisableTelemetry = true` (A.4.7).
 
 **D8. Descriptions are part of the contract.** Phase 1 comments `breakfast.proto` (the service, every rpc, message and
 field). Phase 4 adds XML doc comments to `ReportingQuery` and the reporting types, which HotChocolate turns into GraphQL
@@ -274,7 +286,7 @@ A `sourceCodeInfo` path addresses the element it documents: `[6, s]` is service 
 |---|---|
 | `GET /graphql/schema.json` | `200`, `application/json; charset=utf-8`. `{"data":{"__schema":{"description":null,"queryType":{"name":"ReportingQuery"},…}}}` — 123,283 bytes today, before descriptions. |
 | `GET /graphql/schema.graphql` (and `?sdl`, `/graphql/schema`) | `200`, `application/graphql; charset=utf-8`, `Content-Disposition: attachment; filename="schema.graphql"`, `Cache-Control: public, max-age=3600`, `ETag`. Begins `schema {\n  query: ReportingQuery\n}`. |
-| `GET /graphql/` | `200`, `text/html`. Nitro (`<title>Nitro IDE</title>`), assets under `/graphql/assets/`. |
+| `GET /graphql/` | `200`, `text/html`. Nitro from the package's embedded files (`<title>Nitro</title>`, scripts under `/graphql/static/js/`), served by the service with no network. Today's default instead proxies ChilliCream's CDN (`<title>Nitro IDE</title>`, `/graphql/assets/…`, `Server: cloudflare`). |
 | `GET /graphql` | `301` to `/graphql/` (HotChocolate). |
 | `POST /graphql` with an introspection query | Unchanged: answered in Development, `400 HC0046` elsewhere (HotChocolate's default). |
 
@@ -363,8 +375,8 @@ shared Then asserts on — failing when nothing was fetched. The new contract fe
 characterisation test for a page that already works — so its red step is to point it at a wrong route and see it fail.
 
 **0.5 `Microsoft.AspNetCore.OpenApi` 10.0.7 pulls `Microsoft.OpenApi` 2.0.0**, which `dotnet restore` flags as a high
-severity vulnerability (NU1903, GHSA-v5pm-xwqc-g5wc). 10.0.12 depends on `Microsoft.OpenApi` `[2.12.0, 3.0.0)`
-(A.10). Bump it, regenerate `docs/openapi.json` and review the diff in the same commit — the newer serialiser may change
+severity vulnerability (NU1903, GHSA-v5pm-xwqc-g5wc, CVE-2026-49451; every `Microsoft.OpenApi` up to 2.7.4 is
+affected). 10.0.11 requires `Microsoft.OpenApi` 2.7.5 or later, 10.0.12 `[2.12.0, 3.0.0)` (A.10). Bump it, regenerate `docs/openapi.json` and review the diff in the same commit — the newer serialiser may change
 the document. This item is separable if its diff turns out large.
 
 **0.6 `post-deployment-tests.yml` runs `tests/BreakfastProvider.Tests.Component/…`**, a project that no longer exists
@@ -372,7 +384,7 @@ the document. This item is separable if its diff turns out large.
 treats LightBDD as the default report. It runs on self-hosted runners, so the commit must say it was not exercised.
 
 **Found and not fixed here (§15):** `Bielu.AspNetCore.AsyncApi.UI` is deprecated (`[Obsolete]`: "render the AsyncAPI
-document with Scalar instead"; Scalar.AspNetCore 2.17 can, 2.14.4 cannot, A.7) and CI's `-p:WarningLevel=0` hides the
+document with Scalar instead"; Scalar.AspNetCore 2.16.1 and later can, 2.14.4 cannot, A.7) and CI's `-p:WarningLevel=0` hides the
 CS0618; `docs/Specifications.yml` comes out in a different YAML dialect from each suite, so its content depends on which
 suite ran last.
 
@@ -691,8 +703,9 @@ Run all six suites; commit `docs/grpc.html` (the page as served, written by S4).
 ## 8. Phase 4 — The GraphQL contract: document, definition and UI (S7, S8, S9)
 
 **Red first.** Add S7, S8 and S9 in all six suites. S7 fails with `404`, and its description assertion keeps it red
-until 8.1 lands. S8 and S9 pass on first run — HotChocolate already serves the SDL and Nitro — so, like S1, their red
-step is to point them at a wrong route and watch them fail; from here on they guard the explicit options in 8.2.
+until 8.1 lands. S9 fails on its last step — the page comes from ChilliCream's CDN — until 8.2 embeds Nitro. S8 passes
+on first run, since HotChocolate already serves the SDL, so like S1 its red step is to point it at a wrong route and
+watch it fail; from here on it guards `EnableSchemaRequests`.
 
 **8.1 Describe the schema.** XML doc comments on `ReportingQuery` and each of its seven methods, and on the reporting
 types it returns (`OrderSummary`, `RecipeReport`, `IngredientUsage`, `RecipeTypeCount`, `BatchCompletionRecord`,
@@ -701,20 +714,25 @@ checked against the ingesters (`ReportingIngester`, the Kafka / Pub/Sub / Event 
 `GenerateDocumentationFile` is already on, and HotChocolate reads `BreakfastProvider.Api.xml` at runtime (A.4.8); the
 external-SUT lane proves the file is in the Docker image, because S7 fails without descriptions.
 
-**8.2 Make HotChocolate's publishing explicit** (`Program.cs:363`), so a later HotChocolate upgrade that changes a
-default fails a scenario instead of silently unpublishing something:
+**8.2 Make HotChocolate's publishing explicit, and serve Nitro from the package** (`Program.cs:363`) — explicit so a
+later HotChocolate upgrade that changes a default fails a scenario instead of silently unpublishing something:
 
 ```csharp
 app.MapGraphQL().WithOptions(new GraphQLServerOptions
 {
-    EnableSchemaRequests = true,   // GET /graphql/schema.graphql
-    Tool = { Enable = true }       // Nitro at GET /graphql/
+    EnableSchemaRequests = true,                          // GET /graphql/schema.graphql
+    Tool =
+    {
+        Enable = true,                                    // Nitro at GET /graphql/
+        ServeMode = GraphQLToolServeMode.Embedded         // from the package, not proxied from ChilliCream's CDN
+    }
 });
-app.MapGraphQLSchemaJson();        // GET /graphql/schema.json
+app.MapGraphQLSchemaJson();                               // GET /graphql/schema.json
 ```
 
 `WithOptions` replaces the whole options object; every other property keeps `GraphQLServerOptions`' default, which is
-what `MapGraphQL()` uses today (verified: Nitro and SDL served, and the existing GraphQL features pass, A.4.9).
+what `MapGraphQL()` uses today (verified: Nitro and SDL served, and the existing GraphQL features pass, A.4.9). The
+serve mode is the one real change: without it the in-memory lane needs the internet to pass S9 (A.4.6).
 
 **8.3 `src/BreakfastProvider.Api/Contracts/GraphQLContract.cs`** and the endpoint:
 
@@ -811,7 +829,7 @@ Feature and scenario names follow `.claude/skills/component-tests/naming-convent
 | S6 | same feature | Grpc server reflection should describe the breakfast service | **When** the breakfast service is described through grpc server reflection · **Then** the description should be the breakfast proto file · **And** the description should contain every breakfast method | 2 |
 | S7 | `Specifications__GraphQL_Schema_Feature` — "/graphql/schema.json; /graphql/schema.graphql - Serving the GraphQL schema as introspection JSON and as a schema definition" | The GraphQL schema endpoint should return a valid specification | **When** the graphql schema endpoint is called · **Then** the response should be valid *(status OK; valid JSON)* · **And** the schema should contain all the reporting queries *(`queryType` `ReportingQuery`; its seven fields)* · **And** the reporting queries should be documented *(the query type and each of its fields has a description)* · **And** the graphql schema is written to disk *(`docs/graphql.json`, attached)* | 4 |
 | S8 | same feature | The GraphQL schema definition endpoint should return the schema definition | **When** the graphql schema definition endpoint is called · **Then** the response should be a graphql schema definition *(status OK; `application/graphql`)* · **And** the schema definition should declare all the reporting queries *(`type ReportingQuery {` and the seven field names)* · **And** the graphql schema definition is written to disk *(`docs/schema.graphql`, attached)* | 4 |
-| S9 | `Specifications__GraphQL_UI_Feature` — "/graphql/ - Serving the Nitro GraphQL IDE" | The GraphQL UI endpoint should return a valid page | **When** the graphql ui endpoint is called *(`Accept: text/html`)* · **Then** the response should be a valid nitro page *(status OK; `<html`; `Nitro`)* | 4 |
+| S9 | `Specifications__GraphQL_UI_Feature` — "/graphql/ - Serving the Nitro GraphQL IDE" | The GraphQL UI endpoint should return a valid page | **When** the graphql ui endpoint is called *(`Accept: text/html`)* · **Then** the response should be a valid nitro page *(status OK; `<html`; `Nitro`)* · **And** the page should be served by the service itself *(no `cf-ray` header: the embedded Nitro, not ChilliCream's CDN)* | 4 |
 
 The class names in the other suites: `Specifications_Async_Api_UI_Tests`, `Specifications_Grpc_Contract_Tests`,
 `Specifications_Grpc_UI_Tests`, `Specifications_Grpc_Reflection_Tests`, `Specifications_GraphQL_Schema_Tests`,
@@ -1140,6 +1158,8 @@ report).
 **Acceptance.**
 
 - [ ] All six suites green in memory; each total exactly 9 above §0.5.
+- [ ] One suite green in memory **with the network off** (e.g. `unshare -rn` on Linux, as in Appendix B): no contract
+      page or document needs the internet.
 - [ ] Running the six suites one after another leaves `git status` clean: six identical writers.
 - [ ] `docs/` holds `openapi.json`, `asyncapi.json`, `grpc.json`, `grpc.html`, `graphql.json`, `schema.graphql`, all LF
       without a BOM; `docs/openapi.json` lists no `/grpc…` or `/graphql/schema.json` path.
@@ -1161,10 +1181,13 @@ report).
 | Comments carry `\r` from a Windows checkout | protoc copies comments verbatim | `*.proto text eol=lf`; `ContractDocs.Normalise` |
 | Tests assert `Query` | The root type is `ReportingQuery` (the spike's first attempt made this mistake, A.4.5) | `GraphQLSchemaDefaults.QueryTypeName` |
 | Client introspection "fixed" by switching it on | HotChocolate refuses it outside Development on purpose | Leave the default; `schema.json` uses `AllowIntrospection()` on its own request only (D5) |
-| HotChocolate 16 | The executor comes from `IRequestExecutorProvider` instead of `IRequestExecutorResolver` (A.11); Nitro and schema defaults may move (16.6.7 is out, the repo pins 15.1.15) | Explicit `WithOptions` (§8, item 8.2); S7-S9 fail on any change |
+| HotChocolate 16 | The executor comes from `IRequestExecutorProvider` instead of `IRequestExecutorResolver` (A.11); `GraphQLToolOptions` becomes `NitroAppOptions` and `GraphQLToolServeMode` becomes `ServeMode`, and `schema.graphql` loses internal directives such as `@cost` (its migration guide, C) — so the upgrade edits §8's code and diffs `docs/schema.graphql` | Explicit `WithOptions` (§8, item 8.2); S7-S9 fail on any change; the drift gate shows the SDL diff |
 | gRPC 2.71 → 2.84 | A minor-version jump across the server stack | 203/203 xUnit in memory on 2.84.0 with reflection mapped (A.5.8); the docker and external-SUT lanes cover h2c |
 | Report size | The GraphQL document is ~120 KB and becomes a response body in the report | Kronikol 4.0 compresses large bodies; record the size before and after (§12) |
 | Nitro licence and status call | ChilliCream License 1.0; the browser calls `api.chillicream.com/status` | Documented (D7); GraphiQL is the drop-in alternative if the licence is unacceptable (§14) |
+| Nitro fetched from the CDN | HotChocolate 15's default `ServeMode.Latest` proxies `cdn.chillicream.com`; offline, `GET /graphql/` is `502`, in memory too (A.4.6) | `ServeMode = GraphQLToolServeMode.Embedded` (§8, item 8.2); S9's last step fails if the page comes from the CDN again |
+| Custom options vanish from the JSON | `Google.Protobuf`'s `JsonFormatter` writes an extension option such as `(google.api.http)` as `"options": {}` (research pass, C) | None needed today — `breakfast.proto` has none. If it gains one, the `.proto` (D2) carries it; say so on the page |
+| Well-known types in the published set | If `breakfast.proto` ever imports `google/protobuf/*.proto`, their descriptors change with `Google.Protobuf` releases and would churn `docs/grpc.json` | Keep `--include_imports` off, as §5 item 1.2 has it: the set holds `breakfast.proto` only |
 | Six suites writing `docs/` at once | Parallel lanes on one machine share the workspace | Identical bytes, and `ContractDocs.WriteAsync` keeps the `IOException` retries |
 | Two attachments with one file name | Kronikol copies an attachment into `Reports/attachments/` under its file name and renames a clash (`ReportGenerator`, `GetUniqueFileName`); the teardown copy looks files up by name, so it would publish the wrong one | Six distinct names (`openapi.json`, `asyncapi.json`, `grpc.json`, `grpc.html`, `graphql.json`, `schema.graphql`) — never a second `schema.json` or `v1.json` |
 | Kestrel cleartext `Http1AndHttp2` | Does not accept HTTP/2 without TLS (A.5.7) | The Docker SUT keeps the separate `Http2` endpoint on `:8081`; the README says how to reach gRPC locally |
@@ -1175,26 +1198,39 @@ report).
 
 | Alternative | For | Against (evidence) |
 |---|---|---|
-| **GrpcBrowser** (in-app Swagger-like gRPC UI) | Interactive, served by the app | 1.3.4 (2025-10-17) still targets `netcoreapp3.1` with MudBlazor 2.0.7, Fluxor 4.2.1 and `protobuf-net.Grpc`; on net10 its page is blank until the project sets `RequiresAspNetWebAssets` and maps static files; it pulls `Newtonsoft.Json` 12.0.3 (NU1903 high); it ships `appsettings*.json` as content files; it lists every method twice (sync and async client methods); it loads Google Fonts from a CDN; in headless Chromium, clicks on an operation were intercepted by overlapping elements; it calls the service through the app's first bound address, which in Docker is the HTTP/1.1-only `:8080`; and as a Blazor Server app it cannot be a Pages page (A.6) |
+| **GrpcBrowser** (in-app Swagger-like gRPC UI) | Interactive, served by the app | 1.3.4 (2025-10-17) still targets `netcoreapp3.1` with MudBlazor 2.0.7, Fluxor 4.2.1 and `protobuf-net.Grpc`; on net10 its page is blank until the project sets `RequiresAspNetWebAssets` and maps static files; it pulls `Newtonsoft.Json` 12.0.3 (NU1903 high); it ships `appsettings*.json` as content files; it lists every method twice (sync and async client methods); it loads Google Fonts from a CDN; in headless Chromium, clicks on an operation were intercepted by overlapping elements; it calls the service through the app's first bound address, which in Docker is the HTTP/1.1-only `:8080` — the research pass saw calls fail over plain HTTP — and keeps its services in static lists, which parallel suites share (C); and as a Blazor Server app it cannot be a Pages page (A.6) |
 | **grpcui** (fullstorydev) | The best-known interactive gRPC UI | A Go binary: a sidecar container, not a page of the service; absent from the in-memory lane and from Pages. Reflection (D3) is what it needs — an optional compose service is listed in §15 |
 | **Scalar** for gRPC | Already the OpenAPI UI | Scalar.AspNetCore 2.17.11 knows two document types, OpenAPI and AsyncAPI (A.7) |
-| **JSON transcoding + `Microsoft.AspNetCore.Grpc.Swagger`** | gRPC in Scalar via an OpenAPI view | Changes the contract (`google.api.http` annotations, new REST routes); the OpenAPI generator is Swashbuckle-based (`Swashbuckle.AspNetCore` 6.6.2 in 0.10.11's `net10.0` dependencies, A.11) beside Microsoft.AspNetCore.OpenApi; and an HTTP/JSON view is not the gRPC contract (no field numbers, streaming semantics or status codes) |
-| **protoc-gen-doc** (HTML/JSON from protos) | Mature static docs | A Go plugin binary per platform, downloaded at build time — breaks "tests just work on pull and build, offline" — and a JSON format of its own instead of the standard descriptor set |
+| **JSON transcoding + `Microsoft.AspNetCore.Grpc.Swagger`** | gRPC in Scalar via an OpenAPI view | Changes the contract (`google.api.http` annotations, new REST routes); the package is **deprecated** — 0.10.11 is its last release and it has left the aspnetcore repo (C) — and is Swashbuckle-based (`Swashbuckle.AspNetCore` 6.6.2, A.11); registered beside the built-in generator it made `/openapi/v1.json` answer `500` (research pass, C); the built-in generator does not describe transcoded routes at all (C); and an HTTP/JSON view is not the gRPC contract (no field numbers, streaming semantics or status codes). If a REST view is ever wanted, the research pass got a separate OpenAPI 3.1 document out of `protoc-gen-connect-openapi` run by Grpc.Tools' protoc, or out of `Community.Grpc.SwaggerGen` with the gRPC routes filtered from the built-in document (C) |
+| **protoc-gen-doc** (HTML/JSON from protos) | Mature static docs; runs under Grpc.Tools' own protoc | A prebuilt plugin binary per platform to vendor or download (v1.5.1, last release 2022-02-18) — a download breaks "tests just work on pull and build, offline" — and a JSON format of its own instead of the standard descriptor set |
+| **buf** (`buf build -o x.json --as-file-descriptor-set`) | Deterministic JSON with comments and custom options | Another binary in the build for what protoc and `JsonFormatter` already give |
+| **Kaya.GrpcExplorer** 1.2.0 (in-app, net10) | Interactive, served by the app at `/grpc-explorer` | Maps its own reflection service — beside ours, an `AmbiguousMatchException` (`500`) — and calls through the app's own address, so on the HTTP/1.1-only port it lists nothing; eleven stars, first released 2026 (research pass, C). `Kuestenlogik.Bowire` 2.8.0 did not build |
 | **Descriptor JSON built at runtime** from `BreakfastReflection.Descriptor` | No build step | Comments are gone (A.5.1) — a contract without descriptions |
 | **GraphQL JSON by client POST from the tests** | No new endpoint | Works only where client introspection is allowed (Development); no GET URL to publish (A.4.3) |
 | **Switch client introspection on everywhere** | Simplest | Weakens HotChocolate's secure default for no gain: the published document does not need it (D5) |
-| **GraphiQL / Voyager inside the app** (`GraphQL.Server.Ui.*` 8.3.3) | MIT-licensed | Nitro is already there and richer; both would introspect by POST, which Production refuses. GraphiQL remains the fallback if Nitro's licence is unacceptable |
+| **GraphiQL / Voyager inside the app** (`GraphQL.Server.Ui.*` 8.3.3) | MIT-licensed | Nitro is already there and richer; both introspect by POST, which Production refuses; and both load their app from a CDN at view time (`graphiql@3.2.0` from unpkg, `graphql-voyager@1.3.0` from jsDelivr, C). GraphiQL remains the fallback if Nitro's licence is unacceptable |
 | **SpectaQL / Magidoc** for the GraphQL Pages page | Reference-style static docs | A Node build step; Voyager needs only a pinned file, like Scalar and AsyncAPI today |
 
 ---
 
 ## 15. Out of scope, and follow-ups
 
-- **An interactive gRPC runner.** Optional compose service
-  `grpcui -plaintext -port 8080 -bind 0.0.0.0 breakfast-provider-api:8081` (image `fullstorydev/grpcui`, pinned) for
-  local Docker work; no lane needs it. Not verified in the spike.
+- **An interactive gRPC runner.** An optional compose service for local Docker work; no lane needs it:
+
+  ```yaml
+  grpcui:                                       # beside breakfast-provider-api in docker-compose-sut.yml; not run
+    image: ghcr.io/fullstorydev/grpcui:v1.5.4   # Docker Hub's fullstorydev/grpcui:latest is older (v1.5.2)
+    command: ["-plaintext", "breakfast-provider-api:8081"]   # the entrypoint already binds 0.0.0.0:8080
+    ports: ["5082:8080"]
+    networks: [localdev]
+    depends_on: [breakfast-provider-api]
+  ```
+
+  The research pass ran the grpcui v1.5.4 binary (not the image) against the service's reflection: it found
+  `breakfast.BreakfastGrpc` and invoked the streaming method, with its assets served offline (C). `Tool.Grpc.UI`
+  packages grpcui as a `dotnet tool`, for use without Docker (reported, not tried).
 - **The AsyncAPI UI on Scalar.** `Bielu.AspNetCore.AsyncApi.UI` is deprecated in favour of Scalar, which reads AsyncAPI
-  from 2.17 (A.7). Moving means upgrading Scalar.AspNetCore 2.14.4 and changing S1's marker.
+  from 2.16.1 (A.7). Moving means upgrading Scalar.AspNetCore 2.14.4 and changing S1's marker.
 - **Breaking-change checks** on pull requests: `buf breaking` for the proto, `graphql-inspector diff` for the schema,
   `oasdiff` for OpenAPI — the natural next step once the contracts are committed and gated.
 - **Kronikol:** `Kronikol.Extensions.Grpc` logs client-streaming and duplex calls, and server-streaming replies, without
@@ -1241,18 +1277,27 @@ rewritten in the running suite's dialect. `docs/asyncapi.json` came out byte-ide
 5. Real API: root type `ReportingQuery` (`schema { query: ReportingQuery }`); the document is 123,283 bytes with
    seven root fields. `GET /graphql` → `301` to `/graphql/`; `GET /graphql/` → `200 text/html` with or without
    `Accept: text/html`.
-6. Nitro (`ChilliCream.Nitro.App` 28.0.7, a dependency of `HotChocolate.AspNetCore`): `<title>Nitro IDE</title>`, assets
-   served by the app (`/graphql/assets/main….js`, 2,867,475 bytes). In Production, after "Create Document", it
-   fetched `GET /graphql/schema.graphql` and showed "Schema available"; its feature probe
-   (`GET …?query=…__type(name: "__SearchResult")…`) got `400 HC0046`, harmlessly.
+6. Nitro (`ChilliCream.Nitro.App` 28.0.7, a dependency of `HotChocolate.AspNetCore`). With the default
+   `ServeMode.Latest` the page (`<title>Nitro IDE</title>`) and its assets (`/graphql/assets/main….js`, 2,867,475
+   bytes) come back with `Server: cloudflare` and `cf-ray` headers — the service proxies `cdn.chillicream.com` — and in
+   a network namespace with loopback only, `GET /graphql/` answered `502`. With
+   `ServeMode = GraphQLToolServeMode.Embedded`, in the same namespace, it answered `200` from Kestrel
+   (`<title>Nitro</title>`) and its scripts (`/graphql/static/js/*.66754811.js`, the package's build) `200`. In
+   Production both loaded the schema the same way: after "Create Document" the page fetched
+   `GET /graphql/schema.graphql` and showed "Schema available"; its feature probe
+   (`GET …?query=…__type(name: "__SearchResult")…`) got `400 HC0046`, harmlessly. The same `502` happens under an in-memory
+   `WebApplicationFactory` (A.4.9; the research pass found it too, C).
 7. The browser requested `https://api.chillicream.com/status` with and without `Tool.DisableTelemetry = true`.
    `Tool.Title` did not change the HTML `<title>`. Licence file: ChilliCream License 1.0.
 8. XML doc comments become descriptions: a `<summary>` on `ReportingQuery` and on `GetOrderSummaries` appeared as
    `"Reporting queries over the business-intelligence database."` above `type ReportingQuery` and
    `"One summary per ingested order."` above `orderSummaries` (`BreakfastProvider.Api.xml` in the output).
 9. `MapGraphQL().WithOptions(new GraphQLServerOptions { EnableSchemaRequests = true, Tool = { Enable = true, … } })`
-   builds and serves SDL and Nitro; on the real API with exactly the §8 (8.2) options, the full xUnit suite passed —
-   211 of 211, the 203 existing scenarios (five GraphQL reporting features among them) and the eight scratch ones. Present in the XML docs: `GraphQLServerOptions.EnableSchemaRequests` ("Defines if
+   builds and serves SDL and Nitro. On the real API with exactly the §8 (8.2) options, embedded Nitro included, the
+   full xUnit suite passed — 211 of 211: the 203 existing scenarios (five GraphQL reporting features among them) and
+   eight scratch ones, the Nitro one asserting there is no `cf-ray` header — both online and in a network namespace
+   with loopback only. With the default serve mode and no network, the scratch Nitro check got `502 Bad Gateway`
+   under `WebApplicationFactory`. Present in the XML docs: `GraphQLServerOptions.EnableSchemaRequests` ("Defines if
    the GraphQL schema SDL can be downloaded"), `.Tool.Enable` ("Defines if Nitro is enabled"), `.Tool.DisableTelemetry`,
    `.Tool.Document`, `.Tool.Title`, `.Tool.ServeMode`; `MapGraphQLSchema(pattern, schemaName)`,
    `MapNitroApp(toolPath, relativeRequestPath)`.
@@ -1266,7 +1311,8 @@ rewritten in the running suite's dialect. `docs/asyncapi.json` came out byte-ide
    the arguments on `breakfast.proto` only.
 3. With source info: 73 locations, 4 with comments; JSON 20,170 bytes. Trimmed to commented locations, the real API's
    document was 5,532 bytes, with `jsonName` on every field (protoc fills it).
-4. The document was byte-identical across restarts and between Development and Production.
+4. The document was byte-identical across restarts and between Development and Production. The research pass found
+   the service's file byte-identical under Google.Protobuf 3.31.1 and 3.35.1 as well (C).
 5. `ProtoRoot="Protos"`: the descriptor and reflection name the file `breakfast.proto` (without it: `Protos/breakfast.proto`).
 6. Reflection: `Grpc.AspNetCore.Server.Reflection` 2.71.0 lists only `grpc.reflection.v1alpha.ServerReflection`;
    2.84.0 lists `v1` and `v1alpha`. The `v1` service is absent from `Grpc.Reflection` 2.76.0 and present from 2.80.0.
@@ -1296,7 +1342,8 @@ files; then it lists the methods, each twice (`GetOrderStatus`, `GetOrderStatusA
 intercepted by an overlay; its log printed `Base URL: http://localhost:5901` — the first, HTTP/1.1-only, address.
 
 **A.7 Scalar.AspNetCore.** 2.14.4 (the repo's) has no AsyncAPI, GraphQL or gRPC support; 2.17.11 has
-`DocumentType.OpenApi` and `DocumentType.AsyncApi` and `AddAsyncApiDocument`, and nothing for GraphQL or gRPC.
+`DocumentType.OpenApi` and `DocumentType.AsyncApi` and `AddAsyncApiDocument`, and nothing for GraphQL or gRPC
+(`AddAsyncApiDocument` first appears in 2.16.1 per the research pass; gRPC is an open Scalar discussion, C).
 `Bielu.AspNetCore.AsyncApi.UI`'s `MapAsyncApiUi` is `[Obsolete]`, pointing to Scalar.
 
 **A.8 AsyncAPI UI.** `GET /asyncapi` → `200 text/html; charset=utf-8`, title "v1 AsyncAPI Documentation", renders
@@ -1311,7 +1358,9 @@ the `{"data":…}` envelope as is.
 **A.10 Packages.** `Microsoft.AspNetCore.OpenApi` 10.0.7 → `Microsoft.OpenApi` 2.0.0 (restore: NU1903
 GHSA-v5pm-xwqc-g5wc); 10.0.12 → `Microsoft.OpenApi` `[2.12.0, 3.0.0)`.
 
-**A.11 Versions on nuget.org / npm, 2026-09-30.** `Grpc.AspNetCore` and `Grpc.AspNetCore.Server.Reflection` 2.84.0;
+**A.11 Versions on nuget.org / npm, 2026-09-30.** `Grpc.AspNetCore` and `Grpc.AspNetCore.Server.Reflection` 2.84.0
+(`Grpc.AspNetCore.Server` 2.71.0 ships `net6.0`-`net9.0` only; 2.76.0 and 2.84.0 add `net10.0`);
+`HotChocolate.AspNetCore` 15.1.15 ships `net8.0` and `net9.0`;
 `HotChocolate.AspNetCore` 16.6.7 stable (repo: 15.1.15) — `HotChocolate.Execution.Abstractions` 16.6.7 declares
 `IRequestExecutorProvider` and `IRequestExecutorManager`, where 15.1.15's `HotChocolate.Execution` declares
 `IRequestExecutorResolver`; `Scalar.AspNetCore` 2.17.11 (repo: 2.14.4);
@@ -1337,6 +1386,11 @@ curl -s -H "Content-Type: application/json" --data @introspection.json http://lo
 curl -s http://localhost:5901/graphql/schema.json | head -c 300                                             # 200
 grpcurl -plaintext localhost:5902 list
 
+# Nitro with no network: loopback only (lo brought up with a SIOCSIFFLAGS ioctl — `ip` was not installed here)
+unshare -rn bash -c 'python3 lo-up.py; ASPNETCORE_ENVIRONMENT=Development dotnet bin/Debug/net10.0/Spike.dll & sleep 8;
+  curl --noproxy "*" -s -o /dev/null -w "%{http_code}\n" -H "Accept: text/html" http://127.0.0.1:5901/graphql/'
+# → 502 with the default ServeMode.Latest; 200 with Tool.ServeMode = GraphQLToolServeMode.Embedded
+
 # GraphQL Voyager over the static document
 npm pack graphql-voyager@2.1.0 && tar xzf graphql-voyager-2.1.0.tgz
 mkdir -p site/api && cp package/dist/voyager.standalone.js package/dist/voyager.css site/api/
@@ -1346,3 +1400,45 @@ python3 -m http.server -d site 5999   # open http://localhost:5999/api/graphql.h
 # Real API: a scratch clone with the §5-§8 changes, then
 dotnet test --project tests/BreakfastProvider.Tests.Component.xUnit/BreakfastProvider.Tests.Component.xUnit.csproj
 ```
+
+## Appendix C — Sources from the second research pass
+
+An independent pass, run with the network switched off where it mattered, against the same package versions. It
+agreed with every fact in Appendix A and added the Nitro serve-mode finding (verified again here, A.4.6) and the
+following. Links are as it reported them.
+
+- HotChocolate 15.1.15 source: `HttpGetSchemaMiddleware.cs` (serves `?sdl`, `/schema`, `/schema.graphql`,
+  `?types=`), `Extensions/EndpointRouteBuilderExtensions.cs` (`MapGraphQLSchema(pattern = "/graphql/sdl")`),
+  `GraphQLToolOptions.cs` (`ServeMode = Latest`, `Enable = true`), and
+  `Extensions/HotChocolateAspNetCoreServiceCollectionExtensions.cs` (introspection off unless `IsDevelopment()`) —
+  https://github.com/ChilliCream/graphql-platform/tree/15.1.15/src/HotChocolate/AspNetCore/src/AspNetCore
+- HotChocolate docs: https://chillicream.com/docs/hotchocolate/v15/server/endpoints,
+  https://chillicream.com/docs/hotchocolate/v15/server/introspection (still shows `AllowIntrospection(false)`, obsolete
+  in 15.x), https://chillicream.com/docs/nitro/integrations/hot-chocolate (serve modes), and the 15 → 16 migration
+  guide, https://github.com/ChilliCream/graphql-platform/blob/16.6.7/website/content/docs/hotchocolate/migrating/migrate-from-15-to-16.md
+- `WebApplicationFactory` runs in Development by default:
+  https://learn.microsoft.com/en-us/aspnet/core/test/integration-tests?view=aspnetcore-10.0
+- gRPC reflection v1: https://github.com/grpc/grpc-dotnet/pull/2704 (released in 2.80.0) and
+  https://github.com/grpc/grpc-dotnet/blob/v2.84.0/src/Grpc.AspNetCore.Server.Reflection/GrpcReflectionEndpointRouteBuilderExtensions.cs
+  (maps v1alpha and v1); Microsoft's advice to map reflection in Development:
+  https://learn.microsoft.com/en-us/aspnet/core/grpc/test-tools?view=aspnetcore-10.0
+- Grpc.Tools `AdditionalProtocArguments` and `ProtoRoot`: https://github.com/grpc/grpc/blob/master/src/csharp/BUILD-INTEGRATION.md.
+  `FileDescriptor.ToProto()` exists from Google.Protobuf 3.20.0, `JsonFormatter.Settings.WithIndentation()` from 3.22.0.
+  `JsonFormatter` writes an extension option such as `(google.api.http)` as `"options": {}`.
+- `dotnet grpc add-url`: https://learn.microsoft.com/en-us/aspnet/core/grpc/dotnet-grpc?view=aspnetcore-10.0
+- `Microsoft.AspNetCore.Grpc.Swagger` deprecated: https://github.com/dotnet/aspnetcore/issues/67134,
+  https://github.com/dotnet/aspnetcore/pull/67919, https://learn.microsoft.com/en-us/aspnet/core/grpc/json-transcoding-openapi?view=aspnetcore-10.0;
+  the package conflict with the built-in generator: https://github.com/dotnet/aspnetcore/issues/65228. With transcoding
+  on, the built-in 10.0.7 document lists none of the transcoded routes. Alternatives it ran:
+  `Community.Grpc.SwaggerGen` 10.0.0 (https://github.com/adam8797/Community.Grpc.OpenApi) and
+  `protoc-gen-connect-openapi` v0.27.3 (https://github.com/sudorandom/protoc-gen-connect-openapi).
+- GrpcBrowser: https://github.com/thomaswormald/grpc-browser (issues #11 and #12 unanswered); the .NET 10 Blazor script
+  change: https://github.com/dotnet/aspnetcore/issues/66059. It also found invocation fails over plain HTTP and that the
+  package keeps services in static lists.
+- Scalar: gRPC not supported (https://github.com/scalar/scalar/discussions/7794); AsyncAPI support
+  (https://github.com/scalar/scalar/issues/7080).
+- grpcui: https://github.com/fullstorydev/grpcui (v1.5.4, 2026-09-02; the image on `ghcr.io/fullstorydev/grpcui`).
+- `GraphQL.Server.Ui.GraphiQL` / `.Voyager` 8.3.3 load `graphiql@3.2.0` from unpkg and `graphql-voyager@1.3.0` from
+  jsDelivr.
+- Microsoft.OpenApi advisory: https://github.com/advisories/GHSA-v5pm-xwqc-g5wc (CVE-2026-49451).
+- No gRPC binding in AsyncAPI: https://github.com/asyncapi/bindings.

@@ -359,5 +359,6 @@ public static class Documentation
         public const string GrpcJson = "/grpc/v1.json";
         public const string GrpcProto = "/grpc/protos/breakfast.proto";
         public const string GrpcUi = "/grpc";
+        public const string GraphQLSchemaJson = "/graphql/schema.json";
     }
 }

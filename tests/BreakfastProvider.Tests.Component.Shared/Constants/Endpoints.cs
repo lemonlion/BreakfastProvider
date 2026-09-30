@@ -61,6 +61,13 @@ public static class Endpoints
         public const string UI = "grpc/";
     }
 
+    public static class GraphQLContract
+    {
+        public const string SchemaJson = "graphql/schema.json";
+        public const string SchemaDefinition = "graphql/schema.graphql";
+        public const string UI = "graphql/";
+    }
+
     public static class AsyncApi
     {
         private const string BasePath = "/asyncapi";

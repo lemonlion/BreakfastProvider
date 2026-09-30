@@ -1,4 +1,5 @@
 using System.Net.Mime;
+using HotChocolate.Execution;
 
 namespace BreakfastProvider.Api.Contracts;
 
@@ -25,6 +26,15 @@ public static class ContractEndpointRouteBuilderExtensions
                 context.Request.Path.Value!.EndsWith('/')
                     ? Results.Text(GrpcContract.Html, MediaTypeNames.Text.Html)
                     : Results.Redirect($"{context.Request.PathBase}{context.Request.Path}/", permanent: true))
+            .ExcludeFromDescription();
+        return app;
+    }
+
+    /// <summary>The GraphQL contract as the standard introspection response, in every environment.</summary>
+    public static IEndpointRouteBuilder MapGraphQLSchemaJson(this IEndpointRouteBuilder app)
+    {
+        app.MapGet(Documentation.Contracts.GraphQLSchemaJson, async (IRequestExecutorResolver executors, CancellationToken ct) =>
+                Results.Text(await GraphQLContract.IntrospectAsync(executors, ct), MediaTypeNames.Application.Json))
             .ExcludeFromDescription();
         return app;
     }

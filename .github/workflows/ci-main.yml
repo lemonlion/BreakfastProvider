@@ -584,7 +584,7 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: lemonlion/Kronikol/templates/github-actions/kronikol-history/record@v4.0.0
+      - uses: lemonlion/Kronikol/templates/github-actions/kronikol-history/record@v4.0.1
         with:
           token: ${{ secrets.PUSH_SPECS_IN_CI_TOKEN != '' && secrets.PUSH_SPECS_IN_CI_TOKEN || github.token }}
 

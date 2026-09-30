@@ -24,7 +24,17 @@ folder in `src`, one Shared step class per protocol, two CI steps, and a Pages b
 
 This document is self-contained. §0 orients a reader new to the repo, §1 is the target, §2 the decisions, §3 the exact
 contracts, §4–§11 the phases in order, §12 the order of work and acceptance, §13 the traps, §14 the alternatives that
-were rejected and why, §15 what is deliberately left out.
+were rejected and why, §15 what is deliberately left out. Appendix D is the tested GraphQL-UI variant for the licence
+decision below.
+
+**Open decisions — the owner's call. Until answered, implement the default.**
+
+| # | Decision | Default in this plan | The alternative, and what it changes |
+|---|---|---|---|
+| O1 | Does a stale contract in `docs/` **fail** the in-memory CI lanes, or only warn? | Fail (D12, §10.1) | Warn: the §10.1 step prints `::warning::` and exits 0; Pages may then publish a stale contract |
+| O2 | Is Nitro's ChilliCream License 1.0 (source-available, not OSI) acceptable? | Yes: Nitro, embedded (D7, §8) | GraphiQL, self-hosted, and Nitro removed from the build entirely — tested, Appendix D |
+| O3 | gRPC server reflection in every environment, or Development only (Microsoft's advice)? | Every environment, like `/openapi/v1.json` (D3) | Development only: `MapGrpcReflectionService()` behind a setting; S5 and S6 then need `[IgnoreIf]` where it is off (the Docker SUT runs Development, so CI keeps them) |
+| O4 | Bump `Microsoft.AspNetCore.OpenApi` 10.0.7 → 10.0.12 in Phase 0 (vulnerable `Microsoft.OpenApi` 2.0.0)? | Yes, in its own commit if the `docs/openapi.json` diff is large (§4, item 0.5) | Leave it for a separate change |
 
 ---
 
@@ -35,6 +45,13 @@ approach: the same scenarios run in three CI lanes (all dependencies in-process;
 Docker) from six test frameworks, and every run writes a Kronikol report with sequence diagrams. There is no
 `CLAUDE.md`; conventions live in `.claude/skills/component-tests/` (start with `SKILL.md`) and
 `.github/copilot-instructions.md`. Plans live at the repo root (`CLICKHOUSE_FEATURE_PLAN.md` and this file).
+
+**Working conventions for this change.** Work on the branch `ccr-8f587aa5-z37wc1` of BreakfastProvider; Kronikol needs
+no change. Commit messages carry no attribution lines (the repo's convention, stated in `CLICKHOUSE_FEATURE_PLAN.md`
+§0) and use the git identity the environment configures. The house style of a commit message is a narrative of what
+changed and what was measured: each suite's test count and, for report-affecting work, the `TestRunReport.json` size.
+Never open `TestRunReport.json`/`.html` or a diagram — read `Reports/Failures.md` or run `kronikol query` (see
+Kronikol's `CLAUDE.md`, "Debugging a test run").
 
 ### 0.1 What is published today
 
@@ -196,7 +213,8 @@ no network, assets from the service (A.4.6). It works in Production too, because
 rather than by introspection (A.4.6). The plan makes all of this explicit (`Tool.Enable = true`, embedded), tests it —
 including that the page no longer comes from the CDN — and documents it. Two facts go into the README: Nitro is under the
 ChilliCream License 1.0 (source-available, not OSI), and the page calls `https://api.chillicream.com/status` from the
-browser even with `DisableTelemetry = true` (A.4.7).
+browser even with `DisableTelemetry = true` (A.4.7). Whether that licence is acceptable is open decision O2; the
+tested way to drop Nitro entirely is Appendix D.
 
 **D8. Descriptions are part of the contract.** Phase 1 comments `breakfast.proto` (the service, every rpc, message and
 field). Phase 4 adds XML doc comments to `ReportingQuery` and the reporting types, which HotChocolate turns into GraphQL
@@ -1509,6 +1527,27 @@ In headless Chromium at 1280×800:
   locally. With `schema.graphql` removed it failed, naming `index.html -> api/schema.graphql` and
   `api/graphql.html -> ./schema.graphql`. With `grpc.json` removed it failed on `index.html -> api/grpc.json`.
 
+**A.13 Nitro's licence, and the GraphiQL variant** (Appendix D).
+- `ChilliCream.Nitro.App` 28.0.7's `LICENSE` was read in full: ChilliCream License 1.0.
+- `HotChocolate.AspNetCore` is MIT and depends on it: 15.1.15 on `ChilliCream.Nitro.App` 28.0.7, and 16.6.7 on 32.0.2.
+  The API's build output today holds `ChilliCream.Nitro.App.dll` (12,174,848 bytes) and `Yarp.ReverseProxy.dll`.
+- CI's `_publish-docker-image.yml` is called only by `_publish-fakes.yml`, so no API image is published.
+- **Excluding the package's files** (`<PackageReference Include="ChilliCream.Nitro.App" Version="28.0.7"
+  ExcludeAssets="all" PrivateAssets="all" />`) builds, and the DLL leaves the output.
+  - With `MapGraphQL()`, even with `Tool.Enable = false`, startup fails:
+    `FileNotFoundException: Could not load file or assembly 'ChilliCream.Nitro.App, Version=28.0.0.0'`.
+  - With `MapGraphQLHttp("/graphql")` and `MapGraphQLSchema("/graphql/schema.graphql")` it runs: SDL `200`, a query
+    answered, `/graphql/schema.json` `200`, `GET /graphql` with `Accept: text/html` `404`, and no exception.
+- **The GraphiQL page.** GraphiQL 3.2.0's `graphiql.min.js` and `graphiql.css`, with React 18.3.1's UMD
+  `react.production.min.js` and `react-dom.production.min.js` (3.7 MB together), were served by that app from `wwwroot`.
+  Its fetcher answers the introspection request from `/graphql/schema.json`.
+  - In Production, where client introspection answered `400`, headless Chromium showed a working page. It fetched
+    `GET /graphql/schema.json`, and its docs panel listed the root type and every schema type.
+  - The default query, sent as `POST /graphql`, returned its data.
+  - No external request, no page error.
+- **GraphiQL versions and licence.** GraphiQL 5.4.0 ships ESM only (`dist/*.js`, no standalone bundle) and
+  peer-depends on React 18 or 19. 3.2.0 ships `graphiql.min.js`. Both are MIT.
+
 ## Appendix B — Reproducing the spike
 
 ```bash
@@ -1540,6 +1579,38 @@ python3 -m http.server -d site 5999   # open http://localhost:5999/api/graphql.h
 # Real API: a scratch clone with the §5-§8 changes, then
 dotnet test --project tests/BreakfastProvider.Tests.Component.xUnit/BreakfastProvider.Tests.Component.xUnit.csproj
 ```
+
+**Working notes for implementing** (from this environment; the container is ephemeral, so check before relying on them):
+
+- **SDK.** The spike installed .NET SDK 10.0.401 with `dotnet-install.sh` into `/root/.dotnet`, which is not on `PATH`:
+  `export PATH=/root/.dotnet:$PATH DOTNET_CLI_TELEMETRY_OPTOUT=1 DOTNET_NOLOGO=1`. `dotnet restore` reaches nuget.org
+  through the session proxy.
+- **Build.** `dotnet build BreakfastProvider.sln` took about 80 s: 0 errors, about 211 warnings, all existing.
+- **Running a suite.** `global.json` selects Microsoft.Testing.Platform, so a suite runs as
+  `dotnet test --project tests/BreakfastProvider.Tests.Component.<Suite>/BreakfastProvider.Tests.Component.<Suite>.csproj --no-build`.
+  xUnit v3 narrows with `--filter-class <full class name>` or `--filter-method "*Name"`.
+- **`docs/`.** Every suite run rewrites `docs/`: `git checkout -- docs/` when that was not the point.
+- **No network.** Run under `unshare -rn`. `ip` is not installed, so bring loopback up with Python:
+
+  ```python
+  import socket, fcntl, struct   # lo-up.py: set IFF_UP on lo inside a fresh network namespace
+  SIOCGIFFLAGS, SIOCSIFFLAGS, IFF_UP = 0x8913, 0x8914, 0x1
+  s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+  flags = struct.unpack('16sH', fcntl.ioctl(s, SIOCGIFFLAGS, struct.pack('16sH', b'lo', 0)))[1]
+  fcntl.ioctl(s, SIOCSIFFLAGS, struct.pack('16sH', b'lo', flags | IFF_UP))
+  ```
+
+  Then unset the proxy variables and use `curl --noproxy '*'` against `127.0.0.1`: there is no IPv6, so `localhost` may
+  fail.
+- **Browser checks.** Playwright 1.56.1 is installed globally for Node, with Chromium under `/opt/pw-browsers`:
+  `const { chromium } = require(require('child_process').execSync('npm root -g').toString().trim() + '/playwright');`.
+  Chromium does not trust the proxy's CA, so pages that load fonts from a CDN log harmless failures.
+- **gRPC tools.** grpcurl 1.9.3 comes from its GitHub release tarball.
+- **Stopping a background `dotnet`.** Pick it out with `ps -eo pid,comm,args | awk '$2=="dotnet" && …'`. A plain
+  `pkill -f <pattern>` matches the calling shell too.
+- **The scratch prototype.** It lived in the session scratchpad (`…/scratchpad/bp`, a clone with a rough
+  `Contracts/ContractEndpoints.cs` and `Scratch_Contract_Tests.cs`) and may be gone. The code in §5–§8 and Appendix D
+  supersedes it.
 
 ## Appendix C — Sources from the second research pass
 
@@ -1582,3 +1653,95 @@ following. Links are as it reported them.
   jsDelivr.
 - Microsoft.OpenApi advisory: https://github.com/advisories/GHSA-v5pm-xwqc-g5wc (CVE-2026-49451).
 - No gRPC binding in AsyncAPI: https://github.com/asyncapi/bindings.
+
+## Appendix D — The GraphiQL variant of Phase 4 (if O2 rules Nitro out)
+
+Tested end to end (A.13). Everything else in the plan stays as it is: `/graphql/schema.json`, the SDL route, Voyager on
+Pages, S7 and S8.
+
+**Why the licence comes up at all.** `HotChocolate.AspNetCore` is MIT, but it depends on `ChilliCream.Nitro.App` (in
+15.1.15 and in 16.6.7), so Nitro's 12 MB DLL is in the API's build output today, whatever this plan does.
+
+The ChilliCream License 1.0:
+- **You get:** free, worldwide rights to use, copy, distribute, make available and modify it.
+- **You must not** circumvent its licence-key checks, which gate the paid features.
+- **You must not** remove ChilliCream's copyright or licence notices.
+- **You must** pass the terms on to anyone you give a copy to, and mark any changes you make.
+- **Patents:** a party that claims Nitro infringes a patent loses its patent licence.
+- **Termination:** a breach ends the licence, but it is restored if you fix it within 30 days of being told.
+
+Its wording follows the Elastic License 2.0, minus that licence's ban on offering the software as a hosted service. It
+is not OSI-approved, because of the licence-key limit.
+
+For this repo as it stands that is harmless:
+- the repo distributes source only;
+- CI publishes images of the fakes, never the API's;
+- a browser receives Nitro's scripts under ChilliCream's terms, and the scripts link to the licence.
+
+It matters to a team with an OSI-only dependency policy, and this repo is a template teams copy. Anyone who ships the
+API image should also carry the licence text, for example in a third-party notices file. This is a reading of the
+text, not legal advice.
+
+**D.1 Take Nitro out of the build.** `MapGraphQL()` loads Nitro's assembly at startup, even with the IDE switched off.
+Map HotChocolate's pieces separately instead and exclude the package's files:
+
+```xml
+<!-- HotChocolate.AspNetCore depends on Nitro; keep its assembly out of the build (MapGraphQL would need it). -->
+<PackageReference Include="ChilliCream.Nitro.App" Version="28.0.7" ExcludeAssets="all" PrivateAssets="all" />
+```
+
+```csharp
+app.MapGraphQLHttp("/graphql");                    // queries; no IDE, no WebSocket endpoint (the API has no subscriptions)
+app.MapGraphQLSchema("/graphql/schema.graphql");   // the SDL; `?sdl` was not tested with this mapping
+app.MapGraphQLSchemaJson();                        // §8, item 8.3
+```
+
+Keep the `ChilliCream.Nitro.App` version equal to the one `HotChocolate.AspNetCore` pins, or NuGet reports a
+downgrade. `Yarp.ReverseProxy` (MIT, Microsoft) stays in the output.
+
+**D.2 The page: GraphiQL at `/graphiql/`.** GraphiQL is MIT-licensed and maintained by the GraphQL Foundation.
+- **Files:** vendor GraphiQL 3.2.0's `graphiql.min.js` and `graphiql.css`, and React 18.3.1's
+  `umd/react.production.min.js` and `umd/react-dom.production.min.js` — 3.7 MB. Serve them as static or embedded
+  files.
+- **Why 3.2.0:** GraphiQL 5 ships ES modules only and would need a JavaScript build step. 3.2.0 is also the version
+  graphql-dotnet's own GraphiQL middleware loads.
+- **Production:** the page's fetcher answers GraphiQL's introspection request from `/graphql/schema.json`, which is
+  what lets it work where HotChocolate refuses client introspection.
+
+This is the tested page:
+
+```html
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Breakfast Provider — GraphiQL</title>
+  <link rel="stylesheet" href="graphiql.css">
+  <style>body { margin: 0; height: 100vh; } #graphiql { height: 100vh; }</style>
+</head>
+<body>
+  <div id="graphiql">Loading…</div>
+  <script src="react.production.min.js"></script>
+  <script src="react-dom.production.min.js"></script>
+  <script src="graphiql.min.js"></script>
+  <script>
+    const live = GraphiQL.createFetcher({ url: new URL('../graphql', location.href).toString() });
+    // The schema comes from the published document, so the explorer works where the server refuses introspection.
+    const fetcher = (params, options) =>
+      params.operationName === 'IntrospectionQuery'
+        ? fetch(new URL('../graphql/schema.json', location.href)).then(response => response.json())
+        : live(params, options);
+    ReactDOM.createRoot(document.getElementById('graphiql')).render(
+      React.createElement(GraphiQL, { fetcher, defaultQuery: '{ popularRecipes { recipeType count } }' }));
+  </script>
+</body>
+</html>
+```
+
+**D.3 What else changes.**
+- **S9** fetches `graphiql/` and asserts status OK, `<html`, `GraphiQL`, and that the page reads `schema.json`. The
+  "not from the CDN" step goes.
+- `Endpoints.GraphQLContract.UI` becomes `"graphiql/"`.
+- §13's two Nitro rows go.
+- The README describes GraphiQL, and the files' licences (GraphiQL and React are both MIT).
+- Pages is unchanged.

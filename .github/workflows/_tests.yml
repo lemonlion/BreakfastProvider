@@ -269,7 +269,7 @@ jobs:
       # the branch it targets (Kronikol reads GITHUB_BASE_REF itself).
       - name: Read the history ledger
         if: ${{ inputs.test-type == 'component' }}
-        uses: lemonlion/Kronikol/templates/github-actions/kronikol-history/read@v3.34.0
+        uses: lemonlion/Kronikol/templates/github-actions/kronikol-history/read@v4.0.0
 
       - name: Install dotnet-coverage tool
         run: dotnet tool install --global dotnet-coverage
@@ -296,7 +296,7 @@ jobs:
       # is the bar the suites report with (KronikolHistory.WithCrossRunHistory).
       - name: History gate
         if: ${{ !cancelled() && inputs.test-type == 'component' }}
-        uses: lemonlion/Kronikol/templates/github-actions/kronikol-history/gate@v3.34.0
+        uses: lemonlion/Kronikol/templates/github-actions/kronikol-history/gate@v4.0.0
         with:
           reports: ${{ steps.reports-dir.outputs.dir }}
           test-outcome: ${{ steps.tests.outcome }}
@@ -306,7 +306,7 @@ jobs:
       # into the ledger. A pull request's run is read against the ledger, never recorded.
       - name: Save the history fragment
         if: ${{ !cancelled() && inputs.test-type == 'component' && github.event_name != 'pull_request' }}
-        uses: lemonlion/Kronikol/templates/github-actions/kronikol-history/save@v3.34.0
+        uses: lemonlion/Kronikol/templates/github-actions/kronikol-history/save@v4.0.0
         with:
           path: ${{ steps.reports-dir.outputs.dir }}
           name: ${{ inputs.test-run-description }}

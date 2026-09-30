@@ -1,36 +1,24 @@
 using System.Net;
-using System.Text;
-using System.Text.Json;
-using BreakfastProvider.Tests.Component.ReqNRoll.Support;
+using BreakfastProvider.Tests.Component.ReqNRoll.StepDefinitions.Specifications;
 using BreakfastProvider.Tests.Component.Shared.Constants;
-using BreakfastProvider.Tests.Component.Shared.Util;
 using Reqnroll;
-using Reqnroll.Infrastructure;
 
 namespace BreakfastProvider.Tests.Component.ReqNRoll.StepDefinitions.OpenApi;
 
 /// <summary>
-/// Handles OpenAPI, Scalar UI, and AsyncAPI specification steps.
-/// Combined into one binding class because "the response should be valid" is shared across features.
+/// Handles the OpenAPI, Scalar UI and AsyncAPI specification steps, and the "the response should be valid" step
+/// every specification feature shares. Each When records what it fetched in the scenario's
+/// <see cref="SpecificationDocumentContext"/>, which the shared step validates.
 /// </summary>
 [Binding]
-public class ApiSpecificationSteps(AppManager appManager, IReqnrollOutputHelper outputHelper)
+public class ApiSpecificationSteps(SpecificationDocumentContext context, IReqnrollOutputHelper outputHelper)
 {
-    private HttpResponseMessage? _swaggerResponse;
-    private string? _swaggerJsonString;
-    private JsonDocument? _swaggerJson;
-    private HttpResponseMessage? _scalarResponse;
-    private string? _scalarHtml;
-    private HttpResponseMessage? _asyncApiResponse;
-    private string? _asyncApiJsonString;
-    private JsonDocument? _asyncApiJson;
-
     // ── OpenAPI When ──
 
     [When("the open api endpoint is called")]
     public async Task WhenTheOpenApiEndpointIsCalled()
     {
-        _swaggerResponse = await appManager.Client.GetAsync(Endpoints.Swagger.SwaggerJson);
+        await context.Retrieve(Endpoints.Swagger.SwaggerJson, SpecificationDocumentFormat.Json);
     }
 
     // ── Scalar UI When ──
@@ -38,7 +26,7 @@ public class ApiSpecificationSteps(AppManager appManager, IReqnrollOutputHelper 
     [When("the scalar ui endpoint is called")]
     public async Task WhenTheScalarUiEndpointIsCalled()
     {
-        _scalarResponse = await appManager.Client.GetAsync(Endpoints.Swagger.ScalarUI);
+        await context.Document.Retrieve(Endpoints.Swagger.ScalarUI);
     }
 
     // ── AsyncAPI When ──
@@ -51,9 +39,8 @@ public class ApiSpecificationSteps(AppManager appManager, IReqnrollOutputHelper 
         {
             try
             {
-                _asyncApiResponse = await appManager.Client.GetAsync(Endpoints.AsyncApi.AsyncApiSpec);
-                _asyncApiJsonString = await _asyncApiResponse.Content.ReadAsStringAsync();
-                if (Json.TryParse(_asyncApiJsonString, out _asyncApiJson))
+                await context.Retrieve(Endpoints.AsyncApi.AsyncApiSpec, SpecificationDocumentFormat.Json);
+                if (context.Document.Json is not null)
                     return;
             }
             catch (HttpRequestException) when (attempt < maxRetries)
@@ -68,21 +55,21 @@ public class ApiSpecificationSteps(AppManager appManager, IReqnrollOutputHelper 
     // ── Shared Then ──
 
     [Then("the response should be valid")]
-    public async Task ThenTheResponseShouldBeValid()
+    public void ThenTheResponseShouldBeValid()
     {
-        if (_swaggerResponse != null)
+        context.Format.Should().NotBeNull("the scenario should have fetched a specification document");
+        context.Document.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
+
+        switch (context.Format)
         {
-            _swaggerResponse.StatusCode.Should().Be(HttpStatusCode.OK);
-            _swaggerJsonString = await _swaggerResponse.Content.ReadAsStringAsync();
-            var openApiResponseIsValidJson = Json.TryParse(_swaggerJsonString, out _swaggerJson);
-            openApiResponseIsValidJson.Should().BeTrue();
-        }
-        else if (_asyncApiResponse != null)
-        {
-            _asyncApiResponse.StatusCode.Should().Be(HttpStatusCode.OK);
-            var asyncApiResponseIsValidJson = _asyncApiJson is not null;
-            asyncApiResponseIsValidJson.Should().BeTrue(
-                $"response body (first 500 chars): {_asyncApiJsonString?[..Math.Min(_asyncApiJsonString.Length, 500)]}");
+            case SpecificationDocumentFormat.Json:
+                var responseIsValidJson = context.Document.Json is not null;
+                responseIsValidJson.Should().BeTrue(
+                    $"response body (first 500 chars): {context.Document.Body?[..Math.Min(context.Document.Body.Length, 500)]}");
+                break;
+            case SpecificationDocumentFormat.DescriptorSet:
+                context.Document.DescriptorSet.Should().NotBeNull();
+                break;
         }
     }
 
@@ -91,7 +78,7 @@ public class ApiSpecificationSteps(AppManager appManager, IReqnrollOutputHelper 
     [Then("the response should contain all the endpoints")]
     public void ThenTheResponseShouldContainAllTheEndpoints()
     {
-        var paths = _swaggerJson!.RootElement.GetProperty("paths");
+        var paths = context.Document.Json!.RootElement.GetProperty("paths");
         paths.GetProperty(Endpoints.Swagger.PancakesPath).Should().NotBeNull();
         paths.GetProperty(Endpoints.Swagger.WafflesPath).Should().NotBeNull();
         paths.GetProperty(Endpoints.Swagger.OrdersPath).Should().NotBeNull();
@@ -108,31 +95,17 @@ public class ApiSpecificationSteps(AppManager appManager, IReqnrollOutputHelper 
     [Then("the openapi spec is written to disk")]
     public async Task ThenTheOpenapiSpecIsWrittenToDisk()
     {
-        var path = $"{OpenApiSpecs.SpecificationsFolderPath}{OpenApiSpecs.JsonFileName}";
-        const int maxRetries = 3;
-        for (var attempt = 1; attempt <= maxRetries; attempt++)
-        {
-            try
-            {
-                await File.WriteAllTextAsync(path, _swaggerJsonString!, Encoding.UTF8);
-                outputHelper.AddAttachment(path);
-                return;
-            }
-            catch (IOException) when (attempt < maxRetries)
-            {
-                await Task.Delay(500 * attempt);
-            }
-        }
+        var path = await context.Document.WriteToDocs(OpenApiSpecs.JsonFileName);
+        outputHelper.AddAttachment(path);
     }
 
     // ── Scalar UI Then ──
 
     [Then("the response should be a valid scalar page")]
-    public async Task ThenTheResponseShouldBeAValidScalarPage()
+    public void ThenTheResponseShouldBeAValidScalarPage()
     {
-        _scalarResponse!.StatusCode.Should().Be(HttpStatusCode.OK);
-        _scalarHtml = await _scalarResponse.Content.ReadAsStringAsync();
-        var scalarUiResponseBody = _scalarHtml;
+        context.Document.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
+        var scalarUiResponseBody = context.Document.Body;
         scalarUiResponseBody.Should().Contain("<html");
         scalarUiResponseBody.Should().Contain("scalar");
     }
@@ -143,28 +116,16 @@ public class ApiSpecificationSteps(AppManager appManager, IReqnrollOutputHelper 
     public async Task ThenTheAsyncapiSpecIsWrittenToDisk()
     {
         // Verify required sections
-        _asyncApiJson!.RootElement.GetProperty("asyncapi").Should().NotBeNull();
-        _asyncApiJson.RootElement.GetProperty("info").Should().NotBeNull();
-        _asyncApiJson.RootElement.GetProperty("defaultContentType").Should().NotBeNull();
-        _asyncApiJson.RootElement.GetProperty("channels").Should().NotBeNull();
-        _asyncApiJson.RootElement.GetProperty("operations").Should().NotBeNull();
-        _asyncApiJson.RootElement.GetProperty("components").Should().NotBeNull();
+        var asyncApiJson = context.Document.Json!;
+        asyncApiJson.RootElement.GetProperty("asyncapi").Should().NotBeNull();
+        asyncApiJson.RootElement.GetProperty("info").Should().NotBeNull();
+        asyncApiJson.RootElement.GetProperty("defaultContentType").Should().NotBeNull();
+        asyncApiJson.RootElement.GetProperty("channels").Should().NotBeNull();
+        asyncApiJson.RootElement.GetProperty("operations").Should().NotBeNull();
+        asyncApiJson.RootElement.GetProperty("components").Should().NotBeNull();
 
         // Write to disk
-        var path = $"{AsyncApiSpecs.SpecificationsFolderPath}{AsyncApiSpecs.JsonFileName}";
-        const int maxRetries = 3;
-        for (var attempt = 1; attempt <= maxRetries; attempt++)
-        {
-            try
-            {
-                await File.WriteAllTextAsync(path, _asyncApiJsonString, Encoding.UTF8);
-                outputHelper.AddAttachment(path);
-                return;
-            }
-            catch (IOException) when (attempt < maxRetries)
-            {
-                await Task.Delay(500 * attempt);
-            }
-        }
+        var path = await context.Document.WriteToDocs(AsyncApiSpecs.JsonFileName);
+        outputHelper.AddAttachment(path);
     }
 }

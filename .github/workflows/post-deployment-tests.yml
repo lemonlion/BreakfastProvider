@@ -43,19 +43,20 @@ jobs:
 
       - name: Update AppSettings
         run: |
-          FILE='tests/BreakfastProvider.Tests.Component/appsettings.componenttests.json'
+          FILE='tests/BreakfastProvider.Tests.Component.LightBDD/appsettings.componenttests.json'
           jq --arg url "${{ inputs.base_url }}" '.ExternalServiceUnderTestUrl = $url | .RunAgainstExternalServiceUnderTest = true' "$FILE" > tmp.json && mv tmp.json "$FILE"
 
+      # The suites run on Microsoft.Testing.Platform (global.json), which has no --logger option: it rejects the
+      # VSTest-only --logger GitHubActions and runs nothing.
       - name: Run component tests
         run: >
-          dotnet test ./tests/BreakfastProvider.Tests.Component/BreakfastProvider.Tests.Component.csproj
+          dotnet test ./tests/BreakfastProvider.Tests.Component.LightBDD/BreakfastProvider.Tests.Component.LightBDD.csproj
           --environment RunningEnvironment=${{inputs.tenant_environment}}
-          --logger GitHubActions
 
       - name: Upload LightBDD report
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v7
         with:
           name: post-deployment-test-report
-          path: ./tests/BreakfastProvider.Tests.Component/bin/Debug/net10.0/Reports/
+          path: ./tests/BreakfastProvider.Tests.Component.LightBDD/bin/Debug/net10.0/Reports/
           retention-days: 7

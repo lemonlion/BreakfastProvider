@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Breakfast Provider — gRPC API</title>
+<style>
+:root { color-scheme: light dark; --text: #1f2937; --muted: #6b7280; --bg: #ffffff; --panel: #f9fafb; --border: #e5e7eb; --link: #4338ca; --code: #eef2ff; }
+@media (prefers-color-scheme: dark) {
+  :root { --text: #e5e7eb; --muted: #9ca3af; --bg: #111827; --panel: #1f2937; --border: #374151; --link: #a5b4fc; --code: #2a2750; }
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 15px/1.55 -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+/* The bar every contract page opens with: the documents behind the page. */
+.contract-bar { display: flex; flex-wrap: wrap; align-items: center; gap: .25rem 1rem; padding: .5rem 1rem; font: 14px/1.4 -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #4f46e5; color: #fff; }
+.contract-bar a { color: #fff; text-decoration: none; }
+.contract-bar a:hover { text-decoration: underline; }
+.contract-bar .title { font-weight: 600; margin-right: auto; }
+.contract-bar .doc { border: 1px solid rgba(255,255,255,.5); border-radius: 6px; padding: .1rem .5rem; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 13px; }
+main { max-width: 72rem; margin: 0 auto; padding: 1.5rem 1rem 3rem; }
+h1 { font-size: 1.75rem; margin: .5rem 0 .75rem; }
+h2 { font-size: 1.35rem; margin: 2.25rem 0 .5rem; padding-bottom: .25rem; border-bottom: 1px solid var(--border); }
+h3 { font-size: 1.1rem; margin: 1.75rem 0 .35rem; }
+.lead { color: var(--muted); }
+a { color: var(--link); }
+code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .9em; background: var(--code); border-radius: 4px; padding: 0 .25rem; }
+/* A wide table scrolls inside its box, so a narrow screen never scrolls the page sideways. */
+.scroll { overflow-x: auto; margin: .5rem 0 1rem; }
+table { width: 100%; min-width: 40rem; border-collapse: collapse; background: var(--panel); }
+.kind { white-space: nowrap; }
+td:last-child { min-width: 18rem; }
+th, td { text-align: left; vertical-align: top; padding: .45rem .6rem; border: 1px solid var(--border); }
+th { font-weight: 600; }
+.empty { color: var(--muted); }
+footer { max-width: 72rem; margin: 0 auto; padding: 1rem; color: var(--muted); font-size: .85rem; border-top: 1px solid var(--border); }
+</style>
+</head>
+<body>
+<nav class="contract-bar">
+<span class="title">gRPC</span>
+<a class="doc" href="v1.json">v1.json</a>
+<a class="doc" href="protos/breakfast.proto">breakfast.proto</a>
+</nav>
+<main>
+<h1>Breakfast Provider — gRPC API</h1>
+<p class="lead">gRPC over HTTP/2. Server reflection is enabled (<code>grpc.reflection.v1</code>), so grpcurl, Postman and Kreya can discover and call the service. The contract is published as <a href="v1.json">a descriptor set in JSON</a> and as <a href="protos/breakfast.proto">its proto file</a>.</p>
+<section class="service">
+<h2 id="breakfast.BreakfastGrpc">breakfast.BreakfastGrpc</h2>
+<p>Breakfast Provider&#39;s gRPC API: recipe summaries and order status for kitchen systems.</p>
+<div class="scroll"><table>
+<thead><tr><th>Method</th><th>Request</th><th>Response</th><th>Kind</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><code>GetRecipeSummary</code></td><td><a href="#breakfast.RecipeSummaryRequest"><code>RecipeSummaryRequest</code></a></td><td><a href="#breakfast.RecipeSummaryReply"><code>RecipeSummaryReply</code></a></td><td class="kind">unary</td><td>Summarises a recipe type. Pancakes and Waffles return fixed sample figures; any other recipe type returns zero batches and no ingredients.</td></tr>
+<tr><td><code>GetOrderStatus</code></td><td><a href="#breakfast.OrderStatusRequest"><code>OrderStatusRequest</code></a></td><td><a href="#breakfast.OrderStatusReply"><code>OrderStatusReply</code></a></td><td class="kind">unary</td><td>Returns an order&#39;s current status. NOT_FOUND when no order has the id.</td></tr>
+<tr><td><code>StreamOrderUpdates</code></td><td><a href="#breakfast.OrderStatusRequest"><code>OrderStatusRequest</code></a></td><td><a href="#breakfast.OrderStatusReply"><code>OrderStatusReply</code></a></td><td class="kind">server streaming</td><td>Streams an order&#39;s status: today one message, the current status, then the stream completes. NOT_FOUND when no order has the id.</td></tr>
+</tbody>
+</table></div>
+</section>
+
+<h2 id="messages">Messages</h2>
+
+<section class="message">
+<h3 id="breakfast.RecipeSummaryRequest">RecipeSummaryRequest</h3>
+<p>Which recipe type to summarise.</p>
+<div class="scroll"><table>
+<thead><tr><th>Field</th><th>Number</th><th>Type</th><th>JSON name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><code>recipe_type</code></td><td>1</td><td><code>string</code></td><td><code>recipeType</code></td><td>The recipe type, e.g. &quot;Pancakes&quot; or &quot;Waffles&quot;.</td></tr>
+</tbody>
+</table></div>
+</section>
+
+<section class="message">
+<h3 id="breakfast.RecipeSummaryReply">RecipeSummaryReply</h3>
+<p>A recipe type&#39;s summary.</p>
+<div class="scroll"><table>
+<thead><tr><th>Field</th><th>Number</th><th>Type</th><th>JSON name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><code>recipe_type</code></td><td>1</td><td><code>string</code></td><td><code>recipeType</code></td><td>The recipe type that was asked for.</td></tr>
+<tr><td><code>total_batches</code></td><td>2</td><td><code>int32</code></td><td><code>totalBatches</code></td><td>How many batches have been prepared.</td></tr>
+<tr><td><code>common_ingredients</code></td><td>3</td><td>repeated <code>string</code></td><td><code>commonIngredients</code></td><td>The ingredients the recipe is usually made with.</td></tr>
+<tr><td><code>last_prepared_at</code></td><td>4</td><td><code>string</code></td><td><code>lastPreparedAt</code></td><td>When the summary was produced, ISO 8601 round-trip format.</td></tr>
+</tbody>
+</table></div>
+</section>
+
+<section class="message">
+<h3 id="breakfast.OrderStatusRequest">OrderStatusRequest</h3>
+<p>Which order to look up.</p>
+<div class="scroll"><table>
+<thead><tr><th>Field</th><th>Number</th><th>Type</th><th>JSON name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><code>order_id</code></td><td>1</td><td><code>string</code></td><td><code>orderId</code></td><td>The order&#39;s id, as returned by POST /orders.</td></tr>
+</tbody>
+</table></div>
+</section>
+
+<section class="message">
+<h3 id="breakfast.OrderStatusReply">OrderStatusReply</h3>
+<p>An order&#39;s current status.</p>
+<div class="scroll"><table>
+<thead><tr><th>Field</th><th>Number</th><th>Type</th><th>JSON name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><code>order_id</code></td><td>1</td><td><code>string</code></td><td><code>orderId</code></td><td>The order&#39;s id.</td></tr>
+<tr><td><code>status</code></td><td>2</td><td><code>string</code></td><td><code>status</code></td><td>Created, Preparing, Ready, Completed or Cancelled.</td></tr>
+<tr><td><code>customer_name</code></td><td>3</td><td><code>string</code></td><td><code>customerName</code></td><td>The customer the order is for.</td></tr>
+<tr><td><code>item_count</code></td><td>4</td><td><code>int32</code></td><td><code>itemCount</code></td><td>How many items the order has.</td></tr>
+<tr><td><code>created_at</code></td><td>5</td><td><code>string</code></td><td><code>createdAt</code></td><td>When the order was created, ISO 8601 round-trip format.</td></tr>
+</tbody>
+</table></div>
+</section>
+
+</main>
+<footer>Generated from breakfast.proto by Breakfast Provider.</footer>
+</body>
+</html>

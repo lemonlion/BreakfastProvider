@@ -54,9 +54,24 @@ public static class Endpoints
         public const string DailySpecialsOrdersPath = "/" + DailySpecialsOrders;
     }
 
+    public static class GrpcContract
+    {
+        public const string ContractJson = "grpc/v1.json";
+        public const string ProtoFile = "grpc/protos/breakfast.proto";
+        public const string UI = "grpc/";
+    }
+
+    public static class GraphQLContract
+    {
+        public const string SchemaJson = "graphql/schema.json";
+        public const string SchemaDefinition = "graphql/schema.graphql";
+        public const string UI = "graphql/";
+    }
+
     public static class AsyncApi
     {
         private const string BasePath = "/asyncapi";
         public const string AsyncApiSpec = $"{BasePath}/v1.json";
+        public const string AsyncApiUI = BasePath;
     }
 }

@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Breakfast Provider — GraphQL</title>
+  <link rel="stylesheet" href="./voyager.css">
+  <link rel="stylesheet" href="./contract-bar.css">
+  <style>html, body { height: 100%; margin: 0; } body { display: flex; flex-direction: column; } #voyager { flex: 1; min-height: 0; }</style>
+</head>
+<body>
+  <nav class="contract-bar">
+    <a href="../">← Breakfast Provider</a>
+    <span class="title">GraphQL</span>
+    <a class="doc" href="./graphql.json">graphql.json</a>
+    <a class="doc" href="./schema.graphql">schema.graphql</a>
+  </nav>
+  <div id="voyager">Loading…</div>
+  <script src="./voyager.standalone.js"></script>
+  <script>
+    GraphQLVoyager.renderVoyager(document.getElementById('voyager'), {
+      introspection: fetch('./graphql.json').then(response => response.json()),
+      displayOptions: { rootType: 'ReportingQuery' }
+    });
+  </script>
+</body>
+</html>

@@ -10,6 +10,7 @@ using BreakfastProvider.Tests.Component.Shared.Common.DailySpecials;
 using BreakfastProvider.Tests.Component.Shared.Common.Downstream;
 using BreakfastProvider.Tests.Component.Shared.Common.Feedback;
 using BreakfastProvider.Tests.Component.Shared.Common.Grpc;
+using BreakfastProvider.Tests.Component.Shared.Common.Specifications;
 using BreakfastProvider.Tests.Component.Shared.Common.IngredientUsage;
 using BreakfastProvider.Tests.Component.Shared.Common.IngredientWaste;
 using BreakfastProvider.Tests.Component.Shared.Common.Ingredients;
@@ -173,6 +174,8 @@ public abstract class BaseFixture : FeatureFixture, IDisposable, IIgnorable<Comp
         services.AddTransient<DeleteEquipmentReadingSteps>();
         services.AddTransient<PublishOrderServedEventSteps>();
         services.AddTransient<GrpcBreakfastSteps>();
+        services.AddTransient<GrpcReflectionSteps>();
+        services.AddTransient<SpecificationDocumentSteps>();
         services.AddSingleton(ConsumedKafkaMessageStore);
         services.AddSingleton(ConsumedPubSubMessageStore);
 

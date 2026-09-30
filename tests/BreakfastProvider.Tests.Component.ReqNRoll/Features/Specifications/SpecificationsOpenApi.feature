@@ -1,5 +1,5 @@
 Feature: Specifications Open Api
-    /swagger/v1/swagger.json - Serving the OpenAPI specification describing all REST endpoints
+    /openapi/v1.json - Serving the OpenAPI specification describing all REST endpoints
 
     @happy-path
     Scenario: The OpenApi endpoint should return a valid specification

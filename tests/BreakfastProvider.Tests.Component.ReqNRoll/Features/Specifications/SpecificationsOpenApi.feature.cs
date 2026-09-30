@@ -26,8 +26,8 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.Specifications
         
         private static string[] featureTags = ((string[])(null));
         
-        private static global::Reqnroll.FeatureInfo featureInfo = new global::Reqnroll.FeatureInfo(new global::System.Globalization.CultureInfo("en-US"), "Features/Specifications", "Specifications Open Api", "    /swagger/v1/swagger.json - Serving the OpenAPI specification describing all R" +
-                "EST endpoints", global::Reqnroll.ProgrammingLanguage.CSharp, featureTags, InitializeCucumberMessages());
+        private static global::Reqnroll.FeatureInfo featureInfo = new global::Reqnroll.FeatureInfo(new global::System.Globalization.CultureInfo("en-US"), "Features/Specifications", "Specifications Open Api", "    /openapi/v1.json - Serving the OpenAPI specification describing all REST endp" +
+                "oints", global::Reqnroll.ProgrammingLanguage.CSharp, featureTags, InitializeCucumberMessages());
         
 #line 1 "SpecificationsOpenApi.feature"
 #line hidden

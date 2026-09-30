@@ -19,7 +19,8 @@
     <PackageReference Include="Google.Cloud.PubSub.V1" Version="3.33.0" />
     <PackageReference Include="Google.Cloud.Spanner.Data" Version="5.0.0" />
     <PackageReference Include="MongoDB.Driver" Version="3.4.0" />
-    <PackageReference Include="Grpc.AspNetCore" Version="2.71.0" />
+    <PackageReference Include="Grpc.AspNetCore" Version="2.84.0" />
+    <PackageReference Include="Grpc.AspNetCore.Server.Reflection" Version="2.84.0" />
     <PackageReference Include="OpenTelemetry.Exporter.Console" Version="1.15.3" />
     <PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.15.3" />
     <PackageReference Include="OpenTelemetry.Extensions.Hosting" Version="1.15.3" />
@@ -38,13 +39,28 @@
     <PackageReference Include="HotChocolate.AspNetCore" Version="15.1.15" />
     <PackageReference Include="HotChocolate.Data.EntityFramework" Version="15.1.15" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.7" />
-    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.7" />
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.12" />
     <PackageReference Include="Scalar.AspNetCore" Version="2.14.4" />
   </ItemGroup>
 
   <ItemGroup>
-    <Protobuf Include="Protos\breakfast.proto" GrpcServices="Both" />
+    <Protobuf Include="Protos\breakfast.proto" GrpcServices="Both" ProtoRoot="Protos"
+              AdditionalProtocArguments="--include_source_info;--descriptor_set_out=$(IntermediateOutputPath)breakfast.protoset" />
     <Protobuf Include="Protos\notifications.proto" GrpcServices="Client" />
   </ItemGroup>
+
+  <ItemGroup>
+    <!-- The source contract, served at /grpc/protos/breakfast.proto. -->
+    <EmbeddedResource Include="Protos\breakfast.proto" LogicalName="Contracts.breakfast.proto" />
+  </ItemGroup>
+
+  <!-- protoc's descriptor set, comments included, is the published gRPC contract (/grpc/v1.json, /grpc/).
+       It only exists once Protobuf_Compile has run, which is after PrepareResources would collect it. -->
+  <Target Name="EmbedGrpcContract" BeforeTargets="PrepareResources" DependsOnTargets="Protobuf_Compile">
+    <ItemGroup>
+      <EmbeddedResource Include="$(IntermediateOutputPath)breakfast.protoset" LogicalName="Contracts.breakfast.protoset"
+                        WithCulture="false" Type="Non-Resx" />
+    </ItemGroup>
+  </Target>
 
 </Project>

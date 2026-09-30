@@ -1,6 +1,11 @@
-# Docs files are generated with LF by SourceControlledDocsHelper - keep them LF
+# Docs files are generated with LF by ContractDocs and SourceControlledDocsHelper - keep them LF
 docs/*.json eol=lf
 docs/*.yml eol=lf
+docs/*.html eol=lf
+docs/*.graphql eol=lf
+
+# protoc copies comments into the published gRPC contract verbatim - a CRLF checkout would put \r into it
+*.proto text eol=lf
 
 # ClickHouse init DDL is fed to the container's clickhouse-client - keep it LF on every checkout
 docker/clickhouse/init/*.sql text eol=lf

@@ -352,4 +352,13 @@ public static class Documentation
         public const string BigQuery = "BigQuery";
         public const string ClickHouse = "ClickHouse";
     }
+
+    /// <summary>Where the gRPC and GraphQL contracts are published, beside /openapi/v1.json and /asyncapi/v1.json.</summary>
+    public static class Contracts
+    {
+        public const string GrpcJson = "/grpc/v1.json";
+        public const string GrpcProto = "/grpc/protos/breakfast.proto";
+        public const string GrpcUi = "/grpc";
+        public const string GraphQLSchemaJson = "/graphql/schema.json";
+    }
 }

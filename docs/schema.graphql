@@ -1,0 +1,393 @@
+schema {
+  query: ReportingQuery
+}
+
+"A completed pancake batch, from its batch-completed event on Google Cloud Pub\/Sub."
+type BatchCompletionRecord {
+  "The reporting database's key for the row."
+  id: Int!
+  "The batch's id, as returned by POST \/pancakes."
+  batchId: UUID!
+  "The recipe type; only pancake batches publish the event, so it is Pancakes."
+  recipeType: String!
+  "The batch's ingredients, comma-separated."
+  ingredients: String!
+  "When the batch was completed, in UTC."
+  completedAt: DateTime!
+}
+
+"""
+An equipment alert, from Azure Event Hub. Each pancake batch raises one: equipment Griddle, alert type
+UsageCycleCompleted.
+"""
+type EquipmentAlert {
+  "The reporting database's key for the row."
+  id: Int!
+  "The alert's id."
+  alertId: UUID!
+  "The id of the batch that raised the alert."
+  batchId: UUID!
+  "The equipment the alert is about, for example Griddle."
+  equipmentName: String!
+  "What happened, for example UsageCycleCompleted."
+  alertType: String!
+  "When the alert was raised, in UTC."
+  alertedAt: DateTime!
+}
+
+"An ingredient delivery, from an IngredientDeliveryEvent that Azure Event Grid delivers."
+type IngredientShipment {
+  "The reporting database's key for the row."
+  id: Int!
+  "The delivery's id, as the event gives it."
+  deliveryId: UUID!
+  "The ingredient delivered."
+  ingredientName: String!
+  "How much was delivered, as the event states it."
+  quantity: Decimal!
+  "When the delivery arrived, as the event states it."
+  deliveredAt: DateTime!
+}
+
+"How many recipe reports list one ingredient."
+type IngredientUsage {
+  "The ingredient, as the recipes name it; names that differ only in case count as one."
+  ingredient: String!
+  "How many recipe reports list it."
+  count: Int!
+}
+
+"An order as the reporting database records it when the order is created."
+type OrderSummary {
+  "The reporting database's key for the row."
+  id: Int!
+  "The order's id, as returned by POST \/orders."
+  orderId: UUID!
+  "The customer the order is for."
+  customerName: String!
+  "How many items the order has."
+  itemCount: Int!
+  "The table the order is for, when it has one."
+  tableNumber: Int
+  "The order's status when it was recorded, Created. Later changes of status are not recorded here."
+  status: String!
+  "When the order was created, in UTC."
+  createdAt: DateTime!
+}
+
+"The recipe of one pancake, waffle or muffin batch, as logged to Kafka."
+type RecipeReport {
+  "The reporting database's key for the row."
+  id: Int!
+  "The id of the batch the recipe was logged for; the recipe log event carries it as OrderId."
+  orderId: UUID!
+  "The recipe type: Pancakes, Waffles or AppleCinnamonMuffins."
+  recipeType: String!
+  "The batch's ingredients, comma-separated."
+  ingredients: String!
+  "The batch's toppings, comma-separated; empty when it has none."
+  toppings: String!
+  "When the recipe was logged, in UTC."
+  loggedAt: DateTime!
+}
+
+"How many recipe reports one recipe type has."
+type RecipeTypeCount {
+  "The recipe type: Pancakes, Waffles or AppleCinnamonMuffins."
+  recipeType: String!
+  "How many recipe reports it has."
+  count: Int!
+}
+
+"""
+Reporting queries over the business-intelligence database, which the service fills from its own orders and batches
+and from the events it consumes.
+"""
+type ReportingQuery {
+  "One summary per order placed through POST \/orders, recorded when the order is created."
+  orderSummaries(where: OrderSummaryFilterInput @cost(weight: "10") order: [OrderSummarySortInput!] @cost(weight: "10")): [OrderSummary!]! @cost(weight: "10")
+  """
+  One report per recipe logged: every pancake, waffle and muffin batch logs its recipe to Kafka, and the reporting
+  consumer records it.
+  """
+  recipeReports(where: RecipeReportFilterInput @cost(weight: "10") order: [RecipeReportSortInput!] @cost(weight: "10")): [RecipeReport!]! @cost(weight: "10")
+  "How many recipe reports list each ingredient, the most used first."
+  ingredientUsage: [IngredientUsage!]! @cost(weight: "10")
+  "How many recipe reports each recipe type has, the most popular first."
+  popularRecipes: [RecipeTypeCount!]! @cost(weight: "10")
+  "One record per completed pancake batch, from the batch-completed events on Google Cloud Pub\/Sub."
+  batchCompletions(where: BatchCompletionRecordFilterInput @cost(weight: "10") order: [BatchCompletionRecordSortInput!] @cost(weight: "10")): [BatchCompletionRecord!]! @cost(weight: "10")
+  """
+  One record per ingredient delivery, from the IngredientDeliveryEvent that Azure Event Grid delivers to
+  POST /webhooks/eventgrid.
+  """
+  ingredientShipments(where: IngredientShipmentFilterInput @cost(weight: "10") order: [IngredientShipmentSortInput!] @cost(weight: "10")): [IngredientShipment!]! @cost(weight: "10")
+  "One record per equipment alert, from Azure Event Hub. Each pancake batch raises one for the griddle."
+  equipmentAlerts(where: EquipmentAlertFilterInput @cost(weight: "10") order: [EquipmentAlertSortInput!] @cost(weight: "10")): [EquipmentAlert!]! @cost(weight: "10")
+}
+
+"A completed pancake batch, from its batch-completed event on Google Cloud Pub\/Sub."
+input BatchCompletionRecordFilterInput {
+  and: [BatchCompletionRecordFilterInput!]
+  or: [BatchCompletionRecordFilterInput!]
+  "The reporting database's key for the row."
+  id: IntOperationFilterInput
+  "The batch's id, as returned by POST \/pancakes."
+  batchId: UuidOperationFilterInput
+  "The recipe type; only pancake batches publish the event, so it is Pancakes."
+  recipeType: StringOperationFilterInput
+  "The batch's ingredients, comma-separated."
+  ingredients: StringOperationFilterInput
+  "When the batch was completed, in UTC."
+  completedAt: DateTimeOperationFilterInput
+}
+
+"A completed pancake batch, from its batch-completed event on Google Cloud Pub\/Sub."
+input BatchCompletionRecordSortInput {
+  "The reporting database's key for the row."
+  id: SortEnumType @cost(weight: "10")
+  "The batch's id, as returned by POST \/pancakes."
+  batchId: SortEnumType @cost(weight: "10")
+  "The recipe type; only pancake batches publish the event, so it is Pancakes."
+  recipeType: SortEnumType @cost(weight: "10")
+  "The batch's ingredients, comma-separated."
+  ingredients: SortEnumType @cost(weight: "10")
+  "When the batch was completed, in UTC."
+  completedAt: SortEnumType @cost(weight: "10")
+}
+
+input DateTimeOperationFilterInput {
+  eq: DateTime @cost(weight: "10")
+  neq: DateTime @cost(weight: "10")
+  in: [DateTime] @cost(weight: "10")
+  nin: [DateTime] @cost(weight: "10")
+  gt: DateTime @cost(weight: "10")
+  ngt: DateTime @cost(weight: "10")
+  gte: DateTime @cost(weight: "10")
+  ngte: DateTime @cost(weight: "10")
+  lt: DateTime @cost(weight: "10")
+  nlt: DateTime @cost(weight: "10")
+  lte: DateTime @cost(weight: "10")
+  nlte: DateTime @cost(weight: "10")
+}
+
+input DecimalOperationFilterInput {
+  eq: Decimal @cost(weight: "10")
+  neq: Decimal @cost(weight: "10")
+  in: [Decimal] @cost(weight: "10")
+  nin: [Decimal] @cost(weight: "10")
+  gt: Decimal @cost(weight: "10")
+  ngt: Decimal @cost(weight: "10")
+  gte: Decimal @cost(weight: "10")
+  ngte: Decimal @cost(weight: "10")
+  lt: Decimal @cost(weight: "10")
+  nlt: Decimal @cost(weight: "10")
+  lte: Decimal @cost(weight: "10")
+  nlte: Decimal @cost(weight: "10")
+}
+
+"""
+An equipment alert, from Azure Event Hub. Each pancake batch raises one: equipment Griddle, alert type
+UsageCycleCompleted.
+"""
+input EquipmentAlertFilterInput {
+  and: [EquipmentAlertFilterInput!]
+  or: [EquipmentAlertFilterInput!]
+  "The reporting database's key for the row."
+  id: IntOperationFilterInput
+  "The alert's id."
+  alertId: UuidOperationFilterInput
+  "The id of the batch that raised the alert."
+  batchId: UuidOperationFilterInput
+  "The equipment the alert is about, for example Griddle."
+  equipmentName: StringOperationFilterInput
+  "What happened, for example UsageCycleCompleted."
+  alertType: StringOperationFilterInput
+  "When the alert was raised, in UTC."
+  alertedAt: DateTimeOperationFilterInput
+}
+
+"""
+An equipment alert, from Azure Event Hub. Each pancake batch raises one: equipment Griddle, alert type
+UsageCycleCompleted.
+"""
+input EquipmentAlertSortInput {
+  "The reporting database's key for the row."
+  id: SortEnumType @cost(weight: "10")
+  "The alert's id."
+  alertId: SortEnumType @cost(weight: "10")
+  "The id of the batch that raised the alert."
+  batchId: SortEnumType @cost(weight: "10")
+  "The equipment the alert is about, for example Griddle."
+  equipmentName: SortEnumType @cost(weight: "10")
+  "What happened, for example UsageCycleCompleted."
+  alertType: SortEnumType @cost(weight: "10")
+  "When the alert was raised, in UTC."
+  alertedAt: SortEnumType @cost(weight: "10")
+}
+
+"An ingredient delivery, from an IngredientDeliveryEvent that Azure Event Grid delivers."
+input IngredientShipmentFilterInput {
+  and: [IngredientShipmentFilterInput!]
+  or: [IngredientShipmentFilterInput!]
+  "The reporting database's key for the row."
+  id: IntOperationFilterInput
+  "The delivery's id, as the event gives it."
+  deliveryId: UuidOperationFilterInput
+  "The ingredient delivered."
+  ingredientName: StringOperationFilterInput
+  "How much was delivered, as the event states it."
+  quantity: DecimalOperationFilterInput
+  "When the delivery arrived, as the event states it."
+  deliveredAt: DateTimeOperationFilterInput
+}
+
+"An ingredient delivery, from an IngredientDeliveryEvent that Azure Event Grid delivers."
+input IngredientShipmentSortInput {
+  "The reporting database's key for the row."
+  id: SortEnumType @cost(weight: "10")
+  "The delivery's id, as the event gives it."
+  deliveryId: SortEnumType @cost(weight: "10")
+  "The ingredient delivered."
+  ingredientName: SortEnumType @cost(weight: "10")
+  "How much was delivered, as the event states it."
+  quantity: SortEnumType @cost(weight: "10")
+  "When the delivery arrived, as the event states it."
+  deliveredAt: SortEnumType @cost(weight: "10")
+}
+
+input IntOperationFilterInput {
+  eq: Int @cost(weight: "10")
+  neq: Int @cost(weight: "10")
+  in: [Int] @cost(weight: "10")
+  nin: [Int] @cost(weight: "10")
+  gt: Int @cost(weight: "10")
+  ngt: Int @cost(weight: "10")
+  gte: Int @cost(weight: "10")
+  ngte: Int @cost(weight: "10")
+  lt: Int @cost(weight: "10")
+  nlt: Int @cost(weight: "10")
+  lte: Int @cost(weight: "10")
+  nlte: Int @cost(weight: "10")
+}
+
+"An order as the reporting database records it when the order is created."
+input OrderSummaryFilterInput {
+  and: [OrderSummaryFilterInput!]
+  or: [OrderSummaryFilterInput!]
+  "The reporting database's key for the row."
+  id: IntOperationFilterInput
+  "The order's id, as returned by POST \/orders."
+  orderId: UuidOperationFilterInput
+  "The customer the order is for."
+  customerName: StringOperationFilterInput
+  "How many items the order has."
+  itemCount: IntOperationFilterInput
+  "The table the order is for, when it has one."
+  tableNumber: IntOperationFilterInput
+  "The order's status when it was recorded, Created. Later changes of status are not recorded here."
+  status: StringOperationFilterInput
+  "When the order was created, in UTC."
+  createdAt: DateTimeOperationFilterInput
+}
+
+"An order as the reporting database records it when the order is created."
+input OrderSummarySortInput {
+  "The reporting database's key for the row."
+  id: SortEnumType @cost(weight: "10")
+  "The order's id, as returned by POST \/orders."
+  orderId: SortEnumType @cost(weight: "10")
+  "The customer the order is for."
+  customerName: SortEnumType @cost(weight: "10")
+  "How many items the order has."
+  itemCount: SortEnumType @cost(weight: "10")
+  "The table the order is for, when it has one."
+  tableNumber: SortEnumType @cost(weight: "10")
+  "The order's status when it was recorded, Created. Later changes of status are not recorded here."
+  status: SortEnumType @cost(weight: "10")
+  "When the order was created, in UTC."
+  createdAt: SortEnumType @cost(weight: "10")
+}
+
+"The recipe of one pancake, waffle or muffin batch, as logged to Kafka."
+input RecipeReportFilterInput {
+  and: [RecipeReportFilterInput!]
+  or: [RecipeReportFilterInput!]
+  "The reporting database's key for the row."
+  id: IntOperationFilterInput
+  "The id of the batch the recipe was logged for; the recipe log event carries it as OrderId."
+  orderId: UuidOperationFilterInput
+  "The recipe type: Pancakes, Waffles or AppleCinnamonMuffins."
+  recipeType: StringOperationFilterInput
+  "The batch's ingredients, comma-separated."
+  ingredients: StringOperationFilterInput
+  "The batch's toppings, comma-separated; empty when it has none."
+  toppings: StringOperationFilterInput
+  "When the recipe was logged, in UTC."
+  loggedAt: DateTimeOperationFilterInput
+}
+
+"The recipe of one pancake, waffle or muffin batch, as logged to Kafka."
+input RecipeReportSortInput {
+  "The reporting database's key for the row."
+  id: SortEnumType @cost(weight: "10")
+  "The id of the batch the recipe was logged for; the recipe log event carries it as OrderId."
+  orderId: SortEnumType @cost(weight: "10")
+  "The recipe type: Pancakes, Waffles or AppleCinnamonMuffins."
+  recipeType: SortEnumType @cost(weight: "10")
+  "The batch's ingredients, comma-separated."
+  ingredients: SortEnumType @cost(weight: "10")
+  "The batch's toppings, comma-separated; empty when it has none."
+  toppings: SortEnumType @cost(weight: "10")
+  "When the recipe was logged, in UTC."
+  loggedAt: SortEnumType @cost(weight: "10")
+}
+
+input StringOperationFilterInput {
+  and: [StringOperationFilterInput!]
+  or: [StringOperationFilterInput!]
+  eq: String @cost(weight: "10")
+  neq: String @cost(weight: "10")
+  contains: String @cost(weight: "20")
+  ncontains: String @cost(weight: "20")
+  in: [String] @cost(weight: "10")
+  nin: [String] @cost(weight: "10")
+  startsWith: String @cost(weight: "20")
+  nstartsWith: String @cost(weight: "20")
+  endsWith: String @cost(weight: "20")
+  nendsWith: String @cost(weight: "20")
+}
+
+input UuidOperationFilterInput {
+  eq: UUID @cost(weight: "10")
+  neq: UUID @cost(weight: "10")
+  in: [UUID] @cost(weight: "10")
+  nin: [UUID] @cost(weight: "10")
+  gt: UUID @cost(weight: "10")
+  ngt: UUID @cost(weight: "10")
+  gte: UUID @cost(weight: "10")
+  ngte: UUID @cost(weight: "10")
+  lt: UUID @cost(weight: "10")
+  nlt: UUID @cost(weight: "10")
+  lte: UUID @cost(weight: "10")
+  nlte: UUID @cost(weight: "10")
+}
+
+enum SortEnumType {
+  ASC
+  DESC
+}
+
+"The purpose of the `cost` directive is to define a `weight` for GraphQL types, fields, and arguments. Static analysis can use these weights when calculating the overall cost of a query or response."
+directive @cost("The `weight` argument defines what value to add to the overall cost for every appearance, or possible appearance, of a type, field, argument, etc." weight: String!) on SCALAR | OBJECT | FIELD_DEFINITION | ARGUMENT_DEFINITION | ENUM | INPUT_FIELD_DEFINITION
+
+"The `@specifiedBy` directive is used within the type system definition language to provide a URL for specifying the behavior of custom scalar definitions."
+directive @specifiedBy("The specifiedBy URL points to a human-readable specification. This field will only read a result for scalar types." url: String!) on SCALAR
+
+"The `DateTime` scalar represents an ISO-8601 compliant date time type."
+scalar DateTime @specifiedBy(url: "https:\/\/www.graphql-scalars.com\/date-time")
+
+"The `Decimal` scalar type represents a decimal floating-point number."
+scalar Decimal
+
+scalar UUID @specifiedBy(url: "https:\/\/tools.ietf.org\/html\/rfc4122")

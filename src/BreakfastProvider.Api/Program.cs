@@ -1,6 +1,7 @@
 using Azure;
 using Azure.Messaging.EventGrid;
 using BreakfastProvider.Api.Configuration;
+using BreakfastProvider.Api.Contracts;
 using BreakfastProvider.Api.Data;
 using BreakfastProvider.Api.Events.Outbox;
 using BreakfastProvider.Api.HttpClients;
@@ -23,6 +24,7 @@ using Scalar.AspNetCore;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using SharpGrip.FluentValidation.AutoValidation.Mvc.Extensions;
 using BreakfastProvider.Api.Services.HealthChecks;
+using HotChocolate.AspNetCore;
 using BreakfastProvider.Api.Validators;
 using System.Threading.RateLimiting;
 using Microsoft.Extensions.Options;
@@ -242,6 +244,7 @@ public class Program
 
         // gRPC
         builder.Services.AddGrpc();
+        builder.Services.AddGrpcReflection();
         builder.Services.AddNotificationGrpcClient(builder.Configuration);
 
         // Services
@@ -360,7 +363,24 @@ public class Program
                 // Constrain all gRPC endpoints to POST only, since gRPC exclusively uses POST.
                 b.Metadata.Add(new HttpMethodMetadata(["POST"]));
             });
-        app.MapGraphQL();
+        // Server reflection (grpc.reflection.v1 and v1alpha) lets grpcurl, Postman and Kreya discover the service.
+        // POST only, for the same reason as the service above.
+        app.MapGrpcReflectionService()
+            .Add(b => b.Metadata.Add(new HttpMethodMetadata(["POST"])));
+        app.MapGrpcContract();
+        // HotChocolate's publishing, made explicit so that an upgrade which changes a default fails a scenario instead
+        // of quietly unpublishing something. WithOptions replaces the whole options object: everything not set here
+        // keeps GraphQLServerOptions' default.
+        app.MapGraphQL().WithOptions(new GraphQLServerOptions
+        {
+            EnableSchemaRequests = true,                      // GET /graphql/schema.graphql
+            Tool =
+            {
+                Enable = true,                                // Nitro at GET /graphql/
+                ServeMode = GraphQLToolServeMode.Embedded     // from the package, not proxied from ChilliCream's CDN
+            }
+        });
+        app.MapGraphQLSchemaJson();                           // GET /graphql/schema.json
         app.MapMetrics();
         app.MapHealthChecks("/health", new HealthCheckOptions
         {

@@ -15,7 +15,7 @@
         "tags": [
           "EventGridWebhook"
         ],
-        "summary": "Processes an array of EventGrid-schema events. Supports subscription\r\nvalidation and `IngredientDeliveryEvent` processing.",
+        "summary": "Processes an array of EventGrid-schema events. Supports subscription\nvalidation and `IngredientDeliveryEvent` processing.",
         "requestBody": {
           "content": {
             "application/json": {

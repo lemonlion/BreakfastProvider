@@ -625,8 +625,10 @@ jobs:
         uses: actions/checkout@v5
         with:
           sparse-checkout: |
-            docs/openapi.json
-            docs/asyncapi.json
+            docs
+            .github/pages
+            .github/scripts
+            src/BreakfastProvider.Api/Protos
 
       - name: Download LightBDD report
         uses: actions/download-artifact@v7
@@ -740,219 +742,14 @@ jobs:
           name: bddfy-external-sut-report
           path: site/reports/docker-sut/bddfy
 
-      - name: Copy API specs and generate UI pages
-        run: |
-          mkdir -p site/api
-          cp docs/openapi.json site/api/openapi.json
-          cp docs/asyncapi.json site/api/asyncapi.json
+      # Every contract as a page and as the documents behind it, one click from the landing page and from its own
+      # page: .github/pages/ holds the landing page and the UI shells, docs/ the contracts the tests committed. The
+      # renderers are pinned; the script fails on a failed download. Builds locally too (see README, Contracts).
+      - name: Build the landing page and the API pages
+        run: bash .github/scripts/build-api-pages.sh site
 
-          # Vendor UI assets locally to avoid third-party requests at view time
-          curl -sL "https://cdn.jsdelivr.net/npm/@scalar/api-reference" -o site/api/scalar.js
-          curl -sL "https://unpkg.com/@asyncapi/react-component@latest/browser/standalone/index.js" -o site/api/asyncapi-standalone.js
-          curl -sL "https://unpkg.com/@asyncapi/react-component@latest/styles/default.min.css" -o site/api/asyncapi.css
-
-          cat > site/api/openapi.html << 'OPENAPI_EOF'
-          <!DOCTYPE html>
-          <html lang="en">
-          <head>
-            <meta charset="utf-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1">
-            <title>Breakfast Provider — OpenAPI</title>
-          </head>
-          <body>
-            <script id="api-reference" data-url="./openapi.json"></script>
-            <script src="./scalar.js"></script>
-          </body>
-          </html>
-          OPENAPI_EOF
-
-          cat > site/api/asyncapi.html << 'ASYNCAPI_EOF'
-          <!DOCTYPE html>
-          <html lang="en">
-          <head>
-            <meta charset="utf-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1">
-            <title>Breakfast Provider — AsyncAPI</title>
-            <link rel="stylesheet" href="./asyncapi.css">
-          </head>
-          <body>
-            <div id="asyncapi"></div>
-            <script src="./asyncapi-standalone.js"></script>
-            <script>
-              AsyncApiStandalone.render({
-                schema: { url: './asyncapi.json' },
-                config: { show: { sidebar: true } }
-              }, document.getElementById('asyncapi'));
-            </script>
-          </body>
-          </html>
-          ASYNCAPI_EOF
-
-      - name: Generate landing page
-        run: |
-          cat > site/index.html << 'LANDING_EOF'
-          <!DOCTYPE html>
-          <html lang="en">
-          <head>
-            <meta charset="utf-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1">
-            <title>Breakfast Provider: A Component Testing Approach Using Kronikol</title>
-            <link rel="icon" type="image/svg+xml" href="https://raw.githubusercontent.com/lemonlion/Kronikol/main/icon.svg">
-            <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/lemonlion/Kronikol/main/icon.png">
-            <style>
-              :root {
-                --primary: #6366f1;
-                --primary-dark: #4f46e5;
-                --surface: #ffffff;
-                --surface-alt: #f8fafc;
-                --border: #e2e8f0;
-                --text: #1e293b;
-                --text-muted: #64748b;
-                --radius: 12px;
-                --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06);
-                --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.08), 0 4px 6px -4px rgba(0,0,0,0.04);
-              }
-              * { box-sizing: border-box; margin: 0; padding: 0; }
-              body {
-                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Inter, Roboto, sans-serif;
-                color: var(--text);
-                background: var(--surface-alt);
-                line-height: 1.6;
-                min-height: 100vh;
-              }
-              .hero {
-                background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-                color: white;
-                padding: 3rem 1.5rem 2.5rem;
-                text-align: center;
-              }
-              .hero h1 { font-size: 2rem; font-weight: 700; margin-bottom: 0.5rem; }
-              .hero p { font-size: 1.1rem; opacity: 0.9; }
-              .badge {
-                display: inline-block;
-                background: rgba(255,255,255,0.2);
-                border: 1px solid rgba(255,255,255,0.3);
-                border-radius: 20px;
-                padding: 0.25rem 0.75rem;
-                font-size: 0.8rem;
-                margin-top: 1rem;
-                font-weight: 500;
-              }
-              .container { max-width: 900px; margin: 0 auto; padding: 2rem 1.5rem 3rem; }
-              .section-title {
-                font-size: 0.75rem;
-                font-weight: 600;
-                text-transform: uppercase;
-                letter-spacing: 0.05em;
-                color: var(--text-muted);
-                margin-bottom: 0.75rem;
-              }
-              .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1rem; margin-bottom: 2.5rem; }
-              .card {
-                background: var(--surface);
-                border: 1px solid var(--border);
-                border-radius: var(--radius);
-                padding: 1.5rem;
-                text-decoration: none;
-                color: var(--text);
-                transition: box-shadow 0.2s, transform 0.2s;
-                box-shadow: var(--shadow);
-              }
-              .card:hover { box-shadow: var(--shadow-lg); transform: translateY(-2px); }
-              .card-icon { font-size: 1.5rem; margin-bottom: 0.5rem; }
-              .card h3 { font-size: 1rem; font-weight: 600; margin-bottom: 0.25rem; }
-              .card p { font-size: 0.875rem; color: var(--text-muted); }
-              .footer {
-                text-align: center;
-                padding: 1.5rem;
-                color: var(--text-muted);
-                font-size: 0.8rem;
-                border-top: 1px solid var(--border);
-              }
-              .footer a { color: var(--primary); text-decoration: none; }
-              .footer a:hover { text-decoration: underline; }
-            </style>
-          </head>
-          <body>
-            <div class="hero">
-              <h1>Breakfast Provider</h1>
-              <p>Component Test Reports &amp; API Documentation</p>
-              <span class="badge">Powered by Kronikol</span>
-            </div>
-
-            <div class="container">
-              <p style="margin:0 0 1.5em;color:#6b7280;font-size:0.95em">These are the reports Kronikol draws from Breakfast Provider's component tests: each scenario's HTTP calls, database queries and messages as a sequence diagram. <a href="reports/xunit/TestRunReport.html#sid-fb8c79cbd78d82b0">See one</a>.</p>
-              <p class="section-title">Test Run Reports</p>
-              <p style="margin:-0.4em 0 1em;color:#6b7280;font-size:0.95em">Every report reads the last runs of its lane from the <a href="https://github.com/lemonlion/BreakfastProvider/tree/kronikol-history">cross-run history ledger</a>: a sparkline and verdict beside each scenario, a History section beside the timeline, and <code>$flaky</code> in the search box. Each report folder also carries <code>Failures.md</code> and <code>ctrf-report.json</code>.</p>
-              <div class="card-grid">
-                <a href="reports/reqnroll/TestRunReport.html" class="card">
-                  <div class="card-icon">🥒</div>
-                  <h3>ReqNRoll</h3>
-                  <p>Gherkin-based component test report with feature specifications</p>
-                </a>
-                <a href="reports/lightbdd/TestRunReport.html" class="card">
-                  <div class="card-icon">📋</div>
-                  <h3>LightBDD</h3>
-                  <p>BDD-style component test report with interaction diagrams</p>
-                </a>
-                <a href="reports/bddfy/TestRunReport.html" class="card">
-                  <div class="card-icon">🎭</div>
-                  <h3>BDDfy</h3>
-                  <p>BDDfy fluent component test report with sequence diagrams</p>
-                </a>
-                <a href="reports/xunit/TestRunReport.html" class="card">
-                  <div class="card-icon">🧪</div>
-                  <h3>xUnit</h3>
-                  <p>Standard xUnit component test report with sequence diagrams</p>
-                </a>
-                <a href="reports/tunit/TestRunReport.html" class="card">
-                  <div class="card-icon">🚀</div>
-                  <h3>TUnit</h3>
-                  <p>Modern TUnit component test report with sequence diagrams</p>
-                </a>
-                <a href="reports/nunit/TestRunReport.html" class="card">
-                  <div class="card-icon">🔬</div>
-                  <h3>NUnit</h3>
-                  <p>NUnit 4 component test report with sequence diagrams</p>
-                </a>
-              </div>
-
-              <p class="section-title">API Specifications</p>
-              <div class="card-grid">
-                <a href="api/openapi.html" class="card">
-                  <div class="card-icon">🔌</div>
-                  <h3>OpenAPI</h3>
-                  <p>Interactive REST API documentation (Scalar UI)</p>
-                </a>
-                <a href="api/asyncapi.html" class="card">
-                  <div class="card-icon">⚡</div>
-                  <h3>AsyncAPI</h3>
-                  <p>Interactive event-driven API documentation</p>
-                </a>
-              </div>
-
-              <p class="section-title">Source Repositories</p>
-              <div class="card-grid">
-                <a href="https://github.com/lemonlion/BreakfastProvider" target="_blank" class="card">
-                  <div class="card-icon">🥞</div>
-                  <h3>BreakfastProvider</h3>
-                  <p>Platform service source code and component tests</p>
-                </a>
-                <a href="https://github.com/lemonlion/Kronikol" target="_blank" class="card">
-                  <div class="card-icon">📊</div>
-                  <h3>Kronikol</h3>
-                  <p>Test reporting library with sequence diagrams</p>
-                </a>
-              </div>
-            </div>
-
-            <div class="footer">
-              Generated by <a href="https://github.com/lemonlion/Kronikol" target="_blank">Kronikol</a>
-              &middot; Updated on every push to main
-            </div>
-          </body>
-          </html>
-          LANDING_EOF
+      - name: Check that every contract link resolves
+        run: python3 .github/scripts/check-site-links.py site
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3

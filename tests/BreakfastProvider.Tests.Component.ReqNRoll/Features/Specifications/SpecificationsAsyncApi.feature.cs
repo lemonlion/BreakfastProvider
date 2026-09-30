@@ -26,8 +26,8 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.Specifications
         
         private static string[] featureTags = ((string[])(null));
         
-        private static global::Reqnroll.FeatureInfo featureInfo = new global::Reqnroll.FeatureInfo(new global::System.Globalization.CultureInfo("en-US"), "Features/Specifications", "Specifications Async Api", "    /asyncapi/asyncapi.json - Serving the AsyncAPI specification describing event" +
-                "-driven messaging", global::Reqnroll.ProgrammingLanguage.CSharp, featureTags, InitializeCucumberMessages());
+        private static global::Reqnroll.FeatureInfo featureInfo = new global::Reqnroll.FeatureInfo(new global::System.Globalization.CultureInfo("en-US"), "Features/Specifications", "Specifications Async Api", "    /asyncapi/v1.json - Serving the AsyncAPI specification describing event-drive" +
+                "n messaging", global::Reqnroll.ProgrammingLanguage.CSharp, featureTags, InitializeCucumberMessages());
         
 #line 1 "SpecificationsAsyncApi.feature"
 #line hidden

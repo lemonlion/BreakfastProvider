@@ -1,5 +1,4 @@
 using System.Net;
-using System.Text;
 using System.Text.Json;
 using BreakfastProvider.Tests.Component.Shared.Constants;
 using BreakfastProvider.Tests.Component.Shared.Util;
@@ -77,22 +76,8 @@ public partial class Specifications__Open_Api_Feature : BaseFixture
 
     private async Task The_openapi_spec_is_written_to_disk_as_json()
     {
-        var path = Path.GetFullPath($"{OpenApiSpecs.SpecificationsFolderPath}{OpenApiSpecs.JsonFileName}");
-        var content = _swaggerJsonString!;
-        const int maxRetries = 3;
-        for (var attempt = 1; attempt <= maxRetries; attempt++)
-        {
-            try
-            {
-                await File.WriteAllTextAsync(path, content, Encoding.UTF8);
-                await StepExecution.Current.AttachFile(m => m.CreateFromFile("openapi.json", path));
-                return;
-            }
-            catch (IOException) when (attempt < maxRetries)
-            {
-                await Task.Delay(500 * attempt);
-            }
-        }
+        var path = await ContractDocs.WriteAsync(OpenApiSpecs.JsonFileName, _swaggerJsonString!);
+        await StepExecution.Current.AttachFile(m => m.CreateFromFile(OpenApiSpecs.JsonFileName, path, removeOriginalFile: false));
     }
 
     #endregion

@@ -8,7 +8,7 @@ using Reqnroll;
 namespace BreakfastProvider.Tests.Component.ReqNRoll.StepDefinitions.Specifications;
 
 /// <summary>
-/// The contract pages and documents beyond OpenAPI: the AsyncAPI UI and the gRPC contract. What a When fetches goes
+/// The contract pages and documents beyond OpenAPI: the AsyncAPI UI, and the gRPC contract and its page. What a When fetches goes
 /// into the scenario's <see cref="SpecificationDocumentContext"/>, which the shared "the response should be valid"
 /// checks.
 /// </summary>
@@ -86,5 +86,44 @@ public class ContractSpecificationSteps(SpecificationDocumentContext context, IR
     {
         context.Document.Body.Should().Contain($"package {GrpcContractDefaults.Package};");
         context.Document.Body.Should().Contain($"service {GrpcContractDefaults.ServiceName}");
+    }
+
+    // ── gRPC UI ──
+
+    [When("the grpc ui endpoint is called")]
+    public async Task WhenTheGrpcUiEndpointIsCalled()
+    {
+        await context.Document.Retrieve(Endpoints.GrpcContract.UI);
+    }
+
+    [Then("the response should be a valid grpc documentation page")]
+    public void ThenTheResponseShouldBeAValidGrpcDocumentationPage()
+    {
+        context.Document.ResponseMessage!.StatusCode.Should().Be(HttpStatusCode.OK);
+        context.Document.ResponseMessage.Content.Headers.ContentType!.MediaType.Should().Be(MediaTypeNames.Text.Html);
+        context.Document.Body.Should().Contain("<html");
+    }
+
+    [Then("the page should describe every breakfast method")]
+    public void ThenThePageShouldDescribeEveryBreakfastMethod()
+    {
+        context.Document.Body.Should().Contain(GrpcContractDefaults.ServiceDescription);
+        GrpcContractPageRows.RowOf(context.Document.Body!, GrpcContractDefaults.GetRecipeSummary).Should().NotBeNull();
+        GrpcContractPageRows.RowOf(context.Document.Body!, GrpcContractDefaults.GetOrderStatus).Should().NotBeNull();
+        GrpcContractPageRows.RowOf(context.Document.Body!, GrpcContractDefaults.StreamOrderUpdates).Should().Contain(GrpcContractDefaults.ServerStreamingKind);
+    }
+
+    [Then("the page should link to the grpc contract")]
+    public void ThenThePageShouldLinkToTheGrpcContract()
+    {
+        context.Document.Body.Should().Contain($"href=\"{GrpcContractDefaults.ContractJsonLink}\"");
+        context.Document.Body.Should().Contain($"href=\"{GrpcContractDefaults.ProtoFileLink}\"");
+    }
+
+    [Then("the grpc ui page is written to disk")]
+    public async Task ThenTheGrpcUiPageIsWrittenToDisk()
+    {
+        var path = await context.Document.WriteToDocs(GrpcSpecs.HtmlFileName);
+        outputHelper.AddAttachment(path);
     }
 }

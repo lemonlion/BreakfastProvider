@@ -14,9 +14,11 @@ public static class GrpcContract
         new JsonFormatter(JsonFormatter.Settings.Default.WithIndentation("  ")).Format(Descriptors.Value));
     private static readonly Lazy<string> ProtoText = new(() =>
         ReadResource("Contracts.breakfast.proto").ReplaceLineEndings("\n"));
+    private static readonly Lazy<string> PageHtml = new(() => GrpcContractPage.Render(Descriptors.Value));
 
     public static string Json => JsonText.Value;
     public static string Proto => ProtoText.Value;
+    public static string Html => PageHtml.Value;
 
     private static FileDescriptorSet LoadDescriptorSet()
     {

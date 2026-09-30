@@ -58,6 +58,7 @@ public static class Endpoints
     {
         public const string ContractJson = "grpc/v1.json";
         public const string ProtoFile = "grpc/protos/breakfast.proto";
+        public const string UI = "grpc/";
     }
 
     public static class AsyncApi

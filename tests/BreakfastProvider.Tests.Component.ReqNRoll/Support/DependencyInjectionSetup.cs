@@ -20,12 +20,14 @@ using BreakfastProvider.Tests.Component.Shared.Common.RecipeReviews;
 using BreakfastProvider.Tests.Component.Shared.Common.IngredientWaste;
 using BreakfastProvider.Tests.Component.Shared.Common.ChefNotes;
 using BreakfastProvider.Tests.Component.Shared.Common.Reporting;
+using BreakfastProvider.Tests.Component.Shared.Common.Specifications;
 using BreakfastProvider.Tests.Component.Shared.Common.Reservations;
 using BreakfastProvider.Tests.Component.Shared.Common.Staff;
 using BreakfastProvider.Tests.Component.Shared.Common.Toppings;
 using BreakfastProvider.Tests.Component.Shared.Common.Waffles;
 using BreakfastProvider.Tests.Component.Shared.Fakes.Kafka;
 using BreakfastProvider.Tests.Component.Shared.Fakes.PubSub;
+using BreakfastProvider.Tests.Component.ReqNRoll.StepDefinitions.Specifications;
 using Microsoft.Extensions.DependencyInjection;
 using Reqnroll.Microsoft.Extensions.DependencyInjection;
 
@@ -104,6 +106,8 @@ public class DependencyInjectionSetup
         services.AddScoped<GetEquipmentReadingSteps>();
         services.AddScoped<DeleteEquipmentReadingSteps>();
         services.AddScoped<PublishOrderServedEventSteps>();
+        services.AddScoped<SpecificationDocumentSteps>();
+        services.AddScoped<SpecificationDocumentContext>();
         services.AddSingleton(AppManager.ConsumedKafkaMessageStore);
         services.AddSingleton(AppManager.ConsumedPubSubMessageStore);
 

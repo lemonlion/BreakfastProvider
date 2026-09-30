@@ -1,5 +1,4 @@
 using System.Net;
-using System.Text;
 using System.Text.Json;
 using BreakfastProvider.Tests.Component.Shared.Constants;
 using BreakfastProvider.Tests.Component.Shared.Util;
@@ -41,20 +40,7 @@ public class Specifications_Open_Api_Tests : BaseFixture
         await swaggerJson!.RootElement.GetProperty("paths").GetProperty(Endpoints.Swagger.AuditLogsPath).Should().NotBeNull();
 
         // And the openapi spec is written to disk as json
-        var path = $"{OpenApiSpecs.SpecificationsFolderPath}{OpenApiSpecs.JsonFileName}";
-        const int maxRetries = 3;
-        for (var attempt = 1; attempt <= maxRetries; attempt++)
-        {
-            try
-            {
-                await File.WriteAllTextAsync(path, swaggerJsonString, Encoding.UTF8);
-                Track.Attachment(path, "openapi.json");
-                return;
-            }
-            catch (IOException) when (attempt < maxRetries)
-            {
-                await Task.Delay(500 * attempt);
-            }
-        }
+        var path = await ContractDocs.WriteAsync(OpenApiSpecs.JsonFileName, swaggerJsonString);
+        Track.Attachment(path, OpenApiSpecs.JsonFileName);
     }
 }

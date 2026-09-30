@@ -1,5 +1,4 @@
 using System.Net;
-using System.Text;
 using System.Text.Json;
 using BreakfastProvider.Tests.Component.Shared.Constants;
 using BreakfastProvider.Tests.Component.Shared.Util;
@@ -55,20 +54,7 @@ public class Specifications_Async_Api_Tests : BaseFixture
         await asyncApiJson!.RootElement.GetProperty("components").Should().NotBeNull();
 
         // And the asyncapi spec is written to disk as json
-        var path = $"{AsyncApiSpecs.SpecificationsFolderPath}{AsyncApiSpecs.JsonFileName}";
-        const int writeRetries = 3;
-        for (var attempt = 1; attempt <= writeRetries; attempt++)
-        {
-            try
-            {
-                await File.WriteAllTextAsync(path, asyncApiJsonString, Encoding.UTF8);
-                Track.Attachment(path, "asyncapi.json");
-                return;
-            }
-            catch (IOException) when (attempt < writeRetries)
-            {
-                await Task.Delay(500 * attempt);
-            }
-        }
+        var path = await ContractDocs.WriteAsync(AsyncApiSpecs.JsonFileName, asyncApiJsonString!);
+        Track.Attachment(path, AsyncApiSpecs.JsonFileName);
     }
 }

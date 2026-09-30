@@ -1,5 +1,4 @@
 using System.Net;
-using System.Text;
 using System.Text.Json;
 using BreakfastProvider.Tests.Component.Shared.Constants;
 using BreakfastProvider.Tests.Component.Shared.Util;
@@ -82,21 +81,8 @@ public partial class Specifications__Async_Api_Feature : BaseFixture
 
     private async Task The_asyncapi_spec_is_written_to_disk_as_json()
     {
-        var path = Path.GetFullPath($"{AsyncApiSpecs.SpecificationsFolderPath}{AsyncApiSpecs.JsonFileName}");
-        const int maxRetries = 3;
-        for (var attempt = 1; attempt <= maxRetries; attempt++)
-        {
-            try
-            {
-                await File.WriteAllTextAsync(path, _asyncApiJsonString, Encoding.UTF8);
-                await StepExecution.Current.AttachFile(m => m.CreateFromFile("asyncapi.json", path));
-                return;
-            }
-            catch (IOException) when (attempt < maxRetries)
-            {
-                await Task.Delay(500 * attempt);
-            }
-        }
+        var path = await ContractDocs.WriteAsync(AsyncApiSpecs.JsonFileName, _asyncApiJsonString!);
+        await StepExecution.Current.AttachFile(m => m.CreateFromFile(AsyncApiSpecs.JsonFileName, path, removeOriginalFile: false));
     }
 
     #endregion

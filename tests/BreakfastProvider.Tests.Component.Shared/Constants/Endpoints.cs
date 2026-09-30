@@ -58,5 +58,6 @@ public static class Endpoints
     {
         private const string BasePath = "/asyncapi";
         public const string AsyncApiSpec = $"{BasePath}/v1.json";
+        public const string AsyncApiUI = BasePath;
     }
 }

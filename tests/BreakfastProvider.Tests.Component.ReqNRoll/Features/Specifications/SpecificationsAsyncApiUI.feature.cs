@@ -17,7 +17,7 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.Specifications
     
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Reqnroll", "3.0.0.0")]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    public partial class SpecificationsOpenApiFeature : object, Xunit.IClassFixture<SpecificationsOpenApiFeature.FixtureData>, Xunit.IAsyncLifetime
+    public partial class SpecificationsAsyncApiUIFeature : object, Xunit.IClassFixture<SpecificationsAsyncApiUIFeature.FixtureData>, Xunit.IAsyncLifetime
     {
         
         private global::Reqnroll.ITestRunner testRunner;
@@ -26,13 +26,12 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.Specifications
         
         private static string[] featureTags = ((string[])(null));
         
-        private static global::Reqnroll.FeatureInfo featureInfo = new global::Reqnroll.FeatureInfo(new global::System.Globalization.CultureInfo("en-US"), "Features/Specifications", "Specifications Open Api", "    /openapi/v1.json - Serving the OpenAPI specification describing all REST endp" +
-                "oints", global::Reqnroll.ProgrammingLanguage.CSharp, featureTags, InitializeCucumberMessages());
+        private static global::Reqnroll.FeatureInfo featureInfo = new global::Reqnroll.FeatureInfo(new global::System.Globalization.CultureInfo("en-US"), "Features/Specifications", "Specifications Async Api UI", "    /asyncapi - Serving the AsyncAPI documentation UI", global::Reqnroll.ProgrammingLanguage.CSharp, featureTags, InitializeCucumberMessages());
         
-#line 1 "SpecificationsOpenApi.feature"
+#line 1 "SpecificationsAsyncApiUI.feature"
 #line hidden
         
-        public SpecificationsOpenApiFeature(SpecificationsOpenApiFeature.FixtureData fixtureData, Xunit.ITestOutputHelper testOutputHelper)
+        public SpecificationsAsyncApiUIFeature(SpecificationsAsyncApiUIFeature.FixtureData fixtureData, Xunit.ITestOutputHelper testOutputHelper)
         {
             this._testOutputHelper = testOutputHelper;
         }
@@ -106,7 +105,7 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.Specifications
         
         private static global::Reqnroll.Formatters.RuntimeSupport.FeatureLevelCucumberMessages InitializeCucumberMessages()
         {
-            return new global::Reqnroll.Formatters.RuntimeSupport.FeatureLevelCucumberMessages("Features/Specifications/SpecificationsOpenApi.feature.ndjson", 3);
+            return new global::Reqnroll.Formatters.RuntimeSupport.FeatureLevelCucumberMessages("Features/Specifications/SpecificationsAsyncApiUI.feature.ndjson", 3);
         }
         
         async System.Threading.Tasks.ValueTask Xunit.IAsyncLifetime.InitializeAsync()
@@ -134,17 +133,17 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.Specifications
             await this.TestTearDownAsync();
         }
         
-        [global::Xunit.FactAttribute(DisplayName="The OpenApi endpoint should return a valid specification")]
-        [global::Xunit.TraitAttribute("FeatureTitle", "Specifications Open Api")]
-        [global::Xunit.TraitAttribute("Description", "The OpenApi endpoint should return a valid specification")]
+        [global::Xunit.FactAttribute(DisplayName="The AsyncApi UI endpoint should return a valid page")]
+        [global::Xunit.TraitAttribute("FeatureTitle", "Specifications Async Api UI")]
+        [global::Xunit.TraitAttribute("Description", "The AsyncApi UI endpoint should return a valid page")]
         [global::Xunit.TraitAttribute("Category", "happy-path")]
-        public async global::System.Threading.Tasks.Task TheOpenApiEndpointShouldReturnAValidSpecification()
+        public async global::System.Threading.Tasks.Task TheAsyncApiUIEndpointShouldReturnAValidPage()
         {
             string[] tagsOfScenario = new string[] {
                     "happy-path"};
             global::System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new global::System.Collections.Specialized.OrderedDictionary();
             string pickleIndex = "0";
-            global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("The OpenApi endpoint should return a valid specification", null, tagsOfScenario, argumentsOfScenario, featureTags, pickleIndex);
+            global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("The AsyncApi UI endpoint should return a valid page", null, tagsOfScenario, argumentsOfScenario, featureTags, pickleIndex);
             string[] tagsOfRule = ((string[])(null));
             global::Reqnroll.RuleInfo ruleInfo = null;
 #line 5
@@ -158,16 +157,10 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.Specifications
             {
                 await this.ScenarioStartAsync();
 #line 6
-        await testRunner.WhenAsync("the open api endpoint is called", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
+        await testRunner.WhenAsync("the asyncapi ui endpoint is called", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
 #line hidden
 #line 7
-        await testRunner.ThenAsync("the response should be valid", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
-#line hidden
-#line 8
-        await testRunner.AndAsync("the response should contain all the endpoints", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
-#line hidden
-#line 9
-        await testRunner.AndAsync("the openapi spec is written to disk", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
+        await testRunner.ThenAsync("the response should be a valid asyncapi page", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
 #line hidden
             }
             await this.ScenarioCleanupAsync();
@@ -180,12 +173,12 @@ namespace BreakfastProvider.Tests.Component.ReqNRoll.Features.Specifications
             
             async System.Threading.Tasks.ValueTask Xunit.IAsyncLifetime.InitializeAsync()
             {
-                await SpecificationsOpenApiFeature.FeatureSetupAsync();
+                await SpecificationsAsyncApiUIFeature.FeatureSetupAsync();
             }
             
             async System.Threading.Tasks.ValueTask System.IAsyncDisposable.DisposeAsync()
             {
-                await SpecificationsOpenApiFeature.FeatureTearDownAsync();
+                await SpecificationsAsyncApiUIFeature.FeatureTearDownAsync();
             }
         }
     }

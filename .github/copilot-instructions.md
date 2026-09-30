@@ -129,7 +129,7 @@ Comprehensive testing conventions, patterns, and infrastructure are documented i
 ## API Conventions
 
 - Route prefix: `/` (e.g. `/pancakes`, `/waffles`, `/orders`, `/eggs`, `/milk`, `/flour`, `/toppings`, `/menu`, `/daily-specials`, `/health`, `/graphql`)
-- Swagger/OpenAPI via Swashbuckle
+- OpenAPI via Microsoft.AspNetCore.OpenApi (`/openapi/v1.json`), rendered by Scalar (`/scalar/v1`)
 - Standard REST conventions: POST for creation, GET for retrieval, PATCH for updates, DELETE for removal
 - Validation returns 400 Bad Request with ProblemDetails
 - Downstream errors return 502 Bad Gateway with ProblemDetails
@@ -167,9 +167,9 @@ Comprehensive testing conventions, patterns, and infrastructure are documented i
 - **Grafana** (`docker-compose-grafana.yml`) runs alongside all Docker modes with auto-provisioned Prometheus and Jaeger datasources and Breakfast Provider dashboard. Anonymous admin auth, no login required. Accessible at `http://localhost:3000`.
 - **Jaeger** (`docker-compose-jaeger.yml`) runs alongside all Docker modes, collecting distributed traces via OTLP. Jaeger UI accessible at `http://localhost:16686`.
 - Generated documentation outputs:
-  - `ComponentSpecificationsWithExamples.html` — with PlantUML interaction diagrams (for DevPortal)
-  - `ComponentSpecifications.yml` — plain YAML spec (source-controlled in `/docs/`)
-  - `FeaturesReport.html` — full report with test run details
+  - `Specifications.html` — with PlantUML interaction diagrams
+  - `Specifications.yml` — plain YAML spec (source-controlled in `/docs/`)
+  - `TestRunReport.html` — full report with test run details
 
 ### Convenience Scripts
 

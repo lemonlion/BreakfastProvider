@@ -433,4 +433,18 @@ jobs:
             echo "matching=no" >> $GITHUB_OUTPUT
           fi
 
-
+      # Pages publishes the contracts committed in docs/. Every in-memory lane has just rewritten them from the
+      # service, and all six suites write the same bytes, so a difference means docs/ is stale. Last, because a
+      # failed step skips every later step whose if: has no status function.
+      - name: Check the committed contracts match the service
+        if: ${{ !cancelled() && inputs.test-type == 'component' && inputs.test-run-type == 'memory' }}
+        run: |
+          contracts="docs/openapi.json docs/asyncapi.json docs/grpc.json docs/grpc.html docs/graphql.json docs/schema.graphql"
+          changed=$(git status --porcelain -- $contracts)
+          if [ -n "$changed" ]; then
+            echo "$changed"
+            git --no-pager diff --stat -- $contracts
+            echo "::error title=Stale contracts::docs/ does not match what the service serves. Run any component suite in memory and commit docs/."
+            exit 1
+          fi
+          echo "The committed contracts match the service."

@@ -216,7 +216,7 @@ jobs:
       # is a regression, has been failing since a particular run, or flips. A pull request build reads against
       # the branch it targets (Kronikol reads GITHUB_BASE_REF itself).
       - name: Read the history ledger
-        uses: lemonlion/Kronikol/templates/github-actions/kronikol-history/read@v4.9.0
+        uses: lemonlion/Kronikol/templates/github-actions/kronikol-history/read@v4.9.1
 
       - name: Build TUnit project
         run: >
@@ -238,7 +238,7 @@ jobs:
       # suites report with (KronikolHistory.WithCrossRunHistory).
       - name: History gate
         if: ${{ !cancelled() }}
-        uses: lemonlion/Kronikol/templates/github-actions/kronikol-history/gate@v4.9.0
+        uses: lemonlion/Kronikol/templates/github-actions/kronikol-history/gate@v4.9.1
         with:
           reports: ${{ steps.history-reports-dir.outputs.dir }}
           test-outcome: ${{ steps.tests.outcome }}
@@ -248,7 +248,7 @@ jobs:
       # into the ledger. A pull request's run is read against the ledger, never recorded.
       - name: Save the history fragment
         if: ${{ !cancelled() && github.event_name != 'pull_request' }}
-        uses: lemonlion/Kronikol/templates/github-actions/kronikol-history/save@v4.9.0
+        uses: lemonlion/Kronikol/templates/github-actions/kronikol-history/save@v4.9.1
         with:
           path: ${{ steps.history-reports-dir.outputs.dir }}
           name: ${{ inputs.test-run-description }}

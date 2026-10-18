@@ -1,7 +1,9 @@
 using System.Text.Json;
+using BreakfastProvider.Tests.Component.Shared.Fakes.HttpFakes;
 using BreakfastProvider.Tests.Component.Shared.Fakes.Kafka;
 using BreakfastProvider.Tests.Component.Shared.Models.RecipeCosts;
 using Confluent.Kafka;
+using Kronikol.Constants;
 using Kronikol.Tracking;
 
 namespace BreakfastProvider.Tests.Component.Shared.Common.RecipeCosts;
@@ -27,7 +29,12 @@ public class PublishRecipeCostEventSteps(
             CalculatedAt = DateTime.UtcNow
         };
 
-        using (TestIdentityScope.Begin("RecipeCostTest", context.RequestId))
+        // The in-memory consumer handles the message synchronously inside these scopes, so the BigQuery / gRPC /
+        // Kitchen arrows are attributed to this test with no HTTP request in flight, and the Kitchen fake files
+        // its request under the request id the Then step looks it up by.
+        var test = context.CurrentTest;
+        using (TestIdentityScope.Begin(test.Name, test.Id))
+        using (ComponentTestRequestIdScope.Begin(context.RequestId))
         {
             var message = new Message<string, string>
             {
@@ -35,8 +42,8 @@ public class PublishRecipeCostEventSteps(
                 Value = JsonSerializer.Serialize(@event),
                 Headers = new Headers
                 {
-                    { "kronikol-test-name", System.Text.Encoding.UTF8.GetBytes("RecipeCostTest") },
-                    { "kronikol-test-id", System.Text.Encoding.UTF8.GetBytes(context.RequestId) }
+                    { TestTrackingMessageHeaders.TestName, System.Text.Encoding.UTF8.GetBytes(test.Name) },
+                    { TestTrackingMessageHeaders.TestId, System.Text.Encoding.UTF8.GetBytes(test.Id) }
                 }
             };
 

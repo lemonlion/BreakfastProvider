@@ -1,6 +1,5 @@
 using BreakfastProvider.Tests.Component.Shared.Constants;
 using Microsoft.AspNetCore.Http;
-using Kronikol.Tracking;
 
 namespace BreakfastProvider.Tests.Component.Shared.Fakes.HttpFakes;
 
@@ -14,8 +13,8 @@ public class RequestCapturingHandler(
         var requestId = httpContextAccessor.HttpContext?.Request.Headers[CustomHeaders.ComponentTestRequestId]
             .FirstOrDefault();
 
-        // Fallback: use TestIdentityScope for event-driven flows (no HTTP context)
-        requestId ??= TestIdentityScope.Current?.Id;
+        // Fallback for event-driven flows (no HTTP context): the id the publishing step set
+        requestId ??= ComponentTestRequestIdScope.Current;
 
         if (requestId != null)
         {

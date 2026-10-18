@@ -1,7 +1,9 @@
 using System.Text.Json;
+using BreakfastProvider.Tests.Component.Shared.Fakes.HttpFakes;
 using BreakfastProvider.Tests.Component.Shared.Fakes.Kafka;
 using BreakfastProvider.Tests.Component.Shared.Models.ServiceTimes;
 using Confluent.Kafka;
+using Kronikol.Constants;
 using Kronikol.Tracking;
 
 namespace BreakfastProvider.Tests.Component.Shared.Common.ServiceTimes;
@@ -28,9 +30,12 @@ public class PublishOrderServedEventSteps(
             ServedAt = DateTime.UtcNow
         };
 
-        // The in-memory consumer handles the message synchronously inside this scope, so the
-        // ClickHouse / gRPC / Kitchen arrows are attributed to this test with no HTTP request in flight.
-        using (TestIdentityScope.Begin("ServiceTimeTest", context.RequestId))
+        // The in-memory consumer handles the message synchronously inside these scopes, so the
+        // ClickHouse / gRPC / Kitchen arrows are attributed to this test with no HTTP request in flight,
+        // and the Kitchen fake files its request under the request id the Then step looks it up by.
+        var test = context.CurrentTest;
+        using (TestIdentityScope.Begin(test.Name, test.Id))
+        using (ComponentTestRequestIdScope.Begin(context.RequestId))
         {
             var message = new Message<string, string>
             {
@@ -38,8 +43,8 @@ public class PublishOrderServedEventSteps(
                 Value = JsonSerializer.Serialize(@event),
                 Headers = new Headers
                 {
-                    { "kronikol-test-name", System.Text.Encoding.UTF8.GetBytes("ServiceTimeTest") },
-                    { "kronikol-test-id", System.Text.Encoding.UTF8.GetBytes(context.RequestId) }
+                    { TestTrackingMessageHeaders.TestName, System.Text.Encoding.UTF8.GetBytes(test.Name) },
+                    { TestTrackingMessageHeaders.TestId, System.Text.Encoding.UTF8.GetBytes(test.Id) }
                 }
             };
 

@@ -28,6 +28,7 @@ using BreakfastProvider.Tests.Component.Shared.Common.Waffles;
 using BreakfastProvider.Tests.Component.Shared.Fakes.Kafka;
 using BreakfastProvider.Tests.Component.Shared.Fakes.PubSub;
 using BreakfastProvider.Tests.Component.ReqNRoll.StepDefinitions.Specifications;
+using Kronikol.ReqNRoll;
 using Microsoft.Extensions.DependencyInjection;
 using Reqnroll.Microsoft.Extensions.DependencyInjection;
 
@@ -49,7 +50,7 @@ public class DependencyInjectionSetup
         services.AddScoped(sp =>
         {
             var appManager = sp.GetRequiredService<AppManager>();
-            return new RequestContext(() => appManager.Client, appManager.RequestId);
+            return new RequestContext(() => appManager.Client, appManager.RequestId, CurrentTestInfo.Fetcher);
         });
 
         services.AddScoped<GetMilkSteps>();

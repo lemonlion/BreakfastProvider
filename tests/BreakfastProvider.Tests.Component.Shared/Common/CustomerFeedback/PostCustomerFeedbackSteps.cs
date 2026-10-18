@@ -1,4 +1,5 @@
 using System.Text.Json;
+using BreakfastProvider.Tests.Component.Shared.Fakes.HttpFakes;
 using BreakfastProvider.Tests.Component.Shared.Fakes.PubSub;
 using BreakfastProvider.Tests.Component.Shared.Models.CustomerFeedback;
 using Kronikol.Tracking;
@@ -26,7 +27,12 @@ public class PublishCustomerFeedbackEventSteps(
             ReceivedAt = DateTime.UtcNow
         };
 
-        using (TestIdentityScope.Begin("CustomerFeedbackTest", context.RequestId))
+        // The in-memory consumer handles the event synchronously inside these scopes, so the MongoDB / gRPC /
+        // Supplier arrows are attributed to this test with no HTTP request in flight, and the Supplier fake
+        // files its request under the request id the Then step looks it up by.
+        var test = context.CurrentTest;
+        using (TestIdentityScope.Begin(test.Name, test.Id))
+        using (ComponentTestRequestIdScope.Begin(context.RequestId))
         {
             pubSubStore.Add(@event, "CustomerFeedbackReceivedEvent");
         }

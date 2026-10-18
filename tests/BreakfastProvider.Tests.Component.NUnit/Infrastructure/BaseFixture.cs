@@ -108,7 +108,7 @@ public abstract class BaseFixture : DiagrammedComponentTest, IDisposable
         var services = new ServiceCollection();
         services.AddSingleton(Settings);
         services.AddSingleton(FakeRequestStore);
-        services.AddSingleton(new RequestContext(() => Client, RequestId));
+        services.AddSingleton(new RequestContext(() => Client, RequestId, CurrentTestInfo.Fetcher));
 
         services.AddTransient<GetMilkSteps>();
         services.AddTransient<GetEggsSteps>();

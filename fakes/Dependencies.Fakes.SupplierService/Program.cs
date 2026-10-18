@@ -21,6 +21,8 @@ public class Program
             };
         });
 
+        app.MapPost("/ingredients/feedback", () => Results.Ok(new { Status = "Received" }));
+
         app.Run();
     }
 }

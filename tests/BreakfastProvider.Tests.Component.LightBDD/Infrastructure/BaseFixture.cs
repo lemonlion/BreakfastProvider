@@ -116,7 +116,7 @@ public abstract class BaseFixture : FeatureFixture, IDisposable, IIgnorable<Comp
         var services = new ServiceCollection();
         services.AddSingleton(Settings);
         services.AddSingleton(FakeRequestStore);
-        services.AddSingleton(new RequestContext(() => Client, RequestId));
+        services.AddSingleton(new RequestContext(() => Client, RequestId, CurrentTestInfo.Fetcher));
 
         // Step classes — transient so each Get<T>() returns a fresh instance
         services.AddTransient<GetMilkSteps>();

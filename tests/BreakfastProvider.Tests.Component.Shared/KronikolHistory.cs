@@ -36,6 +36,11 @@ public static class KronikolHistory
         // github-test-reporter step of the workflow.
         options.GenerateCtrfReport = true;
 
+        // One lane writes its data file compressed, as TestRunReport.krkl, first (Kronikol's REPORT_FORMAT_PLAN.md
+        // 6.2): CI turns it on for that lane alone. kronikol query, the history gate and merge read it as they read
+        // the JSON, and `kronikol decode` writes the JSON out for anything that needs it.
+        options.CompressTestRunReport = Environment.GetEnvironmentVariable("KRONIKOL_COMPRESS_TEST_RUN_REPORT") == "true";
+
         return options;
     }
 }

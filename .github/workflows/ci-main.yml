@@ -33,7 +33,6 @@ jobs:
       test-type: component
       test-run-type: memory
       test-run-description: lightbdd-in-memory
-      compress-test-run-report: "true"
       csproj-path: ./tests/BreakfastProvider.Tests.Component.LightBDD/BreakfastProvider.Tests.Component.LightBDD.csproj
       features-report-path: tests/BreakfastProvider.Tests.Component.LightBDD/bin/Debug/net10.0/Reports/TestRunReport.html
     secrets: inherit
@@ -585,7 +584,7 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: lemonlion/Kronikol/templates/github-actions/kronikol-history/record@v4.32.0
+      - uses: lemonlion/Kronikol/templates/github-actions/kronikol-history/record@v5.0.0
         with:
           token: ${{ secrets.PUSH_SPECS_IN_CI_TOKEN != '' && secrets.PUSH_SPECS_IN_CI_TOKEN || github.token }}
 

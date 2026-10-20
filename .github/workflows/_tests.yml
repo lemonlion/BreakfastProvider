@@ -11,14 +11,11 @@ on:
       features-report-path: { type: string, required: false, default: "tests/BreakfastProvider.Tests.Component.LightBDD/bin/Debug/net10.0/Reports/TestRunReport.html" }
       runs-on: { type: string, required: false, default: "ubuntu-24.04" }
       component-specifications-filename: { type: string, required: false, default: "Specifications" }
-      # "true" writes the run's data file compressed, as TestRunReport.krkl (Kronikol 4.32.0, CompressTestRunReport).
-      compress-test-run-report: { type: string, required: false, default: "false" }
 
 env:
   BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
   # One cross-run history stream per suite and per lane (see KronikolHistory.WithCrossRunHistory).
   KRONIKOL_SUITE: ${{ inputs.test-run-description }}
-  KRONIKOL_COMPRESS_TEST_RUN_REPORT: ${{ inputs.compress-test-run-report }}
 
 jobs:
   run-tests:
@@ -272,7 +269,7 @@ jobs:
       # the branch it targets (Kronikol reads GITHUB_BASE_REF itself).
       - name: Read the history ledger
         if: ${{ inputs.test-type == 'component' }}
-        uses: lemonlion/Kronikol/templates/github-actions/kronikol-history/read@v4.32.0
+        uses: lemonlion/Kronikol/templates/github-actions/kronikol-history/read@v5.0.0
 
       - name: Install dotnet-coverage tool
         run: dotnet tool install --global dotnet-coverage
@@ -299,7 +296,7 @@ jobs:
       # is the bar the suites report with (KronikolHistory.WithCrossRunHistory).
       - name: History gate
         if: ${{ !cancelled() && inputs.test-type == 'component' }}
-        uses: lemonlion/Kronikol/templates/github-actions/kronikol-history/gate@v4.32.0
+        uses: lemonlion/Kronikol/templates/github-actions/kronikol-history/gate@v5.0.0
         with:
           reports: ${{ steps.reports-dir.outputs.dir }}
           test-outcome: ${{ steps.tests.outcome }}
@@ -309,7 +306,7 @@ jobs:
       # into the ledger. A pull request's run is read against the ledger, never recorded.
       - name: Save the history fragment
         if: ${{ !cancelled() && inputs.test-type == 'component' && github.event_name != 'pull_request' }}
-        uses: lemonlion/Kronikol/templates/github-actions/kronikol-history/save@v4.32.0
+        uses: lemonlion/Kronikol/templates/github-actions/kronikol-history/save@v5.0.0
         with:
           path: ${{ steps.reports-dir.outputs.dir }}
           name: ${{ inputs.test-run-description }}

@@ -53,7 +53,7 @@ public static class ServiceCollectionExtensions
                     {
                         ServiceName = Documentation.ServiceNames.CosmosDb,
                         CallerName = Documentation.ServiceNames.BreakfastProvider,
-                        Verbosity = CosmosTrackingVerbosity.Summarised,
+                        Verbosity = CosmosTrackingVerbosity.Detailed,
                         CurrentTestInfoFetcher = _currentTestInfoFetcher
                     },
                     fakeHandler,
@@ -74,7 +74,7 @@ public static class ServiceCollectionExtensions
         {
             ServiceName = Documentation.ServiceNames.CosmosDb,
             CallerName = Documentation.ServiceNames.BreakfastProvider,
-            Verbosity = CosmosTrackingVerbosity.Summarised,
+            Verbosity = CosmosTrackingVerbosity.Detailed,
             CurrentTestInfoFetcher = currentTestInfoFetcher
         };
 
@@ -354,7 +354,7 @@ public static class ServiceCollectionExtensions
             ServiceName = Documentation.ServiceNames.EventGrid,
             UseHttpContextCorrelation = true,
             CurrentTestInfoFetcher = currentTestInfoFetcher,
-            Verbosity = MessageTrackerVerbosity.Summarised
+            Verbosity = MessageTrackerVerbosity.Detailed
         });
 
         services.DecorateAll<IOutboxWriter>((sp, inner) =>
@@ -376,7 +376,7 @@ public static class ServiceCollectionExtensions
         {
             ServiceName = Documentation.ServiceNames.KafkaBroker,
             CallerName = Documentation.ServiceNames.BreakfastProvider,
-            Verbosity = KafkaTrackingVerbosity.Summarised,
+            Verbosity = KafkaTrackingVerbosity.Detailed,
             CurrentTestInfoFetcher = currentTestInfoFetcher
         };
 
@@ -570,7 +570,7 @@ public static class ServiceCollectionExtensions
                 {
                     ServiceName = Documentation.ServiceNames.ReportingDatabase,
                     CallerName = Documentation.ServiceNames.BreakfastProvider,
-                    Verbosity = SqlTrackingVerbosity.Summarised
+                    Verbosity = SqlTrackingVerbosity.Detailed
                 },
                 new HttpContextAccessor()))
             .Options;
@@ -663,7 +663,7 @@ public static class ServiceCollectionExtensions
                 {
                     ServiceName = Documentation.ServiceNames.BreakfastDatabase,
                     CallerName = Documentation.ServiceNames.BreakfastProvider,
-                    Verbosity = SqlTrackingVerbosity.Summarised
+                    Verbosity = SqlTrackingVerbosity.Detailed
                 },
                 new HttpContextAccessor()))
             .Options;
@@ -1084,7 +1084,7 @@ public static class ServiceCollectionExtensions
                     {
                         ServiceName = Documentation.ServiceNames.ReportingDatabase,
                         CallerName = Documentation.ServiceNames.BreakfastProvider,
-                        Verbosity = SqlTrackingVerbosity.Summarised
+                        Verbosity = SqlTrackingVerbosity.Detailed
                     },
                     sp.GetRequiredService<IHttpContextAccessor>()))
                 .Options;
@@ -1127,7 +1127,7 @@ public static class ServiceCollectionExtensions
                     {
                         ServiceName = Documentation.ServiceNames.BreakfastDatabase,
                         CallerName = Documentation.ServiceNames.BreakfastProvider,
-                        Verbosity = SqlTrackingVerbosity.Summarised
+                        Verbosity = SqlTrackingVerbosity.Detailed
                     },
                     sp.GetRequiredService<IHttpContextAccessor>()))
                 .Options;

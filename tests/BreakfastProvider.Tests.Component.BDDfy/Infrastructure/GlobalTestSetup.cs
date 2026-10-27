@@ -61,7 +61,7 @@ public class GlobalTestSetup : IAsyncLifetime
             TestRunReportTitle = "Breakfast Provider (BDDfy) Test Run Report",
             WriteCiSummary = true,
             ExcludedHeaders = [CustomHeaders.ComponentTestRequestId, CustomHeaders.CorrelationId]
-        }.WithCrossRunHistory("BDDfy"));
+        }.WithCrossRunHistory("BDDfy").WithParties(Settings));
 
         await SourceControlledDocsHelper.CopySpecificationsFileToDocsFolder();
         await SourceControlledDocsHelper.CopyApiSpecificationFilesToDocsFolder();

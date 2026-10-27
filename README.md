@@ -957,3 +957,29 @@ git fetch origin kronikol-history && git show FETCH_HEAD:history.jsonl > history
 kronikol query history <reports-dir> --history history.jsonl                 # dotnet tool install -g Kronikol.Tool
 kronikol history gate  <reports-dir> --history history.jsonl --min-runs 3    # exit 1 on a new failure, flaky read out
 ```
+
+## Real dependencies and test doubles
+
+Every component run tells Kronikol which service the tests are about (`breakfast-provider`) and, for each
+dependency, whether its own software answered or something stood in for it. `KronikolParties.WithParties`
+(`tests/BreakfastProvider.Tests.Component.Shared`) works this out from the same `RunWithAnInMemory*` flags that
+pick the lane, so the answer changes with the lane:
+
+| Dependency | In memory | In docker |
+|---|---|---|
+| Breakfast and Reporting databases (SQL Server), MongoDB, ClickHouse, Kafka | test double (in-process fake) | real (the product's own image) |
+| Cosmos DB, Spanner, Pub/Sub, BigQuery, Event Hubs, Event Grid | test double (in-process fake) | test double (an emulator or simulator) |
+| Cow, Goat, Supplier, Kitchen and Notification services | test double (the `fakes/` projects, in process) | test double (the same fakes, in containers) |
+
+Against an external SUT only the service and the test client are declared: its calls to its dependencies happen inside its own
+container, so the report never sees them.
+
+A test double is drawn with «test double» under its name in the sequence and component diagrams, and each note
+says what answered (`CosmosDB.InMemoryEmulator in process`, `MongoDB in docker`). To list them for a run:
+
+```bash
+kronikol query parties <reports-dir>                 # every party, its kind and how it is known
+kronikol query parties <reports-dir> --kind double   # only the stand-ins
+```
+
+The service id also goes on the history ledger's run line and into `ctrf-report.json` as `environment.appName`.

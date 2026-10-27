@@ -55,7 +55,7 @@ public sealed class TestRunHooks
                 TestRunReportTitle = "Breakfast Provider (ReqNRoll) Test Run Report",
                 WriteCiSummary = true,
                 ExcludedHeaders = [CustomHeaders.ComponentTestRequestId, CustomHeaders.CorrelationId]
-            }.WithCrossRunHistory("ReqNRoll"));
+            }.WithCrossRunHistory("ReqNRoll").WithParties(Support.AppManager.Settings));
 
         Support.AppManager.DisposeFactory();
         SourceControlledDocsHelper.CopySpecificationsFileToDocsFolder().GetAwaiter().GetResult();

@@ -723,6 +723,10 @@ Component tests generate an HTML specification report with embedded PlantUML seq
 3. **`TestRunReport.html`** — full report with test run details (for analysis)
 4. **`Failures.md`** — every failure in context; read this (or `kronikol query`) rather than opening the report
 
+### Parties: real or test double
+
+Every framework's options chain `.WithCrossRunHistory(...).WithParties(Settings)` (`KronikolParties.cs` in the Shared project). It sets `ServiceId = "breakfast-provider"`, declares `Breakfast Provider` as the service under test and `Caller` (the test client's default name) as the test and, unless the run targets an external SUT, declares each dependency from its `RunWithAnInMemory*` flag: SQL Server, MongoDB, ClickHouse and Kafka are `Real` in docker, everything else is a `Double` on every lane, and the note says what answered. Names must match the calls exactly (`Documentation.ServiceNames`, and the labels in `TestHttpClientFactory`); a name no call carries is a Kronikol diagnostic, so a new dependency or a renamed participant needs a line here too. Check a run with `kronikol query parties <reports-dir>`.
+
 ### Redaction Pipeline
 
 `HtmlDocumentHelpers.cs` chains transformations to redact sensitive data from PlantUML diagrams. When a new value appears unredacted, add a new `Regex` field and chain a redaction call.

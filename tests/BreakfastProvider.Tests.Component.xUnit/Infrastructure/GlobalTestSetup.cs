@@ -69,7 +69,7 @@ public class GlobalTestSetup : IAsyncLifetime
                 TestRunReportTitle = "Breakfast Provider (xUnit3) Test Run Report",
                 WriteCiSummary = true,
                 ExcludedHeaders = [CustomHeaders.ComponentTestRequestId, CustomHeaders.CorrelationId]
-            }.WithCrossRunHistory("xUnit3"));
+            }.WithCrossRunHistory("xUnit3").WithParties(Settings));
 
         await SourceControlledDocsHelper.CopySpecificationsFileToDocsFolder();
         await SourceControlledDocsHelper.CopyApiSpecificationFilesToDocsFolder();

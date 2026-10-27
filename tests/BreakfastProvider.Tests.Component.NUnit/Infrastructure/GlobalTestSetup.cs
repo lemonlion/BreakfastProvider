@@ -73,7 +73,7 @@ public class GlobalTestSetup : DiagrammedTestRun
                 TestRunReportTitle = "Breakfast Provider (NUnit) Test Run Report",
                 WriteCiSummary = true,
                 ExcludedHeaders = [CustomHeaders.ComponentTestRequestId, CustomHeaders.CorrelationId]
-            }.WithCrossRunHistory("NUnit"));
+            }.WithCrossRunHistory("NUnit").WithParties(Settings));
 
         await SourceControlledDocsHelper.CopySpecificationsFileToDocsFolder();
         await SourceControlledDocsHelper.CopyApiSpecificationFilesToDocsFolder();
